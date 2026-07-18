@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
+import me.mykindos.betterpvp.clans.clans.chat.ClanChatChannel;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
@@ -31,6 +33,8 @@ import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
+import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -41,6 +45,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
+import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -49,8 +54,8 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -60,14 +65,13 @@ import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.minecraft.world.level.gamerules.GameRuleMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -82,8 +86,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
@@ -139,15 +145,18 @@ public class ClanEventListener extends ClanListener {
         }
 
         final String stringChunk = UtilWorld.chunkToPrettyString(chunk);
-        UtilMessage.message(player, "clans.prefix", "clans.command.clan.claim.success-self", Component.text(stringChunk, NamedTextColor.YELLOW));
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.claim.success-self",
+                Component.text(stringChunk, NamedTextColor.YELLOW)
+        );
 
         clan.getMembers().forEach(member -> {
             if (member.getUuid().equals(player.getUniqueId())) return;
-            Player clanPlayer = Bukkit.getPlayer(member.getUuid());
-            if (clanPlayer != null) {
-                UtilMessage.message(clanPlayer, "clans.prefix", "clans.command.clan.claim.success-clan",
-                        Component.text(player.getName(), NamedTextColor.YELLOW),
-                        Component.text(stringChunk, NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.claim.success-clan",
+                        this.clanManager.getPlayerName(ClanRelation.SELF, player),
+                        Component.text(stringChunk, NamedTextColor.YELLOW)
+                );
             }
         });
 
@@ -174,7 +183,9 @@ public class ClanEventListener extends ClanListener {
                 return; // Allow the core to be unclaimed if it is the only territory and the player is in the clan
             }
 
-            UtilMessage.message(player, "clans.prefix", "clans.command.clan.unclaim.core-fail", Component.text(UtilWorld.chunkToPrettyString(chunk), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.unclaim.core-fail",
+                    Component.text(UtilWorld.chunkToPrettyString(chunk), NamedTextColor.YELLOW)
+            );
 
             if (selfClan) {
                 UtilMessage.message(player, "clans.prefix", "clans.command.clan.unclaim.core-self-fail");
@@ -232,15 +243,18 @@ public class ClanEventListener extends ClanListener {
         final String chunkString = UtilWorld.chunkToFile(chunk);
         final String chunkToPrettyString = UtilWorld.chunkToPrettyString(chunk);
 
-        UtilMessage.message(player, "clans.prefix", "clans.command.clan.unclaim.success-self", Component.text(chunkToPrettyString, NamedTextColor.YELLOW));
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.unclaim.success-self",
+                Component.text(chunkToPrettyString, NamedTextColor.YELLOW)
+        );
 
         targetClan.getMembers().forEach(member -> {
             if (member.getUuid().equals(player.getUniqueId())) return;
-            Player clanPlayer = Bukkit.getPlayer(member.getUuid());
-            if (clanPlayer != null) {
-                UtilMessage.message(clanPlayer, "clans.prefix", "clans.command.clan.unclaim.success-clan",
-                        Component.text(player.getName(), NamedTextColor.YELLOW),
-                        Component.text(chunkToPrettyString, NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.unclaim.success-clan",
+                        this.clanManager.getPlayerName(ClanRelation.SELF, player),
+                        Component.text(chunkToPrettyString, NamedTextColor.YELLOW)
+                );
             }
         });
         this.clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
@@ -295,7 +309,10 @@ public class ClanEventListener extends ClanListener {
         clan.saveProperty(ClanProperty.BALANCE, 0);
         clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
 
-        UtilMessage.message(player, "clans.prefix", "clans.command.clan.create.success", Component.text(clan.getName(), NamedTextColor.AQUA));
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.create.success",
+                this.clanManager.getClanShortName(ClanRelation.SELF, clan)
+        );
+
         log.info("{} ({}) created {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
                 .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
         clientManager.incrementStat(player, ClientStat.CLANS_CLAN_CREATE, 1);
@@ -304,84 +321,84 @@ public class ClanEventListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanDisband(final ClanDisbandEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
 
         final Clan clan = event.getClan();
 
-        for (final ClanAlliance alliance : clan.getAlliances()) {
-            alliance.getClan().getAlliances().removeIf(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
+        /*
+         * Build a function that lazily creates the enemy dominance component for a
+         * viewer's clan. The enemy list is sorted and the function chain is built once,
+         * while viewer-specific clan relations are resolved when the function is applied.
+         */
+        Function<IClan, Component> enemyDominanceComponentFunction = viewerClan -> Component.empty();
+
+        final List<ClanEnemy> clanEnemyList = clan.getEnemies().stream().sorted(Comparator.comparingDouble(ClanEnemy::getDominance)).toList();
+
+        for (final ClanEnemy clanEnemy : clanEnemyList) {
+            final Function<IClan, Component> previousEnemyDominanceComponentFunction = enemyDominanceComponentFunction;
+
+            final double dominance = clanEnemy.getDominance() - clanEnemy.getClan().getEnemy(clan).orElseThrow().getDominance();
+
+            enemyDominanceComponentFunction = viewerClan -> {
+                final ClanRelation clanRelation = this.clanManager.getRelation(viewerClan, clanEnemy.getClan());
+
+                return previousEnemyDominanceComponentFunction.apply(viewerClan)
+                        .append(this.clanManager.getClanShortName(clanRelation, clanEnemy.getClan()))
+                        .appendSpace()
+                        .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED))
+                        .appendSpace();
+            };
         }
 
-        if (clan.getTerritory().isEmpty()) {
-            UtilMessage.broadcast("clans.prefix", "clans.command.clan.disband.broadcast", Component.text(clan.getName(), NamedTextColor.YELLOW));
-        } else {
-            final Chunk chunk = UtilWorld.stringToChunk(clan.getTerritory().get(0).getChunk());
-            if (chunk != null) {
-                UtilMessage.broadcast("clans.prefix", "clans.command.clan.disband.broadcast-with-location",
-                        Component.text(clan.getName(), NamedTextColor.YELLOW),
+        final Chunk chunk = clan.getTerritory().isEmpty() ? null : UtilWorld.stringToChunk(clan.getTerritory().getFirst().getChunk());
+
+        // There used to be 3 getOnlinePlayers() iterations throughout this method, this code does all-in-one.
+        for (final Player targetPlayer : Bukkit.getServer().getOnlinePlayers()) {
+            final Clan targetPlayerClan = this.clanManager.getClanByPlayer(targetPlayer).orElse(null);
+
+            final ClanRelation clanRelation = this.clanManager.getRelation(targetPlayerClan, clan);
+
+            // If the 'chunk' is null, message without location, otherwise with location.
+            if (chunk == null) {
+                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.disband.broadcast",
+                        this.clanManager.getClanShortName(clanRelation, clan)
+                );
+            } else {
+                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.disband.broadcast-with-location",
+                        this.clanManager.getClanShortName(clanRelation, clan),
                         Component.text(chunk.getX() * 16, NamedTextColor.YELLOW),
-                        Component.text(chunk.getZ() * 16, NamedTextColor.YELLOW));
+                        Component.text(chunk.getZ() * 16, NamedTextColor.YELLOW)
+                );
             }
 
-        }
+            // If the 'clan' has enemies, message enemy dominance component.
+            if (!clanEnemyList.isEmpty()) {
+                final Component finalEnemyDominanceComponent = enemyDominanceComponentFunction.apply(targetPlayerClan);
+                final ClickEvent clickEvent = ClickEvent.callback(audience -> {
+                            UtilMessage.message(audience, "clans.prefix", finalEnemyDominanceComponent);
+                        }, ClickCallback.Options.builder()
+                                .uses(UNLIMITED_USES)
+                                .build()
+                );
 
-        Component enemyDominanceComponent = Component.empty();
-        clan.getEnemies().sort(Comparator.comparingDouble(ClanEnemy::getDominance));
-        for (final ClanEnemy enemy : clan.getEnemies()) {
-            double dominance = enemy.getDominance() - enemy.getClan().getEnemy(clan).orElseThrow().getDominance();
-            enemyDominanceComponent = enemyDominanceComponent.append(Component.text(enemy.getClan().getName(), ClanRelation.NEUTRAL.getPrimary()))
-                    .appendSpace()
-                    .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED)).appendSpace();
-            enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
-        }
-
-        Component finalEnemyDominanceComponent = enemyDominanceComponent;
-        ClickEvent clickEvent = ClickEvent.callback(audience -> {
-                    UtilMessage.message((CommandSender) audience, "clans.prefix", finalEnemyDominanceComponent);
-                }, ClickCallback.Options.builder()
-                        .uses(UNLIMITED_USES)
-                        .build()
-        );
-
-        UtilMessage.broadcast(Translations.component("clans.prefix").append(Component.text("> ", NamedTextColor.BLUE)).clickEvent(clickEvent).hoverEvent(HoverEvent.showText(finalEnemyDominanceComponent))
-                .append(Translations.component("clans.command.clan.disband.enemies-link",
-                        Component.text(clan.getName(), ClanRelation.NEUTRAL.getPrimary()))));
-
-        try {
-            ClanCore core = clan.getCore();
-            if (core != null && clan.getCore().getPosition() != null) {
-                Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
-
-                ClanMailbox mailbox = core.getMailbox();
-                mailbox.getContents().forEach(item -> {
-                    dropLocation.getWorld().dropItem(dropLocation, item);
-                });
-                mailbox.getContents().clear();
-
-                ClanVault vault = core.getVault();
-                vault.getContents().values().forEach(item -> {
-                    dropLocation.getWorld().dropItem(dropLocation, item);
-                });
-                vault.getContents().clear();
-
-                clan.getCore().removeBlock(); // Remove the core block if it exists
-                clan.getCore().setPosition(null);
+                UtilMessage.message(targetPlayer, "clans.prefix", Translations.component("clans.command.clan.disband.enemies-link",
+                        this.clanManager.getClanShortName(clanRelation, clan)).clickEvent(clickEvent).hoverEvent(HoverEvent.showText(finalEnemyDominanceComponent))
+                );
             }
-        } catch (Exception ex) {
-            log.error("Failed to clean up clan core on disband", ex).submit();
         }
 
-        clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
-        if (event.getPlayer() != null) {
+        Player player = event.getPlayer();
+
+        if (player != null) {
             clan.getMembers().forEach(clanMember -> {
                 if (!clanMember.isOnline()) {
                     offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                             OfflineMessage.Action.CLAN_DISBAND,
-                            "Your clan <aqua>%s</aqua> was disbanded by <yellow>%s</yellow>.",
-                            clan.getName(), event.getPlayer().getName());
+                            "Your clan %s was disbanded by %s.",
+                            this.clanManager.getClanShortName(ClanRelation.SELF, clan), this.clanManager.getPlayerName(ClanRelation.SELF, player)
+                    );
                 } else {
                     Objects.requireNonNull(clanMember.getPlayer()).closeInventory();
                 }
@@ -391,38 +408,82 @@ public class ClanEventListener extends ClanListener {
                 if (!clanMember.isOnline()) {
                     offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                             OfflineMessage.Action.CLAN_DISBAND,
-                            "Your clan <aqua>%s</aqua> was disbanded due to running out of energy.",
-                            clan.getName());
+                            "Your clan %s was disbanded due to running out of energy.",
+                            this.clanManager.getClanShortName(ClanRelation.SELF, clan));
                 }
             });
         }
 
+        this.handleClanDisband(clan, player);
+    }
 
-        clan.getMembers().clear();
-        clan.getTerritory().clear();
-        clan.getEnemies().clear();
-        clan.getAlliances().clear();
+    private void handleClanDisband(Clan clan, Player player) {
+        try {
+            ClanCore core = clan.getCore();
+            if (core != null && clan.getCore().getPosition() != null) {
+                Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
+
+                ClanMailbox mailbox = core.getMailbox();
+                mailbox.getContents().forEach(item -> dropLocation.getWorld().dropItem(dropLocation, item));
+
+                ClanVault vault = core.getVault();
+                vault.getContents().values().forEach(item -> dropLocation.getWorld().dropItem(dropLocation, item));
+
+                clan.getCore().removeBlock(); // Remove the core block if it exists
+            }
+        } catch (Exception ex) {
+            log.error("Failed to clean up clan core on disband", ex).submit();
+        }
+
+        clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
+
+        if (clan.getTntRecoveryRunnable() != null) {
+            clan.getTntRecoveryRunnable().cancel();
+        }
+
+        for (final ClanAlliance alliance : clan.getAlliances()) {
+            final IClan allianceClan = alliance.getClan();
+
+            allianceClan.getAlliance(clan).ifPresent(value -> allianceClan.getAlliances().remove(value));
+        }
+
+        for (final ClanEnemy enemy : clan.getEnemies()) {
+            final IClan enemyClan = enemy.getClan();
+
+            enemyClan.getEnemy(clan).ifPresent(value -> enemyClan.getEnemies().remove(value));
+        }
+
+        // Probably a better way to do this, but good to have.
+        this.clanManager.getPillageHandler().getActivePillages()
+                .removeIf(pillage -> pillage.getPillaged().getId() == clan.getId() || pillage.getPillager().getId() == clan.getId());
+
+        final List<ClanMember> clanMemberCacheList = new ArrayList<>(clan.getMembers());
 
         this.clanManager.getRepository().delete(clan);
         this.clanManager.getObjects().remove(clan.getId());
         this.clanManager.getLeaderboard().forceUpdate();
 
-        if (event.getPlayer() != null) {
-            log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
-                    .setAction("CLAN_DISBAND").addClientContext(event.getPlayer()).addClanContext(clan).submit();
+        clanMemberCacheList.forEach(clanMember -> {
+            final Player memberPlayer = Bukkit.getPlayer(clanMember.getUuid());
+            if (memberPlayer != null) {
+                memberPlayer.removeMetadata("clan", this.clans);
+
+                // Reset Chat Channel if in one of the Clan Chat Channel
+                Gamer gamer = this.clientManager.search().online(memberPlayer).getGamer();
+
+                if (gamer.getChatChannel() instanceof ClanChatChannel || gamer.getChatChannel() instanceof AllianceChatChannel) {
+                    gamer.resetChatChannel();
+                }
+            }
+        });
+
+        if (player != null) {
+            log.info("{} ({}) disbanded {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
+                    .setAction("CLAN_DISBAND").addClientContext(player).addClanContext(clan).submit();
         } else {
             log.info("System disbanded {} ({}) for running out of energy", clan.getName(), clan.getId())
                     .setAction("CLAN_DISBAND").addClanContext(clan).submit();
         }
-
-        final var memberCache = new ArrayList<>(event.getClan().getMembers());
-        memberCache.forEach(member -> {
-            final Player player = Bukkit.getPlayer(member.getUuid());
-            if (player != null) {
-                player.removeMetadata("clan", this.clans);
-            }
-        });
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -433,33 +494,40 @@ public class ClanEventListener extends ClanListener {
 
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();
-        final Player target = event.getTarget();
+        final Player targetPlayer = event.getTarget();
 
+        final ClanRelation playerClanRelation = this.clanManager.getRelation(clan, this.clanManager.getClanByPlayer(targetPlayer).orElse(null));
 
-        UtilMessage.message(player, "clans.prefix", "clans.command.clan.invite.success-self", Component.text(target.getName(), NamedTextColor.YELLOW));
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.invite.success-self",
+                this.clanManager.getPlayerName(playerClanRelation, targetPlayer)
+        );
 
         clan.getMembers().forEach(member -> {
             if (member.getUuid().equals(player.getUniqueId())) return;
-            Player clanPlayer = Bukkit.getPlayer(member.getUuid());
-            if (clanPlayer != null) {
-                UtilMessage.message(clanPlayer, "clans.prefix", "clans.command.clan.invite.success-clan",
-                        Component.text(player.getName(), NamedTextColor.YELLOW),
-                        Component.text(target.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.invite.success-clan",
+                        this.clanManager.getPlayerName(ClanRelation.SELF, player),
+                        this.clanManager.getPlayerName(playerClanRelation, targetPlayer)
+                );
             }
         });
 
-        UtilMessage.message(target, "clans.prefix", "clans.command.clan.invite.success-target", Component.text(player.getName(), NamedTextColor.YELLOW), Component.text(clan.getName(), NamedTextColor.YELLOW));
+        UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.invite.success-target",
+                this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player),
+                this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+        );
 
         final Component inviteMessage = Translations.component("clans.command.clan.invite.accept-link")
                 .clickEvent(ClickEvent.runCommand("/c join " + clan.getName()))
                 .append(Translations.component("clans.command.clan.invite.accept-text", Component.text("/c join " + clan.getName(), NamedTextColor.YELLOW)));
-        UtilMessage.message(target, "clans.prefix", inviteMessage);
+        UtilMessage.message(targetPlayer, "clans.prefix", inviteMessage);
 
-        final Gamer targetGamer = this.clientManager.search().online(target).getGamer();
+        final Gamer targetGamer = this.clientManager.search().online(targetPlayer).getGamer();
         this.inviteHandler.createInvite(clan, targetGamer, "Invite", 20);
         log.info("{} ({}) invited {} ({}) to {} ({})", player.getName(), player.getUniqueId(),
-                        target.getName(), target.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_INVITE")
-                .addClientContext(target, true).addClientContext(event.getPlayer()).addClanContext(clan).submit();
+                        targetPlayer.getName(), targetPlayer.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_INVITE")
+                .addClientContext(targetPlayer, true).addClientContext(event.getPlayer()).addClanContext(clan).submit();
 
     }
 
@@ -473,12 +541,16 @@ public class ClanEventListener extends ClanListener {
 
         if (!client.isAdministrating()) {
             if (!this.inviteHandler.isInvited(gamer, clan, "Invite")) {
-                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.not-invited", Component.text(clan.getName(), NamedTextColor.YELLOW));
+                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.not-invited",
+                        this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+                );
                 return;
             }
 
             if (clan.getSquadCount() >= this.maxClanMembers) {
-                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.limit", Component.text(clan.getName(), NamedTextColor.YELLOW));
+                UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.limit",
+                        this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+                );
                 return;
             }
 
@@ -486,22 +558,24 @@ public class ClanEventListener extends ClanListener {
             for (ClanAlliance clanAlliance : clan.getAlliances()) {
                 if (clanAlliance.getClan().getSquadCount() + 1 > maxClanMembers) {
                     UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.ally-limit",
-                            Component.text(clan.getName(), NamedTextColor.YELLOW),
-                            Component.text(clanAlliance.getClan().getName(), NamedTextColor.YELLOW));
+                            this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan),
+                            this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clanAlliance.getClan())
+                    );
 
                     clan.getMembers().forEach(member -> {
-                        Player clanPlayer = Bukkit.getPlayer(member.getUuid());
-                        if (clanPlayer != null) {
-                            UtilMessage.message(clanPlayer, "clans.prefix", "clans.command.clan.join.ally-limit-clan",
-                                    Component.text(player.getName(), NamedTextColor.YELLOW),
-                                    Component.text(clanAlliance.getClan().getName(), NamedTextColor.YELLOW));
+                        Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+                        if (memberPlayer != null) {
+                            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.join.ally-limit-clan",
+                                    this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player),
+                                    this.clanManager.getClanShortName(this.clanManager.getRelation(clan, clanAlliance.getClan()), clanAlliance.getClan())
+                            );
                         }
                     });
                     allySquadCountTooHigh = true;
                 }
             }
 
-            if(clanManager.getPillageHandler().isBeingPillaged(clan)) {
+            if (clanManager.getPillageHandler().isBeingPillaged(clan)) {
                 UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.pillaged");
                 return;
             }
@@ -510,11 +584,16 @@ public class ClanEventListener extends ClanListener {
                 return;
             }
         } else {
-            Component notification = Translations.component("clans.command.clan.join.force-mod-notification",
-                    Component.text(player.getName(), NamedTextColor.YELLOW),
-                    Component.text(clan.getName(), NamedTextColor.YELLOW));
-            clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(targetRank -> {
-                UtilMessage.message(targetRank, "clans.prefix", notification);
+            clientManager.getPlayersOfRank(Rank.TRIAL_MOD).forEach(targetPlayer -> {
+                Clan targetPlayerClan = this.clanManager.getClanByPlayer(targetPlayer).orElse(null);
+                ClanRelation clanRelation = this.clanManager.getRelation(targetPlayerClan, clan);
+
+                Component notification = Translations.component("clans.command.clan.join.force-mod-notification",
+                        this.clanManager.getPlayerName(clanRelation, player),
+                        this.clanManager.getClanShortName(clanRelation, clan)
+                );
+
+                UtilMessage.message(targetPlayer, "clans.prefix", notification);
             });
         }
 
@@ -531,13 +610,17 @@ public class ClanEventListener extends ClanListener {
         clan.setOnline(true);
         clan.getMembers().forEach(clanMember -> {
             if (clanMember.getUuid().equals(player.getUniqueId())) return;
-            Player pMember = Bukkit.getPlayer(clanMember.getUuid());
-            if (pMember != null) {
-                UtilMessage.message(pMember, "clans.prefix", "clans.command.clan.join.success-clan", Component.text(player.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(clanMember.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.join.success-clan",
+                        this.clanManager.getPlayerName(ClanRelation.SELF, player)
+                );
             }
         });
 
-        UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.success-self", Component.text(clan.getName(), NamedTextColor.YELLOW));
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.join.success-self",
+                this.clanManager.getClanShortName(ClanRelation.SELF, clan)
+        );
 
         log.info("{} ({}) joined {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_JOIN")
                 .addClientContext(player)
@@ -564,14 +647,20 @@ public class ClanEventListener extends ClanListener {
             this.clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
-            UtilMessage.message(player, "clans.prefix", "clans.command.clan.leave.success-self", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.leave.success-self",
+                    this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+            );
+
             player.removeMetadata("clan", this.clans);
 
             boolean isOnline = false;
             for (final ClanMember member : clan.getMembers()) {
-                final Player playerMember = Bukkit.getPlayer(member.getUuid());
-                if (playerMember != null) {
-                    UtilMessage.message(playerMember, "clans.prefix", "clans.command.clan.leave.success-clan", Component.text(player.getName(), NamedTextColor.YELLOW));
+                final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+                if (memberPlayer != null) {
+                    UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.leave.success-clan",
+                            this.clanManager.getPlayerName(ClanRelation.NEUTRAL, player)
+                    );
+
                     isOnline = true;
                 }
             }
@@ -602,22 +691,30 @@ public class ClanEventListener extends ClanListener {
             this.clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
-            UtilMessage.message(player, "clans.prefix", "clans.command.clan.kick.success-self", Component.text(target.getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "clans.prefix", "clans.command.clan.kick.success-self",
+                    this.clanManager.getPlayerName(ClanRelation.NEUTRAL, target.getName())
+            );
+
             clan.getMembers().forEach(member -> {
-                Player clanPlayer = Bukkit.getPlayer(member.getUuid());
-                if (clanPlayer != null) {
-                    UtilMessage.message(clanPlayer, "clans.prefix", "clans.command.clan.kick.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
+                Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+                if (memberPlayer != null) {
+                    UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.kick.success-clan",
+                            this.clanManager.getPlayerName(ClanRelation.NEUTRAL, target.getName())
+                    );
                 }
             });
 
             final Player targetPlayer = Bukkit.getPlayerExact(target.getName());
             if (targetPlayer != null) {
-                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.kick.success-target", Component.text(clan.getName(), NamedTextColor.YELLOW));
+                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.kick.success-target",
+                        this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+                );
+
                 targetPlayer.closeInventory();
                 targetPlayer.removeMetadata("clan", this.clans);
 
             } else {
-                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "You were kicked from clan <aqua>%s</aqua>", clan.getName());
+                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "You were kicked from clan %s", this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan));
             }
         }
 
@@ -636,7 +733,9 @@ public class ClanEventListener extends ClanListener {
         final Clan target = event.getTargetClan();
 
         if (this.inviteHandler.isInvited(target, clan, "Alliance")) {
-            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.ally.already-requested", Component.text(target.getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.ally.already-requested",
+                    this.clanManager.getClanShortName(ClanRelation.NEUTRAL, target)
+            );
             return;
         }
 
@@ -647,11 +746,28 @@ public class ClanEventListener extends ClanListener {
         }
 
         this.inviteHandler.createInvite(clan, target, "Alliance", 10);
-        UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.ally.success-self", Component.text(target.getName(), NamedTextColor.YELLOW));
+
+        UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.ally.success-self",
+                this.clanManager.getClanShortName(ClanRelation.NEUTRAL, target)
+        );
+
+        // TODO: Forgot a `clan` members message?? ("Your Clan has requested an alliance with ...") created below, translation needed
+//        clan.getMembers().forEach(member -> {
+//            if (member.getUuid().equals(event.getPlayer().getUniqueId())) return;
+//            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+//            if (memberPlayer != null) {
+//                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.ally.success-self-others",
+//                        this.clanManager.getClanShortName(ClanRelation.NEUTRAL, target)
+//                );
+//            }
+//        });
+
         target.getMembers().forEach(member -> {
-            Player targetPlayer = Bukkit.getPlayer(member.getUuid());
-            if (targetPlayer != null) {
-                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.ally.success-target", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.ally.success-target",
+                        this.clanManager.getClanShortName(ClanRelation.NEUTRAL, clan)
+                );
             }
         });
 
@@ -678,15 +794,19 @@ public class ClanEventListener extends ClanListener {
         target.getAlliances().add(targetAlliance);
 
         clan.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.ally.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.ally.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ALLY, target)
+                );
             }
         });
         target.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.ally.success-clan", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.ally.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ALLY, clan)
+                );
             }
         });
 
@@ -709,7 +829,9 @@ public class ClanEventListener extends ClanListener {
         final Clan target = event.getTargetClan();
 
         if (this.inviteHandler.isInvited(target, clan, "Trust")) {
-            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.trust.already-requested", Component.text(target.getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.trust.already-requested",
+                    this.clanManager.getClanShortName(ClanRelation.ALLY, target)
+            );
             return;
         }
 
@@ -720,11 +842,28 @@ public class ClanEventListener extends ClanListener {
         }
 
         this.inviteHandler.createInvite(clan, target, "Trust", 10);
-        UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.trust.success-self", Component.text(target.getName(), NamedTextColor.YELLOW));
+
+        UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.trust.success-self",
+                this.clanManager.getClanShortName(ClanRelation.ALLY, target)
+        );
+
+        // TODO: Forgot a `clan` members message?? ("Your Clan has requested to trust with ...") created below, translation needed
+//        clan.getMembers().forEach(member -> {
+//            if (member.getUuid().equals(event.getPlayer().getUniqueId())) return;
+//            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+//            if (memberPlayer != null) {
+//                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.trust.success-self-others",
+//                        this.clanManager.getClanShortName(ClanRelation.ALLY, target)
+//                );
+//            }
+//        });
+
         target.getMembers().forEach(member -> {
-            Player targetPlayer = Bukkit.getPlayer(member.getUuid());
-            if (targetPlayer != null) {
-                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.trust.success-target", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.trust.success-target",
+                        this.clanManager.getClanShortName(ClanRelation.ALLY, clan)
+                );
             }
         });
 
@@ -751,15 +890,19 @@ public class ClanEventListener extends ClanListener {
         targetAlliance.setTrusted(true);
 
         clan.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.trust.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.trust.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ALLY_TRUST, target)
+                );
             }
         });
         target.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.trust.success-clan", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.trust.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ALLY_TRUST, clan)
+                );
             }
         });
 
@@ -786,15 +929,19 @@ public class ClanEventListener extends ClanListener {
         targetAlliance.setTrusted(false);
 
         clan.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.untrust.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.untrust.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ALLY, target)
+                );
             }
         });
         target.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.untrust.success-clan", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.untrust.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ALLY, clan)
+                );
             }
         });
 
@@ -816,10 +963,15 @@ public class ClanEventListener extends ClanListener {
         final Clan clan = event.getClan();
         final Clan target = event.getTargetClan();
 
+        final ClanRelation clanToTargetRelation = this.clanManager.getRelation(clan, target);
+        final ClanRelation targetToClanRelation = this.clanManager.getRelation(target, clan);
+
         if (clan.isEnemy(target)) {
 
             if (this.inviteHandler.isInvited(target, clan, "Neutral")) {
-                UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.neutral.already-requested", Component.text(target.getName(), NamedTextColor.YELLOW));
+                UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.neutral.already-requested",
+                        this.clanManager.getClanShortName(clanToTargetRelation, target)
+                );
                 return;
             }
 
@@ -830,11 +982,27 @@ public class ClanEventListener extends ClanListener {
             }
 
             this.inviteHandler.createInvite(clan, target, "Neutral", 10);
-            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.neutral.success-self", Component.text(target.getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.neutral.success-self",
+                    this.clanManager.getClanShortName(clanToTargetRelation, target)
+            );
+
+            // TODO: Forgot a `clan` members message?? ("Your Clan has requested to neutral with ...") created below, translation needed
+//        clan.getMembers().forEach(member -> {
+//            if (member.getUuid().equals(event.getPlayer().getUniqueId())) return;
+//            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+//            if (memberPlayer != null) {
+//                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.neutral.success-self-others",
+//                        this.clanManager.getClanShortName(clanToTargetRelation, target)
+//                );
+//            }
+//        });
+
             target.getMembers().forEach(member -> {
-                Player targetPlayer = Bukkit.getPlayer(member.getUuid());
-                if (targetPlayer != null) {
-                    UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.neutral.success-target", Component.text(clan.getName(), NamedTextColor.YELLOW));
+                Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+                if (memberPlayer != null) {
+                    UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.neutral.success-target",
+                            this.clanManager.getClanShortName(targetToClanRelation, clan)
+                    );
                 }
             });
 
@@ -856,6 +1024,9 @@ public class ClanEventListener extends ClanListener {
         final Clan clan = event.getClan();
         final Clan target = event.getTargetClan();
 
+        final ClanRelation clanToTargetRelation = this.clanManager.getRelation(clan, target);
+        final ClanRelation targetToClanRelation = this.clanManager.getRelation(target, clan);
+
         this.inviteHandler.removeInvite(clan, target, "Neutral");
         this.inviteHandler.removeInvite(target, clan, "Neutral");
 
@@ -874,15 +1045,19 @@ public class ClanEventListener extends ClanListener {
         }
 
         clan.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.neutral.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.neutral.success-clan",
+                        this.clanManager.getClanShortName(clanToTargetRelation, target)
+                );
             }
         });
         target.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.neutral.success-clan", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.neutral.success-clan",
+                        this.clanManager.getClanShortName(targetToClanRelation, clan)
+                );
             }
         });
 
@@ -936,15 +1111,19 @@ public class ClanEventListener extends ClanListener {
         this.clanManager.getRepository().saveClanEnemy(target, targetEnemy);
 
         clan.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.enemy.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.enemy.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ENEMY, target)
+                );
             }
         });
         target.getMembers().forEach(member -> {
-            Player p = Bukkit.getPlayer(member.getUuid());
-            if (p != null) {
-                UtilMessage.message(p, "clans.prefix", "clans.command.clan.enemy.success-clan", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            Player memberPlayer = Bukkit.getPlayer(member.getUuid());
+            if (memberPlayer != null) {
+                UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.enemy.success-clan",
+                        this.clanManager.getClanShortName(ClanRelation.ENEMY, clan)
+                );
             }
         });
 
@@ -985,7 +1164,9 @@ public class ClanEventListener extends ClanListener {
         final Player player = event.getPlayer();
 
         if (event.getPlayer().getLocation().getY() > maxCoreY) {
-            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.set-core.too-high", Component.text(maxCoreY, NamedTextColor.YELLOW));
+            UtilMessage.message(event.getPlayer(), "clans.prefix", "clans.command.clan.set-core.too-high",
+                    Component.text(maxCoreY, NamedTextColor.YELLOW)
+            );
             return;
         }
 
@@ -1008,7 +1189,7 @@ public class ClanEventListener extends ClanListener {
         Location highest = player.getLocation();
 
         final Block block = core.getSafest(highest).getBlock();
-        if(block.getType() == Material.BEDROCK) {
+        if (block.getType() == Material.BEDROCK) {
             UtilMessage.message(player, "clans.prefix", "clans.command.clan.set-core.invalid-location");
             return;
         }
@@ -1019,8 +1200,10 @@ public class ClanEventListener extends ClanListener {
         core.placeBlock(); // Place new core
 
         UtilMessage.message(player, "clans.prefix", "clans.command.clan.set-core.success",
-                Component.text(UtilWorld.locationToString(player.getLocation()), NamedTextColor.YELLOW));
-        log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
+                Component.text(UtilWorld.locationToString(player.getLocation()), NamedTextColor.YELLOW)
+        );
+
+        log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getId(),
                         UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
 
@@ -1046,8 +1229,9 @@ public class ClanEventListener extends ClanListener {
         this.clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
             result.ifPresent(clientFound -> {
                 UtilMessage.message(player, "clans.prefix", "clans.command.clan.promote.success-self",
-                        Component.text(clientFound.getName(), NamedTextColor.AQUA),
-                        Component.text(member.getRank().getName(), NamedTextColor.YELLOW));
+                        this.clanManager.getPlayerName(ClanRelation.SELF, clientFound.getName()),
+                        Component.text(member.getRank().getName(), NamedTextColor.YELLOW)
+                );
 
                 log.info("{} ({}) was promoted by {} ({}) to {} in {} ({})", clientFound.getName(), member.getUuid(), player.getName(),
                                 player.getUniqueId(), member.getRank().getName(), clan.getName(), clan.getId()).setAction("CLAN_PROMOTE")
@@ -1060,7 +1244,9 @@ public class ClanEventListener extends ClanListener {
 
         final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
         if (memberPlayer != null) {
-            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.promote.success-target", Component.text(member.getRank().getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.promote.success-target",
+                    Component.text(member.getRank().getName(), NamedTextColor.YELLOW)
+            );
         }
     }
 
@@ -1082,8 +1268,10 @@ public class ClanEventListener extends ClanListener {
         this.clientManager.search().offline(member.getUuid()).thenAcceptAsync(result -> {
             result.ifPresent(clientFound -> {
                 UtilMessage.message(player, "clans.prefix", "clans.command.clan.demote.success-self",
-                        Component.text(clientFound.getName(), NamedTextColor.AQUA),
-                        Component.text(member.getRank().getName(), NamedTextColor.YELLOW));
+                        this.clanManager.getPlayerName(ClanRelation.SELF, clientFound.getName()),
+                        Component.text(member.getRank().getName(), NamedTextColor.YELLOW)
+                );
+
                 log.info("{} ({}) was demoted by {} ({}) to {} in {} ({})", clientFound.getName(), member.getUuid(),
                                 player.getName(), player.getUniqueId(), member.getRank().getName(), clan.getName(), clan.getId())
                         .setAction("CLAN_DEMOTE").addClientContext(player).addClientContext(clientFound, true).addClanContext(clan)
@@ -1094,7 +1282,9 @@ public class ClanEventListener extends ClanListener {
 
         final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
         if (memberPlayer != null) {
-            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.demote.success-target", Component.text(member.getRank().getName(), NamedTextColor.YELLOW));
+            UtilMessage.message(memberPlayer, "clans.prefix", "clans.command.clan.demote.success-target",
+                    Component.text(member.getRank().getName(), NamedTextColor.YELLOW)
+            );
         }
     }
 
