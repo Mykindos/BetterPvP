@@ -1075,7 +1075,7 @@ public class ClanManager extends Manager<Long, Clan> {
     }
 
     public Component getClanFullName(ClanRelation clanRelation, IClan clan) {
-        return UtilMessage.deserialize(clanRelation.getPrimaryMiniColor() + "Clan" + clan.getName() + clanRelation.getPrimaryClosingMiniColor());
+        return UtilMessage.deserialize(clanRelation.getPrimaryMiniColor() + "Clan " + clan.getName() + clanRelation.getPrimaryClosingMiniColor());
     }
 
     public Component getClanShortName(ClanRelation clanRelation, IClan clan) {
