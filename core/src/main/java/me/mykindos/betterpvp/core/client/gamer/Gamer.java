@@ -248,7 +248,9 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
                     Component.text(event.getNewChannel().getChannel().name().toLowerCase(), NamedTextColor.GREEN));
             this.chatChannel = event.getNewChannel();
         }
-
     }
 
+    public void resetChatChannel() {
+        this.chatChannel = ServerChatChannel.getInstance();
+    }
 }

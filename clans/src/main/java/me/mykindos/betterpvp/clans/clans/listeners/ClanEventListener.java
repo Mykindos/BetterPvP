@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
+import me.mykindos.betterpvp.clans.clans.chat.ClanChatChannel;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
@@ -31,6 +33,8 @@ import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
+import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -41,6 +45,7 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
+import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -60,6 +65,7 @@ import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.world.level.gamerules.GameRuleMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -80,8 +86,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
@@ -313,94 +321,76 @@ public class ClanEventListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanDisband(final ClanDisbandEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
 
         final Clan clan = event.getClan();
 
-        for (final ClanAlliance alliance : clan.getAlliances()) {
-            alliance.getClan().getAlliances().removeIf(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
+        /*
+         * Build a function that lazily creates the enemy dominance component for a
+         * viewer's clan. The enemy list is sorted and the function chain is built once,
+         * while viewer-specific clan relations are resolved when the function is applied.
+         */
+        Function<IClan, Component> enemyDominanceComponentFunction = viewerClan -> Component.empty();
+
+        final List<ClanEnemy> clanEnemyList = clan.getEnemies().stream().sorted(Comparator.comparingDouble(ClanEnemy::getDominance)).toList();
+
+        for (final ClanEnemy clanEnemy : clanEnemyList) {
+            final Function<IClan, Component> previousEnemyDominanceComponentFunction = enemyDominanceComponentFunction;
+
+            final double dominance = clanEnemy.getDominance() - clanEnemy.getClan().getEnemy(clan).orElseThrow().getDominance();
+
+            enemyDominanceComponentFunction = viewerClan -> {
+                final ClanRelation clanRelation = this.clanManager.getRelation(viewerClan, clanEnemy.getClan());
+
+                return previousEnemyDominanceComponentFunction.apply(viewerClan)
+                        .append(this.clanManager.getClanShortName(clanRelation, clanEnemy.getClan()))
+                        .appendSpace()
+                        .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED))
+                        .appendSpace();
+            };
         }
 
-        if (clan.getTerritory().isEmpty()) {
-            for (Player targetPlayer : Bukkit.getServer().getOnlinePlayers()) {
-                ClanRelation clanRelation = this.clanManager.getRelation(this.clanManager.getClanByPlayer(targetPlayer).orElse(null), clan);
+        final Chunk chunk = clan.getTerritory().isEmpty() ? null : UtilWorld.stringToChunk(clan.getTerritory().getFirst().getChunk());
 
+        // There used to be 3 getOnlinePlayers() iterations throughout this method, this code does all-in-one.
+        for (final Player targetPlayer : Bukkit.getServer().getOnlinePlayers()) {
+            final Clan targetPlayerClan = this.clanManager.getClanByPlayer(targetPlayer).orElse(null);
+
+            final ClanRelation clanRelation = this.clanManager.getRelation(targetPlayerClan, clan);
+
+            // If the 'chunk' is null, message without location, otherwise with location.
+            if (chunk == null) {
                 UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.disband.broadcast",
                         this.clanManager.getClanShortName(clanRelation, clan)
                 );
+            } else {
+                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.disband.broadcast-with-location",
+                        this.clanManager.getClanShortName(clanRelation, clan),
+                        Component.text(chunk.getX() * 16, NamedTextColor.YELLOW),
+                        Component.text(chunk.getZ() * 16, NamedTextColor.YELLOW)
+                );
             }
-        } else {
-            final Chunk chunk = UtilWorld.stringToChunk(clan.getTerritory().getFirst().getChunk());
-            if (chunk != null) {
-                for (Player targetPlayer : Bukkit.getServer().getOnlinePlayers()) {
-                    ClanRelation clanRelation = this.clanManager.getRelation(this.clanManager.getClanByPlayer(targetPlayer).orElse(null), clan);
 
-                    UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.disband.broadcast-with-location",
-                            this.clanManager.getClanShortName(clanRelation, clan),
-                            Component.text(chunk.getX() * 16, NamedTextColor.YELLOW),
-                            Component.text(chunk.getZ() * 16, NamedTextColor.YELLOW)
-                    );
-                }
+            // If the 'clan' has enemies, message enemy dominance component.
+            if (!clanEnemyList.isEmpty()) {
+                final Component finalEnemyDominanceComponent = enemyDominanceComponentFunction.apply(targetPlayerClan);
+                final ClickEvent clickEvent = ClickEvent.callback(audience -> {
+                            UtilMessage.message(audience, "clans.prefix", finalEnemyDominanceComponent);
+                        }, ClickCallback.Options.builder()
+                                .uses(UNLIMITED_USES)
+                                .build()
+                );
+
+                UtilMessage.message(targetPlayer, "clans.prefix", Translations.component("clans.command.clan.disband.enemies-link",
+                        this.clanManager.getClanShortName(clanRelation, clan)).clickEvent(clickEvent).hoverEvent(HoverEvent.showText(finalEnemyDominanceComponent))
+                );
             }
         }
-
-        // TODO: Could replace `Component.text(enemy.getClan().getName(), ClanRelation.NEUTRAL.getPrimary())` with per message receiver's clan colors
-        Component enemyDominanceComponent = Component.empty();
-        clan.getEnemies().sort(Comparator.comparingDouble(ClanEnemy::getDominance));
-        for (final ClanEnemy enemy : clan.getEnemies()) {
-            double dominance = enemy.getDominance() - enemy.getClan().getEnemy(clan).orElseThrow().getDominance();
-            enemyDominanceComponent = enemyDominanceComponent.append(Component.text(enemy.getClan().getName(), ClanRelation.NEUTRAL.getPrimary()))
-                    .appendSpace()
-                    .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED)).appendSpace();
-            enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
-        }
-
-        Component finalEnemyDominanceComponent = enemyDominanceComponent;
-        ClickEvent clickEvent = ClickEvent.callback(audience -> {
-                    UtilMessage.message(audience, "clans.prefix", finalEnemyDominanceComponent);
-                }, ClickCallback.Options.builder()
-                        .uses(UNLIMITED_USES)
-                        .build()
-        );
-
-        for (Player targetPlayer : Bukkit.getServer().getOnlinePlayers()) {
-            ClanRelation clanRelation = this.clanManager.getRelation(this.clanManager.getClanByPlayer(targetPlayer).orElse(null), clan);
-
-            UtilMessage.message(targetPlayer, "clans.prefix", Translations.component("clans.command.clan.disband.enemies-link",
-                    this.clanManager.getClanShortName(clanRelation, clan)).clickEvent(clickEvent).hoverEvent(HoverEvent.showText(finalEnemyDominanceComponent))
-            );
-        }
-
-        try {
-            ClanCore core = clan.getCore();
-            if (core != null && clan.getCore().getPosition() != null) {
-                Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
-
-                ClanMailbox mailbox = core.getMailbox();
-                mailbox.getContents().forEach(item -> {
-                    dropLocation.getWorld().dropItem(dropLocation, item);
-                });
-                mailbox.getContents().clear();
-
-                ClanVault vault = core.getVault();
-                vault.getContents().values().forEach(item -> {
-                    dropLocation.getWorld().dropItem(dropLocation, item);
-                });
-                vault.getContents().clear();
-
-                clan.getCore().removeBlock(); // Remove the core block if it exists
-                clan.getCore().setPosition(null);
-            }
-        } catch (Exception ex) {
-            log.error("Failed to clean up clan core on disband", ex).submit();
-        }
-
-        clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
 
         Player player = event.getPlayer();
+
         if (player != null) {
             clan.getMembers().forEach(clanMember -> {
                 if (!clanMember.isOnline()) {
@@ -424,30 +414,76 @@ public class ClanEventListener extends ClanListener {
             });
         }
 
-        clan.getMembers().clear();
-        clan.getTerritory().clear();
-        clan.getEnemies().clear();
-        clan.getAlliances().clear();
+        this.handleClanDisband(clan, player);
+    }
+
+    private void handleClanDisband(Clan clan, Player player) {
+        try {
+            ClanCore core = clan.getCore();
+            if (core != null && clan.getCore().getPosition() != null) {
+                Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
+
+                ClanMailbox mailbox = core.getMailbox();
+                mailbox.getContents().forEach(item -> dropLocation.getWorld().dropItem(dropLocation, item));
+
+                ClanVault vault = core.getVault();
+                vault.getContents().values().forEach(item -> dropLocation.getWorld().dropItem(dropLocation, item));
+
+                clan.getCore().removeBlock(); // Remove the core block if it exists
+            }
+        } catch (Exception ex) {
+            log.error("Failed to clean up clan core on disband", ex).submit();
+        }
+
+        clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
+
+        if (clan.getTntRecoveryRunnable() != null) {
+            clan.getTntRecoveryRunnable().cancel();
+        }
+
+        for (final ClanAlliance alliance : clan.getAlliances()) {
+            final IClan allianceClan = alliance.getClan();
+
+            allianceClan.getAlliance(clan).ifPresent(value -> allianceClan.getAlliances().remove(value));
+        }
+
+        for (final ClanEnemy enemy : clan.getEnemies()) {
+            final IClan enemyClan = enemy.getClan();
+
+            enemyClan.getEnemy(clan).ifPresent(value -> enemyClan.getEnemies().remove(value));
+        }
+
+        // Probably a better way to do this, but good to have.
+        this.clanManager.getPillageHandler().getActivePillages()
+                .removeIf(pillage -> pillage.getPillaged().getId() == clan.getId() || pillage.getPillager().getId() == clan.getId());
+
+        final List<ClanMember> clanMemberCacheList = new ArrayList<>(clan.getMembers());
 
         this.clanManager.getRepository().delete(clan);
         this.clanManager.getObjects().remove(clan.getId());
         this.clanManager.getLeaderboard().forceUpdate();
 
-        if (event.getPlayer() != null) {
-            log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
-                    .setAction("CLAN_DISBAND").addClientContext(event.getPlayer()).addClanContext(clan).submit();
+        clanMemberCacheList.forEach(clanMember -> {
+            final Player memberPlayer = Bukkit.getPlayer(clanMember.getUuid());
+            if (memberPlayer != null) {
+                memberPlayer.removeMetadata("clan", this.clans);
+
+                // Reset Chat Channel if in one of the Clan Chat Channel
+                Gamer gamer = this.clientManager.search().online(memberPlayer).getGamer();
+
+                if (gamer.getChatChannel() instanceof ClanChatChannel || gamer.getChatChannel() instanceof AllianceChatChannel) {
+                    gamer.resetChatChannel();
+                }
+            }
+        });
+
+        if (player != null) {
+            log.info("{} ({}) disbanded {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
+                    .setAction("CLAN_DISBAND").addClientContext(player).addClanContext(clan).submit();
         } else {
             log.info("System disbanded {} ({}) for running out of energy", clan.getName(), clan.getId())
                     .setAction("CLAN_DISBAND").addClanContext(clan).submit();
         }
-
-        final var memberCache = new ArrayList<>(event.getClan().getMembers());
-        memberCache.forEach(member -> {
-            final Player memberPlayer = Bukkit.getPlayer(member.getUuid());
-            if (memberPlayer != null) {
-                memberPlayer.removeMetadata("clan", this.clans);
-            }
-        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
