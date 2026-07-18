@@ -137,8 +137,8 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {
             championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
-            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(ent, player));
-            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, ent));
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed", this.championsManager.getDisplayNameAsComponent(ent, player));
+            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed-by", this.championsManager.getDisplayNameAsComponent(player, ent));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
         }
 

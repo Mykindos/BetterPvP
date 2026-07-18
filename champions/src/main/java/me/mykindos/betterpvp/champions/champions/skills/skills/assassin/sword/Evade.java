@@ -168,7 +168,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
             UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
 
-            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.evade.target-used", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
+            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.evade.target-used", this.championsManager.getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
 
             active.remove(player.getUniqueId());
         });

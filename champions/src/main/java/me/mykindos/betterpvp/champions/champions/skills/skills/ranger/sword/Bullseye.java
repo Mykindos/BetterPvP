@@ -212,7 +212,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
             event.addModifier(new SkillDamageModifier.Flat(this, getBonusDamage(playerLevel)));
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
-            UtilMessage.message(damagee, getName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(damager, damagee), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(damagee, getName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(damager, damagee), getDisplayName().color(NamedTextColor.GREEN));
 
             //apply cooldown
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);

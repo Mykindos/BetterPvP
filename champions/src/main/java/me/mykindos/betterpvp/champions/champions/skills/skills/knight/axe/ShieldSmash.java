@@ -151,7 +151,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             }
 
             // Inform them
-            UtilMessage.message(ent, "core.prefix.skill", "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(ent, "core.prefix.skill", "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN));
         }
 
         if (hit) { // entity hit

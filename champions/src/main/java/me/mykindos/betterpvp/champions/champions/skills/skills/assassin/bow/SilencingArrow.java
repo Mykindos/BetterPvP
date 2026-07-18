@@ -84,11 +84,11 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
     public void onHit(Player damager, LivingEntity target, int level) {
         championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) (getDuration(level)) * 1000L);
         if (championsManager.getEffects().hasEffect(target, EffectTypes.IMMUNE)) {
-            UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.assassin.silencing-arrow.immune", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(target, damager));
+            UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.assassin.silencing-arrow.immune", this.championsManager.getDisplayNameAsComponent(target, damager));
             return;
         }
-        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(target, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(damager, target), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(target, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(damager, target), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @Override
