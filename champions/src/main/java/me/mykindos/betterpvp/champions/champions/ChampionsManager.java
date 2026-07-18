@@ -16,8 +16,6 @@ import me.mykindos.betterpvp.core.energy.EnergyService;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 
-import java.awt.*;
-
 /**
  * A wrapper containing frequently used dependencies throughout the champions module
  */
