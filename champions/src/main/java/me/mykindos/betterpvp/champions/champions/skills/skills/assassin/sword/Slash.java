@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -140,8 +139,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 0.8f, 2f);
             hit.getWorld().playSound(hit.getLocation().add(0, 1, 0), Sound.ITEM_TRIDENT_HIT, 0.8f, 1.5f);
 
-            UtilMessage.message(caster, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(hit.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
-            UtilMessage.message(hit, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(caster, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(hit, caster), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(hit, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(caster, hit), getDisplayName().color(NamedTextColor.GREEN));
         }
     }
 

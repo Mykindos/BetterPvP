@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -138,8 +137,8 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {
             championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
-            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed", Component.text(ent.getName(), NamedTextColor.GREEN));
-            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed-by", Component.text(player.getName(), NamedTextColor.GREEN));
+            UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed", this.championsManager.getDisplayNameAsComponent(ent, player));
+            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.sever.severed-by", this.championsManager.getDisplayNameAsComponent(player, ent));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
         }
 

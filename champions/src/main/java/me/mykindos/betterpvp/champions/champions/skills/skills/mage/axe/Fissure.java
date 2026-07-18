@@ -25,7 +25,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
@@ -190,8 +189,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doDamage(new DamageEvent(livingEntity, fissureCast.getPlayer(), null, new SkillDamageCause(this), damage, "Fissure"));
 
-            UtilMessage.message(fissureCast.getPlayer(), getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(livingEntity.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
-            UtilMessage.message(livingEntity, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(fissureCast.getPlayer().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(fissureCast.getPlayer(), getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(livingEntity, fissureCast.getPlayer()), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(livingEntity, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(fissureCast.getPlayer(), livingEntity), getDisplayName().color(NamedTextColor.GREEN));
 
             fissureCast.getEntitiesHit().add(livingEntity.getUniqueId());
         }

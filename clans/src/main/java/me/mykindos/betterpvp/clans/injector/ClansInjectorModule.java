@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.PlayerDeathFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
+import me.mykindos.betterpvp.clans.displayname.ClansDisplayNameProvider;
 
 public class ClansInjectorModule extends AbstractModule {
 
@@ -24,6 +25,8 @@ public class ClansInjectorModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Clans.class).toInstance(plugin);
+
+        bind(ClansDisplayNameProvider.class);
 
         // Battle fatigue strategies. Adding/removing a factor or punishment is a
         // single line here — the manager and hold service never name a concrete

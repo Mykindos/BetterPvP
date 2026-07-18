@@ -111,8 +111,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .receivers(60)
                 .spawn();
 
-        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(damager, target), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(target, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @Override

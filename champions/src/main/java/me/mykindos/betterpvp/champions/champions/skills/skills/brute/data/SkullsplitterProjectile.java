@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -191,8 +190,8 @@ public class SkullsplitterProjectile extends Projectile {
                     new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
                     bleedSeconds,
                     skill.getName()));
-            UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(damagee.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
-            UtilMessage.message(damagee, skill.getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(damagee, caster), skill.getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(damagee, skill.getClassType().getDisplayName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(caster, damagee), skill.getDisplayName().color(NamedTextColor.GREEN));
         }
     }
 }

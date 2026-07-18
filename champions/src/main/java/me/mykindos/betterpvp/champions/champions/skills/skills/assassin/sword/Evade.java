@@ -21,14 +21,13 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -116,7 +115,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     public void onEvade(DamageEvent event) {
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamagee() instanceof Player player)) return;
@@ -169,9 +168,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
             UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.used", getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
 
-            if (ent instanceof Player temp) {
-                UtilMessage.message(temp, getClassType().getDisplayName(), "champions.skill.assassin.evade.target-used", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
-            }
+            UtilMessage.message(ent, getClassType().getDisplayName(), "champions.skill.assassin.evade.target-used", this.championsManager.getDisplayNameAsComponent(player, ent), getDisplayName().color(NamedTextColor.GREEN), Component.text(String.valueOf(level), NamedTextColor.GREEN));
 
             active.remove(player.getUniqueId());
         });

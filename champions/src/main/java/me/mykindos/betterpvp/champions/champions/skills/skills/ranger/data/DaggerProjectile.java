@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
 import org.bukkit.Location;
@@ -84,8 +83,8 @@ public class DaggerProjectile extends Projectile {
                 damage,
                 skill.getName()));
 
-        UtilMessage.message(hit, skill.getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
-        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(hit.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(hit, skill.getClassType().getDisplayName(), "champions.skill.hit-by", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(caster, hit), skill.getDisplayName().color(NamedTextColor.GREEN));
+        UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", this.skill.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(hit, caster), skill.getDisplayName().color(NamedTextColor.GREEN));
     }
 
     public void remove() {

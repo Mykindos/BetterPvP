@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClanHudInfo;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
+import me.mykindos.betterpvp.clans.displayname.ClansDisplayNameProvider;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -21,6 +22,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.displayname.DisplayNameService;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
@@ -103,6 +105,8 @@ public class Clans extends BPvPPlugin {
             injector = core.getInjector().createChildInjector(new ClansInjectorModule(this),
                     new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
+
+            injector.getInstance(DisplayNameService.class).setProvider(injector.getInstance(ClansDisplayNameProvider.class));
 
             database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:clans-migrations/postgres/", "clans");
 
