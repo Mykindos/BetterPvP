@@ -189,8 +189,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doDamage(new DamageEvent(livingEntity, fissureCast.getPlayer(), null, new SkillDamageCause(this), damage, "Fissure"));
 
-            UtilMessage.message(fissureCast.getPlayer(), getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(livingEntity, fissureCast.getPlayer()), getDisplayName().color(NamedTextColor.GREEN));
-            UtilMessage.message(livingEntity, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(fissureCast.getPlayer(), livingEntity), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(fissureCast.getPlayer(), getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(livingEntity, fissureCast.getPlayer()), getDisplayName().color(NamedTextColor.GREEN));
+            UtilMessage.message(livingEntity, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(fissureCast.getPlayer(), livingEntity), getDisplayName().color(NamedTextColor.GREEN));
 
             fissureCast.getEntitiesHit().add(livingEntity.getUniqueId());
         }

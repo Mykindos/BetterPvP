@@ -246,8 +246,8 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                     show(player, nearbyAllies, target);
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN));
-                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameService().getProvider().getDisplayNameAsComponent(target, player), getDisplayName().color(NamedTextColor.GREEN));
+                    UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN));
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(target, player), getDisplayName().color(NamedTextColor.GREEN));
 
                     new BukkitRunnable() {
                         @Override

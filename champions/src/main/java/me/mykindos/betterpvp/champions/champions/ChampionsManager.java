@@ -13,6 +13,10 @@ import me.mykindos.betterpvp.core.displayname.DisplayNameProvider;
 import me.mykindos.betterpvp.core.displayname.DisplayNameService;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.energy.EnergyService;
+import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Entity;
+
+import java.awt.*;
 
 /**
  * A wrapper containing frequently used dependencies throughout the champions module
@@ -44,5 +48,18 @@ public class ChampionsManager {
         this.energy = energy;
         this.throwables = throwables;
         this.displayNameService = displayNameService;
+    }
+
+    /**
+     * Convenience method for retrieving an entity's display name as a {@link Component}.
+     * This is a shorter way of accessing the {@link DisplayNameService} and its
+     * {@link DisplayNameProvider} directly.
+     *
+     * @param entity the entity whose display name should be retrieved
+     * @param viewer the entity viewing the display name, used for contextual formatting
+     * @return the entity's display name as a {@link Component}
+     */
+    public Component getDisplayNameAsComponent(Entity entity, Entity viewer) {
+        return this.displayNameService.getProvider().getDisplayNameAsComponent(entity, viewer);
     }
 }
