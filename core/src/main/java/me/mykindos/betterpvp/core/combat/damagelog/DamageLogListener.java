@@ -96,14 +96,15 @@ public class DamageLogListener implements Listener {
         );
 
 
+        final Component hover = Component.text("What killed you?");
         final Component component = Component.text("Click")
                 .appendSpace()
                 .append(Component.text("here").color(NamedTextColor.WHITE))
                 .appendSpace()
                 .append(Component.text("to view your death summary."))
-                .clickEvent(clickEvent);
-        final Component hover = Component.text("What killed you?");
-        UtilMessage.message(event.getPlayer(), "core.prefix.death", component, hover);
+                .clickEvent(clickEvent)
+                .hoverEvent(hover);
+        UtilMessage.message(event.getPlayer(), "core.prefix.death", component);
 
         // Clear the damage logs for this player after this death
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {

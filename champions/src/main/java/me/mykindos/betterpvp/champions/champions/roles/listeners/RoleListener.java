@@ -18,13 +18,15 @@ import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.object.ObjectContents;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -130,10 +132,15 @@ public class RoleListener implements Listener {
         final Function<LivingEntity, Component> def = event.getNameFormat();
         event.setNameFormat(entity -> {
             Component name = def.apply(entity);
-            final Optional<Role> role = roleManager.getRole(entity);
-            if (role.isPresent()) {
-                final TextComponent prefix = Component.text(role.get().getPrefix() + ".", NamedTextColor.GREEN);
-                name = Component.join(JoinConfiguration.noSeparators(), prefix, name);
+            final Optional<Role> roleOpt = roleManager.getRole(entity);
+            if (roleOpt.isPresent()) {
+                final Role role = roleOpt.get();
+                final TextColor color = role == Role.ASSASSIN ? TextColor.color(0xA06540) : NamedTextColor.WHITE;
+
+                final Key atlas = Key.key("items");
+                final Key spriteKey = Key.key("item/" + role.getChestplate().key().value());
+                final Component prefix = Component.object(ObjectContents.sprite(atlas, spriteKey)).color(color);
+                name = Component.join(JoinConfiguration.spaces(), prefix, name);
             }
             return name;
         });

@@ -172,6 +172,7 @@ public class DeathListener implements Listener {
                     .append(Component.text(round, NamedTextColor.GREEN))).appendNewline();
         }
 
-        UtilMessage.message(event.getReceiver(), "core.prefix.death", message, hoverComponent);
+        message = message.hoverEvent(hoverComponent);
+        UtilMessage.message(event.getReceiver(), "core.prefix.death", message);
     }
 }
