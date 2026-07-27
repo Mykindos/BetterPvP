@@ -13,7 +13,7 @@ import java.util.List;
  * <p>
  * It contributes its capability {@link Zone zones} and its {@link SceneSpawn scene objects} from Mapper data — that's
  * all. A {@link Continent} bundles content and hands each slice to the matching generic loader
- * ({@link ContinentZoneLoader} / {@link ContinentSceneLoader}), so content owns <em>what</em> it is while the loaders
+ * ({@link IslandZoneLoader} / {@link IslandSceneLoader}), so content owns <em>what</em> it is while the loaders
  * own registration and teardown. Implement only the method(s) relevant to the content; both default to empty.
  */
 public interface WorldContent {

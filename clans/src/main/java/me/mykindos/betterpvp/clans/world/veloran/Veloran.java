@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.world.Continent;
+import me.mykindos.betterpvp.clans.world.Island;
 import me.mykindos.betterpvp.clans.world.WorldContent;
 import me.mykindos.betterpvp.clans.world.veloran.gateway.SunderedGate;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 @Singleton
 @PluginAdapter("Mapper")
-public class Veloran extends Continent {
+public class Veloran extends Island implements Continent {
 
     private final SunderedGate sunderedGate;
 

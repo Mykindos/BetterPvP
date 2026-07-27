@@ -6,8 +6,6 @@ import me.mykindos.betterpvp.core.scene.SceneObject;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Villager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,24 +28,5 @@ public class QuestNpcFactory extends SceneObjectFactory {
     @Override
     public SceneObject spawnDefault(@NotNull Location location, @NotNull String type) {
         return spawn(new QuestGiverNpc(this, "NPC"), backingEntity(location));
-    }
-
-    /** A still, invulnerable, persistent-off villager to back a quest-giver NPC. */
-    public static Entity backingEntity(@NotNull Location location) {
-        return backingEntity(location, false);
-    }
-
-    /**
-     * Backing villager for a quest NPC. Pass {@code ai=true} for a moving
-     * companion (it then has a pathfinder); {@code false} for a static giver.
-     */
-    public static Entity backingEntity(@NotNull Location location, boolean ai) {
-        return location.getWorld().spawn(location, Villager.class, villager -> {
-            villager.setAI(ai);
-            villager.setInvulnerable(true);
-            villager.setCollidable(false);
-            villager.setPersistent(false);
-            villager.setSilent(true);
-        });
     }
 }

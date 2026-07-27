@@ -8,8 +8,6 @@ import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.scene.npc.NPC;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Pig;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
@@ -39,16 +37,5 @@ public class ClansSceneObjectFactory extends SceneObjectFactory {
                     location, this::backingEntity);
             default -> throw new IllegalArgumentException("Invalid clans NPC type: " + type);
         };
-    }
-
-    private Entity backingEntity(@NotNull Location location) {
-        return location.getWorld().spawn(location, Pig.class, spawned -> {
-            spawned.setAI(false);
-            spawned.setInvulnerable(true);
-            spawned.setCollidable(false);
-            spawned.setPersistent(false);
-            spawned.setInvisible(true);
-            spawned.setSilent(true);
-        });
     }
 }

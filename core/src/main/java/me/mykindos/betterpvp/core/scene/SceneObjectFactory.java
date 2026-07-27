@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.scene;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Pig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -80,6 +81,22 @@ public abstract class SceneObjectFactory {
         object.configureMaterialization(anchor, entityFactory);
         registry.register(object);
         return object;
+    }
+
+    /**
+     * Spawns a temporary entity at the given location.
+     * @param location the location to spawn at
+     * @return the spawned entity
+     */
+    public Entity backingEntity(@NotNull Location location) {
+        return location.getWorld().spawn(location, Pig.class, spawned -> {
+            spawned.setAI(false);
+            spawned.setInvulnerable(true);
+            spawned.setCollidable(false);
+            spawned.setPersistent(false);
+            spawned.setInvisible(true);
+            spawned.setSilent(true);
+        });
     }
 
 }
