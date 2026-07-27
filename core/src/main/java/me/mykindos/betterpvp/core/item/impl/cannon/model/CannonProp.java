@@ -155,6 +155,7 @@ public class CannonProp extends ModeledProp implements SoundProvider {
             modeled.addModel(model, true);
             modeled.setBaseEntityVisible(false);
             modeled.setModelRotationLocked(false);
+            modeled.getBase().setRenderRadius(512);
             // The backing entity is non-persistent and rebuilt from the store, so letting ModelEngine save the model
             // would resurrect orphaned bodies the cannon record no longer knows about.
             modeled.setSaved(false);
