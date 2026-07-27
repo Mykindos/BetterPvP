@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.resource;
+package me.mykindos.betterpvp.core.framework.store;
 
 import lombok.CustomLog;
 import org.jetbrains.annotations.NotNull;
@@ -27,14 +27,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * never leave a half-parsed record. An in-memory mirror loaded once at construction answers reads without touching disk.
  * <p>
  * The store is payload-agnostic: a {@link RecordCodec} supplies each record's key and body serialisation, so the same
- * machinery backs single-block respawn records ({@link BlockReplacementStore}) and batches of blocks
- * ({@link BlockBatchStore}) alike. The store is deliberately decoupled from the world (no per-block PDC), so deleting
+ * machinery backs single-block respawn records ({@code BlockReplacementStore}) and batches of blocks
+ * ({@code BlockBatchStore}) alike. The store is deliberately decoupled from the world (no per-block PDC), so deleting
  * the folder is a full reset and a rebuilt scene can never silently desync.
  *
  * @param <T> the record type, encoded by the supplied {@link RecordCodec}
  */
 @CustomLog
-public class ResourceCacheStore<T> {
+public class RecordStore<T> {
 
     /** Bumped if the on-disk envelope ever changes; mismatched files are ignored on load. */
     private static final byte FORMAT_VERSION = 1;
@@ -45,7 +45,7 @@ public class ResourceCacheStore<T> {
     private final RecordCodec<T> codec;
     private final Map<String, T> records = new ConcurrentHashMap<>();
 
-    public ResourceCacheStore(@NotNull File directory, @NotNull RecordCodec<T> codec) {
+    public RecordStore(@NotNull File directory, @NotNull RecordCodec<T> codec) {
         this.directory = directory;
         this.codec = codec;
         load();
@@ -75,7 +75,7 @@ public class ResourceCacheStore<T> {
         }
         final File file = fileFor(key);
         if (file.exists() && !file.delete()) {
-            log.warn("Could not delete resource cache record {}", file).submit();
+            log.warn("Could not delete record {}", file).submit();
         }
     }
 
@@ -87,7 +87,7 @@ public class ResourceCacheStore<T> {
             out.writeByte(FORMAT_VERSION);
             codec.write(out, record);
         } catch (IOException exception) {
-            log.error("Failed to write resource cache record {}", destination, exception).submit();
+            log.error("Failed to write record {}", destination, exception).submit();
             return;
         }
         try {
@@ -97,10 +97,10 @@ public class ResourceCacheStore<T> {
             try {
                 Files.move(temp.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException exception) {
-                log.error("Failed to commit resource cache record {}", destination, exception).submit();
+                log.error("Failed to commit record {}", destination, exception).submit();
             }
         } catch (IOException exception) {
-            log.error("Failed to commit resource cache record {}", destination, exception).submit();
+            log.error("Failed to commit record {}", destination, exception).submit();
         }
     }
 
@@ -117,7 +117,7 @@ public class ResourceCacheStore<T> {
                 final T record = codec.read(in);
                 records.put(codec.key(record), record);
             } catch (IOException | RuntimeException exception) {
-                log.warn("Skipping unreadable resource cache record {}", file).submit();
+                log.warn("Skipping unreadable record {}", file).submit();
             }
         }
     }

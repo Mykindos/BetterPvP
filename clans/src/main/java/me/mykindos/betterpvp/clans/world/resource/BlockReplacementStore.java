@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.clans.world.resource;
 
+import me.mykindos.betterpvp.core.framework.store.RecordCodec;
+import me.mykindos.betterpvp.core.framework.store.RecordStore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Value;
@@ -22,17 +24,17 @@ import java.util.List;
  * restart. Each in-flight block is one tiny file under {@code scenes/cache/block-single/}, written when the block is
  * degraded and removed when it respawns; {@link #entriesWithin} answers a node's reconcile from the in-memory mirror.
  * <p>
- * A thin block-shaped facade over the generic {@link ResourceCacheStore} — it owns the {@link Entry} shape and the
+ * A thin block-shaped facade over the generic {@link RecordStore} — it owns the {@link Entry} shape and the
  * spatial query, the store owns the I/O.
  */
 @Singleton
 public class BlockReplacementStore {
 
-    private final ResourceCacheStore<Entry> store;
+    private final RecordStore<Entry> store;
 
     @Inject
     public BlockReplacementStore(@NotNull Clans clans) {
-        this.store = new ResourceCacheStore<>(new File(clans.getDataFolder(), "scenes/cache/block-single"),
+        this.store = new RecordStore<>(new File(clans.getDataFolder(), "scenes/cache/block-single"),
                 new EntryCodec());
     }
 

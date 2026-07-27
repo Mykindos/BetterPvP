@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.resource;
+package me.mykindos.betterpvp.core.framework.store;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -7,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * The per-payload strategy a {@link ResourceCacheStore} delegates to: how to derive a record's stable key (its filename
+ * The per-payload strategy a {@link RecordStore} delegates to: how to derive a record's stable key (its filename
  * and mirror key) and how to serialise/deserialise its body. The store owns everything else — atomic writes, the
  * in-memory mirror, versioning — and never needs to understand the payload, so a record body must be self-describing
  * (it stores enough to rebuild its own key on load).

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.resource;
+package me.mykindos.betterpvp.core.world.mapper;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

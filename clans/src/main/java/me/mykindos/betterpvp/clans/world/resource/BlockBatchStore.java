@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.clans.world.resource;
 
+import me.mykindos.betterpvp.core.framework.store.RecordCodec;
+import me.mykindos.betterpvp.core.framework.store.RecordStore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -27,17 +29,17 @@ import java.util.UUID;
  * footprint — which would erase tall grass, flowers and other decoration sitting in cells the frame overlaps.
  * <p>
  * One file per batch under {@code scenes/cache/block-batches/}, keyed by a persistent {@link UUID}; a thin facade over
- * the generic {@link ResourceCacheStore} that owns the {@link Batch} shape, the store owns the I/O.
+ * the generic {@link RecordStore} that owns the {@link Batch} shape, the store owns the I/O.
  */
 @Singleton
 @CustomLog
 public class BlockBatchStore {
 
-    private final ResourceCacheStore<Batch> store;
+    private final RecordStore<Batch> store;
 
     @Inject
     public BlockBatchStore(@NotNull Clans clans) {
-        this.store = new ResourceCacheStore<>(new File(clans.getDataFolder(), "scenes/cache/block-batches"),
+        this.store = new RecordStore<>(new File(clans.getDataFolder(), "scenes/cache/block-batches"),
                 new BatchCodec());
     }
 

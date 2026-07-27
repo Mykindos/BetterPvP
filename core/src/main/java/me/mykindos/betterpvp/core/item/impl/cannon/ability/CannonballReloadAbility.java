@@ -13,9 +13,12 @@ import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.impl.cannon.ammo.CannonAmmo;
+import me.mykindos.betterpvp.core.item.impl.cannon.ammo.CannonAmmoRegistry;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonReloadEvent;
-import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
-import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonService;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonState;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -29,18 +32,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+/**
+ * Chambers whatever round the held item represents. The ability no longer knows about any particular cannonball -
+ * it asks {@link CannonAmmoRegistry} what the item loads, so a new ammo type needs no change here.
+ */
 @Getter
 @Setter
 @Singleton
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class CannonballReloadAbility extends AbstractInteraction implements DisplayedInteraction {
 
-    private final CannonManager cannonManager;
+    private final CannonService cannonService;
+    private final CannonAmmoRegistry ammoRegistry;
 
     @Inject
-    public CannonballReloadAbility(Core core, CannonManager cannonManager) {
+    public CannonballReloadAbility(Core core, CannonService cannonService, CannonAmmoRegistry ammoRegistry) {
         super("cannonball_reload");
-        this.cannonManager = cannonManager;
+        this.cannonService = cannonService;
+        this.ammoRegistry = ammoRegistry;
     }
 
     @Override
@@ -55,21 +64,18 @@ public class CannonballReloadAbility extends AbstractInteraction implements Disp
 
     @Override
     protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
-                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
-        if (!(actor.getEntity() instanceof Player player)) {
+                                                   @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+        if (!(actor.getEntity() instanceof Player player) || !canUse(player)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        if (!canUse(player)) {
+        final CannonAmmo ammo = ammoRegistry.byItem(itemInstance).orElse(null);
+        if (ammo == null) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         final RayTraceResult trace = player.getWorld().rayTraceEntities(player.getEyeLocation(),
-                player.getEyeLocation().getDirection(),
-                3,
-                0.1,
-                entity -> !entity.equals(player));
-
+                player.getEyeLocation().getDirection(), 3, 0.1, entity -> !entity.equals(player));
         if (trace == null) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
@@ -79,19 +85,24 @@ public class CannonballReloadAbility extends AbstractInteraction implements Disp
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        final Optional<Cannon> cannonOpt = this.cannonManager.of(targetEntity);
+        final Optional<CannonProp> cannonOpt = cannonService.of(targetEntity);
         if (cannonOpt.isEmpty()) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        final Cannon cannon = cannonOpt.get();
-        if (cannon.isLoaded()) {
+        final CannonProp cannon = cannonOpt.get();
+        if (cannon.getCycleState() != CannonState.IDLE || !cannon.getArchetype().getFiringMode().consumesAmmo()) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        final CannonReloadEvent cannonReloadEvent = new CannonReloadEvent(cannon, player);
-        cannonReloadEvent.callEvent();
-        if (!cannonReloadEvent.isCancelled()) {
+        if (!cannon.getArchetype().accepts(ammo.id())) {
+            UtilMessage.message(player, "core.prefix.combat", "core.cannon.wrong_ammo", ammo.displayName().color(NamedTextColor.YELLOW));
+            return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
+        }
+
+        final CannonReloadEvent reloadEvent = new CannonReloadEvent(cannon, player, ammo);
+        reloadEvent.callEvent();
+        if (!reloadEvent.isCancelled()) {
             return InteractionResult.Success.ADVANCE;
         }
         return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
@@ -105,4 +116,4 @@ public class CannonballReloadAbility extends AbstractInteraction implements Disp
         }
         return true;
     }
-} 
+}

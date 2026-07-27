@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.inventory.window.WindowManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -58,6 +59,11 @@ public class MenuListener implements Listener {
 
         if (window.getInventories()[0] != event.getClickedInventory()) {
             return;
+        }
+
+        // Vanilla pre-cancels container clicks for spectators, which stops InvUI from ever dispatching them
+        if (event.isCancelled() && player.getGameMode() == GameMode.SPECTATOR) {
+            event.setCancelled(false);
         }
 
         double cooldown = 0.1;

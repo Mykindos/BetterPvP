@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.resource;
 
+import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.brauw.mapper.MapperPlugin;

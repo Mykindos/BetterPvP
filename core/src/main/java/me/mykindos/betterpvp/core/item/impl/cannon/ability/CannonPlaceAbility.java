@@ -15,8 +15,8 @@ import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.PreCannonPlaceEvent;
-import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
-import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonManager;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonService;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -43,14 +43,14 @@ public class CannonPlaceAbility extends CooldownInteraction implements Displayed
 
     @EqualsAndHashCode.Include
     private double cooldown;
-    private final CannonManager cannonManager;
+    private final CannonService cannonService;
     private final Map<UUID, Location> cannonLocations = new HashMap<>();
 
     @Inject
-    private CannonPlaceAbility(Core core, CannonManager cannonManager, CooldownManager cooldownManager) {
+    private CannonPlaceAbility(Core core, CannonService cannonService, CooldownManager cooldownManager) {
         super("cannon_placement", cooldownManager);
-        this.cannonManager = cannonManager;
-        this.cooldown = cannonManager.getSpawnCooldown();
+        this.cannonService = cannonService;
+        this.cooldown = cannonService.getSpawnCooldown();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class CannonPlaceAbility extends CooldownInteraction implements Displayed
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
-        Cannon cannon = this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
+        CannonProp cannon = this.cannonService.spawn(player.getUniqueId(), cannonLocation);
         if (cannon != null) {
             UtilMessage.message(player, "core.prefix.combat", "core.cannon.placed",
                     Translations.component("core.item.cannon.name").color(NamedTextColor.YELLOW));

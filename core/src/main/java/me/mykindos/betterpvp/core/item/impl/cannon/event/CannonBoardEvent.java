@@ -7,15 +7,16 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when a player fuses a cannon {@link CannonProp}.
+ * Called before a player climbs into a passenger cannon. Cancelling keeps them out - this is the hook other modules
+ * use to apply ownership or region rules to a launch, the same way {@link CannonFuseEvent} gates a shot.
  */
 @Getter
-public class CannonFuseEvent extends CustomCancellableEvent {
+public class CannonBoardEvent extends CustomCancellableEvent {
 
     private final @NotNull CannonProp cannon;
     private final @NotNull Player player;
 
-    public CannonFuseEvent(@NotNull CannonProp cannon, @NotNull Player player) {
+    public CannonBoardEvent(@NotNull CannonProp cannon, @NotNull Player player) {
         this.cannon = cannon;
         this.player = player;
     }

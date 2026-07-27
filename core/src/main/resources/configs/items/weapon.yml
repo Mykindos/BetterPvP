@@ -13,6 +13,22 @@ cannon:
   cannonball-velocity-strengh: 1.3
   entity-collision-explode: true
   cooldown: 15.0
+  launcher:
+    fuse-seconds: 3.5
+    cooldown: 8.0
+  cluster:
+    alive-seconds: 2.0
+    bomblets: 4
+    bomblet-spread: 0.35
+    damage: 7.0
+    min-damage: 2.0
+    damage-min-radius: 1.0
+    damage-max-radius: 3.0
+  ride:
+    targeting-seconds: 3.0
+    max-range: 120.0
+    min-flight-ticks: 25
+    max-flight-ticks: 110
 booster_sword:
   durability: 32
 rustic_sword:

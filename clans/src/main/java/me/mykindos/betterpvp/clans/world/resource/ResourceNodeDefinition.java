@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.resource;
 
+import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;

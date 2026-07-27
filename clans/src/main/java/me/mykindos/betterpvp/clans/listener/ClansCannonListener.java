@@ -4,25 +4,22 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonAimEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonFuseEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonPlaceEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonReloadEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.PreCannonPlaceEvent;
-import me.mykindos.betterpvp.core.item.impl.cannon.model.Cannon;
+import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonBoardEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Optional;
 
@@ -31,17 +28,21 @@ import java.util.Optional;
 @PluginAdapter("ModelEngine")
 public class ClansCannonListener implements Listener {
 
+    /**
+     * Cannon tag holding the name of the owning clan. Stored on the cannon rather than on its backing entity, whose
+     * PDC is discarded every time the scene framework rebuilds the body.
+     */
+    private static final String CLAN_TAG = "clans:owner";
+
     @Inject
     private ClanManager clanManager;
 
-    private boolean canUse(final Player player, final Cannon cannon) {
-        final IronGolem backingEntity = cannon.getBackingEntity();
-        final PersistentDataContainer pdc = backingEntity.getPersistentDataContainer();
-        if (!pdc.has(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING)) {
+    private boolean canUse(final Player player, final CannonProp cannon) {
+        final String clanName = cannon.getTag(CLAN_TAG);
+        if (clanName == null) {
             return true; // Non-tagged cannons are free to use
         }
 
-        final String clanName = pdc.getOrDefault(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING, "");
         final Optional<Clan> clanOpt = clanManager.getClanByName(clanName);
         if (clanOpt.isEmpty()) {
             UtilMessage.message(player, "core.prefix.clans", "clans.cannon.not-owned");
@@ -111,9 +112,15 @@ public class ClansCannonListener implements Listener {
             return;
         }
 
-        final IronGolem backingEntity = event.getCannon().getBackingEntity();
         final Clan clan = clanManager.getClanByPlayer(event.getPlayer()).orElseThrow();
-        backingEntity.getPersistentDataContainer().set(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING, clan.getName());
+        event.getCannon().setTag(CLAN_TAG, clan.getName());
+    }
+
+    @EventHandler
+    public void onBoard(CannonBoardEvent event) {
+        if (!canUse(event.getPlayer(), event.getCannon())) {
+            event.cancel("Not Your Clan");
+        }
     }
 
 }
