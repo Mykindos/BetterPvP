@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
-import dev.brauw.mapper.MapperPlugin;
+import dev.brauw.mapper.Mapper;
 import dev.brauw.mapper.export.JsonExportStrategy;
 import dev.brauw.mapper.export.model.RegionCollection;
 import dev.brauw.mapper.region.Region;
@@ -18,9 +18,11 @@ public final class MapperHelper {
     }
 
     public static RegionCollection getRegions(@NotNull World world) {
-        final File dataPointsFile = new File(world.getWorldFolder(), "dataPoints.json");
-        final JsonExportStrategy loadStrategy = (JsonExportStrategy) MapperPlugin.getInstance()
-                .getExportManager()
+        final Mapper mapper = Mapper.get();
+        // Asking the storage manager rather than assuming <world>/dataPoints.json keeps us on whatever
+        // location Mapper is configured to use, which is no longer fixed.
+        final File dataPointsFile = mapper.getStorageManager().getRegionsFile(world);
+        final JsonExportStrategy loadStrategy = (JsonExportStrategy) mapper.getExportManager()
                 .getAvailableStrategies()
                 .get("json");
         return loadStrategy.read(dataPointsFile);

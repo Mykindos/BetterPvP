@@ -53,7 +53,8 @@ public class Spawn extends Island implements WorldContent {
     @Override
     public @NotNull List<WorldContent> content() {
         final Dock dock = new Dock(clientManager, clansSceneFactory, List.of(aldenmark.get()));
-        return List.of(this, dock, this.humanCannon);
+        final SpawnResidents residents = new SpawnResidents(clansSceneFactory);
+        return List.of(this, dock, this.humanCannon, residents);
     }
 
     @Override

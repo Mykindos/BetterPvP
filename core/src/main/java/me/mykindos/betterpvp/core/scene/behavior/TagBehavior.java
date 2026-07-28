@@ -172,6 +172,7 @@ public class TagBehavior implements SceneBehavior {
             d.setShadowed(true);
             d.setPersistent(false);
             d.setSeeThrough(true);
+            d.setTeleportDuration(1);
         }));
 
         entity.addBehavior(new TagBehavior(entity, anchor, roleOffset, d -> {
@@ -181,6 +182,7 @@ public class TagBehavior implements SceneBehavior {
             d.setShadowed(true);
             d.setPersistent(false);
             d.setSeeThrough(true);
+            d.setTeleportDuration(1);
         }));
     }
 }

@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import dev.brauw.mapper.MapperPlugin;
+import dev.brauw.mapper.Mapper;
 import dev.brauw.mapper.export.JsonExportStrategy;
 import dev.brauw.mapper.metadata.MapMetadata;
 import dev.brauw.mapper.region.PerspectiveRegion;
@@ -13,7 +13,6 @@ import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.AbstractGame;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -137,8 +136,8 @@ public class MapManager {
                 return null;
             }
 
-            MapMetadata metadata = MapperPlugin.getInstance().getMetadataManager().loadMetadata(metadataStream);
-            final JsonExportStrategy json = (JsonExportStrategy) MapperPlugin.getInstance().getExportManager().getAvailableStrategies().get("json");
+            MapMetadata metadata = Mapper.get().getMetadataManager().loadMetadata(metadataStream);
+            final JsonExportStrategy json = (JsonExportStrategy) Mapper.get().getExportManager().getAvailableStrategies().get("json");
             if (metadata == null || metadata.getGameMode().isEmpty()) {
                 return null;
             }

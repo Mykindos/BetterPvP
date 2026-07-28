@@ -32,7 +32,12 @@ import java.util.function.Consumer;
  */
 public class ModeledNPC extends NPC implements HasModeledEntity {
 
-    @Nullable private Consumer<ModeledEntity> initConsumer;
+    /**
+     * Applied on every materialization, not just the first: each one binds a brand-new entity and so
+     * needs a brand-new {@link ModeledEntity}. Releasing this after the first use would leave the NPC
+     * modelless for the rest of its life once its chunk cycled.
+     */
+    @Nullable private final Consumer<ModeledEntity> initConsumer;
 
     public ModeledNPC(SceneObjectFactory factory, @Nullable Consumer<ModeledEntity> initConsumer) {
         super(factory);
@@ -63,7 +68,6 @@ public class ModeledNPC extends NPC implements HasModeledEntity {
     @Override
     protected void onInit() {
         ModelEngineHelper.bind(getEntity(), initConsumer);
-        this.initConsumer = null; // release - only needed once
     }
 
     @Override

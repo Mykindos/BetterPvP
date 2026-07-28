@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.hub.model;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import dev.brauw.mapper.MapperPlugin;
+import dev.brauw.mapper.Mapper;
 import dev.brauw.mapper.export.JsonExportStrategy;
 import dev.brauw.mapper.export.model.RegionCollection;
 import dev.brauw.mapper.metadata.MapMetadata;
@@ -42,14 +42,14 @@ public class HubWorld extends BPvPWorld {
     private HubWorld() {
         super(MAIN_WORLD_NAME);
         final World world = Objects.requireNonNull(getWorld());
-        final File worldFolder = world.getWorldFolder();
-        final File dataPointsFile = new File(worldFolder, "dataPoints.json");
+        final Mapper mapper = Mapper.get();
+        final File dataPointsFile = mapper.getStorageManager().getRegionsFile(world);
 
         // then get properties
-        final JsonExportStrategy loadStrategy = (JsonExportStrategy) MapperPlugin.getInstance().getExportManager().getAvailableStrategies().get("json");
+        final JsonExportStrategy loadStrategy = (JsonExportStrategy) mapper.getExportManager().getAvailableStrategies().get("json");
         final RegionCollection regions = loadStrategy.read(dataPointsFile);
         this.regions = Collections.unmodifiableList(regions);
-        this.metadata = MapperPlugin.getInstance().getMetadataManager().loadMetadata(world);
+        this.metadata = mapper.getMetadataManager().loadMetadata(world);
 
         // get spawnpoint
         this.spawnpoint = regions.stream()

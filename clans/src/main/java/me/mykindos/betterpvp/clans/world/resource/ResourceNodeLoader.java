@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.clans.world.resource;
 
-import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import dev.brauw.mapper.MapperPlugin;
+import dev.brauw.mapper.Mapper;
 import dev.brauw.mapper.region.CuboidRegion;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.PointRegion;
@@ -25,6 +24,7 @@ import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
 import me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader;
 import me.mykindos.betterpvp.core.scene.loader.ServerStartLoadStrategy;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
+import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
@@ -184,6 +184,7 @@ public class ResourceNodeLoader extends SceneObjectLoader {
      */
     private void registerTags(@NotNull List<Pair<ResourceNodeDefinition, ResourceArchetype>> definitions) {
         final Set<String> regionNames = new LinkedHashSet<>();
+        final Map<String, Region.RegionType> expectedTypes = new HashMap<>();
         for (Pair<ResourceNodeDefinition, ResourceArchetype> entry : definitions) {
             final ResourceNodeDefinition definition = entry.getLeft();
             final String regionName = definition.getMatchName();
@@ -191,18 +192,37 @@ public class ResourceNodeLoader extends SceneObjectLoader {
                 continue;
             }
             regionNames.add(regionName);
+            expectedTypes.put(regionName.toLowerCase(Locale.ROOT), entry.getRight().regionType());
         }
         if (regionNames.isEmpty()) {
             return;
         }
 
-        final TagRegistry tagRegistry = MapperPlugin.getInstance().getTagRegistry();
+        final TagRegistry tagRegistry = Mapper.get().getTagRegistry();
         tagRegistry.register(
                 new PatternTag("level", "level:\\d+", "level:<number>",
                         "Overrides the required profession level for this placement", true, regionNames),
                 new PatternTag("name", "name:.+", "name:<text>",
                         "Overrides the display name for this placement", true, regionNames));
         log.info("Registered resource node tags on {} region name(s)", regionNames.size()).submit();
+
+        registerValidator(expectedTypes);
+    }
+
+    /**
+     * Registers the save-time check for these node regions.
+     * <p>
+     * Guarded separately from tag registration, and on {@link Throwable} rather than
+     * {@link Exception}: an older Mapper without the validation API surfaces as
+     * {@link NoClassDefFoundError}, and a missing editor convenience must never stop nodes loading.
+     */
+    private void registerValidator(@NotNull Map<String, Region.RegionType> expectedTypes) {
+        try {
+            Mapper.get().getValidationRegistry().register(new ResourceNodeValidator(expectedTypes));
+        } catch (Throwable throwable) {
+            log.warn("Could not register the resource node validator - check the Mapper plugin version",
+                    throwable).submit();
+        }
     }
 
     private @NotNull Collection<Region> regionsFor(@NotNull World world) {
