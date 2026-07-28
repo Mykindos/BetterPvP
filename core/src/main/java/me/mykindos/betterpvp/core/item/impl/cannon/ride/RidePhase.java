@@ -7,18 +7,16 @@ package me.mykindos.betterpvp.core.item.impl.cannon.ride;
  */
 public enum RidePhase {
 
-    /** Aboard, camera settled on the cannon, waiting on the emplacement's own fuse. */
+    /** Aboard with the camera settled on the cannon and nothing of the ride's own running - most of it spent waiting
+     * on a shared emplacement's fuse, once a destination has been chosen. */
     BOARDING,
 
     /**
-     * The rider's own fuse is burning. Private cannons only: they run one sequence per rider rather than one for the
-     * emplacement, so the countdown belongs to the ride. On a shared cannon the cycle owns it and the ride waits out
-     * the fuse in {@link #BOARDING}.
+     * The rider's own fuse is burning towards the destination they picked. Private cannons only: they run one sequence
+     * per rider rather than one for the emplacement, so the countdown belongs to the ride. On a shared cannon the cycle
+     * owns it and the ride waits the fuse out in {@link #BOARDING}.
      */
     FUSING,
-
-    /** Fuse spent; the rider is choosing where to land. */
-    TARGETING,
 
     /** In the air. */
     FLYING,

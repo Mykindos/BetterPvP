@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.item.impl.cannon.model;
 
 /**
- * Where a cannon is in its load-fire-recover cycle. {@link #BOARDING} and {@link #TARGETING} apply only to the
- * passenger firing mode, whose sequence continues past the fuse.
+ * Where a cannon is in its load-fire-recover cycle. {@link #TARGETING} applies only to the passenger firing mode,
+ * whose sequence begins before the fuse rather than at it.
  */
 public enum CannonState {
 
@@ -15,10 +15,7 @@ public enum CannonState {
     /** The fuse is burning. It will fire on its own when the fuse runs out. */
     FUSING,
 
-    /** A rider is aboard and the cannon is preparing to fuse. Passenger mode only. */
-    BOARDING,
-
-    /** The fuse has burned out and the rider is choosing where to land. Passenger mode only. */
+    /** A rider is aboard and choosing where to land. Nothing is lit yet. Passenger mode only. */
     TARGETING,
 
     /** Recovering from a shot; cannot be loaded or fired. */
@@ -31,6 +28,6 @@ public enum CannonState {
 
     /** Whether the cannon is mid-sequence and should ignore aim and load input. */
     public boolean isBusy() {
-        return this == FUSING || this == BOARDING || this == TARGETING;
+        return this == FUSING || this == TARGETING;
     }
 }

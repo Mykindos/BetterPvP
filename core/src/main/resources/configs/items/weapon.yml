@@ -25,7 +25,7 @@ cannon:
     damage-min-radius: 1.0
     damage-max-radius: 3.0
   ride:
-    targeting-seconds: 3.0
+    targeting-seconds: 15.0
     max-range: 120.0
     min-flight-ticks: 25
     max-flight-ticks: 110

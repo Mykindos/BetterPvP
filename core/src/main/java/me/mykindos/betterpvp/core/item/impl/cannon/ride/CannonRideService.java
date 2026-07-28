@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonBoardEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonLandEvent;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonLaunchPlayerEvent;
@@ -13,10 +14,7 @@ import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonConfig;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonDestination;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -33,6 +31,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * Owns every in-flight human cannonball: boarding, the camera, target selection, the ballistic arc, and returning the
@@ -99,7 +99,7 @@ public class CannonRideService {
         final Location muzzle = cannon.getMuzzle();
         muzzle.add(cannon.getEntity().getLocation().getDirection().multiply(-0.5));
         muzzle.subtract(0, 0.4, 0);
-        final RideMannequin mannequin = new RideMannequin(player, muzzle);
+        final RideMannequin mannequin = new RideMannequin(core, player, muzzle);
         final CannonRide ride = new CannonRide(player.getUniqueId(), origin, mannequin, cannon);
         if (ride.isPrivateRide()) {
             mannequin.restrictTo(player.getUniqueId());
@@ -116,55 +116,87 @@ public class CannonRideService {
     }
 
     /**
-     * Lights this rider's own fuse, for a cannon that runs privately.
+     * Offers {@code player} the cannon's destinations before they climb in. Nobody is boarded and nothing is lit until
+     * they pick, so a rider who changes their mind never leaves the ground.
      * <p>
-     * The countdown lives on the ride rather than on the cannon's cycle, which is what lets several people be mid-shot
-     * in the same emplacement at once: the cannon itself is never claimed, so it never has to be handed back.
-     */
-    public void beginFuse(@NotNull UUID rider) {
-        of(rider).ifPresent(ride -> ride.enter(RidePhase.FUSING));
-    }
-
-    /**
-     * The cannon's fuse has burned out; offer the rider the cannon's destinations.
-     * <p>
-     * A cannon with no destinations declared has nothing to choose between, so it simply fires along its own barrel.
+     * A cannon with no destinations declared has nothing to choose between, so it commits straight away and fires
+     * along its own barrel.
      *
-     * @return {@code false} if there is no longer a rider to aim - the cannon must recover rather than wait for a shot
-     * that will never be taken
+     * @param onChosen run with the chosen destination, or {@code null} when there was nothing to choose between
+     * @param onCancel run when the menu is closed, or lapses, without a choice
      */
-    public boolean beginTargeting(@NotNull UUID rider) {
-        final CannonRide ride = rides.get(rider);
-        if (ride == null) {
-            return false;
-        }
-
-        ride.enter(RidePhase.TARGETING);
-        final Player player = Bukkit.getPlayer(rider);
-        if (player == null) {
-            return false;
-        }
-
-        final CannonProp cannon = ride.getCannon();
-        final List<CannonDestination> destinations = cannon == null ? List.of() : cannon.getDestinations();
+    public void selectDestination(@NotNull Player player, @NotNull CannonProp cannon,
+                                  @NotNull Consumer<CannonDestination> onChosen, @NotNull Runnable onCancel) {
+        final List<CannonDestination> destinations = cannon.getDestinations();
         if (destinations.isEmpty()) {
-            // Deferred a tick: this runs inside the cycle's fuse transition, and launching now would close the
-            // shot before the cycle applies the state this call returns, leaving the cannon stuck in TARGETING.
-            UtilServer.runTask(core, () -> launch(ride));
-            return true;
+            onChosen.accept(null);
+            return;
         }
 
         new SoundEffect(Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.6f).play(player);
-        new CannonDestinationMenu(destinations, destination -> chooseDestination(rider, destination)).show(player);
-        return true;
+        final AtomicBoolean chosen = new AtomicBoolean();
+        final Window window = new CannonDestinationMenu(destinations, destination -> {
+            chosen.set(true);
+            // Off the click: boarding swaps the player's game mode, which is not something to do to a client that is
+            // still closing a menu.
+            UtilServer.runTaskLater(core, () -> {
+                if (player.isOnline()) {
+                    onChosen.accept(destination);
+                } else {
+                    onCancel.run();
+                }
+            }, 1L);
+        }).show(player);
+
+        window.addCloseHandler(() -> {
+            if (!chosen.get()) {
+                onCancel.run();
+            }
+        });
+        UtilServer.runTaskLater(core, () -> {
+            if (!chosen.get() && window.isOpen()) {
+                window.close();
+            }
+        }, (long) (config.getRideTargetingSeconds() * 20L));
     }
 
-    /** Locks in a destination and fires immediately. Ignored unless the rider is still choosing. */
-    public void chooseDestination(@NotNull UUID rider, @NotNull CannonDestination destination) {
-        of(rider).filter(ride -> ride.getPhase() == RidePhase.TARGETING).ifPresent(ride -> {
-            ride.setTarget(destination.getLocation());
-            launch(ride);
+    /** Lights the fuse for a rider who has just boarded with their destination already picked. */
+    public void beginFuse(@NotNull UUID rider, @Nullable CannonDestination destination) {
+        of(rider).ifPresent(ride -> {
+            if (destination != null) {
+                ride.setTarget(destination.getLocation());
+            }
+            armFuse(ride);
         });
+    }
+
+    /**
+     * Lights the fuse now that the rider has somewhere to be fired at.
+     * <p>
+     * A private cannon burns its countdown on the ride itself, which is what lets several people be mid-shot in the
+     * same emplacement at once: the cannon is never claimed, so it never has to be handed back. A shared one hands the
+     * countdown to its own cycle, which raises the shot event and calls {@link #launch(UUID)} when the fuse runs out.
+     */
+    private void armFuse(@NotNull CannonRide ride) {
+        if (ride.isPrivateRide()) {
+            ride.enter(RidePhase.FUSING);
+            return;
+        }
+
+        final CannonProp cannon = ride.getCannon();
+        if (cannon == null || cannon.getCycle() == null || !cannon.getCycle().beginFuse(ride.getRider())) {
+            abort(ride);
+            return;
+        }
+        ride.enter(RidePhase.BOARDING);
+    }
+
+    /**
+     * Fires a rider whose shared cannon has burned its fuse down. Ignored if they are no longer waiting on one - they
+     * logged out, or the cannon went away and put them back.
+     */
+    public void launch(@NotNull UUID rider) {
+        of(rider).filter(ride -> ride.getPhase() == RidePhase.BOARDING).ifPresent(this::launch);
     }
 
     /**
@@ -243,7 +275,6 @@ public class CannonRideService {
             switch (ride.getPhase()) {
                 case BOARDING -> holdCameraOnCannon(ride, player);
                 case FUSING -> tickFusing(ride, player);
-                case TARGETING -> tickTargeting(ride, player);
                 case FLYING -> tickFlight(ride, player);
                 case FINISHED -> {
                 }
@@ -277,7 +308,7 @@ public class CannonRideService {
     }
 
     /**
-     * Burns this rider's own fuse on a private cannon, then hands them over to targeting.
+     * Burns this rider's own fuse on a private cannon, then fires them at the destination they already picked.
      * <p>
      * The crackle, the sparks and the countdown all go to the rider alone, so the several people who may be sitting in
      * the same barrel at the same time each see only their own shot coming.
@@ -300,36 +331,11 @@ public class CannonRideService {
                 return;
             }
 
-            beginTargeting(ride.getRider());
+            launch(ride);
             return;
         }
 
         cannon.emitFuse(player);
-    }
-
-    /**
-     * Holds the camera steady on the cannon while the destination menu is open, and fires anyway if the rider never
-     * picks - an abandoned menu must not leave them stuck in the barrel.
-     */
-    private void tickTargeting(@NotNull CannonRide ride, @NotNull Player player) {
-        final CannonProp cannon = ride.getCannon();
-        if (cannon != null && cannon.isMaterialized()) {
-            final Location camera = ride.getMannequin().getCamera().getLocation();
-            final Vector toCannon = cannon.getLocation().toVector().add(new Vector(0, 2.5, 0)).subtract(camera.toVector());
-            if (toCannon.lengthSquared() > 1.0E-4) {
-                ride.getMannequin().aimCamera(toCannon);
-                lookAt(player, toCannon);
-            }
-        }
-
-        if (ride.millisInPhase() >= (long) (config.getRideTargetingSeconds() * 1000L)) {
-            final List<CannonDestination> destinations = cannon == null ? List.of() : cannon.getDestinations();
-            if (!destinations.isEmpty()) {
-                ride.setTarget(destinations.getFirst().getLocation());
-            }
-            player.closeInventory();
-            launch(ride);
-        }
     }
 
     private void tickFlight(@NotNull CannonRide ride, @NotNull Player player) {
@@ -375,6 +381,8 @@ public class CannonRideService {
      * spot they clicked from.
      */
     public void abort(@NotNull CannonRide ride) {
+        releaseCycle(ride);
+
         final Player player = Bukkit.getPlayer(ride.getRider());
         if (player == null) {
             ride.enter(RidePhase.FINISHED);
@@ -388,6 +396,20 @@ public class CannonRideService {
             player.teleport(origin);
         }
         player.setGameMode(ride.getOrigin().toGameMode());
+    }
+
+    /**
+     * Hands a shared emplacement back after a ride that never fired. Nothing was chambered and no shot was taken, so
+     * the cannon returns to being usable rather than dropping into a cooldown the next person would have to wait out.
+     */
+    private void releaseCycle(@NotNull CannonRide ride) {
+        final CannonProp cannon = ride.getCannon();
+        if (ride.isPrivateRide() || cannon == null || cannon.getCycle() == null) {
+            return;
+        }
+        if (ride.getRider().equals(cannon.getCycle().getOperator())) {
+            cannon.getCycle().abort();
+        }
     }
 
     /**
@@ -429,10 +451,23 @@ public class CannonRideService {
         }, 2L);
     }
 
+    /**
+     * Hides every restricted mannequin from a player who joined while its ride was still in the barrel. The server
+     * tracks the body for anyone in range, so a private ride only stays private if each new client is told to hide it.
+     */
+    public void hideRestrictedFrom(@NotNull Player viewer) {
+        for (CannonRide ride : rides.values()) {
+            ride.getMannequin().applyVisibility(viewer);
+        }
+    }
+
     /** Leaves the durable record in place so the rider is restored on their next join. */
     public void onQuit(@NotNull UUID rider) {
         final CannonRide ride = rides.remove(rider);
         if (ride != null) {
+            // Someone who logs out while choosing would otherwise leave the emplacement claimed by a rider who is
+            // never coming back to fire it.
+            releaseCycle(ride);
             ride.getMannequin().remove();
         }
     }

@@ -101,7 +101,7 @@ public class CannonCycle implements SceneBehavior {
 
     /** Starts the fuse on behalf of {@code operatorId}. No-op unless the cannon is chambered and idle-handed. */
     public boolean beginFuse(@NotNull UUID operatorId) {
-        if (state != CannonState.LOADED && state != CannonState.BOARDING) {
+        if (state != CannonState.LOADED && state != CannonState.TARGETING) {
             return false;
         }
         this.operator = operatorId;
@@ -109,10 +109,10 @@ public class CannonCycle implements SceneBehavior {
         return true;
     }
 
-    /** Puts a rider aboard without starting the fuse yet. */
-    public void beginBoarding(@NotNull UUID operatorId) {
+    /** Claims the cannon for a rider who is choosing where to be fired, before any fuse is lit. */
+    public void beginTargeting(@NotNull UUID operatorId) {
         this.operator = operatorId;
-        transition(CannonState.BOARDING);
+        transition(CannonState.TARGETING);
     }
 
     /**
@@ -181,7 +181,6 @@ public class CannonCycle implements SceneBehavior {
                         .inverted().getTextColor();
                 yield Component.text(UtilFormat.formatNumber(secondsLeft, 1) + "s", color, TextDecoration.BOLD);
             }
-            case BOARDING -> Component.text("BOARDING", NamedTextColor.AQUA, TextDecoration.BOLD);
             case TARGETING -> Component.text("TARGETING", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD);
             case LOADED -> Component.text("LOADED", NamedTextColor.GOLD, TextDecoration.BOLD);
             case IDLE -> Component.empty();

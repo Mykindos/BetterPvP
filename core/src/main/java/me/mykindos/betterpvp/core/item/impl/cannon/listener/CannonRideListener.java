@@ -38,6 +38,7 @@ public class CannonRideListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
         rideService.restoreIfStranded(event.getPlayer());
+        rideService.hideRestrictedFrom(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

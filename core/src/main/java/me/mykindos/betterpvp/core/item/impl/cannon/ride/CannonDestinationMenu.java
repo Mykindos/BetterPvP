@@ -21,7 +21,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 /**
- * Where a rider picks the landing site they will be fired at, shown once the fuse burns out.
+ * Where a rider picks the landing site they will be fired at, shown as soon as they climb in. Nothing is lit until
+ * they choose, and closing this menu without choosing puts them back on the ground.
  * <p>
  * Laid out like the navigator's island menu: one destination centred at the bottom and the rest scattered above it, so
  * the choices read as points on a map rather than a list.
@@ -63,8 +64,10 @@ public class CannonDestinationMenu extends AbstractGui implements Windowed {
             @Override
             public void handleClick(@NotNull ClickType clickType, @NotNull Player player,
                                     @NotNull InventoryClickEvent event) {
-                player.closeInventory();
+                // Selection before close: closing this menu is what cancels an unmade choice, so the choice has to
+                // already be locked in by the time the close handler runs.
                 onSelect.accept(destination);
+                player.closeInventory();
             }
         };
     }

@@ -82,7 +82,7 @@ public class CannonConfig implements Reloadable {
         clusterInnerRadius = getDouble(config, "cannon.cluster.damage-min-radius", 1.0);
         clusterOuterRadius = getDouble(config, "cannon.cluster.damage-max-radius", 3.0);
 
-        rideTargetingSeconds = getDouble(config, "cannon.ride.targeting-seconds", 3.0);
+        rideTargetingSeconds = getDouble(config, "cannon.ride.targeting-seconds", 15.0);
         rideMaxRange = getDouble(config, "cannon.ride.max-range", 120.0);
         rideMinFlightTicks = config.getOrSaveInt("cannon.ride.min-flight-ticks", 25);
         rideMaxFlightTicks = config.getOrSaveInt("cannon.ride.max-flight-ticks", 110);

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.impl.cannon.event.CannonFuseEvent;
+import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonDestination;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonState;
 import me.mykindos.betterpvp.core.item.impl.cannon.ride.CannonRideService;
@@ -17,7 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 /**
- * The human cannonball: a single click boards the clicker, and the whole sequence runs from there - fuse, aim, launch.
+ * The human cannonball: a click asks the clicker where they want to go, and picking somewhere boards them, lights the
+ * fuse and launches them.
  * <p>
  * Shares the model, animations, aiming, tags, persistence and chunk lifecycle of every other cannon, differing only in
  * what it chambers and what happens when the fuse runs out.
@@ -62,24 +64,37 @@ public class PassengerFiringMode implements CannonFiringMode {
             return false;
         }
 
+        // Aim first, from the ground: the rider picks a destination, and only that choice puts them in the barrel and
+        // lights the fuse. A shared emplacement is claimed for the whole choosing window so nobody climbs in behind a
+        // rider who has not committed yet.
+        if (shared) {
+            cannon.getCycle().beginTargeting(player.getUniqueId());
+        }
+        rides.get().selectDestination(player, cannon,
+                destination -> chamber(cannon, player, destination),
+                () -> releaseCycle(cannon, player));
+        return true;
+    }
+
+    /**
+     * Puts a rider who has committed to a destination in the barrel and lights the fuse. Anything vetoing the fuse, or
+     * a rider who can no longer board, hands a shared emplacement back rather than leaving it claimed.
+     */
+    private void chamber(@NotNull CannonProp cannon, @NotNull Player player, @Nullable CannonDestination destination) {
         final CannonFuseEvent event = new CannonFuseEvent(cannon, player);
         event.callEvent();
-        if (event.isCancelled()) {
-            return false;
+        if (event.isCancelled() || !rides.get().board(player, cannon)) {
+            releaseCycle(cannon, player);
+            return;
         }
+        rides.get().beginFuse(player.getUniqueId(), destination);
+    }
 
-        if (!rides.get().board(player, cannon)) {
-            return false;
+    /** Hands a shared emplacement back, if this player is the one still holding it. */
+    private void releaseCycle(@NotNull CannonProp cannon, @NotNull Player player) {
+        if (cannon.getCycle() != null && player.getUniqueId().equals(cannon.getCycle().getOperator())) {
+            cannon.getCycle().abort();
         }
-
-        // One gesture does both: there is no second click to light the fuse.
-        if (shared) {
-            cannon.getCycle().beginBoarding(player.getUniqueId());
-            cannon.getCycle().beginFuse(player.getUniqueId());
-        } else {
-            rides.get().beginFuse(player.getUniqueId());
-        }
-        return true;
     }
 
     @Override
@@ -90,19 +105,14 @@ public class PassengerFiringMode implements CannonFiringMode {
     @Override
     public @NotNull CannonState onFuseComplete(@NotNull CannonProp cannon, @Nullable Player operator,
                                                @NotNull UUID operatorId) {
-        // The fuse is spent, but the shot is not over: the rider now picks where to land, and the ride closes the
-        // cycle itself once they are away. A rider who is no longer aboard - they logged out on the fuse - leaves
-        // nothing to wait for, so the cannon recovers instead of holding a shot that will never be taken.
-        return rides.get().beginTargeting(operatorId) ? CannonState.TARGETING : CannonState.COOLDOWN;
+        // The rider aimed before the fuse was ever lit, so there is nothing left to decide: they go now. A rider who
+        // is no longer aboard - they logged out on the fuse - simply leaves the cannon to recover.
+        rides.get().launch(operatorId);
+        return CannonState.COOLDOWN;
     }
 
     @Override
     public @NotNull Component actionLine(@NotNull CannonProp cannon) {
-        if (cannon.getCycleState() == CannonState.TARGETING) {
-            return Component.text("Look", NamedTextColor.WHITE, TextDecoration.BOLD)
-                    .append(Component.text(" to ", NamedTextColor.AQUA))
-                    .append(Component.text("Aim", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD));
-        }
         if (cannon.getCycleState().isBusy()) {
             return Component.empty();
         }
