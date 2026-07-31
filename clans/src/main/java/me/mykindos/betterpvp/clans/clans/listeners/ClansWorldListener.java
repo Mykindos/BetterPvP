@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.clans.world.SurvivalWorlds;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -126,6 +127,7 @@ public class ClansWorldListener extends ClanListener {
     private final ItemFactory itemFactory;
     private final BlockTagManager blockTagHandler;
     private final ZoneManager zoneManager;
+    private final SurvivalWorlds survivalWorlds;
     public static final String AGGRESSIVE_RODDER_UNLOCKED = "aggressive_rodder_unlocked";
 
     @Inject
@@ -142,7 +144,7 @@ public class ClansWorldListener extends ClanListener {
     public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans,
                               final EffectManager effectManager, final EnergyService energyService, final CooldownManager cooldownManager,
                               final WorldBlockHandler worldBlockHandler, ItemRegistry itemRegistry, ItemFactory itemFactory, BlockTagManager blockTagHandler,
-                              ZoneManager zoneManager) {
+                              ZoneManager zoneManager, SurvivalWorlds survivalWorlds) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
@@ -153,6 +155,7 @@ public class ClansWorldListener extends ClanListener {
         this.itemFactory = itemFactory;
         this.blockTagHandler = blockTagHandler;
         this.zoneManager = zoneManager;
+        this.survivalWorlds = survivalWorlds;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -734,6 +737,13 @@ public class ClansWorldListener extends ClanListener {
             }
 
             if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
+                if (this.survivalWorlds.allows(player.getWorld())) {
+                    if (player.getGameMode() == GameMode.ADVENTURE) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                    }
+                    continue;
+                }
+
                 final Client client = this.clientManager.search().online(player);
                 if (!client.isAdministrating() && player.getGameMode() == GameMode.SURVIVAL) {
                     player.setGameMode(GameMode.ADVENTURE);

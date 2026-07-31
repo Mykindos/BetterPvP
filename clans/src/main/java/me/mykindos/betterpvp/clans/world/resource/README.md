@@ -28,8 +28,31 @@ profession: Mining                # Mining | Woodcutting | Fishing (capitalised)
 level: 25                         # minimum profession level to harvest (gate). Default 0 (ungated).
 displayName: "Copper Mine"        # label text. Default: the file name.
 lootTable: copper_mine            # loot-table id resolved from Supabase (tree/fishing). Ore sets loot per-chain — see below.
-respawn: 45                       # seconds before a harvested node restores.
+respawn: 45                       # seconds before a harvested node restores, or none|never for a node that never does.
 ```
+
+### One-shot nodes (`respawn: none`)
+
+`respawn` accepts either a delay in seconds or the sentinel `none`/`never` (case-insensitive), which marks the node
+**one-shot**: harvested once and never restored. This is the setting for discovery-island content — a cloned island
+world the player strips and leaves, where a node coming back would be wrong. An unparseable `respawn` value is logged
+and falls back to the default delay rather than breaking the node.
+
+One-shot composes with `parent:` — a shared template can stay on a normal respawn timer while an island variant of the
+same node overrides it to `none`:
+
+```yaml
+parent: willow_tree
+match: { name: willow_island }
+respawn: none      # this placement never regrows; the willow_tree template it inherits from still does
+```
+
+Per archetype, one-shot means:
+
+- **Tree** — fells normally and stays a stump forever.
+- **Ore** — degrades/drops normally and never restores to its original material.
+- **Fishing** — `respawn` is already unused here (fishing nodes don't consume blocks), so `respawn: none` is harmless
+  and has no effect.
 
 > Definitions are **world-agnostic**: a node binds to *every* matching region in *every* loaded world. Place the same
 > tag in two worlds and you get a node in each — no `world` field to set.
@@ -167,7 +190,8 @@ follows the stone chain from the start.
 **Steps:** build the ore blocks into the map → draw a cuboid region around the mine, tag it `copper_mine` → set
 `mining.xpPerBlock` for the ore in the Progression config → create any loot tables you reference in Supabase.
 
-*Global speed:* world events (Mining Madness) can multiply all ore respawn speed via `ResourceNodeSpeed`.
+*Global speed:* world events (Mining Madness) can multiply all ore respawn speed via `ResourceNodeSpeed`. A one-shot
+node (`respawn: none`) is immune to this multiplier — it never restores no matter how it's tuned.
 
 ---
 
@@ -177,7 +201,8 @@ Bind to a **perspective** region (a point with a facing). The marker's **locatio
 (snapped to 90°) is the rotation**. The tree is built entirely from authored schematics — you don't build each tree in
 the world, you place a marker and the system pastes the tree there, rotated to the marker's facing. Hitting it
 `tree.hits` times fells it through the stage schematics (last = stump) and rolls the loot table; after `respawn`
-seconds the standing schematic is re-pasted (its own air clears the debris).
+seconds the standing schematic is re-pasted (its own air clears the debris) — or, with `respawn: none`, the tree
+simply stays a stump.
 
 ```yaml
 archetype: tree

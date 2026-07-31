@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.scene.behavior.ScriptEffectBehavior;
 import me.mykindos.betterpvp.core.scene.behavior.Waypoint;
 import me.mykindos.betterpvp.core.scene.behavior.WaypointPatrolBehavior;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
+import me.mykindos.betterpvp.core.scene.npc.NpcInteractionRegistry;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
@@ -56,7 +57,8 @@ import java.util.Locale;
  *   <li>{@code npc_resident} (perspective) - one villager. {@code id:} names it (only needed if it
  *       has wares), {@code skin:} picks the blueprint, {@code name:}/{@code role:} the nameplate,
  *       {@code route:} makes it walk, and {@code speed:}/{@code mode:}/{@code dwell:}/{@code nav:}
- *       tune that.</li>
+ *       tune that. {@code interact:} names something for right-clicking to open - {@code interact:trade}
+ *       makes this resident a broker.</li>
  *   <li>{@code npc_route} (path) - an ordered walk, matched to a resident by {@code id:}. Waypoint
  *       order comes from the path itself; facing at each stop comes from the waypoint. The resident
  *       walks the drawn line, so a route that bends around a building needs a waypoint on the corner;
@@ -84,9 +86,11 @@ public class SpawnResidents implements WorldContent {
     private static final long DEFAULT_DWELL_MILLIS = 3000L;
 
     private final SceneObjectFactory objectFactory;
+    private final NpcInteractionRegistry npcInteractions;
 
-    public SpawnResidents(SceneObjectFactory objectFactory) {
+    public SpawnResidents(SceneObjectFactory objectFactory, NpcInteractionRegistry npcInteractions) {
         this.objectFactory = objectFactory;
+        this.npcInteractions = npcInteractions;
     }
 
     @Override
@@ -152,6 +156,8 @@ public class SpawnResidents implements WorldContent {
                 new PatternTag("dwell", "dwell:\\d+", "dwell:<millis>", "Pause at each waypoint", true, resident),
                 new PatternTag("nav", "nav:(direct|path)", "nav:<direct|path>",
                         "Walk the route exactly (direct), or pathfind between its points (path)", true, resident),
+                new PatternTag("interact", "interact:.+", "interact:<action>",
+                        "What right-clicking this resident opens, e.g. trade", true, resident),
 
                 // Display
                 new PatternTag("resident", "resident:.+", "resident:<id>", "Which resident this belongs to", true, display),
@@ -175,6 +181,7 @@ public class SpawnResidents implements WorldContent {
         final String walkAnimation = tags.getString("walk", DEFAULT_WALK);
         final String displayName = tags.getString("name", "Villager");
         final String role = tags.getString("role", "");
+        final String interaction = tags.getString("interact", "");
 
         final List<Waypoint> route = route(tags, routes, world);
         final List<ItemShowcaseBehavior.ShowcaseItem> wares = wares(id, displays, world);
@@ -210,6 +217,9 @@ public class SpawnResidents implements WorldContent {
 
             resident.setInteractionHandler(player -> {
                 ModelEngineHelper.playAnimation(model, DEFAULT_INTERACT, 0.2, 0.1, 1.0, false);
+                if (!interaction.isBlank()) {
+                    npcInteractions.run(interaction, player);
+                }
             });
         });
 

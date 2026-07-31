@@ -1,0 +1,25 @@
+# Discovery island templates. Each top-level key is the template's id, cloned by IslandWorldProvisioner to spawn a
+# fresh IslandInstance.
+#
+# display-name     : shown to players
+# template-folder   : path of the template world folder, relative to the Bukkit world container
+# icon              : Material used to represent this island in menus
+
+mining:
+  display-name: "Mining Isle"
+  template-folder: "templates/islands/mining"
+  icon: IRON_PICKAXE
+
+woodcutting:
+  display-name: "Woodcutting Isle"
+  template-folder: "templates/islands/woodcutting"
+  icon: OAK_LOG
+
+fishing:
+  display-name: "Fishing Isle"
+  template-folder: "templates/islands/fishing"
+  icon: FISHING_ROD
+
+# Which server hosts each island template, by key. A template with no entry here defaults to the server it is
+# running on. Leave empty for an all-local setup.
+hosting: { }

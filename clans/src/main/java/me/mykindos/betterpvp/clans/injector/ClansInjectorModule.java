@@ -11,6 +11,17 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.PlayerDeathFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
+import me.mykindos.betterpvp.clans.world.island.InstanceAllocationPolicy;
+import me.mykindos.betterpvp.clans.world.island.IslandAllocator;
+import me.mykindos.betterpvp.clans.world.island.RoutingIslandAllocator;
+import me.mykindos.betterpvp.clans.world.island.RoutingTravelTransport;
+import me.mykindos.betterpvp.clans.world.island.SoloAllocationPolicy;
+import me.mykindos.betterpvp.clans.world.island.TravelTransport;
+import me.mykindos.betterpvp.clans.world.travel.TravelGuard;
+import me.mykindos.betterpvp.clans.world.travel.guard.AllocatingTravelGuard;
+import me.mykindos.betterpvp.clans.world.travel.guard.AlreadyOnIslandTravelGuard;
+import me.mykindos.betterpvp.clans.world.travel.guard.CombatTravelGuard;
+import me.mykindos.betterpvp.clans.world.travel.guard.DepartingTravelGuard;
 
 public class ClansInjectorModule extends AbstractModule {
 
@@ -37,6 +48,23 @@ public class ClansInjectorModule extends AbstractModule {
 
         final Multibinder<FatiguePunishment> punishments = Multibinder.newSetBinder(binder(), FatiguePunishment.class);
         punishments.addBinding().to(SlownessPunishment.class);
+
+        // Travel guards. Adding a new restriction on where/when a player may travel is a single line here.
+        final Multibinder<TravelGuard> travelGuards = Multibinder.newSetBinder(binder(), TravelGuard.class);
+        travelGuards.addBinding().to(CombatTravelGuard.class);
+        travelGuards.addBinding().to(DepartingTravelGuard.class);
+        travelGuards.addBinding().to(AlreadyOnIslandTravelGuard.class);
+        travelGuards.addBinding().to(AllocatingTravelGuard.class);
+
+        // Discovery island occupancy. Solo for now; swapping to a shared/pooled policy is a single line here.
+        bind(InstanceAllocationPolicy.class).to(SoloAllocationPolicy.class);
+
+        // Where a discovery island instance comes from, and how a player physically gets to one. Both are routed
+        // per-template (allocation) or per-handle (delivery) by IslandHostRouter, so hosting can be split across
+        // servers on a per-template basis rather than as a single global local/remote switch. The local
+        // implementations stay bound as concrete classes so the routers can compose them directly.
+        bind(IslandAllocator.class).to(RoutingIslandAllocator.class);
+        bind(TravelTransport.class).to(RoutingTravelTransport.class);
     }
 
 }

@@ -5,13 +5,13 @@ import com.google.inject.Singleton;
 import dev.brauw.mapper.region.CuboidRegion;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
+import me.mykindos.betterpvp.clans.world.resource.BlockReplacementStore;
 import me.mykindos.betterpvp.clans.world.resource.DegradeChain;
 import me.mykindos.betterpvp.clans.world.resource.ResourceArchetype;
 import me.mykindos.betterpvp.clans.world.resource.ResourceLoot;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeManager;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeProp;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeSpeed;
-import me.mykindos.betterpvp.clans.world.resource.BlockReplacementStore;
 import me.mykindos.betterpvp.clans.world.resource.Respawn;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
@@ -201,12 +201,15 @@ public class OreArchetype implements ResourceArchetype {
         }
 
         // A snapshotted resource point mined from its intact state schedules a respawn back to its original ore, and is
-        // persisted so it survives a restart mid-respawn (and the next scan does not mis-read the degraded block).
+        // persisted so it survives a restart mid-respawn (and the next scan does not mis-read the degraded block). A
+        // one-shot point never respawns, so nothing would ever consult or clear that persisted record - skip writing it.
         if (point != null && point.active && current.equals(point.chain.first())) {
             point.lastMinedMs = System.currentTimeMillis();
             point.active = false;
-            progressStore.markDirty(block.getWorld().getName(), point.x, point.y, point.z,
-                    point.original.getAsString(), point.lastMinedMs);
+            if (!node.getDefinition().isOneShot()) {
+                progressStore.markDirty(block.getWorld().getName(), point.x, point.y, point.z,
+                        point.original.getAsString(), point.lastMinedMs);
+            }
         }
         return true;
     }
@@ -220,8 +223,8 @@ public class OreArchetype implements ResourceArchetype {
     @Override
     public void tick(@NotNull ResourceNodeProp node) {
         final OreField field = fields.get(node.getId());
-        if (field == null) {
-            return;
+        if (field == null || node.getDefinition().isOneShot()) {
+            return; // one-shot ore is snapshotted (its degrade chain still needs the origin) but never restores
         }
 
         final long now = System.currentTimeMillis();

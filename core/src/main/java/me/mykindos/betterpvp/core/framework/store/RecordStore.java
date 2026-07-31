@@ -14,10 +14,13 @@ import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 /**
  * A crash-surviving key→record store: one tiny binary file per record under a fixed directory, written the moment a
@@ -77,6 +80,26 @@ public class RecordStore<T> {
         if (file.exists() && !file.delete()) {
             log.warn("Could not delete record {}", file).submit();
         }
+    }
+
+    /**
+     * Drops every record matching {@code predicate}, deleting each backing file. Used by callers that key records by
+     * a field the store itself doesn't understand (e.g. a world name embedded in the record body) — the facade owning
+     * that shape supplies the predicate, the store still owns the removal and file deletion.
+     *
+     * @return the number of records removed
+     */
+    public int removeIf(@NotNull Predicate<T> predicate) {
+        final List<String> matched = new ArrayList<>();
+        for (Map.Entry<String, T> entry : records.entrySet()) {
+            if (predicate.test(entry.getValue())) {
+                matched.add(entry.getKey());
+            }
+        }
+        for (String key : matched) {
+            remove(key);
+        }
+        return matched.size();
     }
 
     private void write(@NotNull String key, @NotNull T record) {

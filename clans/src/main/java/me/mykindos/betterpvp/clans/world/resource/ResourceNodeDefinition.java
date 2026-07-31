@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.clans.world.resource;
 
-import me.mykindos.betterpvp.core.world.mapper.RegionTags;
+import lombok.CustomLog;
 import lombok.Getter;
+import lombok.Value;
+import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,9 +13,14 @@ import org.jetbrains.annotations.Nullable;
  * profession gate, the loot table, and respawn timing. The archetype-specific block (e.g. {@code tree:}, {@code ore:},
  * {@code fishing:}) is exposed verbatim via {@link #getArchetypeSection()} so each archetype reads its own knobs.
  * <p>
+ * {@code respawn} is either a delay in seconds ({@link #getRespawnSeconds()}) or the sentinel {@code none}/{@code
+ * never} (case-insensitive), which marks the node {@link #isOneShot()} — harvested once and never restored. Each
+ * archetype is responsible for early-outing its own respawn logic when {@link #isOneShot()} is set.
+ * <p>
  * Region tags can override {@code level} and {@code displayName} per placement (see {@link RegionTags}).
  */
 @Getter
+@CustomLog
 public final class ResourceNodeDefinition {
 
     private final String id;
@@ -24,11 +31,13 @@ public final class ResourceNodeDefinition {
     private final String displayName;
     private final @Nullable String lootTable;
     private final double respawnSeconds;
+    private final boolean oneShot;
     private final ConfigurationSection root;
 
     private ResourceNodeDefinition(String id, String archetype, @Nullable String matchName,
                                    @Nullable String profession, int level, String displayName,
-                                   @Nullable String lootTable, double respawnSeconds, ConfigurationSection root) {
+                                   @Nullable String lootTable, double respawnSeconds, boolean oneShot,
+                                   ConfigurationSection root) {
         this.id = id;
         this.archetype = archetype;
         this.matchName = matchName;
@@ -37,6 +46,7 @@ public final class ResourceNodeDefinition {
         this.displayName = displayName;
         this.lootTable = lootTable;
         this.respawnSeconds = respawnSeconds;
+        this.oneShot = oneShot;
         this.root = root;
     }
 
@@ -64,6 +74,7 @@ public final class ResourceNodeDefinition {
             return null;
         }
         final String displayName = config.getString("displayName", id);
+        final RespawnValue respawn = parseRespawn(id, config);
         return new ResourceNodeDefinition(
                 id,
                 archetype.toLowerCase(),
@@ -72,7 +83,43 @@ public final class ResourceNodeDefinition {
                 config.getInt("level", 0),
                 displayName,
                 config.getString("lootTable"),
-                config.getDouble("respawn", 60.0),
+                respawn.getSeconds(),
+                respawn.isOneShot(),
                 config);
+    }
+
+    /**
+     * Parses {@code respawn} as either a delay in seconds or the sentinel {@code none}/{@code never}
+     * (case-insensitive) for a node that never restores. A missing or unparseable value falls back to the 60-second
+     * default rather than throwing.
+     */
+    private static @NotNull RespawnValue parseRespawn(@NotNull String id, @NotNull ConfigurationSection config) {
+        final Object raw = config.get("respawn");
+        if (raw == null) {
+            return new RespawnValue(60.0, false);
+        }
+        if (raw instanceof Number number) {
+            return new RespawnValue(number.doubleValue(), false);
+        }
+        if (raw instanceof String text) {
+            if (text.equalsIgnoreCase("none") || text.equalsIgnoreCase("never")) {
+                return new RespawnValue(60.0, true);
+            }
+            try {
+                return new RespawnValue(Double.parseDouble(text.trim()), false);
+            } catch (NumberFormatException invalid) {
+                log.warn("Node '{}' has an unparseable 'respawn' value '{}' - defaulting to 60 seconds", id, text).submit();
+                return new RespawnValue(60.0, false);
+            }
+        }
+        log.warn("Node '{}' has an unparseable 'respawn' value '{}' - defaulting to 60 seconds", id, raw).submit();
+        return new RespawnValue(60.0, false);
+    }
+
+    /** A parsed {@code respawn} value: the delay to use, and whether it was the one-shot sentinel. */
+    @Value
+    private static class RespawnValue {
+        double seconds;
+        boolean oneShot;
     }
 }

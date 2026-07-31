@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -33,6 +34,11 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class NameSearchButton extends AbstractItem {
 
+    /**
+     * What is being searched, e.g. items or players. Filled into the input's label so the prompt reads
+     * as the menu it is in rather than assuming everything searchable is an item.
+     */
+    private final ComponentLike subject;
     private final Supplier<String> getter;
     private final Consumer<String> setter;
 
@@ -72,7 +78,7 @@ public class NameSearchButton extends AbstractItem {
 
     private void createDialog(RegistryBuilderFactory<@NotNull Dialog, ? extends DialogRegistryEntry.Builder> factory) {
         final DialogRegistryEntry.Builder builder = factory.empty();
-        final TextDialogInput input = DialogInput.text("search", Translations.component("core.menu.dialog.search.prompt")).maxLength(20).build();
+        final TextDialogInput input = DialogInput.text("search", Translations.component("core.menu.dialog.search.prompt", subject)).maxLength(20).build();
         builder.base(DialogBase.builder(Translations.component("core.menu.button.search.name"))
                 .inputs(List.of(input))
                 .build());

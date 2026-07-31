@@ -100,6 +100,9 @@ server:
     fastNightCycle: true
     mainWorld: world
 command:
+  leaveisland:
+    enabled: true
+    requiredRank: PLAYER
   allychat:
     enabled: true
     requiredRank: ADMIN

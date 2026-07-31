@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.filter.NameSearchButton;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -54,7 +55,7 @@ public class ShopMenu extends AbstractPagedGui<IShopItem> implements Windowed {
 
         // we have to do this because we want to pass this
         setItem(45, new SortButton(this));
-        setItem(49, new NameSearchButton(() -> nameFilter, filter -> {
+        setItem(49, new NameSearchButton(Translations.component("core.menu.search.subject.items"), () -> nameFilter, filter -> {
             nameFilter = filter;
             refresh();
         }));

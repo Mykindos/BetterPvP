@@ -57,7 +57,7 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
         this.auctionManager = auctionManager;
         this.auctionFilter = auctionFilter;
 
-        setItem(52, new NameSearchButton(() -> nameSearch, newName -> {
+        setItem(52, new NameSearchButton(Translations.component("core.menu.search.subject.items"), () -> nameSearch, newName -> {
             nameSearch = newName;
             refresh();
         }));

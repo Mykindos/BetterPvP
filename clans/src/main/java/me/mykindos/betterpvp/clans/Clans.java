@@ -17,6 +17,8 @@ import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
+import me.mykindos.betterpvp.clans.world.travel.ServerLocation;
+import me.mykindos.betterpvp.clans.world.travel.TravelHistory;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -37,12 +39,14 @@ import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
 import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
+import me.mykindos.betterpvp.core.world.WorldHandler;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -174,10 +178,31 @@ public class Clans extends BPvPPlugin {
     public void onDisable() {
         clanManager.getRepository().processPropertyUpdates(false);
         if (injector != null) {
+            // Island worlds are deleted by IslandBootRecovery at next boot, so anyone still inside one must be moved
+            // out before their logout location is saved into a world that won't exist on rejoin. Synchronous: async
+            // tasks don't run reliably during disable.
+            evacuateIslandOccupants();
+
             // Unload scene content so each archetype's onDeactivate fires on a graceful shutdown (the previously-unused
             // SceneLoaderManager.shutdown()). In-flight respawn points are already persisted synchronously as they are
             // mined, so no final flush is needed here.
             injector.getInstance(SceneLoaderManager.class).shutdown();
+        }
+    }
+
+    private void evacuateIslandOccupants() {
+        final TravelHistory travelHistory = injector.getInstance(TravelHistory.class);
+        final WorldHandler worldHandler = injector.getInstance(WorldHandler.class);
+        for (World world : Bukkit.getWorlds()) {
+            if (!world.getName().startsWith("islands/")) {
+                continue;
+            }
+            for (Player player : world.getPlayers()) {
+                final Location destination = travelHistory.origin(player)
+                        .flatMap(ServerLocation::toLocation)
+                        .orElseGet(worldHandler::getSpawnLocation);
+                player.teleport(destination);
+            }
         }
     }
 }

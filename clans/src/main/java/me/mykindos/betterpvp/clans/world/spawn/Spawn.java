@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonService;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
+import me.mykindos.betterpvp.core.scene.npc.NpcInteractionRegistry;
 import me.mykindos.betterpvp.core.world.zone.GlobalBounds;
 import me.mykindos.betterpvp.core.world.zone.NoBuildRule;
 import me.mykindos.betterpvp.core.world.zone.Zone;
@@ -37,23 +38,25 @@ public class Spawn extends Island implements WorldContent {
     private final ClientManager clientManager;
     private final ClansSceneObjectFactory clansSceneFactory;
     private final HumanCannon humanCannon;
+    private final NpcInteractionRegistry npcInteractions;
     private final Provider<Aldenmark> aldenmark; // circular dependency
 
     @Inject
     private Spawn(@NotNull ZoneManager zoneManager, @NotNull SceneObjectRegistry sceneRegistry, @NotNull SceneLoaderManager loaderManager,
                   @NotNull Clans clans, ClientManager clientManager, ClansSceneObjectFactory clansSceneFactory,
-                  CannonService cannonService, Provider<Aldenmark> aldenmark) {
+                  CannonService cannonService, NpcInteractionRegistry npcInteractions, Provider<Aldenmark> aldenmark) {
         super(zoneManager, sceneRegistry, loaderManager, clans);
         this.clientManager = clientManager;
         this.clansSceneFactory = clansSceneFactory;
         this.humanCannon = new HumanCannon(cannonService);
+        this.npcInteractions = npcInteractions;
         this.aldenmark = aldenmark;
     }
 
     @Override
     public @NotNull List<WorldContent> content() {
         final Dock dock = new Dock(clientManager, clansSceneFactory, List.of(aldenmark.get()));
-        final SpawnResidents residents = new SpawnResidents(clansSceneFactory);
+        final SpawnResidents residents = new SpawnResidents(clansSceneFactory, npcInteractions);
         return List.of(this, dock, this.humanCannon, residents);
     }
 

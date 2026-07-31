@@ -6,6 +6,7 @@ import dev.brauw.mapper.region.CuboidRegion;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
+import lombok.Value;
 import me.mykindos.betterpvp.clans.world.resource.BlockBatchStore;
 import me.mykindos.betterpvp.clans.world.resource.ResourceArchetype;
 import me.mykindos.betterpvp.clans.world.resource.ResourceLoot;
@@ -52,12 +53,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * and rolls the loot table. Frames are applied non-destructively — each is overlaid with {@link
  * SchematicAnimator#pasteCapturing} ({@code //paste -a}, solid blocks only) and the previous frame is backed out with
  * {@link SchematicAnimator#restore} ({@code //undo}) before the next is shown, so surrounding decoration is never
- * touched and exiting a frame restores exactly what it overwrote. After the respawn delay the stump is undone and the
- * standing schematic re-placed. Only the transient fell frames are mirrored to a {@link BlockBatchStore} (standing, the
- * resting state, caches nothing — like the ore store): a fresh activation restores whatever fell frame a previous run
- * left — a graceful stop, or a crash mid-animation — reverting the debris to bare ground before standing goes back down,
- * then clears the record. Standing's own cells were air, so re-airing them (config-derived) fells the tree cleanly even
- * after a restart while it stood.
+ * touched and exiting a frame restores exactly what it overwrote. For a respawning tree, the delay elapsed the stump
+ * is undone and the standing schematic re-placed. Every fell frame's undo is mirrored to a {@link BlockBatchStore},
+ * keyed by (world, region): a fresh activation restores whatever fell frame a previous run left showing — a graceful
+ * stop, or a crash mid-animation — reverting the debris to bare ground before standing goes back down, then the record
+ * is cleared once standing is placed. Standing's own cells were air, so re-airing them (config-derived) fells the tree
+ * cleanly even after a restart while it stood. A one-shot node (`respawn: none`) never re-places standing, so its
+ * final frame's record is left in place instead of being cleared — {@link #onActivate} reads its presence as proof
+ * the tree was already felled and leaves the stump standing rather than resurrecting the tree.
  */
 @Singleton
 @CustomLog
@@ -70,7 +73,7 @@ public class TreeArchetype implements ResourceArchetype {
     private final BlockBatchStore frameStore;
     private final ClientManager clientManager;
 
-    private final Map<UUID, TreePlacement> placements = new ConcurrentHashMap<>();
+    private final Map<PlacementKey, TreePlacement> placements = new ConcurrentHashMap<>();
     private final Map<Integer, TreeRuntime> trees = new ConcurrentHashMap<>();
 
     @Inject
@@ -104,7 +107,19 @@ public class TreeArchetype implements ResourceArchetype {
     public void onActivate(@NotNull ResourceNodeProp node) {
         final TreePlacement placement = prepare(node.getDefinition(), (PerspectiveRegion) node.getRegion());
         final TreeRuntime runtime = new TreeRuntime(placement);
-        placeStanding(runtime, true);
+        final World world = placement.anchor.getWorld();
+        final boolean harvested = node.getDefinition().isOneShot() && world != null
+                && !placement.stages.isEmpty() && frameStore.get(placement.regionId, world.getName()).isPresent();
+        if (harvested) {
+            // A one-shot tree already felled in a previous run: re-paste the stump — onDeactivate reverted whatever
+            // frame was showing before shutdown/reload — instead of standing, so a reload never resurrects a
+            // harvested island tree. The record is keyed by (world, region), so a cloned world never inherits
+            // another world's felled state.
+            runtime.felled = true;
+            showFrame(runtime, world, placement.stages.get(placement.stages.size() - 1), runtime.animationGeneration);
+        } else {
+            placeStanding(runtime, true);
+        }
         trees.put(node.getId(), runtime);
     }
 
@@ -113,10 +128,11 @@ public class TreeArchetype implements ResourceArchetype {
         final TreeRuntime runtime = trees.remove(node.getId());
         if (runtime != null) {
             runtime.animationGeneration++; // abort any fell frames still queued for this tree
-            placements.remove(runtime.placement.regionId);
-
             final Location anchor = runtime.placement.anchor;
-            schematicAnimator.restore(anchor.getWorld(), runtime.currentUndo);
+            final World anchorWorld = anchor.getWorld();
+            placements.remove(new PlacementKey(anchorWorld.getName(), runtime.placement.regionId));
+
+            schematicAnimator.restore(anchorWorld, runtime.currentUndo);
         }
     }
 
@@ -165,6 +181,9 @@ public class TreeArchetype implements ResourceArchetype {
         if (runtime == null || !runtime.felled || runtime.placement.standing == null) {
             return;
         }
+        if (node.getDefinition().isOneShot()) {
+            return; // a one-shot tree stays felled forever - it never regrows
+        }
         if (!Respawn.isReady(runtime.felledAtMs, node.getDefinition().getRespawnSeconds(), 1.0, System.currentTimeMillis())) {
             return;
         }
@@ -191,12 +210,12 @@ public class TreeArchetype implements ResourceArchetype {
         }
         runtime.animationGeneration++; // supersede any fell frames still scheduled
         final List<Schematic.PlacedBlock> leftover = clearLeftover
-                ? frameStore.get(placement.regionId).map(BlockBatchStore.Batch::getBlocks).orElse(List.of())
+                ? frameStore.get(placement.regionId, world.getName()).map(BlockBatchStore.Batch::getBlocks).orElse(List.of())
                 : runtime.currentUndo;
         schematicAnimator.restore(world, leftover);
         schematicAnimator.pasteCapturing(world, placement.standing, placement.anchor, placement.quarterTurns);
         runtime.currentUndo = placement.standingUndo;
-        frameStore.clear(placement.regionId); // standing is the resting state — cache nothing, matching the ore store
+        frameStore.clear(placement.regionId, world.getName()); // standing is the resting state — cache nothing, matching the ore store
         runtime.felled = false;
 
         // cues
@@ -222,6 +241,11 @@ public class TreeArchetype implements ResourceArchetype {
      * Animates the fell: stage {@code i} is shown after {@code stageDelay × i} ticks by undoing the frame currently on
      * screen and overlaying the next (solid blocks only). A per-runtime generation, captured when the fell starts, lets
      * any respawn / deactivate / re-fell that bumps it abort frames still queued.
+     * <p>
+     * The last frame's undo, recorded via {@link #recordFrame} like every other frame, is left in {@link #frameStore}
+     * rather than cleared. For a normal tree that record is transient — {@link #placeStanding} clears it on the next
+     * respawn. For a one-shot tree it never respawns, so the record simply persists as the "already felled" marker
+     * {@link #onActivate} checks for on the next node load.
      */
     private void fell(@NotNull TreeRuntime runtime) {
         runtime.felled = true;
@@ -275,7 +299,8 @@ public class TreeArchetype implements ResourceArchetype {
     }
 
     private @NotNull TreePlacement prepare(@NotNull ResourceNodeDefinition definition, @NotNull PerspectiveRegion marker) {
-        return placements.computeIfAbsent(marker.getId(), id -> compute(definition, marker));
+        final PlacementKey key = new PlacementKey(marker.getWorld().getName(), marker.getId());
+        return placements.computeIfAbsent(key, k -> compute(definition, marker));
     }
 
     private @NotNull TreePlacement compute(@NotNull ResourceNodeDefinition definition, @NotNull PerspectiveRegion marker) {
@@ -362,6 +387,17 @@ public class TreeArchetype implements ResourceArchetype {
                 Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.min(a[2], b[2]),
                 Math.max(a[3], b[3]), Math.max(a[4], b[4]), Math.max(a[5], b[5])
         };
+    }
+
+    /**
+     * Identifies a tree marker by world and Mapper region id. A world cloned at runtime from a template carries the
+     * template's {@code dataPoints.json}, so its markers share the template's region ids — the world qualifies the id
+     * so a placement in one world is never resolved from another's cache entry.
+     */
+    @Value
+    private static class PlacementKey {
+        String world;
+        UUID regionId;
     }
 
     /** Static placement for a tree marker: its schematics, anchor, rotation and the gate-zone footprint. */

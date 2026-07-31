@@ -150,6 +150,11 @@ public class GamerListener implements Listener {
             gamer.saveProperty(GamerProperty.PREFERRED_SPAWN, "");
         }
 
+        Optional<String> travelOriginOptional = gamer.getProperty(GamerProperty.TRAVEL_ORIGIN);
+        if (travelOriginOptional.isEmpty()) {
+            gamer.saveProperty(GamerProperty.TRAVEL_ORIGIN, "");
+        }
+
     }
 
     private void validateExistingClientDefaults(Client client, Gamer gamer) {

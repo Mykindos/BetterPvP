@@ -111,7 +111,7 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
 
         this.recipeRegistries = recipeRegistries;
 
-        setItem(45, new NameSearchButton(() -> nameSearch, newName -> {
+        setItem(45, new NameSearchButton(Translations.component("core.menu.search.subject.items"), () -> nameSearch, newName -> {
             nameSearch = newName;
             refresh();
         }));

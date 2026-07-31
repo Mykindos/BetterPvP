@@ -1,11 +1,11 @@
 package me.mykindos.betterpvp.clans.world.resource;
 
-import me.mykindos.betterpvp.core.framework.store.RecordCodec;
-import me.mykindos.betterpvp.core.framework.store.RecordStore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Value;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.core.framework.store.RecordCodec;
+import me.mykindos.betterpvp.core.framework.store.RecordStore;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +46,11 @@ public class BlockReplacementStore {
     /** Drops a block's record once it has respawned. */
     public void clear(@NotNull String world, int x, int y, int z) {
         store.remove(key(world, x, y, z));
+    }
+
+    /** Drops every mid-respawn record belonging to {@code world} — used when a world (e.g. a destroyed island instance) is torn down, so its cache never outlives the world folder. */
+    public int purgeWorld(@NotNull String world) {
+        return store.removeIf(entry -> entry.getWorld().equals(world));
     }
 
     /** Every in-flight block whose position lies inside the given cuboid (inclusive), used to reconcile a node at load. */

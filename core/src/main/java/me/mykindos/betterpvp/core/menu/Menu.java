@@ -32,6 +32,7 @@ public class Menu {
     public static final ItemProvider BACKGROUND_ITEM = ItemView.builder()
             .material(Material.GRAY_STAINED_GLASS_PANE)
             .displayName(Component.empty())
+            .hideTooltip(true)
             .build();
 
     /**
