@@ -444,7 +444,11 @@ public abstract class Skill implements IChampionsSkill {
 
     protected Optional<BuildSkill> getSkill(GamerBuilds gamerBuilds) {
         final Player player = Objects.requireNonNull(gamerBuilds.getClient().getGamer().getPlayer());
-        Role role = championsManager.getRoles().getRole(player);
+        Role role = championsManager.getRoles().getRole(player).orElse(null);
+        if (role == null) {
+            return Optional.empty(); // No kit equipped, so there is no build to read
+        }
+
         if (role == getClassType() || getClassType() == null) {
             RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
             BuildSkill buildSkill = roleBuild.getBuildSkill(getType());

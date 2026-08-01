@@ -50,13 +50,13 @@ public class ChampionsCombatData extends CombatData {
         final Player killerPlayer = Bukkit.getPlayer(killer);
         final Player victimPlayer = Bukkit.getPlayer(victim);
 
-        final Role killerRole = killerPlayer == null ? null : roleManager.getRole(killerPlayer);
-        final Role victimRole = victimPlayer == null ? null : roleManager.getRole(victimPlayer);
+        final Role killerRole = killerPlayer == null ? null : roleManager.getRole(killerPlayer).orElse(null);
+        final Role victimRole = victimPlayer == null ? null : roleManager.getRole(victimPlayer).orElse(null);
 
         final Map<Contribution, Role> contributorRoles = new HashMap<>();
         contributions.forEach(contribution -> {
             final Player contributorPlayer = Bukkit.getPlayer(contribution.getContributor());
-            final Role contributorRole = contributorPlayer == null ? null : roleManager.getRole(contributorPlayer);
+            final Role contributorRole = contributorPlayer == null ? null : roleManager.getRole(contributorPlayer).orElse(null);
             contributorRoles.put(contribution, contributorRole);
         });
         return new ChampionsKill(killId, killer, victim, ratingDelta, contributions, killerRole, victimRole, contributorRoles);

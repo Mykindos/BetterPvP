@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.armor.RoleArmorComponent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
@@ -25,7 +24,6 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 
 @Singleton
 @ItemKey("champions:reinforced_warlock_boots")
-@FallbackItem(value = Material.NETHERITE_BOOTS, keepRecipes = true)
 public class ReinforcedWarlockBoots extends ArmorItem {
 
     private transient boolean registered;
@@ -34,7 +32,7 @@ public class ReinforcedWarlockBoots extends ArmorItem {
     private ReinforcedWarlockBoots(Champions champions) {
         super(champions, translatableName("champions.item.reinforced-warlock-boots.name"), Item.builder(Material.NETHERITE_BOOTS)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
-                .build(), ItemRarity.COMMON);
+                .build(), ItemRarity.UNCOMMON);
         addBaseComponent(new RoleArmorComponent(Role.WARLOCK));
     }
 
@@ -42,13 +40,23 @@ public class ReinforcedWarlockBoots extends ArmorItem {
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
         if (registered) return;
         registered = true;
-        final BaseItem netherite = itemFactory.getFallbackItem(Material.NETHERITE_INGOT);
-        String[] pattern = new String[] {
-                "N N",
-                "N N",
-        };
-        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('N', new RecipeIngredient(netherite, 1));
-        registry.registerRecipe(new NamespacedKey("champions", "warlock_boots"), builder.build());
+        final BaseItem ingot = itemFactory.getFallbackItem(Material.NETHERITE_INGOT);
+        final BaseItem block = itemFactory.getFallbackItem(Material.NETHERITE_BLOCK);
+
+        final ShapedCraftingRecipe.Builder builder1 = new ShapedCraftingRecipe.Builder(this, new String[] {
+                "B I",
+                "I I",
+        }, itemFactory);
+        builder1.setIngredient('I', new RecipeIngredient(ingot, 1));
+        builder1.setIngredient('B', new RecipeIngredient(block, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "reinforced_warlock_boots_top"), builder1.build());
+
+        final ShapedCraftingRecipe.Builder builder2 = new ShapedCraftingRecipe.Builder(this, new String[] {
+                "I I",
+                "B I",
+        }, itemFactory);
+        builder2.setIngredient('I', new RecipeIngredient(ingot, 1));
+        builder2.setIngredient('B', new RecipeIngredient(block, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "reinforced_warlock_boots_bottom"), builder2.build());
     }
 }

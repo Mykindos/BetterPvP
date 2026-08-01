@@ -78,7 +78,7 @@ public class CombatCommand extends Command {
         try {
             if (args.length == 0) {
                 final Player player = target.getGamer().getPlayer();
-                filter = player == null || !player.isValid() ? ChampionsFilter.NONE : ChampionsFilter.fromRole(roleManager.getRole(player));
+                filter = player == null || !player.isValid() ? ChampionsFilter.NONE : ChampionsFilter.fromRole(roleManager.getRole(player).orElse(null));
                 loaded = championsRepository.getDataAsync(target.getUniqueId()).thenApply(roleStats -> roleStats.getCombatData(filter));
             } else {
                 filter = ChampionsFilter.valueOf(args[0].toUpperCase());

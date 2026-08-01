@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.armor.RoleArmorComponent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
@@ -25,7 +24,6 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 
 @Singleton
 @ItemKey("champions:reinforced_ranger_chestplate")
-@FallbackItem(value = Material.CHAINMAIL_CHESTPLATE, keepRecipes = true)
 public class ReinforcedRangerChestplate extends ArmorItem {
 
     private transient boolean registered;
@@ -34,7 +32,7 @@ public class ReinforcedRangerChestplate extends ArmorItem {
     private ReinforcedRangerChestplate(Champions champions) {
         super(champions, translatableName("champions.item.reinforced-ranger-chestplate.name"), Item.builder(Material.CHAINMAIL_CHESTPLATE)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.HOST)).build())
-                .build(), ItemRarity.COMMON);
+                .build(), ItemRarity.UNCOMMON);
         addBaseComponent(new RoleArmorComponent(Role.RANGER));
     }
 
@@ -42,14 +40,16 @@ public class ReinforcedRangerChestplate extends ArmorItem {
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
         if (registered) return;
         registered = true;
-        final BaseItem emerald = itemFactory.getFallbackItem(Material.EMERALD);
-        String[] pattern = new String[] {
-                "E E",
-                "EEE",
-                "EEE",
-        };
-        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('E', new RecipeIngredient(emerald, 1));
-        registry.registerRecipe(new NamespacedKey("champions", "ranger_chestplate"), builder.build());
+        final BaseItem ingot = itemFactory.getFallbackItem(Material.EMERALD);
+        final BaseItem block = itemFactory.getFallbackItem(Material.EMERALD_BLOCK);
+
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, new String[] {
+                "I I",
+                "IBI",
+                "III",
+        }, itemFactory);
+        builder.setIngredient('I', new RecipeIngredient(ingot, 1));
+        builder.setIngredient('B', new RecipeIngredient(block, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "reinforced_ranger_chestplate"), builder.build());
     }
 }

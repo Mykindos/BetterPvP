@@ -35,7 +35,7 @@ public class ChampionsStatsListener extends CombatStatsListener<ChampionsCombatD
 
     @Override
     protected CompletableFuture<ChampionsCombatData> getCombatData(Player player) {
-        Role role = roleManager.getRole(player);
+        Role role = roleManager.getRole(player).orElse(null);
         return getAssignedRepository().getDataAsync(player).thenApply(data -> data.getCombatData(role));
     }
 }

@@ -82,7 +82,7 @@ public class PortableClassAbility extends AbstractInteraction implements Listene
 
         final Gamer gamer = actor.getClient().getGamer();
         final Player player = (Player) actor.getEntity();
-        if (gamer.isInCombat() || roleManager.getRole(player) == role) {
+        if (gamer.isInCombat() || roleManager.getRole(player).orElse(null) == role) {
             new SoundEffect(Sound.ENTITY_BEE_STING, 0f, 1f).play(player);
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS); // They're already the role or they're in combat
         }

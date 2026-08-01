@@ -14,10 +14,10 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
@@ -62,8 +62,8 @@ public class SendSkillsCommand extends Command {
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
 
-            Role role = roleManager.getRole(player);
-            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            Role role = roleManager.getRole(player).orElse(null);
+            RoleBuild build = role == null ? null : builds.getActiveBuilds().get(role.getName());
             if (build != null) {
                 Component messageComponent = Translations.component("champions.command.sendskills.my-build", role.getDisplayName()).color(NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true)
                         .hoverEvent(HoverEvent.showText(build.getBuildComponent()));

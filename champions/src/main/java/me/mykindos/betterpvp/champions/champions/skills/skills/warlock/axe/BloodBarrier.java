@@ -21,12 +21,11 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -150,7 +149,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 return true;
             }
 
-            if (championsManager.getRoles().getRole(player) != entry.getValue().getRole()) {
+            if (championsManager.getRoles().getRole(player).orElse(null) != entry.getValue().getRole()) {
                 return true; // They swapped roles, remove effecdt
             }
 
@@ -198,14 +197,14 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
-        Role playerRole = championsManager.getRoles().getRole(player);
+        Role playerRole = championsManager.getRoles().getRole(player).orElse(null);
         shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), playerRole));
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
             if (player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected(level)) < 1) {
                 break;
             }
 
-            Role allyRole = championsManager.getRoles().getRole(ally);
+            Role allyRole = championsManager.getRoles().getRole(ally).orElse(null);
             shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), allyRole));
             healthReduction += getHealthReductionPerPlayerAffected(level);
         }

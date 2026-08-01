@@ -7,25 +7,49 @@ import io.papermc.paper.datacomponent.item.ItemArmorTrim;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.armor.RoleArmorComponent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.item.FallbackItem;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.model.ArmorItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
 
 @Singleton
 @ItemKey("champions:reinforced_mage_chestplate")
-@FallbackItem(value = Material.GOLDEN_CHESTPLATE, keepRecipes = true)
 public class ReinforcedMageChestplate extends ArmorItem {
+
+    private transient boolean registered;
+
     @Inject
     private ReinforcedMageChestplate(Champions champions) {
         super(champions, translatableName("champions.item.reinforced-mage-chestplate.name"), Item.builder(Material.GOLDEN_CHESTPLATE)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
-                .build(), ItemRarity.COMMON);
+                .build(), ItemRarity.UNCOMMON);
         addBaseComponent(new RoleArmorComponent(Role.MAGE));
     }
-} 
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
+        if (registered) return;
+        registered = true;
+        final BaseItem ingot = itemFactory.getFallbackItem(Material.GOLD_INGOT);
+        final BaseItem block = itemFactory.getFallbackItem(Material.GOLD_BLOCK);
+
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, new String[] {
+                "I I",
+                "IBI",
+                "III",
+        }, itemFactory);
+        builder.setIngredient('I', new RecipeIngredient(ingot, 1));
+        builder.setIngredient('B', new RecipeIngredient(block, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "reinforced_mage_chestplate"), builder.build());
+    }
+}

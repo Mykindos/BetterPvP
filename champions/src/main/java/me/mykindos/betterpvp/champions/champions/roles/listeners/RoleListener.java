@@ -72,7 +72,7 @@ public class RoleListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        roleManager.populate(event.getPlayer());
+        roleManager.refreshRole(event.getPlayer(), RoleChangeCause.JOIN_BOOTSTRAP);
     }
 
     @EventHandler
@@ -107,7 +107,7 @@ public class RoleListener implements Listener {
     @EventHandler
     public void onApplyBuild(ApplyBuildEvent event) {
         Player player = event.getPlayer();
-        final Role role = roleManager.getRole(player);
+        final Role role = roleManager.getRole(player).orElse(null);
         if (event.getNewBuild().getRole() == role && combatFeaturesService.isActive(player)) {
             UtilMessage.message(player, equipMessage(player, role));
         }
@@ -116,7 +116,7 @@ public class RoleListener implements Listener {
     @EventHandler
     public void onDeleteBuild(DeleteBuildEvent event) {
         Player player = event.getPlayer();
-        final Role role = roleManager.getRole(player);
+        final Role role = roleManager.getRole(player).orElse(null);
         if (event.getRoleBuild().getRole() == role && combatFeaturesService.isActive(player)) {
             UtilMessage.message(player, equipMessage(player, role));
         }

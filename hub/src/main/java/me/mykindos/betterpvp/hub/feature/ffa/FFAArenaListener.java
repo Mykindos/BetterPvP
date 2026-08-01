@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.hub.feature.ffa;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.champions.roles.RolePlaceholderVisibility;
-import me.mykindos.betterpvp.champions.champions.roles.packet.ArmorProtocol;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -14,14 +12,14 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.core.world.zone.PlayerEnterZoneEvent;
 import me.mykindos.betterpvp.core.world.zone.PlayerExitZoneEvent;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.hub.feature.HubInventoryService;
 import me.mykindos.betterpvp.hub.feature.zone.HubZones;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -47,22 +45,18 @@ public class FFAArenaListener implements Listener {
     private final ClientManager clientManager;
     private final FFARegionService ffaRegionService;
     private final HubInventoryService inventoryService;
-    private final RolePlaceholderVisibility rolePlaceholderVisibility;
     private final CombatFeaturesService combatFeaturesService;
-    private final ArmorProtocol armorProtocol;
     private final Set<UUID> ffaRespawns = ConcurrentHashMap.newKeySet();
 
     @Inject
     public FFAArenaListener(ZoneManager zoneManager, ClientManager clientManager, FFARegionService ffaRegionService,
-                            HubInventoryService inventoryService, RolePlaceholderVisibility rolePlaceholderVisibility,
-                            CombatFeaturesService combatFeaturesService, ArmorProtocol armorProtocol, TeleportRules teleportRules) {
+                            HubInventoryService inventoryService, CombatFeaturesService combatFeaturesService,
+                            TeleportRules teleportRules) {
         this.zoneManager = zoneManager;
         this.clientManager = clientManager;
         this.ffaRegionService = ffaRegionService;
         this.inventoryService = inventoryService;
-        this.rolePlaceholderVisibility = rolePlaceholderVisibility;
         this.combatFeaturesService = combatFeaturesService;
-        this.armorProtocol = armorProtocol;
         teleportRules.putRule("hub-ffa", (entity, destination) -> isInFFA(zoneManager, ffaRegionService, entity, destination));
     }
 
@@ -76,8 +70,6 @@ public class FFAArenaListener implements Listener {
     public void onEnterFfa(PlayerEnterZoneEvent event) {
         final boolean ffa = event.getZone().is(HubZones.FFA);
         this.combatFeaturesService.setActive(event.getPlayer(), ffa);
-        this.rolePlaceholderVisibility.setVisible(event.getPlayer(), ffa);
-        armorProtocol.broadcast(event.getPlayer(), true);
         if (!ffa) {
             return;
         }
@@ -93,8 +85,6 @@ public class FFAArenaListener implements Listener {
         }
 
         this.combatFeaturesService.setActive(event.getPlayer(), false);
-        this.rolePlaceholderVisibility.setVisible(event.getPlayer(), false);
-        armorProtocol.broadcast(event.getPlayer(), true);
         inventoryService.applyHubHotbar(event.getPlayer());
         sendSubtitle(event.getPlayer(), false);
     }

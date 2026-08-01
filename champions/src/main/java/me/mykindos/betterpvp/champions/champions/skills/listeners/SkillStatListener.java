@@ -113,7 +113,11 @@ public class SkillStatListener extends TimedStatListener {
     }
 
     private void incrementStats(Client client, ChampionsSkillStat.Action action, long value) {
-        final Role role = roleManager.getRole(Objects.requireNonNull(client.getGamer().getPlayer()));
+        final Role role = roleManager.getRole(Objects.requireNonNull(client.getGamer().getPlayer())).orElse(null);
+        if (role == null) {
+            return; // No kit equipped, so no build to attribute this to
+        }
+
         final GamerBuilds gamerBuilds = buildManager.getObject(client.getUniqueId()).orElseThrow();
         final RoleBuild build = gamerBuilds.getActiveBuilds().get(role.getName());
         incrementBuildStats(build, client, action, value);

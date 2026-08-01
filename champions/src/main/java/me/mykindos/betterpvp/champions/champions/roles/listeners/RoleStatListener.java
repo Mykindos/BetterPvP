@@ -43,7 +43,7 @@ public class RoleStatListener extends TimedStatListener {
 
     @Override
     public void onUpdate(Client client, long deltaTime) {
-        final Role role = roleManager.getRole(Objects.requireNonNull(client.getGamer().getPlayer()));
+        final Role role = roleManager.getRole(Objects.requireNonNull(client.getGamer().getPlayer())).orElse(null);
         final RoleStat roleStat = RoleStat.builder()
                 .action(RoleStat.Action.TIME_PLAYED)
                 .role(role)

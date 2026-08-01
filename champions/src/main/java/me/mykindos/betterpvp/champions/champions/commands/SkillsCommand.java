@@ -62,9 +62,9 @@ public class SkillsCommand extends Command {
                 return;
             }
 
-            Role role = roleManager.getRole(target);
+            Role role = roleManager.getRole(target).orElse(null);
             GamerBuilds builds = gamerBuildsOptional.get();
-            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            RoleBuild build = role == null ? null : builds.getActiveBuilds().get(role.getName());
             if (build != null) {
                 UtilMessage.message(player, "core.prefix.skills", Translations.component("champions.command.skills.target-build", Component.text(target.getName(), NamedTextColor.YELLOW)).appendNewline().append(build.getBuildComponent()));
                 return;
@@ -76,8 +76,8 @@ public class SkillsCommand extends Command {
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
 
-            Role role = roleManager.getRole(player);
-            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            Role role = roleManager.getRole(player).orElse(null);
+            RoleBuild build = role == null ? null : builds.getActiveBuilds().get(role.getName());
             if (build != null) {
                 UtilMessage.message(player, "core.prefix.skills", Translations.component("champions.command.skills.your-build").appendNewline().append(build.getBuildComponent()));
             }

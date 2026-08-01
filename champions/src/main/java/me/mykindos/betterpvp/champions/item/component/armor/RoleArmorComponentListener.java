@@ -2,11 +2,9 @@ package me.mykindos.betterpvp.champions.item.component.armor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.armor.ArmorEquipEvent;
-import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -19,33 +17,31 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Optional;
+import java.util.Collections;
 import java.util.Set;
 
 @BPvPListener
 @Singleton
 public class RoleArmorComponentListener implements Listener {
 
-    private final ComponentLookupService lookupService;
-    private final RoleManager roleManager;
+    private final RoleArmorResolver armorResolver;
 
     @Inject
-    private RoleArmorComponentListener(ComponentLookupService lookupService, RoleManager roleManager) {
-        this.lookupService = lookupService;
-        this.roleManager = roleManager;
+    private RoleArmorComponentListener(RoleArmorResolver armorResolver) {
+        this.armorResolver = armorResolver;
     }
 
     @EventHandler
     public void onEquip(ArmorEquipEvent event) {
-        final Optional<RoleArmorComponent> opt = lookupService.getComponent(event.getItem(), RoleArmorComponent.class);
-        if (opt.isEmpty()) {
+        final Set<Role> roles = armorResolver.rolesFor(event.getItem());
+        if (roles.isEmpty()) {
             return; // No restrictions
         }
 
-        final RoleArmorComponent component = opt.get();
-        final Set<Role> roles = component.getRoles();
-        final Role role = roleManager.getRole(event.getPlayer());
-        if (!roles.contains(role)) {
+        // Gate on the sets this piece still leaves reachable rather than the current role, because a set is
+        // built one piece at a time and the wearer has no role until it is complete
+        final Set<Role> reachable = armorResolver.reachableRoles(event.getPlayer(), event.getArmorSlot(), event.getItem());
+        if (Collections.disjoint(roles, reachable)) {
             event.setCancelled(true);
         }
     }
@@ -53,23 +49,25 @@ public class RoleArmorComponentListener implements Listener {
     // If they swap kits, take off their incompatible armor
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
+        final Role role = event.getRole();
+        if (role == null) {
+            return; // Losing a role means an incomplete set, which they are allowed to keep wearing
+        }
+
         final EntityEquipment equipment = event.getLivingEntity().getEquipment();
         if (equipment == null) {
             return;
         }
 
         final LivingEntity entity = event.getLivingEntity();
-        final Role role = event.getRole();
         final ItemStack[] armorContents = equipment.getArmorContents();
         for (int i = 0; i < armorContents.length; i++) {
             final ItemStack armorContent = armorContents[i];
-            final Optional<RoleArmorComponent> opt = lookupService.getComponent(armorContent, RoleArmorComponent.class);
-            if (opt.isEmpty()) {
+            final Set<Role> roles = armorResolver.rolesFor(armorContent);
+            if (roles.isEmpty()) {
                 continue; // No restrictions
             }
 
-            final RoleArmorComponent component = opt.get();
-            final Set<Role> roles = component.getRoles();
             if (!roles.contains(role)) {
                 armorContents[i] = null; // Remove incompatible armor
 

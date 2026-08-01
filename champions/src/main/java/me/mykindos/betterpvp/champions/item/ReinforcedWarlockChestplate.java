@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.armor.RoleArmorComponent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
@@ -25,7 +24,6 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 
 @Singleton
 @ItemKey("champions:reinforced_warlock_chestplate")
-@FallbackItem(value = Material.NETHERITE_CHESTPLATE, keepRecipes = true)
 public class ReinforcedWarlockChestplate extends ArmorItem {
 
     private transient boolean registered;
@@ -34,7 +32,7 @@ public class ReinforcedWarlockChestplate extends ArmorItem {
     private ReinforcedWarlockChestplate(Champions champions) {
         super(champions, translatableName("champions.item.reinforced-warlock-chestplate.name"), Item.builder(Material.NETHERITE_CHESTPLATE)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.IRON, TrimPattern.HOST)).build())
-                .build(), ItemRarity.COMMON);
+                .build(), ItemRarity.UNCOMMON);
         addBaseComponent(new RoleArmorComponent(Role.WARLOCK));
     }
 
@@ -42,14 +40,16 @@ public class ReinforcedWarlockChestplate extends ArmorItem {
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
         if (registered) return;
         registered = true;
-        final BaseItem netherite = itemFactory.getFallbackItem(Material.NETHERITE_INGOT);
-        String[] pattern = new String[] {
-                "N N",
-                "NNN",
-                "NNN",
-        };
-        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('N', new RecipeIngredient(netherite, 1));
-        registry.registerRecipe(new NamespacedKey("champions", "warlock_chestplate"), builder.build());
+        final BaseItem ingot = itemFactory.getFallbackItem(Material.NETHERITE_INGOT);
+        final BaseItem block = itemFactory.getFallbackItem(Material.NETHERITE_BLOCK);
+
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, new String[] {
+                "I I",
+                "IBI",
+                "III",
+        }, itemFactory);
+        builder.setIngredient('I', new RecipeIngredient(ingot, 1));
+        builder.setIngredient('B', new RecipeIngredient(block, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "reinforced_warlock_chestplate"), builder.build());
     }
 }

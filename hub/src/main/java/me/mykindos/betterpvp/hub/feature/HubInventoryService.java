@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.item.MushroomStew;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -41,8 +42,14 @@ public class HubInventoryService {
     }
 
     public void applyFfaLoadout(Player player) {
+        // Clearing the inventory strips their armor, and with it their role, so re-equip the kit they last picked
+        final Role role = roleManager.getRole(player)
+                .or(() -> roleManager.getLastEquippedRole(player))
+                .orElse(Role.DEFAULT);
+
         player.getInventory().clear();
 
+        roleManager.equipRole(player, role);
         roleManager.equipWeapons(player);
 
         final MushroomStew stew = Objects.requireNonNull(itemFactory.getItemRegistry().getItemByClass(MushroomStew.class));

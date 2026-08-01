@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.component.armor.RoleArmorComponent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.FallbackItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
@@ -25,7 +24,6 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 
 @Singleton
 @ItemKey("champions:reinforced_ranger_helmet")
-@FallbackItem(value = Material.CHAINMAIL_HELMET, keepRecipes = true)
 public class ReinforcedRangerHelmet extends ArmorItem {
 
     private transient boolean registered;
@@ -34,7 +32,7 @@ public class ReinforcedRangerHelmet extends ArmorItem {
     private ReinforcedRangerHelmet(Champions champions) {
         super(champions, translatableName("champions.item.reinforced-ranger-helmet.name"), Item.builder(Material.CHAINMAIL_HELMET)
                 .data(DataComponentTypes.TRIM, ItemArmorTrim.itemArmorTrim(new ArmorTrim(TrimMaterial.NETHERITE, TrimPattern.HOST)).build())
-                .build(), ItemRarity.COMMON);
+                .build(), ItemRarity.UNCOMMON);
         addBaseComponent(new RoleArmorComponent(Role.RANGER));
     }
 
@@ -42,13 +40,15 @@ public class ReinforcedRangerHelmet extends ArmorItem {
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory) {
         if (registered) return;
         registered = true;
-        final BaseItem emerald = itemFactory.getFallbackItem(Material.EMERALD);
-        String[] pattern = new String[] {
-                "EEE",
-                "E E",
-        };
-        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
-        builder.setIngredient('E', new RecipeIngredient(emerald, 1));
-        registry.registerRecipe(new NamespacedKey("champions", "ranger_helmet"), builder.build());
+        final BaseItem ingot = itemFactory.getFallbackItem(Material.EMERALD);
+        final BaseItem block = itemFactory.getFallbackItem(Material.EMERALD_BLOCK);
+
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, new String[] {
+                "IBI",
+                "I I",
+        }, itemFactory);
+        builder.setIngredient('I', new RecipeIngredient(ingot, 1));
+        builder.setIngredient('B', new RecipeIngredient(block, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "reinforced_ranger_helmet"), builder.build());
     }
 }

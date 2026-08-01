@@ -252,7 +252,9 @@ public class SkillListener implements Listener {
             }
         }
 
-        Role role = roleManager.getRole(player);
+        Role role = roleManager.getRole(player).orElse(null);
+        if (role == null) return;
+
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
@@ -284,7 +286,9 @@ public class SkillListener implements Listener {
             return;
         }
 
-        Role role = roleManager.getRole(player);
+        Role role = roleManager.getRole(player).orElse(null);
+        if (role == null) return;
+
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
@@ -369,7 +373,9 @@ public class SkillListener implements Listener {
             return;
         }
 
-        Role role = roleManager.getRole(player);
+        Role role = roleManager.getRole(player).orElse(null);
+        if (role == null) return;
+
         Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
         if (gamerBuildsOptional.isPresent()) {
             GamerBuilds builds = gamerBuildsOptional.get();
@@ -508,7 +514,11 @@ public class SkillListener implements Listener {
             return;
         }
 
-        Role role = roleManager.getRole(player);
+        Role role = roleManager.getRole(player).orElse(null);
+        if (role == null) {
+            return;
+        }
+
         GamerBuilds builds = event.getGamerBuilds();
 
         // Track new skills
@@ -577,7 +587,11 @@ public class SkillListener implements Listener {
             return;
         }
 
-        final Role role = roleManager.getRole(player);
+        final Role role = roleManager.getRole(player).orElse(null);
+        if (role == null) {
+            return;
+        }
+
         final RoleBuild build = gamerBuildsOptional.get().getActiveBuilds().get(role.getName());
         if (build == null) {
             return;

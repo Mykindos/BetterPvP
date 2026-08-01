@@ -30,8 +30,8 @@ public class RoleStatsListener implements Listener {
         if (lastDamaged == null) return;
         if (!(lastDamaged.getDamager() instanceof Player killer)) return;
 
-        Role killedRole = roleManager.getRole(killed);
-        Role killerRole = roleManager.getRole(killer);
+        Role killedRole = roleManager.getRole(killed).orElse(null);
+        Role killerRole = roleManager.getRole(killer).orElse(null);
         roleManager.getRepository().saveKillDeathData(killedRole, killerRole);
     }
 }

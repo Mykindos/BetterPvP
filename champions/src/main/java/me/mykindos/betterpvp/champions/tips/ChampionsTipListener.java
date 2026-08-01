@@ -34,7 +34,7 @@ public class ChampionsTipListener implements Listener {
         Player player = event.getPlayer();
         WeighedList<Tip> tipList = event.getTipList();
 
-        final Role role  = roleManager.getRole(player);
+        final Role role  = roleManager.getRole(player).orElse(null);
 
         tipManager.getTips().forEach(tip -> {
             if (tip instanceof ChampionsTip championsTip) {
