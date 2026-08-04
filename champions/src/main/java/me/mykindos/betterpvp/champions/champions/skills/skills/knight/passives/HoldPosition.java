@@ -1,14 +1,12 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
+package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -27,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -35,7 +32,7 @@ import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill {
+public class HoldPosition extends Skill implements CooldownToggleSkill, Listener, BuffSkill {
 
     public double baseDuration;
 
@@ -96,7 +93,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
     @Override
     public SkillType getType() {
-        return SkillType.AXE;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
@@ -117,7 +114,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
 
     @Override
-    public boolean activate(Player player, int level) {
+    public void toggle(Player player, int level) {
         long duration = (long) (getDuration(level) * 1000);
         championsManager.getEffects().addEffect(player, player, EffectTypes.RESISTANCE, resistanceStrength, duration);
         championsManager.getEffects().addEffect(player, player, EffectTypes.SLOWNESS, slownessStrength, duration);
@@ -142,7 +139,6 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 ticksRun++;
             }
         }.runTaskTimer(champions, 0, 1);
-        return true;
     }
 
     private void spawnMobSpellParticles(Player player) {
@@ -154,11 +150,6 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
             double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.9;
             player.getWorld().spawnParticle(Particle.ENTITY_EFFECT, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0, org.bukkit.Color.BLACK);
         }
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
     }
 
     public void loadSkillConfig() {
