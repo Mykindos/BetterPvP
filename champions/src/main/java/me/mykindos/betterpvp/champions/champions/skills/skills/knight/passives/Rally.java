@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -24,7 +23,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -90,7 +88,7 @@ public class Rally extends Skill implements CooldownToggleSkill, Listener, BuffS
     @Override
     public void toggle(Player player, int level) {
         final Location playerLocation = player.getLocation();
-        final Optional<Location> closest = UtilLocation.getClosestSurfaceBlock(playerLocation, 3.0, true);
+        final Optional<Location> closest = UtilLocation.getClosestSurfaceBelow(playerLocation, 10.0);
         final Location center = closest.orElse(playerLocation);
         if (closest.isPresent()) {
             center.add(0, 1, 0); // Move up one block to be above the surface
