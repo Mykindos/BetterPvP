@@ -26,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 
+@Deprecated
 @Singleton
 @BPvPListener
 public class Concussion extends PrepareSkill implements CooldownSkill, Listener, DebuffSkill, OffensiveSkill {

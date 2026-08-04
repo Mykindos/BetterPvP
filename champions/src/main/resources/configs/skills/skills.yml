@@ -83,7 +83,7 @@ skills:
       duration: 1.0
       durationIncreasePerLevel: 0.0
     concussion:
-      enabled: true
+      enabled: false
       cooldown: 14.0
       maxlevel: 3
       durationPerLevel: 1.5
@@ -169,6 +169,20 @@ skills:
       successCooldownDecreasePerLevel: 0.1
       channelTimeCooldownMultiplier: 1.0
       channelTimeCooldownMultiplierDecreasePerLevel: 0.0
+    phantomblade:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15.0
+      cooldownDecreasePerLevel: 1.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      speed: 40.0
+      flightDuration: 0.4
+      hitboxSize: 0.6
+      anchorDuration: 5.0
+      hitWindow: 3.0
+      baseCooldownReduction: 7.0
+      cooldownReductionPerLevel: 1.0
   knight:
     vanguardsmight:
       cooldown: 15.0
