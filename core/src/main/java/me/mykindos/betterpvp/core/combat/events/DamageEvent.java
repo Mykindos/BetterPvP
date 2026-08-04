@@ -7,6 +7,7 @@
  import lombok.Data;
  import lombok.EqualsAndHashCode;
  import lombok.Getter;
+ import me.mykindos.betterpvp.core.combat.attack.AttackScaling;
  import me.mykindos.betterpvp.core.combat.cause.DamageCause;
  import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
  import me.mykindos.betterpvp.core.combat.data.SoundProvider;
@@ -81,6 +82,17 @@ public class DamageEvent extends CustomCancellableEvent {
     private boolean knockback;
     private boolean hurtAnimation = true;
     private long damageDelay;
+
+    /**
+     * Attack strength completion of the swing that caused this damage, 0 to 1. Stays at 1 for anything that
+     * is not a cooldown-scaled melee hit, which makes the scaling a no-op for those.
+     */
+    private double attackStrengthScale = 1.0;
+
+    /**
+     * Whether this hit is a critical hit, multiplying base damage by 1.5.
+     */
+    private boolean critical;
     
     // Effects and reasons
     @NotNull
@@ -370,7 +382,21 @@ public class DamageEvent extends CustomCancellableEvent {
 
 
     /**
-     * Calculates the final modified damage after applying all modifiers in order of priority
+     * Sets the attack strength completion, clamped to the 0 to 1 range vanilla uses.
+     * @param attackStrengthScale the attack strength completion
+     */
+    public void setAttackStrengthScale(double attackStrengthScale) {
+        this.attackStrengthScale = Math.clamp(attackStrengthScale, 0.0, 1.0);
+    }
+
+    /**
+     * Calculates the final modified damage after applying all modifiers in order of priority.
+     * <p>
+     * Increases are resolved first, split across the {@link AttackScaling} buckets so that a partially
+     * charged swing shrinks weapon damage and rune damage by different amounts and leaves ability damage
+     * alone. Reductions then apply to the scaled total, and are never scaled themselves - armour and
+     * defensive skills protect against the damage that actually landed.
+     *
      * @return the final modified damage
      */
     public double getModifiedDamage() {
@@ -384,9 +410,20 @@ public class DamageEvent extends CustomCancellableEvent {
             else damage = damage + (base * result.getDamageOperand());
         }
 
+        double enchantment = 0;
+        double additional = 0;
         for (DamageModifier modifier : getOrderedModifiers(false, DamageOperator.FLAT)) {
-            damage = damage + modifier.apply(this).getDamageOperand();
+            final double operand = modifier.apply(this).getDamageOperand();
+            switch (modifier.getScaling()) {
+                case BASE -> damage += operand;
+                case ENCHANTMENT -> enchantment += operand;
+                case ADDITIONAL -> additional += operand;
+            }
         }
+
+        damage = damage * AttackScaling.BASE.multiplier(attackStrengthScale, critical)
+                + enchantment * AttackScaling.ENCHANTMENT.multiplier(attackStrengthScale, critical)
+                + additional;
 
         for (DamageModifier modifier : getOrderedModifiers(true, DamageOperator.FLAT)) {
             damage = damage + modifier.apply(this).getDamageOperand();

@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
+import me.mykindos.betterpvp.core.combat.attack.AttackScaling;
+import me.mykindos.betterpvp.core.combat.attack.CriticalHitService;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.combat.delay.DamageDelayManager;
@@ -54,13 +56,16 @@ public class DamageEventFinalizer {
     private final DamageDelayManager delayManager;
     private final Set<UUID> delayKillSet = new HashSet<>();
     private final ClientManager clientManager;
+    private final CriticalHitService criticalHitService;
 
     @Inject
-    private DamageEventFinalizer(Core core, DurabilityProcessor durabilityProcessor, DamageDelayManager delayManager, ClientManager clientManager) {
+    private DamageEventFinalizer(Core core, DurabilityProcessor durabilityProcessor, DamageDelayManager delayManager,
+                                 ClientManager clientManager, CriticalHitService criticalHitService) {
         this.core = core;
         this.durabilityProcessor = durabilityProcessor;
         this.delayManager = delayManager;
         this.clientManager = clientManager;
+        this.criticalHitService = criticalHitService;
     }
     
     protected void finalizeEvent(@NotNull DamageEvent event, @Nullable CustomDamageAdapter adapter) {
@@ -174,10 +179,15 @@ public class DamageEventFinalizer {
         }
         
         LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
-        
+
         // Play hurt animation
         if (event.isHurtAnimation()) {
             damagee.playHurtAnimation(270);
+        }
+
+        // Critical hit feedback, which the server's disabled vanilla crits would otherwise never send
+        if (event.isCritical()) {
+            criticalHitService.playEffects(event);
         }
         
         // Play damage sound
@@ -248,6 +258,13 @@ public class DamageEventFinalizer {
             UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.hurt_animation", event.isHurtAnimation() ? yes : no);
             UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.living_damagee", event.isDamageeLiving() ? yes : no);
             UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.damage_delay", Component.text(event.getDamageDelay() + "ms", NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.attack_strength",
+                    Component.text(String.format("%.3f (base x%.3f, enchant x%.3f)",
+                            event.getAttackStrengthScale(),
+                            AttackScaling.BASE.multiplier(event.getAttackStrengthScale(), event.isCritical()),
+                            AttackScaling.ENCHANTMENT.multiplier(event.getAttackStrengthScale(), event.isCritical())
+                    ), NamedTextColor.YELLOW));
+            UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.critical", event.isCritical() ? yes : no);
             UtilMessage.message(player, "core.prefix.damage", "core.damage.debug.reasons", Component.text(String.join(", ", event.getReasons()), NamedTextColor.YELLOW));
             UtilMessage.message(player, "core.prefix.damage", "");
             UtilMessage.message(player, "core.prefix.damage", Translations.component("core.damage.debug.cause_breakdown").decorate(TextDecoration.UNDERLINED));

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.item;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
@@ -17,6 +18,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -91,6 +94,21 @@ public class ItemInstanceView implements ItemProvider {
         );
         itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, tooltipBuilder.build());
 
+        // Attack speed has to survive the wipe below. The client simulates held-item attribute modifiers itself
+        // to draw the attack indicator, so if the view drops the material's contribution while the canonical
+        // stack still carries it, the indicator fills at a different rate than the server's swing ticker.
+        // Read through the data component rather than the meta: for an untouched item the material's modifiers
+        // are implicit defaults and never appear in ItemMeta, but writing any modifier below suppresses them.
+        final List<AttributeModifier> attackSpeedModifiers = new ArrayList<>();
+        final ItemAttributeModifiers canonicalAttributes = itemStack.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+        if (canonicalAttributes != null) {
+            for (ItemAttributeModifiers.Entry entry : canonicalAttributes.modifiers()) {
+                if (entry.attribute().equals(Attribute.ATTACK_SPEED)) {
+                    attackSpeedModifiers.add(entry.modifier());
+                }
+            }
+        }
+
         // lol bug so we can hide attributes
         final ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) return itemStack;
@@ -98,6 +116,9 @@ public class ItemInstanceView implements ItemProvider {
             meta.removeAttributeModifier(value);
         }
         meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, DUMMY_ATTR); // This is necessary as of 1.20.6
+        for (AttributeModifier attackSpeedModifier : attackSpeedModifiers) {
+            meta.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeedModifier);
+        }
         itemStack.setItemMeta(meta);
         // end lol bug
 

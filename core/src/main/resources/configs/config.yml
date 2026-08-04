@@ -20,7 +20,10 @@ core:
   resourcepack:
     enabled: true
 pvp:
-  enableOldPvP: true
+  attackCooldown:
+    enabled: false
+  criticalHits:
+    enabled: false
   hitboxExpansion: 0.0
   hitboxCooldown: 0.0
   mythic-damage-indicators:

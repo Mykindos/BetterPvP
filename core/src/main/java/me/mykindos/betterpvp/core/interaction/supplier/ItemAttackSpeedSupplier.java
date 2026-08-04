@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatTypes;
-import me.mykindos.betterpvp.core.item.component.impl.stat.handler.MeleeAttackSpeedStatHandler;
 import me.mykindos.betterpvp.core.item.config.ConfigEntry;
 
 import java.util.Optional;
@@ -23,12 +22,13 @@ import java.util.function.ToLongFunction;
  * <p>
  * Priority order:
  * <ol>
- *   <li>Damage event attack delay (from {@link InputMeta#DAMAGE_EVENT})</li>
  *   <li>Item's melee attack speed stat</li>
+ *   <li>Damage event attack delay (from {@link InputMeta#DAMAGE_EVENT})</li>
  *   <li>Fallback supplier</li>
  * </ol>
+ * The stat comes first because the melee damage delay is a fixed invulnerability window that no longer
+ * narrows with attack speed - reading it first would pace every weapon's abilities identically.
  *
- * @see MeleeAttackSpeedStatHandler
  * @see StatTypes#MELEE_ATTACK_SPEED
  */
 public class ItemAttackSpeedSupplier implements ToLongFunction<InteractionContext> {
@@ -55,16 +55,7 @@ public class ItemAttackSpeedSupplier implements ToLongFunction<InteractionContex
     @Override
     public long applyAsLong(InteractionContext context) {
         if (context != null) {
-            // First, try to get attack delay from damage event
-            final Optional<DamageEvent> damageEventOpt = context.get(InputMeta.DAMAGE_EVENT);
-            if (damageEventOpt.isPresent()) {
-                final DamageEvent damageEvent = damageEventOpt.get();
-                final long attackDelay = damageEvent.getDamageDelay();
-                if (attackDelay > 0) {
-                    return attackDelay;
-                }
-            }
-
+            // First, try to derive the delay from the held item's attack speed
             final Optional<ItemInstance> itemOpt = context.get(InteractionContext.HELD_ITEM);
             if (itemOpt.isPresent()) {
                 final ItemInstance item = itemOpt.get();
@@ -82,6 +73,15 @@ public class ItemAttackSpeedSupplier implements ToLongFunction<InteractionContex
                     }
                 }
 
+            }
+
+            final Optional<DamageEvent> damageEventOpt = context.get(InputMeta.DAMAGE_EVENT);
+            if (damageEventOpt.isPresent()) {
+                final DamageEvent damageEvent = damageEventOpt.get();
+                final long attackDelay = damageEvent.getDamageDelay();
+                if (attackDelay > 0) {
+                    return attackDelay;
+                }
             }
         }
 

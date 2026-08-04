@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.combat.attack.MeleeCombatSettings;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarMode;
@@ -49,10 +50,6 @@ public class ClientListener implements Listener {
     private static final String SERVER_STILL_LOADING_ERROR = "The server is still starting!";
 
     @Inject
-    @Config(path = "pvp.enableOldPvP", defaultValue = "true")
-    private boolean enableOldPvP;
-
-    @Inject
     @Config(path = "server.unlimitedPlayers", defaultValue = "false")
     public boolean unlimitedPlayers;
 
@@ -66,14 +63,16 @@ public class ClientListener implements Listener {
 
     private final Core core;
     private final ClientManager clientManager;
+    private final MeleeCombatSettings meleeCombatSettings;
 
     private boolean serverLoaded;
     private final Set<UUID> usersLoading = Collections.synchronizedSet(new HashSet<>());
 
     @Inject
-    public ClientListener(Core core, ClientManager clientManager) {
+    public ClientListener(Core core, ClientManager clientManager, MeleeCombatSettings meleeCombatSettings) {
         this.core = core;
         this.clientManager = clientManager;
+        this.meleeCombatSettings = meleeCombatSettings;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -209,16 +208,15 @@ public class ClientListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClientLogin(ClientJoinEvent event) {
-        if (enableOldPvP) {
-            AttributeInstance attribute = event.getPlayer().getAttribute(Attribute.ATTACK_SPEED);
-            if (attribute != null) {
-                double baseValue = attribute.getBaseValue();
-
-                // Setting this higher than the usual actually force removes the 1.9 attack indicator
-                if (baseValue != 100000000) {
-                    attribute.setBaseValue(100000000);
-                    event.getPlayer().saveData();
-                }
+        AttributeInstance attribute = event.getPlayer().getAttribute(Attribute.ATTACK_SPEED);
+        if (attribute != null) {
+            // With the cooldown model off this is set absurdly high, which force removes the attack indicator
+            // and pins every swing at full strength. With it on it is the server's melee cadence, so the
+            // indicator fills exactly as the melee damage delay expires.
+            final double target = meleeCombatSettings.getPlayerBaseAttackSpeed();
+            if (attribute.getBaseValue() != target) {
+                attribute.setBaseValue(target);
+                event.getPlayer().saveData();
             }
         }
 

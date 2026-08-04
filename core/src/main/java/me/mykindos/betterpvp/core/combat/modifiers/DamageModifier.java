@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.modifiers;
 
+import me.mykindos.betterpvp.core.combat.attack.AttackScaling;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,6 +43,16 @@ public interface DamageModifier {
      * @return the modifier type
      */
     ModifierType getType();
+
+    /**
+     * Gets how this modifier responds to attack strength. Only meaningful for
+     * {@link DamageOperator#FLAT} modifiers; multipliers always ride on the base bucket.
+     *
+     * @return the scaling bucket for this modifier
+     */
+    default AttackScaling getScaling() {
+        return AttackScaling.forType(getType());
+    }
 
     @NotNull
     DamageOperator getDamageOperator();
