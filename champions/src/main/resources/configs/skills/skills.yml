@@ -171,7 +171,7 @@ skills:
       channelTimeCooldownMultiplierDecreasePerLevel: 0.0
     phantomblade:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 15.0
       cooldownDecreasePerLevel: 1.0
       baseDamage: 4.0
@@ -182,7 +182,7 @@ skills:
       anchorDuration: 5.0
       hitWindow: 3.0
       baseCooldownReduction: 7.0
-      cooldownReductionPerLevel: 1.0
+      cooldownReductionPerLevel: 2.2
   knight:
     vanguardsmight:
       cooldown: 15.0
@@ -201,7 +201,7 @@ skills:
       damageReduction: 0.7
       damageReductionIncreasePerLevel: 0.0
     battlebind:
-      enabled: false
+      enabled: true
       maxlevel: 3
       cooldown: 16.0
       cooldownDecreasePerLevel: 0.5
@@ -209,11 +209,11 @@ skills:
       damagePerLevel: 0.5
       speed: 40.0
       airDuration: 0.5
-      baseBindDuration: 1.5
+      baseBindDuration: 0.75
       bindDurationPerLevel: 0.25
       hitboxSize: 0.6
     unstoppableforce:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 22.0
       cooldownDecreasePerLevel: 1.0
@@ -235,30 +235,6 @@ skills:
       range: 3.0
       fov: 90.0
       cooldownDecreasePerLevel: 1.0
-    upheaval:
-      enabled: true
-      maxlevel: 5
-      cooldown: 13.0
-      cooldownDecreasePerLevel: 1.0
-      baseDamage: 6.0
-      damageIncreasePerLevel: 0.5
-      baseSlowDuration: 1.5
-      slowDurationIncreasePerLevel: 0.25
-      slowStrength: 2
-      baseDistance: 7.0
-      distanceIncreasePerLevel: 0.5
-      pullStrength: 0.9
-      minRockHeight: 0.5
-      maxRockHeight: 1.5
-      heightRamp: 2.5
-      rockScale: 0.6
-      rocksPerStep: 2
-      stepDistance: 0.6
-      stepsPerTick: 3
-      spread: 0.9
-      hitRadius: 1.8
-      lifespanTicks: 50
-      sinkTicks: 8
     ride:
       enabled: false
       cooldown: 30.0
@@ -357,7 +333,7 @@ skills:
       basePercentage: 0.08
       percentageIncreasePerLevel: 0.08
     defensivestance:
-      enabled: true
+      enabled: false
       maxlevel: 5
       energy: 70
       damage: 2.0
@@ -415,6 +391,51 @@ skills:
       pulseInterval: 1.5
       resistanceStrength: 1
       emergeTicks: 3
+    emberstep:
+      enabled: true
+      maxlevel: 5
+      baseMaxCharges: 3
+      chargeIncreasePerLevel: 0
+      baseRechargeSeconds: 9.0
+      rechargeReductionPerLevel: 1.0
+      lungeStrength: 1.9
+      lungeVerticalBoost: 0.35
+      baseLungeDuration: 1.0
+      lungeDurationIncreasePerLevel: 0.0
+      knockbackRadius: 4.0
+      knockbackStrength: 1.1
+      knockbackVertical: 0.45
+      pathHitRadius: 1.5
+      pathKnockbackStrength: 0.5
+      pathKnockbackVertical: 0.2
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      burnDuration: 2.0
+      flameSpeed: 0.12
+    upheaval:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15.0
+      cooldownDecreasePerLevel: 1.0
+      baseDamage: 6.0
+      damageIncreasePerLevel: 0.5
+      baseSlowDuration: 1.5
+      slowDurationIncreasePerLevel: 0.25
+      slowStrength: 2
+      baseDistance: 7.0
+      distanceIncreasePerLevel: 0.5
+      pullStrength: 1.2
+      minRockHeight: 0.5
+      maxRockHeight: 1.8
+      heightRamp: 2.5
+      rockScale: 0.6
+      rocksPerStep: 4
+      spread: 1.5
+      hitRadius: 1.8
+      lifespanTicks: 50
+      sinkTicks: 8
+      stepDistance: 0.6
+      stepsPerTick: 2
   mage:
     staticlazer:
       enabled: false
