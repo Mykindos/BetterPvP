@@ -1,14 +1,14 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.data;
 
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword.Battlebind;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.projectile.LinkProjectile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.projectile.ReturningLinkProjectile;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,16 +24,16 @@ import org.bukkit.util.Transformation;
 
 import java.util.Collection;
 
-public class BattlebindProjectile extends ReturningLinkProjectile {
+public class BattlebindProjectile extends LinkProjectile {
 
-    private final double damage;
-    private final Skill skill;
+    private final Battlebind skill;
+    private final int level;
     private final ItemStack swordItem;
 
-    public BattlebindProjectile(Player caster, double hitboxSize, Location location, long aliveTime, long pullTime, double pullSpeed, ItemStack item, double damage, Skill skill) {
-        super(caster, hitboxSize, location, aliveTime, pullTime, pullSpeed);
-        this.damage = damage;
+    public BattlebindProjectile(Player caster, double hitboxSize, Location location, long aliveTime, ItemStack item, Battlebind skill, int level) {
+        super(caster, hitboxSize, location, aliveTime);
         this.skill = skill;
+        this.level = level;
         this.swordItem = item;
     }
 
@@ -95,23 +95,34 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
     }
 
     @Override
-    protected SoundEffect pullSound() {
-        return new SoundEffect(Sound.BLOCK_CHAIN_BREAK, 0f, 1f);
-    }
-
-    @Override
     protected SoundEffect pushSound() {
         return new SoundEffect(Sound.BLOCK_CHAIN_PLACE, 1f, 1f);
     }
 
     @Override
-    public SoundEffect impactSound() {
-        return new SoundEffect(Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
+    protected SoundEffect impactSound() {
+        return new SoundEffect(Sound.BLOCK_CHAIN_BREAK, 0.8f, 1f);
     }
 
+    /**
+     * The chain snaps on contact: the whole link trail and the thrown sword vanish, and whoever was
+     * struck wears what is left of it.
+     */
     @Override
     protected void onImpact(Location location, RayTraceResult result) {
         super.onImpact(location, result);
+        remove();
+        setMarkForRemoval(true);
+
+        Particle.BLOCK.builder()
+                .count(20)
+                .extra(0)
+                .data(Material.IRON_CHAIN.createBlockData())
+                .offset(0.3, 0.3, 0.3)
+                .location(location)
+                .allPlayers()
+                .spawn();
+
         if (hit == null) {
             return;
         }
@@ -120,10 +131,12 @@ public class BattlebindProjectile extends ReturningLinkProjectile {
                 caster,
                 null,
                 new SkillDamageCause(skill),
-                damage,
+                skill.getDamage(level),
                 skill.getName());
         event.setDamageDelay(0);
         UtilDamage.doDamage(event);
+
+        skill.bind(caster, hit, level);
 
         UtilMessage.message(hit, skill.getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(caster.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));
         UtilMessage.message(caster, skill.getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(hit.getName(), NamedTextColor.YELLOW), skill.getDisplayName().color(NamedTextColor.GREEN));

@@ -3,28 +3,19 @@ package me.mykindos.betterpvp.core.utilities.model.projectile;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class ReturningLinkProjectile extends Projectile {
+public abstract class ReturningLinkProjectile extends LinkProjectile {
 
     /**
      * Defines how the chain retracts after impact.
@@ -50,8 +41,6 @@ public abstract class ReturningLinkProjectile extends Projectile {
         PULL_TO_MIDPOINT
     }
 
-    protected final Display lead;
-    private final LinkedHashMap<Display, Double> links = new LinkedHashMap<>();
     private final long pullTime;
     private final double pullSpeed;
     private final double meetDistance;
@@ -59,9 +48,7 @@ public abstract class ReturningLinkProjectile extends Projectile {
     @Setter
     @Getter
     protected PullMode pullMode;
-    protected LivingEntity hit;
     protected Location anchorLocation; // Where the chain started (caster position at impact)
-    protected Location impactLocation; // Where the projectile hit (for wall grappling)
 
     /**
      * Constructor with default PULL_TARGET mode for backwards compatibility.
@@ -89,7 +76,6 @@ public abstract class ReturningLinkProjectile extends Projectile {
         this.pullSpeed = pullSpeed;
         this.pullMode = pullMode;
         this.meetDistance = meetDistance;
-        this.lead = item();
     }
 
     public boolean hasFinishedPulling() {
@@ -101,96 +87,26 @@ public abstract class ReturningLinkProjectile extends Projectile {
         return UtilTime.elapsed(creationTime, impacted ? pullTime + aliveTime : aliveTime);
     }
 
-    protected abstract Display item();
-
-    protected abstract Display createLink(Location spawnLocation, double height);
-
-    private Map.Entry<Display, Double> appendLink(Location spawnLocation, double height) {
-        Display link = createLink(spawnLocation, height);
-        link.setMetadata("height", new FixedMetadataValue(
-                JavaPlugin.getPlugin(Core.class), link.getTransformation().getScale().y));
-        links.putLast(link, 0d);
-        return links.lastEntry();
-    }
-
-    @Override
-    protected boolean canCollideWith(Entity entity) {
-        if (!super.canCollideWith(entity)) {
-            return false;
-        }
-
-        final EntityCanHurtEntityEvent event = new EntityCanHurtEntityEvent(caster, (LivingEntity) entity);
-        event.callEvent();
-        return event.getResult() != Event.Result.DENY;
-    }
-
     @Override
     protected void onTick() {
-        final double length = this.velocity.length();
-        final double speed = length / 20;
-        lead.teleport(location.clone().setDirection(lead.getLocation().getDirection()));
+        super.onTick();
 
-        if (!impacted) {
-            tickOutgoing(speed);
-        } else if (!links.isEmpty()) {
-            // PULL_CASTER doesn't require a hit entity (can grapple to walls)
-            // Other modes require a valid hit entity
-            if (pullMode != PullMode.PULL_CASTER && (hit == null || !hit.isValid())) {
-                setMarkForRemoval(true);
-                return;
-            }
-
-            switch (pullMode) {
-                case PULL_TARGET -> tickPullTarget();
-                case PULL_CASTER -> tickPullCaster();
-                case PULL_TO_MIDPOINT -> tickPullToMidpoint();
-            }
-        }
-    }
-
-    /**
-     * Handles the outgoing phase where the chain extends toward the target.
-     */
-    private void tickOutgoing(double speed) {
-        double remaining = speed;
-
-        while (remaining > 0) {
-            Map.Entry<Display, Double> toMove;
-
-            if (this.links.isEmpty()) {
-                toMove = appendLink(this.location.clone(), speed);
-            } else {
-                toMove = this.links.lastEntry();
-                if (toMove.getValue() >= 1.0) {
-                    Location newLinkStart = getEndOfLink(toMove.getKey());
-                    toMove = appendLink(newLinkStart, speed);
-                }
-            }
-
-            final double availableProgress = Math.max(0.05, 1.0 - toMove.getValue());
-            final double progress = Math.min(remaining, availableProgress);
-            final double newProgress = toMove.getValue() + progress;
-            this.links.replace(toMove.getKey(), toMove.getValue(), newProgress);
-
-            final double height = toMove.getKey().getMetadata("height").getFirst().asDouble();
-            remaining -= Math.max(0.05, progress * height);
-            final Transformation transformation = toMove.getKey().getTransformation();
-            transformation.getScale().set(
-                    transformation.getScale().x,
-                    (float) (height * newProgress),
-                    transformation.getScale().z
-            );
-            toMove.getKey().setTransformation(transformation);
-            toMove.getKey().teleport(toMove.getKey().getLocation().setDirection(getVelocity()));
+        if (!impacted || links.isEmpty()) {
+            return;
         }
 
-        pushSound().play(location);
-    }
+        // PULL_CASTER doesn't require a hit entity (can grapple to walls)
+        // Other modes require a valid hit entity
+        if (pullMode != PullMode.PULL_CASTER && (hit == null || !hit.isValid())) {
+            setMarkForRemoval(true);
+            return;
+        }
 
-    private Location getEndOfLink(Display link) {
-        double height = link.getMetadata("height").getFirst().asDouble();
-        Vector direction = getVelocity().clone().normalize();
-        return link.getLocation().clone().add(direction.multiply(height));
+        switch (pullMode) {
+            case PULL_TARGET -> tickPullTarget();
+            case PULL_CASTER -> tickPullCaster();
+            case PULL_TO_MIDPOINT -> tickPullToMidpoint();
+        }
     }
 
     /**
@@ -434,22 +350,6 @@ public abstract class ReturningLinkProjectile extends Projectile {
     }
 
     /**
-     * Updates the visual scale of a link based on its current progress value.
-     */
-    private void updateLinkScale(Display link, double progressValue) {
-        if (!link.hasMetadata("height")) return;
-
-        final double originalHeight = link.getMetadata("height").getFirst().asDouble();
-        final Transformation transformation = link.getTransformation();
-        transformation.getScale().set(
-                transformation.getScale().x,
-                (float) (originalHeight * progressValue),
-                transformation.getScale().z
-        );
-        link.setTransformation(transformation);
-    }
-
-    /**
      * Repositions all links evenly along the chain between caster and target.
      * This keeps the visual chain connected as both ends retract.
      */
@@ -483,34 +383,16 @@ public abstract class ReturningLinkProjectile extends Projectile {
 
     protected abstract SoundEffect pullSound();
 
-    protected abstract SoundEffect pushSound();
-
-    protected abstract SoundEffect impactSound();
-
     @Override
     protected void onImpact(Location location, RayTraceResult result) {
-        // Store locations for pull phase
+        super.onImpact(location, result);
+
+        // Store where the chain started, for the pull phase
         this.anchorLocation = caster == null ? location.clone() : caster.getLocation().clone();
-        this.impactLocation = location.clone();
 
-        final Entity hit = result.getHitEntity();
-        impactSound().play(location);
-
-        if (hit == null) {
+        if (hit == null && pullMode != PullMode.PULL_CASTER) {
             // PULL_CASTER can work without hitting an entity (wall grapple)
-            if (pullMode != PullMode.PULL_CASTER) {
-                setMarkForRemoval(true);
-            }
-            return;
-        }
-
-        this.hit = (LivingEntity) hit;
-    }
-
-    public void remove() {
-        lead.remove();
-        for (Display link : links.keySet()) {
-            link.remove();
+            setMarkForRemoval(true);
         }
     }
 }

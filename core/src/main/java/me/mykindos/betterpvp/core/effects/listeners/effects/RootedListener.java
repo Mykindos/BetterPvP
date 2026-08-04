@@ -16,6 +16,12 @@ import org.bukkit.event.Listener;
 @BPvPListener
 public class RootedListener implements Listener {
 
+    /**
+     * Tagged on every velocity this listener kills, so anything that wants to carve out an exception
+     * for its own flavour of root can recognise the cancellation as ours and undo it.
+     */
+    public static final String CANCEL_REASON = "Rooted";
+
     private final EffectManager effectManager;
 
     @Inject
@@ -29,7 +35,7 @@ public class RootedListener implements Listener {
         if (!(rawEntity instanceof LivingEntity entity)) return;
 
         if (effectManager.hasEffect(entity, EffectTypes.ROOTED)) {
-            event.setCancelled(true);
+            event.cancel(CANCEL_REASON);
         }
     }
 }

@@ -209,8 +209,8 @@ skills:
       damagePerLevel: 0.5
       speed: 40.0
       airDuration: 0.5
-      pullDuration: 1.0
-      pullSpeed: 20.0
+      baseBindDuration: 1.5
+      bindDurationPerLevel: 0.25
       hitboxSize: 0.6
     unstoppableforce:
       enabled: true
@@ -235,6 +235,30 @@ skills:
       range: 3.0
       fov: 90.0
       cooldownDecreasePerLevel: 1.0
+    upheaval:
+      enabled: true
+      maxlevel: 5
+      cooldown: 13.0
+      cooldownDecreasePerLevel: 1.0
+      baseDamage: 6.0
+      damageIncreasePerLevel: 0.5
+      baseSlowDuration: 1.5
+      slowDurationIncreasePerLevel: 0.25
+      slowStrength: 2
+      baseDistance: 7.0
+      distanceIncreasePerLevel: 0.5
+      pullStrength: 0.9
+      minRockHeight: 0.5
+      maxRockHeight: 1.5
+      heightRamp: 2.5
+      rockScale: 0.6
+      rocksPerStep: 2
+      stepDistance: 0.6
+      stepsPerTick: 3
+      spread: 0.9
+      hitRadius: 1.8
+      lifespanTicks: 50
+      sinkTicks: 8
     ride:
       enabled: false
       cooldown: 30.0
