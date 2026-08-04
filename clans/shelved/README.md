@@ -67,12 +67,14 @@ twelve files.
    `offer.setAshore(sailors)` once for the whole landing party, which is what allocates one island and lands them
    together.
 
-5. **The camera work needs its shaders back.** `SteeringService`, `SteeringControls` and `SteeringCues` roll and shake
-   the view through `core.framework.shader`, which is gone — see [screen-effects](screen-effects/README.md) for what it
-   was and what survives of it. Restore both halves or drop the camera work; nothing else in discovery depends on it.
+5. **Decide about the camera work.** `SteeringService`, `SteeringControls` and `SteeringCues` roll and shake the view
+   through `core.framework.shader`, which is no longer in the build — see [screen-effects](screen-effects/README.md),
+   which holds both halves. Restoring it is its own job, so discovery can come back without it first: drop the
+   `ScreenEffectService` parameter from those three constructors and the two calls that use it. Nothing else depends
+   on it.
 
 ## screen-effects
 
-The server-driven core-shader system (camera roll, screen shake, weather grades) that discovery steered with. Removed
-from both the plugin and the resource pack; what is kept here is the technique and the compiled classes. See its own
-README.
+The server-driven core-shader system (camera roll, screen shake, weather grades) that discovery steered with. Taken
+out of both the plugin and the resource pack. The pack's GLSL is here in full, along with the plugin half as compiled
+classes. See its own README.
