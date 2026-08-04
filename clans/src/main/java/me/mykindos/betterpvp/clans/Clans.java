@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
 import me.mykindos.betterpvp.clans.world.travel.ServerLocation;
+import me.mykindos.betterpvp.clans.world.ship.ShipService;
 import me.mykindos.betterpvp.clans.world.travel.TravelHistory;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -182,6 +183,10 @@ public class Clans extends BPvPPlugin {
             // out before their logout location is saved into a world that won't exist on rejoin. Synchronous: async
             // tasks don't run reliably during disable.
             evacuateIslandOccupants();
+
+            // Un-paste every ship before the worlds save. The hulls are drawn fresh each boot from their structures, so
+            // letting them reach disk would bake a copy into the map that no longer tracks the structure it came from.
+            injector.getInstance(ShipService.class).restoreAll();
 
             // Unload scene content so each archetype's onDeactivate fires on a graceful shutdown (the previously-unused
             // SceneLoaderManager.shutdown()). In-flight respawn points are already persisted synchronously as they are

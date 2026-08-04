@@ -4,9 +4,6 @@ import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.animation.ModelState;
 import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
-import me.mykindos.betterpvp.clans.world.travel.Destination;
-import me.mykindos.betterpvp.clans.world.travel.DestinationProvider;
-import me.mykindos.betterpvp.clans.world.travel.TravelService;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagAnchor;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
@@ -18,18 +15,22 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.function.Consumer;
 
+/**
+ * The dockhand who puts you aboard.
+ * <p>
+ * The navigator no longer decides where you are going — that is the helm's job, once you have a crew. All this does is
+ * get you onto the ship it is tied to, which is why it takes an action rather than a list of destinations.
+ */
 public class NavigatorNPC extends ModeledNPC implements Actor {
 
-    private final List<DestinationProvider> providers;
-    private final TravelService travelService;
+    private final Consumer<Player> onBoard;
     private ActiveModel model;
 
-    public NavigatorNPC(SceneObjectFactory factory, List<DestinationProvider> providers, TravelService travelService) {
+    public NavigatorNPC(SceneObjectFactory factory, Consumer<Player> onBoard) {
         super(factory);
-        this.providers = providers;
-        this.travelService = travelService;
+        this.onBoard = onBoard;
     }
 
     @Override
@@ -50,14 +51,7 @@ public class NavigatorNPC extends ModeledNPC implements Actor {
 
     @Override
     public void act(Player runner) {
-        // Resolved per player, per interaction: island offers are generated fresh (or pulled from a short-lived
-        // per-player cache) rather than fixed at construction time.
-        final List<Destination> destinations = providers.stream()
-                .flatMap(provider -> provider.destinationsFor(runner).stream())
-                .toList();
-
-        // Open
-        new NavigationMenu(destinations, travelService).show(runner);
+        onBoard.accept(runner);
 
         // VFX
         this.model.getAnimationHandler().playAnimation("vendor_stand_1_interact", 0.2, 0.1, 1.0, false);

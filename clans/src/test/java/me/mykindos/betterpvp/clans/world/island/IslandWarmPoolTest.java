@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.island;
 
+import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +50,7 @@ class IslandWarmPoolTest {
     private IslandWarmPool warmPool;
 
     private static IslandTemplate template(String key) {
-        return new IslandTemplate(key, Component.text(key), "islands/" + key, Material.GRASS_BLOCK);
+        return new IslandTemplate(key, Component.text(key), "islands/" + key, Material.GRASS_BLOCK, VoyageTiming.DEFAULT);
     }
 
     @BeforeEach

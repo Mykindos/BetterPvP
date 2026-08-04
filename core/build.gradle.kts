@@ -55,6 +55,8 @@ dependencies {
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)
+    // Mapper is compileOnly for the plugin (it is a server dependency), but the schematic tests build real regions.
+    testImplementation(libs.mapper)
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

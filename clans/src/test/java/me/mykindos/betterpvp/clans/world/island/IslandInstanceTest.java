@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.island;
 
+import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class IslandInstanceTest {
 
     private static IslandInstance newInstance() {
-        final IslandTemplate template = new IslandTemplate("solo", Component.text("Solo"), "islands/solo", Material.GRASS_BLOCK);
+        final IslandTemplate template = new IslandTemplate("solo", Component.text("Solo"), "islands/solo", Material.GRASS_BLOCK, VoyageTiming.DEFAULT);
         return new IslandInstance(UUID.randomUUID(), template, "islands/solo/abc12345");
     }
 

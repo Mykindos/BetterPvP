@@ -1,0 +1,30 @@
+# Places a ship's helm can set a course for. Each top-level key is the destination id.
+#
+# world         : the world crews land in. Must contain at least one `ship_arrive` marker.
+# display-name  : shown at the helm
+# icon          : Material representing it in the helm menu
+# min-seconds   : no landfall roll happens before this
+# max-seconds   : landfall is certain by this, however the rolls go
+# chance        : odds of each roll landing, once past min-seconds (rolled every 10s)
+# distribution  : which dock a crew lands at — random | round-robin | first
+#
+# Crews always land together, at one dock chosen once for the whole crew.
+
+aldenmark:
+  display-name: "Aldenmark"
+  world: "world"
+  icon: GRASS_BLOCK
+  min-seconds: 60
+  max-seconds: 120
+  chance: 0.25
+  distribution: random
+
+spawn:
+  display-name: "Spawn"
+  world: "Season-2/Spawn"
+  icon: OAK_BOAT
+  min-seconds: 45
+  max-seconds: 90
+  chance: 0.3
+  # Spawn has a front door; everyone arrives at the same quay.
+  distribution: first

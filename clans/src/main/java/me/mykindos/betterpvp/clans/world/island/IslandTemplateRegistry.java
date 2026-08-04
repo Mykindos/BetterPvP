@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -64,8 +65,13 @@ public class IslandTemplateRegistry {
             }
 
             final Material icon = Material.matchMaterial(section.getString("icon", "GRASS_BLOCK"));
+            final VoyageTiming timing = VoyageTiming.of(
+                    section.getInt("min-seconds", VoyageTiming.DEFAULT.getMinSeconds()),
+                    section.getInt("max-seconds", VoyageTiming.DEFAULT.getMaxSeconds()),
+                    section.getDouble("chance", VoyageTiming.DEFAULT.getChancePerRoll()));
+
             templates.put(key, new IslandTemplate(key, Component.text(displayName), templateFolder,
-                    icon != null ? icon : Material.GRASS_BLOCK));
+                    icon != null ? icon : Material.GRASS_BLOCK, timing));
         }
 
         log.info("Loaded {} discovery island template(s)", templates.size()).submit();

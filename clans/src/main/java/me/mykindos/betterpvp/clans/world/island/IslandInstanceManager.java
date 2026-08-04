@@ -80,6 +80,11 @@ public class IslandInstanceManager {
         return instances.values().stream().filter(instance -> instance.getWorldName().equals(worldName)).findFirst();
     }
 
+    /** The instance a player is counted as occupying, which is the only record of where a delivered traveller went. */
+    public @NotNull Optional<IslandInstance> byOccupant(@NotNull UUID player) {
+        return instances.values().stream().filter(instance -> instance.getOccupants().contains(player)).findFirst();
+    }
+
     public @NotNull Collection<IslandInstance> all() {
         return instances.values();
     }

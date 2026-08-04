@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.mapper;
 
+import dev.brauw.mapper.region.Region;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -21,6 +22,15 @@ public final class RegionTags {
 
     private final Set<String> markers = new HashSet<>();
     private final Map<String, String> values = new HashMap<>();
+
+    /**
+     * Reads a region's tags. Mapper leaves the tag set null on an untagged region, so this is the safe way to get a
+     * view of any region rather than only ones somebody has tagged.
+     */
+    public static @NotNull RegionTags of(@NotNull Region region) {
+        final Set<String> tags = region.getOptions().getTags();
+        return new RegionTags(tags == null ? Set.of() : tags);
+    }
 
     public RegionTags(@NotNull Set<String> tags) {
         for (String raw : tags) {

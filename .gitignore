@@ -30,3 +30,6 @@ build/
 /private/
 **/bin/
 /grafana/*
+
+# Runtime logs from test servers
+logs/

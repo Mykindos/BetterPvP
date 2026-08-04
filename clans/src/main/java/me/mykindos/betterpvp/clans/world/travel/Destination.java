@@ -52,4 +52,16 @@ public interface Destination {
      * @return completes with {@code true} once the player has arrived, or {@code false} if the relocation failed
      */
     @NotNull CompletableFuture<Boolean> receive(@NotNull Player traveller);
+
+    /**
+     * Whether a successful {@link #receive(Player)} means the traveller is standing at this destination, and so should
+     * be welcomed to it.
+     * <p>
+     * False for anything that only <em>sets out</em> — a ship's crossing succeeds the moment the crew is at sea, which
+     * is minutes before they see the place. Announcing arrival there tells somebody they have landed while they are
+     * still looking at open water.
+     */
+    default boolean announcesArrival() {
+        return true;
+    }
 }

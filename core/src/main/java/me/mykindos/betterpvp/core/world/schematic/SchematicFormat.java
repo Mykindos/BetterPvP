@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 
 /**
@@ -31,4 +32,16 @@ public interface SchematicFormat {
      * @throws IOException if the stream is not a valid schematic of this format
      */
     @NotNull Schematic read(@NotNull InputStream in) throws IOException;
+
+    /**
+     * Writes a schematic to a stream. The stream is owned by the caller and is not closed here.
+     * <p>
+     * Optional: a format that only ever reads existing files (a legacy import path, say) may leave this unsupported.
+     * Capturing from the world requires it.
+     *
+     * @throws UnsupportedOperationException if this format cannot be written
+     */
+    default void write(@NotNull OutputStream out, @NotNull Schematic schematic) throws IOException {
+        throw new UnsupportedOperationException(id() + " schematics can be read but not written");
+    }
 }

@@ -2,15 +2,12 @@ package me.mykindos.betterpvp.clans.world.veloran;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.world.Continent;
 import me.mykindos.betterpvp.clans.world.Island;
 import me.mykindos.betterpvp.clans.world.WorldContent;
+import me.mykindos.betterpvp.clans.world.content.WorldContentService;
 import me.mykindos.betterpvp.clans.world.veloran.gateway.SunderedGate;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
-import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
-import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
-import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -29,9 +26,8 @@ public class Veloran extends Island implements Continent {
     private final SunderedGate sunderedGate;
 
     @Inject
-    public Veloran(ZoneManager zoneManager, SceneObjectRegistry sceneRegistry, SceneLoaderManager loaderManager,
-                   Clans clans, SunderedGate sunderedGate) {
-        super(zoneManager, sceneRegistry, loaderManager, clans);
+    public Veloran(@NotNull WorldContentService contentService, SunderedGate sunderedGate) {
+        super(contentService);
         this.sunderedGate = sunderedGate;
     }
 

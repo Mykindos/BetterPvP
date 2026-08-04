@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.schematic;
 
 import com.google.inject.Singleton;
+import dev.brauw.mapper.region.Region;
 import org.bukkit.Axis;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,8 +33,16 @@ import java.util.Set;
 public class SchematicAnimator {
 
     /**
-     * Instantly applies every block of {@code schematic}, rotated {@code quarterTurns} × 90° about its anchor, with the
-     * anchor block placed at {@code at}. Physics is suppressed so neighbouring blocks do not react mid-paste.
+     * Instantly applies the <em>solid</em> blocks of {@code schematic}, rotated {@code quarterTurns} × 90° about its
+     * anchor, with the anchor block placed at {@code at}. Physics is suppressed so neighbouring blocks do not react
+     * mid-paste.
+     * <p>
+     * Air is skipped, so a structure lands as its own shape rather than as the cuboid it was captured in. A selection is
+     * always looser than the build inside it, and writing its air would gouge a rectangular hole in whatever surrounds
+     * the paste — most visibly in water, where a hull would arrive sitting in a dry rectangular trench.
+     * <p>
+     * The cost is that the destination's own contents survive inside the structure: a hull pasted into open sea keeps
+     * the sea in any space its build left empty. Build the interior out of blocks if it should be dry.
      */
     public void paste(@NotNull Schematic schematic, @NotNull Location at, int quarterTurns) {
         final World world = at.getWorld();
@@ -42,6 +51,9 @@ public class SchematicAnimator {
         final int az = at.getBlockZ();
         final int turns = quarterTurns & 3;
         for (Schematic.PlacedBlock block : schematic.getBlocks()) {
+            if (block.getData().getMaterial().isAir()) {
+                continue;
+            }
             final int lx = block.getX() - schematic.getAnchorX();
             final int ly = block.getY() - schematic.getAnchorY();
             final int lz = block.getZ() - schematic.getAnchorZ();
@@ -88,6 +100,29 @@ public class SchematicAnimator {
         for (Schematic.PlacedBlock block : captured) {
             world.getBlockAt(block.getX(), block.getY(), block.getZ()).setBlockData(block.getData(), false);
         }
+    }
+
+    /**
+     * Rebuilds the schematic's captured data-points in the world, positioned and rotated to match a {@link #paste} with
+     * the same {@code at} and {@code quarterTurns}.
+     * <p>
+     * The regions are returned rather than registered: they are not part of the world's Mapper file and should not be
+     * written to it, so whoever pasted the structure hands them to the content pipeline for this session only.
+     *
+     * @return the placed regions, empty for a schematic that carries none
+     */
+    public @NotNull List<Region> pasteRegions(@NotNull Schematic schematic, @NotNull Location at, int quarterTurns) {
+        return pasteRegions(schematic, at, quarterTurns, Set.of());
+    }
+
+    /** As {@link #pasteRegions(Schematic, Location, int)}, tagging every placed region so the paste can be identified. */
+    public @NotNull List<Region> pasteRegions(@NotNull Schematic schematic, @NotNull Location at, int quarterTurns,
+                                              @NotNull Set<String> extraTags) {
+        final List<Region> placed = new ArrayList<>(schematic.getRegions().size());
+        for (CapturedRegion region : schematic.getRegions()) {
+            placed.add(region.rebuild(at, quarterTurns, extraTags));
+        }
+        return placed;
     }
 
     /**

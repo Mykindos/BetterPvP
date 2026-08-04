@@ -35,4 +35,16 @@ public interface TagAnchor {
             return entity.getLocation().add(0, entity.getHeight() + 0.2, 0);
         };
     }
+
+    /**
+     * Anchors a fixed height above the owner's feet.
+     * <p>
+     * For anything wearing a model: the backing entity keeps its own dimensions whatever the model is, so measuring
+     * from it puts a label inside a model taller than the entity carrying it.
+     *
+     * @param height how far above the owner's feet, in blocks
+     */
+    static TagAnchor above(SceneObject owner, double height) {
+        return () -> owner.isInitialized() ? owner.getEntity().getLocation().add(0, height, 0) : null;
+    }
 }

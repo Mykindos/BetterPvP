@@ -5,14 +5,13 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import dev.brauw.mapper.region.CuboidRegion;
 import dev.brauw.mapper.region.PerspectiveRegion;
-import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.clans.world.SceneSpawn;
 import me.mykindos.betterpvp.clans.world.WorldContent;
 import me.mykindos.betterpvp.clans.world.veloran.Veloran;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.utilities.MapperHelper;
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.zone.NoBuildRule;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
@@ -28,7 +27,6 @@ import org.bukkit.World;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,12 +72,8 @@ public class SunderedGate implements WorldContent {
     }
 
     @Override
-    public @NotNull List<Zone> zones(@NotNull World world, @NotNull Collection<Region> regions) {
-        return MapperHelper.findRegion(regions, REGION_NAME, CuboidRegion.class)
-                .map(cuboid -> {
-                    cuboid.setWorld(world);
-                    return cuboid;
-                })
+    public @NotNull List<Zone> zones(@NotNull World world, @NotNull RegionIndex regions) {
+        return regions.findOne(REGION_NAME, CuboidRegion.class)
                 .map(cuboid -> List.of(buildZone(cuboid)))
                 .orElseGet(() -> {
                     log.warn("The Sundered Gate has no '{}' Mapper cuboid - zone not loaded", REGION_NAME).submit();
@@ -88,21 +82,18 @@ public class SunderedGate implements WorldContent {
     }
 
     @Override
-    public @NotNull List<SceneSpawn> sceneObjects(@NotNull World world, @NotNull Collection<Region> regions) {
-        final Optional<CuboidRegion> portalRegion = MapperHelper.findRegion(regions, PORTAL_NAME, CuboidRegion.class);
+    public @NotNull List<SceneSpawn> sceneObjects(@NotNull World world, @NotNull RegionIndex regions) {
+        final Optional<CuboidRegion> portalRegion = regions.findOne(PORTAL_NAME, CuboidRegion.class);
         if (portalRegion.isEmpty()) {
             log.warn("The Sundered Gate has no '{}' Mapper perspective region - portal not spawned", PORTAL_NAME).submit();
             return List.of();
         }
 
-        final Optional<PerspectiveRegion> markerRegion = MapperHelper.findRegion(regions, PORTAL_MARKER_NAME, PerspectiveRegion.class);
+        final Optional<PerspectiveRegion> markerRegion = regions.findOne(PORTAL_MARKER_NAME, PerspectiveRegion.class);
         if (markerRegion.isEmpty()) {
             log.warn("The Sundered Gate has no '{}' Mapper perspective region - portal label not spawned", PORTAL_MARKER_NAME).submit();
             return List.of();
         }
-
-        portalRegion.get().setWorld(world);
-        markerRegion.get().setWorld(world);
 
         final Location markerLocation = markerRegion.get().getLocation();
         final GatewayProp prop = new GatewayProp(propFactory,

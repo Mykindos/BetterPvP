@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.scene.npc.NpcInteractionRegistry;
+import me.mykindos.betterpvp.core.scene.interaction.SceneInteractionRegistry;
 import me.mykindos.betterpvp.core.trade.event.TradeCancelledEvent;
 import me.mykindos.betterpvp.core.trade.event.TradeCompletedEvent;
 import me.mykindos.betterpvp.core.trade.event.TradeStartedEvent;
@@ -87,13 +87,13 @@ public class TradeManager {
 
     @Inject
     public TradeManager(TradeSettlement settlement, ClientManager clientManager, TradeCurrencyRegistry currencyRegistry,
-                        NpcInteractionRegistry npcInteractions) {
+                        SceneInteractionRegistry sceneInteractions) {
         this.settlement = settlement;
         this.clientManager = clientManager;
         this.currencyRegistry = currencyRegistry;
 
-        // Any NPC tagged interact:trade is a broker. Trading claims the name; the map decides who wears it.
-        npcInteractions.register("trade", this::openBroker);
+        // Anything tagged interact:trade is a broker. Trading claims the name; the map decides who wears it.
+        sceneInteractions.register("trade", (player, placement) -> openBroker(player));
     }
 
     @NotNull

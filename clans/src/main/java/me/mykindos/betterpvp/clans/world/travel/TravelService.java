@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -58,11 +59,49 @@ public class TravelService {
         departureController.begin(traveller, destination, () -> completeVoyage(traveller, destination));
     }
 
+    /**
+     * Travels with no departure hold — the guards and origin-recording still apply, but the destination receives the
+     * traveller at once.
+     * <p>
+     * For departures that already have their own ceremony to sit through. A ship's crossing is minutes of waiting at
+     * sea; making the captain stand still for three seconds first only delays the part that is the wait.
+     */
+    public void travelNow(@NotNull Player traveller, @NotNull Destination destination) {
+        if (!vet(traveller, destination)) {
+            return;
+        }
+
+        travelHistory.recordOrigin(traveller);
+        completeVoyage(traveller, destination);
+    }
+
+    /** @return {@code false} if the destination or a guard refused, having already told the traveller why */
+    private boolean vet(@NotNull Player traveller, @NotNull Destination destination) {
+        if (!destination.isReady()) {
+            UtilMessage.message(traveller, "clans.prefix.travel", "clans.travel.unavailable");
+            return false;
+        }
+
+        for (TravelGuard guard : guards) {
+            final Optional<Component> veto = guard.veto(traveller, destination);
+            if (veto.isPresent()) {
+                UtilMessage.simpleMessage(traveller, "Travel", veto.get());
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void completeVoyage(@NotNull Player traveller, @NotNull Destination destination) {
         destination.receive(traveller).whenComplete((arrived, error) -> {
             if (error != null || !Boolean.TRUE.equals(arrived)) {
                 log.warn("Travel to {} failed for {}", destination.key(), traveller.getName()).submit();
                 UtilMessage.simpleMessage(traveller, "Travel", Component.text("Something went wrong on arrival — please try again.", NamedTextColor.RED));
+                return;
+            }
+
+            // A crossing is under way, not over: it runs its own cues when the crew actually sights land.
+            if (!destination.announcesArrival()) {
                 return;
             }
 

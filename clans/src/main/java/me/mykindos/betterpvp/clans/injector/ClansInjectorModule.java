@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.PlayerDeathFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
+import me.mykindos.betterpvp.clans.world.island.CrewAllocationPolicy;
 import me.mykindos.betterpvp.clans.world.island.InstanceAllocationPolicy;
 import me.mykindos.betterpvp.clans.world.island.IslandAllocator;
 import me.mykindos.betterpvp.clans.world.island.RoutingIslandAllocator;
@@ -57,7 +58,9 @@ public class ClansInjectorModule extends AbstractModule {
         travelGuards.addBinding().to(AllocatingTravelGuard.class);
 
         // Discovery island occupancy. Solo for now; swapping to a shared/pooled policy is a single line here.
-        bind(InstanceAllocationPolicy.class).to(SoloAllocationPolicy.class);
+        // Crews must land in one island together; a solo traveller still gets their own, since nobody aboard is a
+        // crewmate of theirs.
+        bind(InstanceAllocationPolicy.class).to(CrewAllocationPolicy.class);
 
         // Where a discovery island instance comes from, and how a player physically gets to one. Both are routed
         // per-template (allocation) or per-handle (delivery) by IslandHostRouter, so hosting can be split across

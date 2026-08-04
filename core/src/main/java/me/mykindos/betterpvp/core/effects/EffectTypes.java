@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.effects.types.negative.EntangledEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.FrenzyEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.FrozenEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.NauseaEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoSprintEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.PinEffect;
@@ -63,6 +64,7 @@ public class EffectTypes {
     public static final EffectType VULNERABILITY = createEffectType(new VulnerabilityEffect());
     public static final EffectType STUN = createEffectType(new StunEffect());
     public static final EffectType POISON = createEffectType(new PoisonEffect());
+    public static final EffectType NAUSEA = createEffectType(new NauseaEffect());
     public static final EffectType NO_JUMP = createEffectType(new NoJumpEffect());
     public static final EffectType PIN = createEffectType(new PinEffect());
     public static final EffectType NO_SPRINT = createEffectType(new NoSprintEffect());

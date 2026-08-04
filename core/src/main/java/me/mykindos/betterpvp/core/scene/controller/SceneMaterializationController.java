@@ -73,10 +73,32 @@ public class SceneMaterializationController implements Listener {
                 .computeIfAbsent(chunkKey(cx, cz), k -> new HashSet<>())
                 .add(object);
 
-        // If the chunk's entities are already present (object registered while a player is nearby), show it now.
+        // If the chunk's entities are already present (object registered while a player is nearby, or content loading
+        // into a world whose spawn chunks never unloaded), show it - on the same deferred path as a chunk load, for the
+        // same reason: a model bound in the caller's tick races ModelEngine, and content loading at server start is
+        // exactly when that race is lost.
         if (world.isChunkLoaded(cx, cz) && world.getChunkAt(cx, cz).isEntitiesLoaded()) {
-            object.materialize();
+            materializeSoon(object, world.getChunkAt(cx, cz));
         }
+    }
+
+    /**
+     * Materializes {@code object} next tick, if it is still registered, still dormant, and its chunk still holds
+     * entities. Failures are logged against the object rather than thrown: one prop that cannot build its body must not
+     * take down whatever else was loading alongside it.
+     */
+    private void materializeSoon(@NotNull SceneObject object, @NotNull Chunk chunk) {
+        UtilServer.runTaskLater(core, () -> {
+            if (!object.isRegistered() || object.isMaterialized() || !chunk.isEntitiesLoaded()) {
+                return;
+            }
+            try {
+                object.materialize();
+            } catch (Exception exception) {
+                log.error("Scene object {} failed to materialize at {}",
+                        object.getClass().getSimpleName(), object.getAnchor(), exception).submit();
+            }
+        }, 1L);
     }
 
     /** Removes {@code object} from the chunk index. Called by the registry on unregister. */
@@ -104,14 +126,7 @@ public class SceneMaterializationController implements Listener {
 
     @EventHandler
     public void onEntitiesLoad(EntitiesLoadEvent event) {
-        forEachIn(event.getChunk(), object -> {
-            // Spawning inside the load event can race ModelEngine binding; defer one tick and re-check the chunk.
-            UtilServer.runTaskLater(core, () -> {
-                if (object.isRegistered() && !object.isMaterialized() && event.getChunk().isEntitiesLoaded()) {
-                    object.materialize();
-                }
-            }, 1L);
-        });
+        forEachIn(event.getChunk(), object -> materializeSoon(object, event.getChunk()));
     }
 
     @EventHandler

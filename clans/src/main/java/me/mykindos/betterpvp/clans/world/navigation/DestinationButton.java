@@ -18,9 +18,17 @@ public class DestinationButton extends ControlItem<NavigationMenu> {
     private final Destination destination;
     private final TravelService travelService;
 
+    /** Whether to skip the departure hold — see {@link NavigationMenu#NavigationMenu(java.util.List, TravelService, boolean)}. */
+    private final boolean immediate;
+
     public DestinationButton(Destination destination, TravelService travelService) {
+        this(destination, travelService, false);
+    }
+
+    public DestinationButton(Destination destination, TravelService travelService, boolean immediate) {
         this.destination = destination;
         this.travelService = travelService;
+        this.immediate = immediate;
     }
 
     @Override
@@ -35,6 +43,10 @@ public class DestinationButton extends ControlItem<NavigationMenu> {
         }
 
         player.closeInventory();
-        travelService.travel(player, destination);
+        if (immediate) {
+            travelService.travelNow(player, destination);
+        } else {
+            travelService.travel(player, destination);
+        }
     }
 }

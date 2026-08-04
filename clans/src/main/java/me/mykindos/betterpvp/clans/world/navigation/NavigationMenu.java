@@ -25,6 +25,14 @@ public class NavigationMenu extends AbstractGui implements Windowed {
     private final Set<Integer> occupiedSlots = new HashSet<>();
 
     public NavigationMenu(List<Destination> destinations, TravelService travelService) {
+        this(destinations, travelService, false);
+    }
+
+    /**
+     * @param immediate skip the departure hold. For a destination whose own journey is the wait — a ship's crossing —
+     *                  standing still for three seconds first only delays it.
+     */
+    public NavigationMenu(List<Destination> destinations, TravelService travelService, boolean immediate) {
         super(9, 5);
         Preconditions.checkArgument(!destinations.isEmpty(), "No destinations to navigate to!");
         this.destinations = destinations;
@@ -32,14 +40,14 @@ public class NavigationMenu extends AbstractGui implements Windowed {
         // last destination should be on the center last
         final ArrayList<Destination> buffer = new ArrayList<>(destinations);
         final Destination center = buffer.removeLast();
-        placeButton(slotIndex(4, 4), center, travelService);
+        placeButton(slotIndex(4, 4), center, travelService, immediate);
 
         boolean side = ThreadLocalRandom.current().nextBoolean();
         for (Destination destination : buffer) {
             final int scattered = scatterSlot(side);
             final int slot = scattered != UNPLACED ? scattered : nextOpenSlot();
             if (slot != UNPLACED) {
-                placeButton(slot, destination, travelService);
+                placeButton(slot, destination, travelService, immediate);
             }
 
             side = !side;
@@ -81,8 +89,8 @@ public class NavigationMenu extends AbstractGui implements Windowed {
         return row * 9 + column;
     }
 
-    private void placeButton(int slot, Destination destination, TravelService travelService) {
-        setItem(slot, new DestinationButton(destination, travelService));
+    private void placeButton(int slot, Destination destination, TravelService travelService, boolean immediate) {
+        setItem(slot, new DestinationButton(destination, travelService, immediate));
         occupiedSlots.add(slot);
     }
 

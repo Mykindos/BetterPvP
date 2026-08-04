@@ -1,11 +1,15 @@
 package me.mykindos.betterpvp.core.world.schematic;
 
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.block.data.BlockData;
@@ -14,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +60,33 @@ public class FaweSchematicFormat implements SchematicFormat {
             }
         }
         throw last != null ? last : new IOException("No clipboard format could read the schematic");
+    }
+
+    /**
+     * Writes the blocks as a Sponge v3 schematic, preserving the anchor as the clipboard origin so a round trip through
+     * disk lands the paste on the same block the author chose.
+     */
+    @Override
+    public void write(@NotNull OutputStream out, @NotNull Schematic schematic) throws IOException {
+        final BlockVector3 max = BlockVector3.at(
+                Math.max(0, schematic.getWidth() - 1),
+                Math.max(0, schematic.getHeight() - 1),
+                Math.max(0, schematic.getLength() - 1));
+        final BlockArrayClipboard clipboard = new BlockArrayClipboard(new CuboidRegion(BlockVector3.ZERO, max));
+        clipboard.setOrigin(BlockVector3.at(schematic.getAnchorX(), schematic.getAnchorY(), schematic.getAnchorZ()));
+
+        try {
+            for (Schematic.PlacedBlock block : schematic.getBlocks()) {
+                clipboard.setBlock(BlockVector3.at(block.getX(), block.getY(), block.getZ()),
+                        BukkitAdapter.adapt(block.getData()));
+            }
+        } catch (WorldEditException exception) {
+            throw new IOException("Failed writing blocks to clipboard", exception);
+        }
+
+        try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_V3_SCHEMATIC.getWriter(out)) {
+            writer.write(clipboard);
+        }
     }
 
     private @NotNull Schematic convert(@NotNull Clipboard clipboard) {

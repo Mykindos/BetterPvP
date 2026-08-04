@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.world.island;
 
 import lombok.Value;
+import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
@@ -16,5 +17,8 @@ public class IslandTemplate {
     @NotNull Component displayName;
     @NotNull String templateFolder;
     @NotNull Material icon;
+
+    /** How long the crossing to it takes, since an island is reached by ship like anywhere else. */
+    @NotNull VoyageTiming timing;
 
 }

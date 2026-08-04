@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.clans.world.model;
 
 import dev.brauw.mapper.region.PointRegion;
-import dev.brauw.mapper.region.Region;
 import me.mykindos.betterpvp.clans.world.SceneSpawn;
 import me.mykindos.betterpvp.clans.world.WorldContent;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonArchetypeRegistry;
@@ -9,14 +8,12 @@ import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonDestination;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProperties;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonService;
-import me.mykindos.betterpvp.core.utilities.MapperHelper;
-import org.bukkit.Bukkit;
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -46,11 +43,11 @@ public class HumanCannon implements WorldContent {
     }
 
     @Override
-    public @NotNull List<SceneSpawn> sceneObjects(@NotNull World world, @NotNull Collection<Region> regions) {
+    public @NotNull List<SceneSpawn> sceneObjects(@NotNull World world, @NotNull RegionIndex regions) {
         final List<SceneSpawn> sceneObjects = new ArrayList<>();
         final List<CannonDestination> destinations = destinations(regions);
 
-        for (PointRegion point : MapperHelper.findRegions(regions, DATA_POINT, PointRegion.class)) {
+        for (PointRegion point : regions.find(DATA_POINT, PointRegion.class)) {
             final Location location = point.getLocation();
             final CannonProp cannon = cannonService.create(CannonArchetypeRegistry.LAUNCHER, properties());
             cannon.setDestinations(destinations);
@@ -61,9 +58,9 @@ public class HumanCannon implements WorldContent {
     }
 
     /** Resolves every {@link #DESTINATIONS} entry whose data-point exists in this world. */
-    private static @NotNull List<CannonDestination> destinations(@NotNull Collection<Region> regions) {
+    private static @NotNull List<CannonDestination> destinations(@NotNull RegionIndex regions) {
         final List<CannonDestination> destinations = new ArrayList<>();
-        DESTINATIONS.forEach((name, dataPoint) -> MapperHelper.findRegion(regions, dataPoint, PointRegion.class)
+        DESTINATIONS.forEach((name, dataPoint) -> regions.findOne(dataPoint, PointRegion.class)
                 .ifPresent(point -> destinations.add(CannonDestination.of(name, point.getLocation()))));
         return destinations;
     }

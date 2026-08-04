@@ -41,22 +41,30 @@ public class IslandExitService {
 
     public void leave(@NotNull Player player) {
         final Optional<IslandInstance> instanceOptional = currentInstance(player);
-        if (instanceOptional.isEmpty()) {
+
+        // An instance world with no live instance behind it is exactly where somebody gets stranded: an instance
+        // reaped, released or failed out from under them. That is when they most need this command to work, so the way
+        // out is offered on the world's name rather than on the registry still knowing about it.
+        if (instanceOptional.isEmpty() && !isInstanceWorld(player)) {
             UtilMessage.simpleMessage(player, "Islands", Component.text("You are not on a discovery island.", NamedTextColor.RED));
             return;
         }
 
-        final IslandInstance instance = instanceOptional.get();
         final Location destination = travelHistory.origin(player)
                 .flatMap(ServerLocation::toLocation)
                 .orElseGet(worldHandler::getSpawnLocation);
 
         player.teleportAsync(destination).thenAccept(arrived -> {
             if (Boolean.TRUE.equals(arrived)) {
-                instanceManager.exit(instance, player);
+                instanceOptional.ifPresent(instance -> instanceManager.exit(instance, player));
             } else {
-                log.warn("Player {} failed to teleport off island instance {}", player.getName(), instance.getId()).submit();
+                log.warn("Player {} failed to teleport off island world {}", player.getName(),
+                        player.getWorld().getName()).submit();
             }
         });
+    }
+
+    private boolean isInstanceWorld(@NotNull Player player) {
+        return player.getWorld().getName().startsWith(IslandWorldProvisioner.WORLD_PREFIX);
     }
 }

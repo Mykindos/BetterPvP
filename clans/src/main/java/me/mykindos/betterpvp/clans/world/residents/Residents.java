@@ -1,5 +1,7 @@
-package me.mykindos.betterpvp.clans.world.spawn;
+package me.mykindos.betterpvp.clans.world.residents;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.animation.ModelState;
 import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
@@ -9,13 +11,18 @@ import dev.brauw.mapper.Mapper;
 import dev.brauw.mapper.region.PathRegion;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.PointRegion;
-import dev.brauw.mapper.region.Region;
 import dev.brauw.mapper.tag.PatternTag;
 import dev.brauw.mapper.tag.RegionScope;
 import dev.brauw.mapper.tag.TagRegistry;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.clans.scene.ClansSceneObjectFactory;
 import me.mykindos.betterpvp.clans.world.SceneSpawn;
 import me.mykindos.betterpvp.clans.world.WorldContent;
+import me.mykindos.betterpvp.clans.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.clans.world.content.WorldContentService;
+import me.mykindos.betterpvp.clans.world.content.WorldSelector;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.scene.ScenePlacement;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagAnchor;
 import me.mykindos.betterpvp.core.scene.behavior.ItemShowcaseBehavior;
@@ -24,10 +31,10 @@ import me.mykindos.betterpvp.core.scene.behavior.PatrolMode;
 import me.mykindos.betterpvp.core.scene.behavior.ScriptEffectBehavior;
 import me.mykindos.betterpvp.core.scene.behavior.Waypoint;
 import me.mykindos.betterpvp.core.scene.behavior.WaypointPatrolBehavior;
+import me.mykindos.betterpvp.core.scene.interaction.SceneInteractionRegistry;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
-import me.mykindos.betterpvp.core.scene.npc.NpcInteractionRegistry;
-import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -39,18 +46,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
- * The people who live at spawn: stallholders standing behind their wares, and townsfolk walking the
- * streets between them.
+ * The people who live somewhere: stallholders standing behind their wares, and townsfolk walking the streets between
+ * them.
  * <p>
- * Every resident is authored as map data, not code. A {@code npc_resident} marker declares one, its
- * tags say who it is, and it is assembled from a plain {@link ModeledNPC} plus behaviours - so adding
- * a villager needs no class, and the difference between a stallholder and a walker is only whether
- * the marker names a route.
+ * Every resident is authored as map data, not code. A {@code npc_resident} marker declares one, its tags say who it is,
+ * and it is assembled from a plain {@link ModeledNPC} plus behaviours - so adding a villager needs no class, and the
+ * difference between a stallholder and a walker is only whether the marker names a route.
+ * <p>
+ * This content belongs to <em>every</em> world. A town, a harbour or a cloned island populates itself simply by having
+ * the markers drawn in it; nothing needs wiring up per world, and an island template carries its residents into every
+ * instance made from it.
  *
  * <h3>Data points</h3>
  * <ul>
@@ -68,9 +78,11 @@ import java.util.Locale;
  * </ul>
  */
 @CustomLog
-public class SpawnResidents implements WorldContent {
+@Singleton
+@PluginAdapter("Mapper")
+public class Residents implements WorldContent {
 
-    // Package-private: SpawnResidentValidator checks the same three data-points and must agree with
+    // Package-private: ResidentValidator checks the same three data-points and must agree with
     // this class about what they are called.
     static final String RESIDENT_POINT = "npc_resident";
     static final String ROUTE_POINT = "npc_route";
@@ -86,47 +98,68 @@ public class SpawnResidents implements WorldContent {
     private static final long DEFAULT_DWELL_MILLIS = 3000L;
 
     private final SceneObjectFactory objectFactory;
-    private final NpcInteractionRegistry npcInteractions;
+    private final SceneInteractionRegistry sceneInteractions;
 
-    public SpawnResidents(SceneObjectFactory objectFactory, NpcInteractionRegistry npcInteractions) {
+    private boolean tagsRegistered;
+
+    @Inject
+    public Residents(@NotNull ClansSceneObjectFactory objectFactory,
+                     @NotNull SceneInteractionRegistry sceneInteractions,
+                     @NotNull WorldContentService contentService) {
         this.objectFactory = objectFactory;
-        this.npcInteractions = npcInteractions;
+        this.sceneInteractions = sceneInteractions;
+
+        contentService.register(new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
     }
 
     @Override
-    public @NotNull List<SceneSpawn> sceneObjects(@NotNull World world, @NotNull Collection<Region> regions) {
+    public @NotNull List<SceneSpawn> sceneObjects(@NotNull World world, @NotNull RegionIndex regions) {
         registerTags();
 
-        final List<PathRegion> routes = MapperHelper.findRegions(regions, ROUTE_POINT, PathRegion.class);
-        final List<PointRegion> displays = MapperHelper.findRegions(regions, DISPLAY_POINT, PointRegion.class);
-        final List<PerspectiveRegion> markers = MapperHelper.findRegions(regions, RESIDENT_POINT, PerspectiveRegion.class);
+        final List<PerspectiveRegion> markers = regions.find(RESIDENT_POINT, PerspectiveRegion.class);
+        if (markers.isEmpty()) {
+            return List.of();
+        }
 
-        // Reported unconditionally: "no residents" and "residents that failed to build" look identical
+        // Indexed once rather than re-scanned per resident: a busy town is otherwise quadratic, and this content now
+        // runs against every world on the server.
+        final Map<String, PathRegion> routes = regions.byId(ROUTE_POINT, PathRegion.class);
+        final List<PointRegion> displays = regions.find(DISPLAY_POINT, PointRegion.class);
+
+        // Reported when there is anything to report: "no residents" and "residents that failed to build" look identical
         // in-world, and the counts say immediately which data-point is the one that is missing or misnamed.
-        log.info("Spawn residents: {} marker(s), {} route(s), {} display(s) from {} region(s)",
-                markers.size(), routes.size(), displays.size(), regions.size()).submit();
+        log.info("Residents in '{}': {} marker(s), {} route(s), {} display(s)",
+                world.getName(), markers.size(), routes.size(), displays.size()).submit();
 
-        final List<SceneSpawn> spawns = new ArrayList<>();
+        final List<SceneSpawn> spawns = new ArrayList<>(markers.size());
         for (PerspectiveRegion marker : markers) {
-            marker.setWorld(world);
-            spawns.add(resident(world, marker, routes, displays));
+            spawns.add(resident(marker, routes, displays));
         }
         return spawns;
     }
 
     /**
-     * Tells Mapper's in-world editor about this content: which tags these data-points take, and what
-     * makes a set of them valid. Both registrations are idempotent, so re-running on reload is safe.
+     * Tells Mapper's in-world editor about this content: which tags these data-points take, and what makes a set of
+     * them valid.
+     * <p>
+     * Done once, on the first world that asks. Not in the constructor, because that now runs during plugin enable when
+     * Mapper may not be ready to take them; not per load either, since the definitions are identical for every world
+     * and this content is asked about all of them.
      */
     private void registerTags() {
+        if (tagsRegistered) {
+            return;
+        }
+        tagsRegistered = true;
+
         try {
             registerTagDefinitions();
-            Mapper.get().getValidationRegistry().register(new SpawnResidentValidator());
+            Mapper.get().getValidationRegistry().register(new ResidentValidator());
         } catch (Throwable throwable) {
             // Editor convenience - it must never stop residents from spawning. Throwable, not
             // Exception, on purpose: an older Mapper on the server surfaces here as
             // NoClassDefFoundError/NoSuchMethodError, and that used to abort the whole content load.
-            log.warn("Could not register spawn resident tags - check the Mapper plugin version", throwable).submit();
+            log.warn("Could not register resident tags - check the Mapper plugin version", throwable).submit();
         }
     }
 
@@ -148,6 +181,7 @@ public class SpawnResidents implements WorldContent {
                 new PatternTag("role", "role:.+", "role:<text>", "Role shown above the name", true, resident),
                 new PatternTag("skin", "skin:.+", "skin:<blueprint>", "ModelEngine skin blueprint", true, resident),
                 new PatternTag("model", "model:.+", "model:<blueprint>", "ModelEngine base model", true, resident),
+                new PatternTag("size", "size:[0-9.]+", "size:<number>", "How large the model is rendered", true, resident),
                 new PatternTag("idle", "idle:.+", "idle:<animation>", "Animation played while standing", true, resident),
                 new PatternTag("walk", "walk:.+", "walk:<animation>", "Animation played while walking", true, resident),
                 new PatternTag("route", "route:.+", "route:<id>", "Route this resident walks", true, resident),
@@ -169,9 +203,9 @@ public class SpawnResidents implements WorldContent {
      * Assembles one resident. Everything that needs the entity present is done in a decorator, so it
      * is re-applied every time the NPC re-materializes after its chunk cycles.
      */
-    private SceneSpawn resident(@NotNull World world, @NotNull PerspectiveRegion marker,
-                                @NotNull List<PathRegion> routes, @NotNull List<PointRegion> displays) {
-        final RegionTags tags = new RegionTags(marker.getOptions().getTags());
+    private SceneSpawn resident(@NotNull PerspectiveRegion marker, @NotNull Map<String, PathRegion> routes,
+                                @NotNull List<PointRegion> displays) {
+        final RegionTags tags = RegionTags.of(marker);
         final Location home = marker.getLocation();
 
         final String id = tags.getString("id", "");
@@ -182,20 +216,26 @@ public class SpawnResidents implements WorldContent {
         final String displayName = tags.getString("name", "Villager");
         final String role = tags.getString("role", "");
         final String interaction = tags.getString("interact", "");
+        final double size = tags.getDouble("size", 1.0);
 
-        final List<Waypoint> route = route(tags, routes, world);
-        final List<ItemShowcaseBehavior.ShowcaseItem> wares = wares(id, displays, world);
+        final List<Waypoint> route = route(tags, routes);
+        final List<ItemShowcaseBehavior.ShowcaseItem> wares = wares(id, displays);
 
         final ModeledNPC npc = new ModeledNPC(objectFactory);
+        // Which copy of this resident was clicked - the world it stands in, its id, and its own tags. Two islands
+        // cloned from one template hold identical markers, so without this an interaction cannot tell them apart.
+        final ScenePlacement placement = new ScenePlacement(npc, id, tags, home);
+
         npc.addDecorator(object -> {
             final ModeledNPC resident = (ModeledNPC) object;
             final ModeledEntity modeled = resident.getModeledEntity();
             if (modeled == null) {
-                log.warn("Spawn resident '{}' could not bind a ModeledEntity", displayName).submit();
+                log.warn("Resident '{}' could not bind a ModeledEntity", displayName).submit();
                 return;
             }
 
             final ActiveModel model = ModelEngineAPI.createActiveModel(modelId);
+            model.setScale(size);
             model.setHitboxScale(1.5);
             model.getAnimationHandler().setDefaultProperty(
                     new AnimationHandler.DefaultProperty(ModelState.IDLE, idleAnimation, 0, 0, 1));
@@ -218,7 +258,7 @@ public class SpawnResidents implements WorldContent {
             resident.setInteractionHandler(player -> {
                 ModelEngineHelper.playAnimation(model, DEFAULT_INTERACT, 0.2, 0.1, 1.0, false);
                 if (!interaction.isBlank()) {
-                    npcInteractions.run(interaction, player);
+                    sceneInteractions.run(interaction, player, placement);
                 }
             });
         });
@@ -257,22 +297,18 @@ public class SpawnResidents implements WorldContent {
      * missing or too short to patrol
      */
     @Nullable
-    private List<Waypoint> route(@NotNull RegionTags tags, @NotNull List<PathRegion> routes, @NotNull World world) {
+    private List<Waypoint> route(@NotNull RegionTags tags, @NotNull Map<String, PathRegion> routes) {
         final String routeId = tags.getString("route", "");
         if (routeId.isBlank()) {
             return null;
         }
 
-        final PathRegion path = routes.stream()
-                .filter(region -> routeId.equalsIgnoreCase(new RegionTags(region.getOptions().getTags()).getString("id", "")))
-                .findFirst()
-                .orElse(null);
+        final PathRegion path = routes.get(routeId.toLowerCase(Locale.ROOT));
         if (path == null) {
-            log.warn("Spawn resident references route '{}', which no npc_route data-point declares", routeId).submit();
+            log.warn("Resident references route '{}', which no npc_route data-point declares", routeId).submit();
             return null;
         }
 
-        path.setWorld(world);
         final long dwell = tags.getInt("dwell", (int) DEFAULT_DWELL_MILLIS);
         final List<Location> points = path.getPoints();
         if (points.size() < 2) {
@@ -288,16 +324,14 @@ public class SpawnResidents implements WorldContent {
     }
 
     /** Collects the showcased items belonging to {@code residentId}, in map order. */
-    private List<ItemShowcaseBehavior.ShowcaseItem> wares(@NotNull String residentId,
-                                                          @NotNull List<PointRegion> displays,
-                                                          @NotNull World world) {
+    private List<ItemShowcaseBehavior.ShowcaseItem> wares(@NotNull String residentId, @NotNull List<PointRegion> displays) {
         if (residentId.isBlank()) {
             return List.of();
         }
 
         final List<ItemShowcaseBehavior.ShowcaseItem> wares = new ArrayList<>();
         for (PointRegion display : displays) {
-            final RegionTags tags = new RegionTags(display.getOptions().getTags());
+            final RegionTags tags = RegionTags.of(display);
             if (!residentId.equalsIgnoreCase(tags.getString("resident", ""))) {
                 continue;
             }
@@ -308,7 +342,6 @@ public class SpawnResidents implements WorldContent {
                 continue;
             }
 
-            display.setWorld(world);
             wares.add(new ItemShowcaseBehavior.ShowcaseItem(
                     display.getLocation(), new ItemStack(material), (float) tags.getDouble("scale", 0.4)));
         }

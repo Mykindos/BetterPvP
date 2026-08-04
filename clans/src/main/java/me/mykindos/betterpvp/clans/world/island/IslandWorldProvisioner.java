@@ -37,13 +37,24 @@ public class IslandWorldProvisioner {
         this.blockReplacementStore = blockReplacementStore;
     }
 
+    /** What every instance world's name begins with, whatever template it came from. */
+    public static final String WORLD_PREFIX = "islands/";
+
+    /**
+     * The world-name prefix every live instance of one template shares. Content that should appear on all of them
+     * selects worlds by this rather than by name, since an instance's full name is only decided when it is created.
+     */
+    public static @NotNull String worldNamePrefix(@NotNull String templateKey) {
+        return WORLD_PREFIX + templateKey + "/";
+    }
+
     /**
      * Clones {@code template}'s world folder and creates the Bukkit world from it. The copy runs off-thread; world
      * creation is hopped back onto the main thread since {@link Bukkit#createWorld(WorldCreator)} requires it.
      */
     public @NotNull CompletableFuture<World> provision(@NotNull IslandTemplate template, @NotNull UUID instanceId) {
         final CompletableFuture<World> future = new CompletableFuture<>();
-        final String worldName = "islands/" + template.getKey() + "/" + instanceId.toString().substring(0, 8);
+        final String worldName = worldNamePrefix(template.getKey()) + instanceId.toString().substring(0, 8);
 
         UtilServer.runTaskAsync(clans, () -> {
             try {

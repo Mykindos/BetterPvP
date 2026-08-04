@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.island;
 
+import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +27,7 @@ class RoutingIslandAllocatorTest {
     private LocalIslandAllocator localAllocator;
 
     private static IslandTemplate template() {
-        return new IslandTemplate("solo", Component.text("Solo"), "islands/solo", Material.GRASS_BLOCK);
+        return new IslandTemplate("solo", Component.text("Solo"), "islands/solo", Material.GRASS_BLOCK, VoyageTiming.DEFAULT);
     }
 
     @Test

@@ -7,10 +7,13 @@ import me.mykindos.betterpvp.core.Core;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -34,6 +37,7 @@ public class SchematicService {
     public SchematicService(@NotNull Core core) {
         this(new File(core.getDataFolder(), "schematics"));
         register(new FaweSchematicFormat());
+        register(new StructureFormat());
     }
 
     /**
@@ -100,6 +104,41 @@ public class SchematicService {
             log.error("Failed to read schematic '{}'", file.getName(), exception).submit();
             return Optional.empty();
         }
+    }
+
+    /**
+     * Writes {@code schematic} to the schematics folder, replacing any file of the same name and dropping the cached
+     * copy so the next {@link #load(String)} reads what was just written.
+     *
+     * @param name the schematic name; an extension picks the format, otherwise {@code .structure} is used so
+     *             data-points are kept
+     * @return the file written, or empty if no registered format could write it
+     */
+    public @NotNull Optional<File> save(@NotNull String name, @NotNull Schematic schematic) {
+        final String fileName = formatFor(name).isPresent() ? name : name + ".structure";
+        final Optional<SchematicFormat> format = formatFor(fileName);
+        if (format.isEmpty()) {
+            log.warn("No schematic format registered for file '{}'", fileName).submit();
+            return Optional.empty();
+        }
+
+        final File file = new File(folder, fileName);
+        final File parent = file.getParentFile();
+        if (parent != null && !parent.isDirectory() && !parent.mkdirs()) {
+            log.warn("Could not create schematic folder {}", parent).submit();
+            return Optional.empty();
+        }
+
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
+            format.get().write(out, schematic);
+        } catch (IOException | UnsupportedOperationException exception) {
+            log.error("Failed to write schematic '{}'", fileName, exception).submit();
+            return Optional.empty();
+        }
+
+        cache.remove(name.toLowerCase(Locale.ROOT));
+        cache.remove(fileName.toLowerCase(Locale.ROOT));
+        return Optional.of(file);
     }
 
     private @NotNull Optional<File> resolveFile(@NotNull String name) {

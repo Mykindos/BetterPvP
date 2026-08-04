@@ -47,8 +47,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.player.PlayerInputEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -917,6 +920,12 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
         Bukkit.getPluginManager().callEvent(damage);
 
         if (damage.isCancelled()) {
+            restoreAndAck(player, block, sequence);
+            return;
+        }
+
+        final PlayerInteractEvent interact = new PlayerInteractEvent(player, Action.LEFT_CLICK_BLOCK, held, block, face);
+        if (!interact.callEvent()) {
             restoreAndAck(player, block, sequence);
             return;
         }

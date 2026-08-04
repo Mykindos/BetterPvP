@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.island;
 
+import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -37,7 +38,7 @@ class IslandHostRouterTest {
     }
 
     private static IslandTemplate template(String key) {
-        return new IslandTemplate(key, Component.text(key), "islands/" + key, Material.GRASS_BLOCK);
+        return new IslandTemplate(key, Component.text(key), "islands/" + key, Material.GRASS_BLOCK, VoyageTiming.DEFAULT);
     }
 
     private static Clans clansWithHosting(ExtendedYamlConfiguration islandsConfig) {
