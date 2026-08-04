@@ -1172,6 +1172,19 @@ skills:
       blindnessLevel: 2
       slownessLevel: 1
       effectDuration: 1.0
+    gravebind:
+      enabled: true
+      maxlevel: 5
+      cooldown: 30.0
+      cooldownDecreasePerLevel: 2.0
+      baseRadius: 6.0
+      radiusIncreasePerLevel: 0.5
+      baseDuration: 1.5
+      durationIncreasePerLevel: 0.25
+      telegraphDuration: 0.6
+      caughtSpikeRadius: 1.3
+      fieldSpikes: 26
+      caughtSpikes: 8
     bloodcompass:
       enabled: true
       maxlevel: 3

@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoSprintEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.PinEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.PoisonEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.RootedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.ShockEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.SilenceEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.SlownessEffect;
@@ -79,6 +80,7 @@ public class EffectTypes {
     public static final EffectType FROZEN = createEffectType(new FrozenEffect());
     public static final EffectType ANTI_HEAL = createEffectType(new AntiHealEffect());
     public static final EffectType ENTANGLED = createEffectType(new EntangledEffect());
+    public static final EffectType ROOTED = createEffectType(new RootedEffect());
     public static final EffectType DEATHS_CURSE = createEffectType(new DeathsCurseEffect());
     public static final EffectType WEAKNESS = createEffectType(new WeaknessEffect());
     public static final EffectType FRENZY = createEffectType(new FrenzyEffect());
