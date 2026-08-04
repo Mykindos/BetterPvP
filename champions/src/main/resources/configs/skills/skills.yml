@@ -381,12 +381,12 @@ skills:
       hitDistance: 4.0
     rally:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 25.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 8.0
       durationIncreasePerLevel: 1.0
-      baseRadius: 6.0
+      baseRadius: 8.0
       radiusIncreasePerLevel: 0.5
       pulseInterval: 1.5
       resistanceStrength: 1
