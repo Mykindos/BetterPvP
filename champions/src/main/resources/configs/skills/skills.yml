@@ -419,9 +419,6 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDamage: 6.0
       damageIncreasePerLevel: 0.5
-      baseSlowDuration: 1.5
-      slowDurationIncreasePerLevel: 0.25
-      slowStrength: 2
       baseDistance: 7.0
       distanceIncreasePerLevel: 0.5
       pullStrength: 1.2

@@ -10,18 +10,15 @@ import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -29,7 +26,6 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -50,13 +46,10 @@ import java.util.Set;
 import java.util.UUID;
 
 @Singleton
-public class Upheaval extends Skill implements InteractSkill, CooldownSkill, AreaOfEffectSkill, DebuffSkill, DamageSkill, CrowdControlSkill {
+public class Upheaval extends Skill implements InteractSkill, CooldownSkill, AreaOfEffectSkill, DamageSkill, CrowdControlSkill {
 
     private double baseDamage;
     private double damageIncreasePerLevel;
-    private double baseSlowDuration;
-    private double slowDurationIncreasePerLevel;
-    private int slowStrength;
     private double baseDistance;
     private double distanceIncreasePerLevel;
     private double pullStrength;
@@ -86,20 +79,13 @@ public class Upheaval extends Skill implements InteractSkill, CooldownSkill, Are
     public Component[] getDescription(int level) {
         Component damage = getValueComponent(this::getDamage, level);
         Component distance = getValueComponent(this::getDistance, level, 1);
-        Component slowDuration = getValueComponent(this::getSlowDuration, level);
-        Component slowness = Translations.component("champions.skill.effect.slowness",
-                Component.text(UtilFormat.getRomanNumeral(slowStrength))).color(NamedTextColor.WHITE);
         Component cooldown = getValueComponent(this::getCooldown, level);
         return Translations.componentLines("champions.skill.knight.upheaval.description",
-                distance, damage, slowness, slowDuration, cooldown);
+                distance, damage, cooldown);
     }
 
     public double getDamage(int level) {
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getSlowDuration(int level) {
-        return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
     }
 
     public double getDistance(int level) {
@@ -196,8 +182,6 @@ public class Upheaval extends Skill implements InteractSkill, CooldownSkill, Are
 
         final VelocityData velocityData = new VelocityData(pull, pullStrength, false, 0.0, 0.45, 0.7, true);
         UtilVelocity.velocity(enemy, player, velocityData, VelocityType.CUSTOM);
-
-        championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
 
         final DamageEvent damageEvent = new DamageEvent(enemy, player, null, new SkillDamageCause(this), getDamage(level), getName());
         damageEvent.setKnockback(false); // Outward knockback would undo the pull
@@ -315,9 +299,6 @@ public class Upheaval extends Skill implements InteractSkill, CooldownSkill, Are
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 6.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
-        baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.25, Double.class);
-        slowStrength = getConfig("slowStrength", 2, Integer.class);
         baseDistance = getConfig("baseDistance", 7.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.5, Double.class);
         pullStrength = getConfig("pullStrength", 0.9, Double.class);
