@@ -2,15 +2,14 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.UseEffects;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.item.ability.FeatherFeetAbility;
-import me.mykindos.betterpvp.champions.item.ability.WindDashAbility;
-import me.mykindos.betterpvp.champions.item.ability.WindSlashAbility;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyService;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.champions.item.ability.ZephyrFlightAbility;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
 import me.mykindos.betterpvp.core.item.Item;
@@ -18,50 +17,59 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
+import me.mykindos.betterpvp.core.item.component.impl.temper.TemperComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.AetherCore;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.FeatherOfZephyr;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.item.temper.TemperProfile;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.NamespacedKey;
-import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 @Singleton
-@BPvPListener
 @EqualsAndHashCode(callSuper = true)
 @ItemKey("champions:wind_blade")
-public class WindBlade extends WeaponItem implements Listener, Reloadable {
+public class WindBlade extends WeaponItem implements Reloadable {
 
-    private final WindDashAbility windDashAbility;
-    private final WindSlashAbility windSlashAbility;
+    private static final ItemStack model;
+
+    static {
+        model = Item.model("windblade");
+        model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
+                .consumeSeconds(Float.MAX_VALUE)
+                .animation(ItemUseAnimation.NONE)
+                .build());
+        model.setData(DataComponentTypes.USE_EFFECTS, UseEffects.useEffects()
+                .canSprint(true)
+                .speedMultiplier(1f)
+                .build());
+    }
+
+    private final ZephyrFlightAbility zephyrFlightAbility;
     private final FeatherFeetAbility featherFeetAbility;
     private transient boolean registered;
 
     @Inject
-    private WindBlade(Champions champions, ChampionsManager championsManager, ItemFactory itemFactory,
-                     CooldownManager cooldownManager, EnergyService energyService) {
-        super(champions, translatableName("champions.item.wind-blade.name"), Item.model("windblade"), ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
+    private WindBlade(Champions champions, ItemFactory itemFactory, ZephyrFlightAbility zephyrFlightAbility) {
+        super(champions, translatableName("champions.item.wind-blade.name"), model, ItemRarity.LEGENDARY, List.of(Group.MELEE, Group.RANGED));
         this.featherFeetAbility = new FeatherFeetAbility(itemFactory);
-
-        // Create abilities
-        this.windDashAbility = new WindDashAbility(championsManager, champions);
-        this.windSlashAbility = new WindSlashAbility(cooldownManager, energyService, this);
+        this.zephyrFlightAbility = zephyrFlightAbility;
 
         // Add ability container
         addBaseComponent(InteractionContainerComponent.builder()
-                .root(InteractionInputs.RIGHT_CLICK, windDashAbility)
-                .root(InteractionInputs.LEFT_CLICK, windSlashAbility)
+                .root(InteractionInputs.HOLD_RIGHT_CLICK, zephyrFlightAbility)
                 .root(InteractionInputs.PASSIVE, featherFeetAbility)
                 .build());
 
         addBaseComponent(TooltipSpriteComponent.of("\uE000"));
+        addSerializableComponent(new TemperComponent(TemperProfile.medium().recoveringWhileGrounded()));
     }
 
     @Override
@@ -69,46 +77,10 @@ public class WindBlade extends WeaponItem implements Listener, Reloadable {
         super.reload();
         final Config config = Config.item(Champions.class, this);
 
-        // Wind Dash
-        double dashVelocity = config.getConfig("dashVelocity", 1.2, Double.class);
-        int dashParticleTicks = config.getConfig("dashParticleTicks", 2, Integer.class);
-        int dashEnergyCost = config.getConfig("dashEnergyCost", 24, Integer.class);
-        double dashImpactVelocity = config.getConfig("dashImpactVelocity", 1.0, Double.class);
-
-        windDashAbility.setDashVelocity(dashVelocity);
-        windDashAbility.setDashParticleTicks(dashParticleTicks);
-        windDashAbility.setDashEnergyCost(dashEnergyCost);
-        windDashAbility.setDashImpactVelocity(dashImpactVelocity);
-
-        // Wind Slash
-        double slashCooldown = config.getConfig("slashCooldown", 2.5, Double.class);
-        double slashHitboxSize = config.getConfig("slashHitboxSize", 0.6, Double.class);
-        int slashEnergyCost = config.getConfig("slashEnergyCost", 0, Integer.class);
-        double slashDamage = config.getConfig("slashDamage", 5.0, Double.class);
-        double slashEnergyRefundPercent = config.getConfig("slashEnergyRefundPercent", 0.2, Double.class);
-        double slashVelocity = config.getConfig("slashVelocity", 0.5, Double.class);
-        int slashAliveMillis = config.getConfig("slashAliveMillis", 1000, Integer.class);
-        double slashSpeed = config.getConfig("slashSpeed", 30.0, Double.class);
-
-        windSlashAbility.setSlashCooldown(slashCooldown);
-        windSlashAbility.setSlashHitboxSize(slashHitboxSize);
-        windSlashAbility.setSlashEnergyCost(slashEnergyCost);
-        windSlashAbility.setSlashDamage(slashDamage);
-        windSlashAbility.setSlashEnergyRefundPercent(slashEnergyRefundPercent);
-        windSlashAbility.setSlashVelocity(slashVelocity);
-        windSlashAbility.setSlashAliveMillis(slashAliveMillis);
-        windSlashAbility.setSlashSpeed(slashSpeed);
-    }
-
-    // Process abilities
-    @UpdateEvent
-    public void updateSlashes() {
-        windSlashAbility.processSlashes();
-    }
-
-    @UpdateEvent
-    public void updateDashes() {
-        windDashAbility.processDashes();
+        // Zephyr Flight
+        zephyrFlightAbility.setFlightSpeed(config.getConfig("flightSpeed", 0.7, Double.class));
+        zephyrFlightAbility.setClimbDrainMultiplier(config.getConfig("climbDrainMultiplier", 2.0, Double.class));
+        getComponent(TemperComponent.class).ifPresent(temper -> temper.getProfile().configure(config));
     }
 
     @Inject

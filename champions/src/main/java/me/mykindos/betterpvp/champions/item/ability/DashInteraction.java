@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
-import me.mykindos.betterpvp.core.locale.Translations;
-
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
@@ -15,6 +13,7 @@ import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -40,7 +39,7 @@ public class DashInteraction extends CooldownInteraction implements DisplayedInt
 
     private double invulnerabilitySeconds = 0.5;
     private double strength = 1.0;
-    private double energy = 12.0;
+    private double cooldown = 2.0;
 
     public DashInteraction(CooldownManager cooldownManager, EffectManager effectManager, Config config) {
         super("dodge", cooldownManager);
@@ -51,7 +50,7 @@ public class DashInteraction extends CooldownInteraction implements DisplayedInt
     public void loadConfig() {
         this.strength = config.getConfig("strength", 1.0, Double.class);
         this.invulnerabilitySeconds = config.getConfig("invulnerability-seconds", 0.5, Double.class);
-        this.energy = config.getConfig("energy", 12.0, Double.class);
+        this.cooldown = config.getConfig("cooldown", 2.0, Double.class);
     }
 
     @Override
@@ -66,12 +65,7 @@ public class DashInteraction extends CooldownInteraction implements DisplayedInt
 
     @Override
     public double getCooldown(InteractionActor actor) {
-        return 0;
-    }
-
-    @Override
-    public double getEnergyCost() {
-        return energy;
+        return cooldown;
     }
 
     @Override

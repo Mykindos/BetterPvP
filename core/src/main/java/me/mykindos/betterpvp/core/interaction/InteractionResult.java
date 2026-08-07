@@ -194,6 +194,11 @@ public sealed interface InteractionResult permits
         ENERGY,
 
         /**
+         * The item running the interaction has no temper left to spend.
+         */
+        TEMPER,
+
+        /**
          * The interaction was cancelled by an external source.
          */
         CANCELLED,

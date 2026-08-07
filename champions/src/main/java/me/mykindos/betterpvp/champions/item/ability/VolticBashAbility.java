@@ -12,28 +12,27 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyService;
-import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
-import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.TemperInteraction;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.temper.TemperService;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -51,13 +50,12 @@ import java.util.WeakHashMap;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class VolticBashAbility extends AbstractInteraction implements DisplayedInteraction {
+public class VolticBashAbility extends TemperInteraction implements DisplayedInteraction {
 
     private double velocity;
     private int maxChargeTicks;
-    private double energyOnCollide;
+    private double temperOnCollide;
     private double chargeDamage;
-    private double energyPerTick;
 
     @EqualsAndHashCode.Exclude
     private final Champions champions;
@@ -66,24 +64,20 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
     @EqualsAndHashCode.Exclude
     private final EffectManager effectManager;
     @EqualsAndHashCode.Exclude
-    private final EnergyService energyService;
-    @EqualsAndHashCode.Exclude
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
 
     @Inject
-    private VolticBashAbility(Champions champions, ClientManager clientManager, EffectManager effectManager, EnergyService energyService) {
-        super("voltic_bash");
+    private VolticBashAbility(Champions champions, ClientManager clientManager, EffectManager effectManager, TemperService temperService) {
+        super("voltic_bash", temperService);
         this.champions = champions;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
-        this.energyService = energyService;
 
         // Default values, will be overridden by config
         this.velocity = 0.8;
         this.maxChargeTicks = 60;
-        this.energyOnCollide = 25.0;
+        this.temperOnCollide = 0.25;
         this.chargeDamage = 7.0;
-        this.energyPerTick = 0.5;
     }
 
     @Override
@@ -96,8 +90,18 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
         return Translations.component("champions.ability.voltic-bash.description");
     }
 
+    /**
+     * Leaving the ground interrupts the bash without ending it, so those steps cost the shield
+     * nothing — it only spends temper while it is actually driving the player forwards.
+     */
     @Override
-    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context, @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+    protected double getDrainMultiplier(@NotNull InteractionActor actor, @NotNull InteractionContext context) {
+        return UtilBlock.isGrounded(actor.getEntity()) ? 1 : 0;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doTemperExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                          @NotNull ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         if (!actor.isPlayer()) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
@@ -111,14 +115,14 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
         }
 
         // Initialize or continue the charge
-        processCharge(player);
+        processCharge(player, itemInstance);
         return InteractionResult.Success.ADVANCE;
     }
-    
+
     /**
      * Process the charge for a player
      */
-    private void processCharge(Player player) {
+    private void processCharge(Player player, ItemInstance itemInstance) {
         // Get or create data
         AegisData data = cache.computeIfAbsent(player, key -> {
             final Gamer gamer = clientManager.search().online(player).getGamer();
@@ -136,11 +140,6 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
         // Check if grounded
         if (!UtilBlock.isGrounded(player)) {
             data.setTicksCharged(0); // Reset charge
-            return;
-        }
-        
-        // Check energy
-        if (!energyService.use(player, "Voltic Bash", energyPerTick, true)) {
             return;
         }
         
@@ -163,7 +162,7 @@ public class VolticBashAbility extends AbstractInteraction implements DisplayedI
         final int charge = data.getTicksCharged();
         if (!collisions.isEmpty()) {
             final double percentage = getChargePercentage(charge);
-            this.energyService.degenerateEnergy(player, this.energyOnCollide / 100, EnergyEvent.Cause.USE);
+            temperService.spend(player, itemInstance, temperOnCollide);
             for (LivingEntity hit : collisions) {
                 collide(player, hit, percentage, data);
             }

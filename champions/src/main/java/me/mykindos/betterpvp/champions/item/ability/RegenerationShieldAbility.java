@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
-import me.mykindos.betterpvp.core.locale.Translations;
-
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
@@ -10,13 +8,14 @@ import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyService;
-import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.TemperInteraction;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.temper.TemperService;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -30,27 +29,22 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class RegenerationShieldAbility extends AbstractInteraction implements DisplayedInteraction {
+public class RegenerationShieldAbility extends TemperInteraction implements DisplayedInteraction {
 
-    private double energyPerTick;
     private int regenerationAmplifier;
 
     @EqualsAndHashCode.Exclude
     private final Champions champions;
     @EqualsAndHashCode.Exclude
-    private final EnergyService energyService;
-    @EqualsAndHashCode.Exclude
     private final EffectManager effectManager;
 
     @Inject
-    public RegenerationShieldAbility(Champions champions, EnergyService energyService, EffectManager effectManager) {
-        super("shield");
+    public RegenerationShieldAbility(Champions champions, TemperService temperService, EffectManager effectManager) {
+        super("shield", temperService);
         this.champions = champions;
-        this.energyService = energyService;
         this.effectManager = effectManager;
 
         // Default values, will be overridden by config
-        this.energyPerTick = 2.5;
         this.regenerationAmplifier = 5;
     }
 
@@ -65,15 +59,10 @@ public class RegenerationShieldAbility extends AbstractInteraction implements Di
     }
 
     @Override
-    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
-                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+    protected @NotNull InteractionResult doTemperExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                          @NotNull ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         if (!(actor.getEntity() instanceof Player player)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
-        }
-
-        // Check energy
-        if (!energyService.use(player, "Shield", energyPerTick, true)) {
-            return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
         // Apply regeneration effect with condition to remove when no longer holding item

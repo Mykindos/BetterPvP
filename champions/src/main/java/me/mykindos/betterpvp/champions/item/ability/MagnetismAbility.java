@@ -1,21 +1,20 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
-import me.mykindos.betterpvp.core.locale.Translations;
-
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
-import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.TemperInteraction;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.temper.TemperService;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -40,27 +39,22 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class MagnetismAbility extends AbstractInteraction implements DisplayedInteraction {
+public class MagnetismAbility extends TemperInteraction implements DisplayedInteraction {
 
     private double pullRange;
     private double pullFov;
-    private double energyPerTick;
 
     @EqualsAndHashCode.Exclude
     private final Champions champions;
-    @EqualsAndHashCode.Exclude
-    private final EnergyService energyService;
 
     @Inject
-    public MagnetismAbility(Champions champions, EnergyService energyService) {
-        super("magnetism");
+    public MagnetismAbility(Champions champions, TemperService temperService) {
+        super("magnetism", temperService);
         this.champions = champions;
-        this.energyService = energyService;
 
         // Default values, will be overridden by config
         this.pullRange = 10.0;
         this.pullFov = 80.3;
-        this.energyPerTick = 2.0;
     }
 
     @Override
@@ -74,14 +68,10 @@ public class MagnetismAbility extends AbstractInteraction implements DisplayedIn
     }
 
     @Override
-    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
-                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+    protected @NotNull InteractionResult doTemperExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                          @NotNull ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         if (!(actor.getEntity() instanceof Player player)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
-        }
-
-        if (!energyService.use(player, "Magnetism", energyPerTick, true)) {
-            return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
         pull(player);

@@ -4,26 +4,25 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,15 +46,13 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class WindDashAbility extends AbstractInteraction implements DisplayedInteraction {
+public class WindDashAbility extends CooldownInteraction implements DisplayedInteraction {
 
     private double dashVelocity;
     private double dashImpactVelocity;
+    private double dashCooldown;
     private int dashParticleTicks;
-    private int dashEnergyCost;
 
-    @EqualsAndHashCode.Exclude
-    private final ChampionsManager championsManager;
     @EqualsAndHashCode.Exclude
     private final Champions champions;
 
@@ -63,10 +60,14 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
     @EqualsAndHashCode.Exclude
     private final Map<Player, DashData> activeDashes = new HashMap<>();
 
-    public WindDashAbility(ChampionsManager championsManager, Champions champions) {
-        super("wind_dash");
-        this.championsManager = championsManager;
+    public WindDashAbility(CooldownManager cooldownManager, Champions champions) {
+        super("wind_dash", cooldownManager);
         this.champions = champions;
+    }
+
+    @Override
+    public double getCooldown(InteractionActor actor) {
+        return dashCooldown;
     }
 
     @Override
@@ -80,8 +81,8 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
     }
 
     @Override
-    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
-                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+    protected @NotNull InteractionResult doCooldownExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                            @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         if (!(actor.getEntity() instanceof Player player)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
@@ -89,10 +90,6 @@ public class WindDashAbility extends AbstractInteraction implements DisplayedInt
         if (UtilBlock.isInLiquid(player)) {
             UtilMessage.message(player, "core.prefix.wind-dash", "champions.item.wind-dash.liquid");
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
-        }
-
-        if (!championsManager.getEnergy().use(player, "Wind Dash", dashEnergyCost, true)) {
-            return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
         // Start dash tracking

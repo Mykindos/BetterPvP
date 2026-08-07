@@ -147,7 +147,14 @@ public abstract class CooldownInteraction extends AbstractInteraction {
                     }
                 }
                 if (!usedSiblingPath) {
-                    cooldownManager.use(player, this.cooldownName, cooldown, informCooldown(), true, false, showActionBarCooldown());
+                    if (itemInstance != null && showActionBarCooldown()) {
+                        // An item's cooldown is only worth reading while that item is in hand, so gate
+                        // it on the item even when it is not a DisplayedInteraction.
+                        cooldownManager.use(player, this.cooldownName, cooldown, informCooldown(), true, false,
+                                itemInstance.getBaseItem());
+                    } else {
+                        cooldownManager.use(player, this.cooldownName, cooldown, informCooldown(), true, false, showActionBarCooldown());
+                    }
                 }
             }
 

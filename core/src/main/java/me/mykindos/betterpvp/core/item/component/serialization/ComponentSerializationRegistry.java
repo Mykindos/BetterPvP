@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.item.component.impl.repair.RepairableComponent
 import me.mykindos.betterpvp.core.item.component.impl.socketables.SocketableRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.socketables.runes.serialization.RuneContainerSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.stat.serialization.StatSerializationRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.temper.TemperComponentSerializer;
 import me.mykindos.betterpvp.core.item.component.serialization.impl.StatContainerSerializer;
 import me.mykindos.betterpvp.core.item.component.serialization.impl.UUIDPropertySerializer;
 import org.bukkit.NamespacedKey;
@@ -46,6 +47,7 @@ public class ComponentSerializationRegistry {
         register(new RuneContainerSerializer(socketableRegistry));
         register(new FuelComponentSerializer());
         register(new DurabilityComponentSerializer());
+        register(new TemperComponentSerializer());
         register(new PurityComponentSerializer());
         register(new RepairableComponentSerializer());
     }

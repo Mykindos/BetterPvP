@@ -16,10 +16,12 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
+import me.mykindos.betterpvp.core.item.component.impl.temper.TemperComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.StormsteelPlate;
 import me.mykindos.betterpvp.core.item.impl.VolticShield;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.item.temper.TemperProfile;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
@@ -60,6 +62,7 @@ public class ThunderclapAegis extends WeaponItem implements Reloadable {
                 .root(InteractionInputs.HOLD_RIGHT_CLICK, volticBashAbility)
                 .build());
         addBaseComponent(TooltipSpriteComponent.of("\uE012"));
+        addSerializableComponent(new TemperComponent(TemperProfile.medium()));
     }
     
     @Override
@@ -70,9 +73,9 @@ public class ThunderclapAegis extends WeaponItem implements Reloadable {
         // Configure VolticBash ability
         volticBashAbility.setVelocity(config.getConfig("velocity", 0.8, Double.class));
         volticBashAbility.setMaxChargeTicks(config.getConfig("maxChargeTicks", 60, Integer.class));
-        volticBashAbility.setEnergyOnCollide(config.getConfig("energyOnCollide", 25.0, Double.class));
+        volticBashAbility.setTemperOnCollide(config.getConfig("temperOnCollide", 0.25, Double.class));
         volticBashAbility.setChargeDamage(config.getConfig("chargeDamage", 7.0, Double.class));
-        volticBashAbility.setEnergyPerTick(config.getConfig("energyPerTick", 0.5, Double.class));
+        getComponent(TemperComponent.class).ifPresent(temper -> temper.getProfile().configure(config));
     }
 
     @Inject

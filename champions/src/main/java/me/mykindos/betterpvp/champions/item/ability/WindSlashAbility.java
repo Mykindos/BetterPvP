@@ -1,15 +1,11 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
-import me.mykindos.betterpvp.core.locale.Translations;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyService;
-import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.interaction.CooldownInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
@@ -18,6 +14,7 @@ import me.mykindos.betterpvp.core.interaction.combat.InteractionDamageCause;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -53,15 +50,11 @@ public class WindSlashAbility extends CooldownInteraction implements DisplayedIn
 
     private double slashCooldown;
     private double slashHitboxSize;
-    private int slashEnergyCost;
     private double slashDamage;
-    private double slashEnergyRefundPercent;
     private double slashVelocity;
     private int slashAliveMillis;
     private double slashSpeed;
 
-    @EqualsAndHashCode.Exclude
-    private final EnergyService energyService;
     @EqualsAndHashCode.Exclude
     private final BaseItem heldItem;
 
@@ -69,10 +62,9 @@ public class WindSlashAbility extends CooldownInteraction implements DisplayedIn
     @EqualsAndHashCode.Exclude
     private final Set<Slash> slashSet = new HashSet<>();
 
-    public WindSlashAbility(CooldownManager cooldownManager, EnergyService energyService, BaseItem heldItem) {
+    public WindSlashAbility(CooldownManager cooldownManager, BaseItem heldItem) {
         super("wind_slash", cooldownManager);
         this.heldItem = heldItem;
-        this.energyService = energyService;
     }
 
     @Override
@@ -88,11 +80,6 @@ public class WindSlashAbility extends CooldownInteraction implements DisplayedIn
     @Override
     public double getCooldown(InteractionActor actor) {
         return slashCooldown;
-    }
-
-    @Override
-    public double getEnergyCost() {
-        return slashEnergyCost;
     }
 
     @Override
@@ -215,10 +202,6 @@ public class WindSlashAbility extends CooldownInteraction implements DisplayedIn
 
             // SFX
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
-
-            // Regen energy
-            final double max = energyService.getMax(caster.getUniqueId());
-            energyService.regenerateEnergy(caster, max * slashEnergyRefundPercent, EnergyEvent.Cause.USE);
         }
     }
 }

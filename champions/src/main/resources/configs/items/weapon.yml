@@ -5,7 +5,11 @@ magnetic_maul:
     max: 8.0
   pullRange: 10.0
   pullFov: 80.3
-  energyPerTick: 2.0
+  temper:
+    useDuration: 3.0
+    recoveryDuration: 7.0
+    recoveryDelay: 2.0
+    minimumToUse: 0.0
   knockbackMultiplier: -1.0
   bypassMinimumKnockback: true
   durability: 3072
@@ -31,8 +35,12 @@ alligators_tooth:
     min: 6.0
     max: 8.0
   velocityStrength: 0.8
-  energyPerTick: 0.33
-  skimmingEnergyMultiplier: 3.0
+  skimmingDrainMultiplier: 3.0
+  temper:
+    useDuration: 12.0
+    recoveryDuration: 10.0
+    recoveryDelay: 2.0
+    minimumToUse: 0.0
   bonusDamage: 4.0
   durability: 3072
   attack_speed:
@@ -45,7 +53,11 @@ giants_broadsword:
     min: 6.0
     max: 8.0
   regenAmplifier: 4
-  energyPerTick: 2.5
+  temper:
+    useDuration: 5.0
+    recoveryDuration: 8.0
+    recoveryDelay: 2.0
+    minimumToUse: 0.0
   durability: 3072
   attack_speed:
     min: -0.25
@@ -100,9 +112,13 @@ thunderclap_aegis:
     max: 6.0
   velocity: 0.8
   maxChargeTicks: 60
-  energyOnCollide: 25.0
+  temperOnCollide: 0.25
   chargeDamage: 7.0
-  energyPerTick: 0.5
+  temper:
+    useDuration: 8.0
+    recoveryDuration: 9.0
+    recoveryDelay: 2.0
+    minimumToUse: 0.0
   durability: 3072
   attack_speed:
     min: -0.25
@@ -144,20 +160,13 @@ meridian_scepter:
 wind_blade:
   enabled: true
   baseDamage: 8.0
-  dashVelocity: 1.2
-  dashParticleTicks: 2
-  dashEnergyCost: 18.75
-  dashImpactVelocity: 1.0
-  slashCooldown: 2.5
-  slashHitboxSize: 0.6
-  slashEnergyCost: 0
-  slashDamage: 5.0
-  slashEnergyRefundPercent: 0.2
-  slashVelocity: 0.5
-  slashAliveTicks: 20
-  slashSpeed: 30.0
-  slashAliveMillis: 1020
-  velocityStrength: 0.5
+  flightSpeed: 0.7
+  climbDrainMultiplier: 2.0
+  temper:
+    useDuration: 8.0
+    recoveryDuration: 9.0
+    recoveryDelay: 2.0
+    minimumToUse: 0.0
   damage:
     base: 6.0
     min: 7.0
@@ -354,8 +363,7 @@ hinokami_katana:
   dash:
     strength: 3.0
     invulnerability-seconds: 0.0
-    cooldown: 0.6
-    energy: 12.0
+    cooldown: 2.0
   batto_do:
     cooldown: 10.0
     damage: 12.0

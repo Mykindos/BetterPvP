@@ -17,11 +17,13 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
+import me.mykindos.betterpvp.core.item.component.impl.temper.TemperComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.impl.MagneticShard;
 import me.mykindos.betterpvp.core.item.impl.PolariteChunk;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.item.temper.TemperProfile;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
@@ -68,6 +70,7 @@ public class MagneticMaul extends WeaponItem implements Reloadable {
                 .root(InteractionInputs.PASSIVE, reverseKnockbackAbility)
                 .build());
         addBaseComponent(TooltipSpriteComponent.of("\uE009"));
+        addSerializableComponent(new TemperComponent(TemperProfile.fast()));
     }
 
     @Override
@@ -78,7 +81,7 @@ public class MagneticMaul extends WeaponItem implements Reloadable {
         // Configure Magnetism ability
         magnetismAbility.setPullRange(config.getConfig("pullRange", 10.0, Double.class));
         magnetismAbility.setPullFov(config.getConfig("pullFov", 80.3, Double.class));
-        magnetismAbility.setEnergyPerTick(config.getConfig("energyPerTick", 2.0, Double.class));
+        getComponent(TemperComponent.class).ifPresent(temper -> temper.getProfile().configure(config));
 
         // Configure Reverse Knockback ability
         reverseKnockbackAbility.setKnockbackMultiplier(config.getConfig("knockbackMultiplier", -1.0, Double.class));

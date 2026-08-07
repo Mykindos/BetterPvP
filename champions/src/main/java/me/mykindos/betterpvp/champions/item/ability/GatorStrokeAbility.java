@@ -1,19 +1,18 @@
 package me.mykindos.betterpvp.champions.item.ability;
 
-import me.mykindos.betterpvp.core.locale.Translations;
-
 import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.energy.EnergyService;
-import me.mykindos.betterpvp.core.interaction.AbstractInteraction;
 import me.mykindos.betterpvp.core.interaction.DisplayedInteraction;
 import me.mykindos.betterpvp.core.interaction.InteractionResult;
+import me.mykindos.betterpvp.core.interaction.TemperInteraction;
 import me.mykindos.betterpvp.core.interaction.actor.InteractionActor;
 import me.mykindos.betterpvp.core.interaction.context.InteractionContext;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.temper.TemperService;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -29,27 +28,22 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class GatorStrokeAbility extends AbstractInteraction implements DisplayedInteraction {
+public class GatorStrokeAbility extends TemperInteraction implements DisplayedInteraction {
 
     private double velocityStrength;
-    private double energyPerTick;
-    private double skimmingEnergyMultiplier;
+    private double skimmingDrainMultiplier;
 
     @EqualsAndHashCode.Exclude
     private final Champions champions;
-    @EqualsAndHashCode.Exclude
-    private final EnergyService energyService;
 
     @Inject
-    public GatorStrokeAbility(Champions champions, EnergyService energyService) {
-        super("gator_stroke");
+    public GatorStrokeAbility(Champions champions, TemperService temperService) {
+        super("gator_stroke", temperService);
         this.champions = champions;
-        this.energyService = energyService;
 
         // Default values, will be overridden by config
         this.velocityStrength = 0.8;
-        this.energyPerTick = 0.33;
-        this.skimmingEnergyMultiplier = 3.0;
+        this.skimmingDrainMultiplier = 3.0;
     }
 
     @Override
@@ -62,24 +56,24 @@ public class GatorStrokeAbility extends AbstractInteraction implements Displayed
         return Translations.component("champions.ability.gator-stroke.description");
     }
 
+    /**
+     * Skimming along the surface with your head out of the water costs the blade more than swimming
+     * fully submerged does.
+     */
     @Override
-    protected @NotNull InteractionResult doExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
-                                                    @Nullable ItemInstance itemInstance, @Nullable ItemStack itemStack) {
+    protected double getDrainMultiplier(@NotNull InteractionActor actor, @NotNull InteractionContext context) {
+        return UtilBlock.isWater(actor.getEntity().getEyeLocation().getBlock()) ? 1 : skimmingDrainMultiplier;
+    }
+
+    @Override
+    protected @NotNull InteractionResult doTemperExecute(@NotNull InteractionActor actor, @NotNull InteractionContext context,
+                                                          @NotNull ItemInstance itemInstance, @Nullable ItemStack itemStack) {
         if (!(actor.getEntity() instanceof Player player)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
         }
 
         if (!UtilBlock.isInWater(player)) {
             return new InteractionResult.Fail(InteractionResult.FailReason.CONDITIONS);
-        }
-
-        double energyToUse = energyPerTick;
-        if (!UtilBlock.isWater(player.getEyeLocation().getBlock())) {
-            energyToUse *= skimmingEnergyMultiplier;
-        }
-
-        if (!energyService.use(player, "Gator Stroke", energyToUse, true)) {
-            return new InteractionResult.Fail(InteractionResult.FailReason.ENERGY);
         }
 
         VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0.11, 1.0, true);

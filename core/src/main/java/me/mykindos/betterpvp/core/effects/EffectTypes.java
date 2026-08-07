@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NauseaEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoSprintEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.OverloadedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.PinEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.PoisonEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.RootedEffect;
@@ -84,6 +85,7 @@ public class EffectTypes {
     public static final EffectType DEATHS_CURSE = createEffectType(new DeathsCurseEffect());
     public static final EffectType WEAKNESS = createEffectType(new WeaknessEffect());
     public static final EffectType FRENZY = createEffectType(new FrenzyEffect());
+    public static final EffectType OVERLOADED = createEffectType(new OverloadedEffect());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">

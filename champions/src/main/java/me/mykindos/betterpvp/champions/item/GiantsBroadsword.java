@@ -18,10 +18,12 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
+import me.mykindos.betterpvp.core.item.component.impl.temper.TemperComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.ColossusFragment;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.item.temper.TemperProfile;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.metal.Runesteel;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
@@ -84,6 +86,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
                 .root(InteractionInputs.HOLD_RIGHT_CLICK, regenerationShieldAbility)
                 .build());
         addBaseComponent(TooltipSpriteComponent.of("\uE005"));
+        addSerializableComponent(new TemperComponent(TemperProfile.mediumFast()));
     }
 
     @Override
@@ -93,7 +96,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
         
         // Configure RegenerationShield ability
         regenerationShieldAbility.setRegenerationAmplifier(config.getConfig("regenAmplifier", 5, Integer.class));
-        regenerationShieldAbility.setEnergyPerTick(config.getConfig("energyPerTick", 2.5, Double.class));
+        getComponent(TemperComponent.class).ifPresent(temper -> temper.getProfile().configure(config));
     }
 
     /**
