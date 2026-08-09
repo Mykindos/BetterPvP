@@ -26,6 +26,67 @@ clans:
     update-interval: 1
     location-captions: true
     player-captions: true
+    # How to fill pixels with no terrain data (beyond the map edge, or a chunk not yet loaded).
+    # CASCADE = bleed the nearest drawn pixel's colour outward (immersive coastline); SOLID = use unknownColor.
+    background: CASCADE
+    unknownColor: "#3a6a9a"
+    # Map zone overlay: colour + translucent tint per zone tag. Any zone carrying the tag (in any world) picks this up;
+    # unlisted tags are hidden. On tag overlap the highest priority wins.
+    # style: FILL|BORDER|DIAGONAL|CHECKER|CORNERS|DOTS, or several combined ("BORDER, DIAGONAL") to draw them together.
+    zones:
+      ocean:
+        color: "#294d7a"
+        alpha: 0.45
+        visible: true
+        priority: 10
+        style: FILL
+      beach:
+        color: "#d8c99a"
+        alpha: 0.4
+        visible: true
+        priority: 20
+        style: FILL
+      mountain:
+        color: "#7a6a5a"
+        alpha: 0.4
+        visible: true
+        priority: 30
+        style: FILL
+      # Above the terrain tags, so a dock reaching out over the sea outlines the water it stands on rather than the ocean.
+      dock:
+        color: "#5ad06a"
+        alpha: 0.55
+        visible: true
+        priority: 35
+        style: BORDER, DIAGONAL
+      no_build:
+        color: "#888888"
+        alpha: 0.2
+        visible: false
+        priority: 5
+        style: FILL
+      clan_territory:
+        color: "#ffffff"
+        alpha: 1.0
+        visible: true
+        priority: 40
+        style: BORDER
+        # Rendered by the clan-territory renderer (border/fill/diagonal/checker/corners/dots), not the flat tint layer.
+        tint: false
+    landmarks:
+      death: true
+  aldenmark:
+    world: Aldenmark
+  terrain:
+    # 'default' applies to every world; add a section named after a world (e.g. terrain.Aldenmark) to override it there.
+    default:
+      seaLevel: 62
+      beachMinWidth: 15
+      beachMaxWidth: 50
+      mountainBaseY: 86
+      beachMaterials: SAND,RED_SAND,GRAVEL,SANDSTONE
+      maxScanChunks: 40000
+      oceanDamage: 3.0
   members:
     max: 8
   insurance:

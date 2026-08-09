@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.world.zone.GlobalBounds;
 import me.mykindos.betterpvp.core.world.zone.NoBuildRule;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -77,6 +78,7 @@ public class Spawn extends Island implements WorldContent {
                 .key(ClanZones.regionKey("spawn"))
                 .displayName(Component.text("Spawn"))
                 .bounds(GlobalBounds.world(world))
+                .tag(Zones.SAFE)
                 .priority(ClanZones.SERVER_REGION_PRIORITY)
                 .rules(rules)
                 .build());

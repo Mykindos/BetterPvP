@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementLoader;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
 import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
@@ -192,6 +193,9 @@ public class Clans extends BPvPPlugin {
             // SceneLoaderManager.shutdown()). In-flight respawn points are already persisted synchronously as they are
             // mined, so no final flush is needed here.
             injector.getInstance(SceneLoaderManager.class).shutdown();
+
+            // Persist the minimap cache synchronously so a restart keeps the generated map instead of re-caching it.
+            injector.getInstance(MapHandler.class).saveMapDataNow();
         }
     }
 

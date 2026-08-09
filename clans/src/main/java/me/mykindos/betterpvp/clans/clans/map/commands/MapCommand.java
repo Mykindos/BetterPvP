@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.clans.clans.map.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.clans.map.ClanMapService;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
+import me.mykindos.betterpvp.clans.clans.map.terrain.MapTerrainService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -12,21 +14,21 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.MapMeta;
 
 @Singleton
 public class MapCommand extends Command {
 
     private final ItemFactory itemFactory;
+    private final ClanMapService clanMapService;
 
     @Inject
-    public MapCommand(ItemFactory itemFactory){
+    public MapCommand(ItemFactory itemFactory, ClanMapService clanMapService) {
         this.itemFactory = itemFactory;
+        this.clanMapService = clanMapService;
     }
 
     @Override
@@ -43,15 +45,12 @@ public class MapCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0f, 1f).play(player);
         if (!UtilInventory.contains(player, Material.FILLED_MAP, 1)) {
-            ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
-            MapMeta meta = (MapMeta) itemStack.getItemMeta();
-            meta.setMapView(Bukkit.getMap(0));
-            itemStack.setItemMeta(meta);
+            final ItemStack itemStack = clanMapService.createMapItem();
             player.getInventory().addItem(itemFactory.convertItemStack(itemStack).orElse(itemStack));
         } else {
-            UtilMessage.message(player, "clans.prefix", Translations.component("clans.command.map.already-have").color(NamedTextColor.RED));
+            UtilMessage.message(player, "clans.prefix",
+                    Translations.component("clans.command.map.already-have").color(NamedTextColor.RED));
         }
-
     }
 
     @Singleton
@@ -68,16 +67,14 @@ public class MapCommand extends Command {
 
         @Override
         public String getDescription() {
-        return "clans.command.save-map.description";
-    }
+            return "clans.command.save-map.description";
+        }
 
         @Override
         public void execute(Player player, Client client, String... args) {
             mapHandler.saveMapData();
             UtilMessage.message(player, "clans.prefix", "clans.command.map.save.success");
         }
-
-
     }
 
     @Singleton
@@ -86,6 +83,8 @@ public class MapCommand extends Command {
 
         @Inject
         private MapHandler mapHandler;
+        @Inject
+        private MapTerrainService terrainService;
 
         @Override
         public String getName() {
@@ -94,15 +93,39 @@ public class MapCommand extends Command {
 
         @Override
         public String getDescription() {
-        return "clans.command.reset-map.description";
-    }
+            return "clans.command.reset-map.description";
+        }
 
         @Override
         public void execute(Player player, Client client, String... args) {
-            mapHandler.resetMapData();
+            mapHandler.resetMapData(player.getWorld());
             UtilMessage.message(player, "clans.prefix", "clans.command.map.reset.success");
+            // Rebuild the whole displayable area from the world's terrain, asynchronously (no walking, no freeze).
+            terrainService.regenerate(player.getWorld(), player);
+        }
+    }
+
+    @Singleton
+    @SubCommand(MapCommand.class)
+    private static class RedrawMapSubCommand extends Command {
+
+        @Inject
+        private ClanMapService clanMapService;
+
+        @Override
+        public String getName() {
+            return "redraw";
         }
 
+        @Override
+        public String getDescription() {
+            return "clans.command.map.redraw.description";
+        }
 
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            clanMapService.getOrCreateMapSettings(player).setForceRedraw(true);
+            UtilMessage.message(player, "clans.prefix", "Redrawing map...");
+        }
     }
 }

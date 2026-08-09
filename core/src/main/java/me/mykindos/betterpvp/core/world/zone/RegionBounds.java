@@ -21,10 +21,16 @@ public final class RegionBounds implements ZoneBounds {
 
     private final Region region;
     private final LongSet chunks;
+    /**
+     * The XZ footprint as {@code minX, minZ, maxX, maxZ} quads, or {@code null} for a shape whose footprint we cannot
+     * describe. Precomputed because the map asks per column and the Mapper getters clone a {@link Location} per call.
+     */
+    private final int[] footprint;
 
     private RegionBounds(@NotNull Region region) {
         this.region = region;
         this.chunks = computeChunks(region);
+        this.footprint = computeFootprint(region);
     }
 
     /**
@@ -42,6 +48,24 @@ public final class RegionBounds implements ZoneBounds {
                 && region.contains(location);
     }
 
+    @Override
+    public boolean containsColumn(@NotNull World world, int x, int y, int z) {
+        if (region.getWorld() != world) {
+            return false;
+        }
+        // A shape with no known footprint keeps the height-sensitive test.
+        if (footprint == null) {
+            return ZoneBounds.super.containsColumn(world, x, y, z);
+        }
+        for (int box = 0; box < footprint.length; box += 4) {
+            if (x >= footprint[box] && z >= footprint[box + 1]
+                    && x <= footprint[box + 2] && z <= footprint[box + 3]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Region getRegion() {
         return region;
     }
@@ -54,6 +78,31 @@ public final class RegionBounds implements ZoneBounds {
     @Override
     public @NotNull LongSet coveredChunks() {
         return chunks;
+    }
+
+    private static int @Nullable [] computeFootprint(Region region) {
+        return switch (region) {
+            case CuboidRegion cuboid -> box(cuboid);
+            case PolygonRegion polygon -> {
+                final int[] boxes = new int[polygon.getChildren().size() * 4];
+                int offset = 0;
+                for (CuboidRegion child : polygon.getChildren()) {
+                    System.arraycopy(box(child), 0, boxes, offset, 4);
+                    offset += 4;
+                }
+                yield boxes;
+            }
+            // PerspectiveRegion extends PointRegion, so this covers both single-point shapes.
+            case PointRegion point -> new int[]{point.getLocation().getBlockX(), point.getLocation().getBlockZ(),
+                    point.getLocation().getBlockX(), point.getLocation().getBlockZ()};
+            default -> null;
+        };
+    }
+
+    private static int[] box(CuboidRegion cuboid) {
+        final Location min = cuboid.getMin();
+        final Location max = cuboid.getMax();
+        return new int[]{min.getBlockX(), min.getBlockZ(), max.getBlockX(), max.getBlockZ()};
     }
 
     private static LongSet computeChunks(Region region) {

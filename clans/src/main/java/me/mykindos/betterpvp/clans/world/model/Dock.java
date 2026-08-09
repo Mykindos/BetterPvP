@@ -15,10 +15,13 @@ import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
+import me.mykindos.betterpvp.core.world.zone.CompositeBounds;
 import me.mykindos.betterpvp.core.world.zone.NoBuildRule;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.ZoneBounds;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -27,7 +30,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,13 +51,17 @@ public class Dock implements WorldContent {
         final ZoneRuleContainer rules = new ZoneRuleContainer();
         rules.add(new NoBuildRule(clientManager));
 
-        // Dock
-        final List<CuboidRegion> dockOpt = regions.find("dock", CuboidRegion.class);
-        for (CuboidRegion dock : dockOpt) {
+        // Dock — every 'dock' region is one zone, since they share an identity and a zone is indexed by it.
+        final List<ZoneBounds> docks = regions.find("dock", CuboidRegion.class).stream()
+                .map(dock -> (ZoneBounds) RegionBounds.of(dock))
+                .toList();
+        if (!docks.isEmpty()) {
             zones.add(Zone.builder()
                     .key(ClanZones.regionKey("dock"))
                     .displayName(Component.text("Dock"))
-                    .bounds(RegionBounds.of(dock))
+                    .tag("dock")
+                    .tag(Zones.SAFE)
+                    .bounds(CompositeBounds.of(docks))
                     .priority(ClanZones.SERVER_REGION_PRIORITY + 5)
                     .rules(rules)
                     .build());

@@ -32,6 +32,11 @@ public final class ChunkBounds implements ZoneBounds {
     }
 
     @Override
+    public boolean containsColumn(@NotNull World world, int x, int y, int z) {
+        return this.world == world && chunks.contains(Chunk.getChunkKey(x >> 4, z >> 4));
+    }
+
+    @Override
     public @NotNull World getWorld() {
         return world;
     }

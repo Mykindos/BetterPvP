@@ -1,19 +1,21 @@
 package me.mykindos.betterpvp.clans.clans.map.listeners;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.Clans;
+import com.google.inject.Singleton;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.map.ClanMapService;
+import me.mykindos.betterpvp.clans.clans.map.cursor.MapCursorService;
 import me.mykindos.betterpvp.clans.clans.map.data.ExtraCursor;
+import me.mykindos.betterpvp.clans.clans.map.data.PlayerMark;
 import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
-import me.mykindos.betterpvp.clans.clans.map.events.MinimapPlayerCursorEvent;
-import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,119 +23,91 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.map.MapCursor;
 
-import java.util.HashMap;
 import java.util.Objects;
 
-
+/**
+ * Places player and clan-core cursors for one viewer, reading the per-tick snapshot in {@link MapCursorService} and a
+ * cached relation table.
+ * <p>
+ * Both are shared across viewers, so a viewer's cursor pass is arithmetic over already-captured data: no clan lookup
+ * and no event dispatch per player observed, and therefore no cost that grows with the square of the player count.
+ */
 @BPvPListener
+@Singleton
 public class MapCursorListener implements Listener {
 
-    private final Clans clans;
     private final ClientManager clientManager;
     private final ClanManager clanManager;
-    private final PillageHandler pillageHandler;
-
-    private final HashMap<String, Clan> clanCache = new HashMap<>();
+    private final ClanMapService clanMapService;
+    private final MapCursorService cursorService;
 
     @Inject
     @Config(path = "clans.map.player-captions", defaultValue = "true")
     private boolean playerCaptions;
 
     @Inject
-    @Config(path = "clans.map.location-captions", defaultValue = "true")
-    private boolean locationCaptions;
-
-
-    @Inject
-    public MapCursorListener(Clans clans, ClientManager clientManager, ClanManager clanManager, PillageHandler pillageHandler) {
-        this.clans = clans;
+    public MapCursorListener(ClientManager clientManager, ClanManager clanManager, ClanMapService clanMapService,
+                             MapCursorService cursorService) {
         this.clientManager = clientManager;
         this.clanManager = clanManager;
-        this.pillageHandler = pillageHandler;
+        this.clanMapService = clanMapService;
+        this.cursorService = cursorService;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCursor(MinimapExtraCursorEvent event) {
-        Player player = event.getPlayer();
-        Clan aClan = clanManager.getClanByPlayer(player).orElse(null);
+        final Player viewer = event.getPlayer();
+        final Client client = clientManager.search().online(viewer);
+        final boolean administrating = client.isAdministrating();
+        final boolean captions = playerCaptions
+                && (boolean) client.getProperty(ClientProperty.MAP_PLAYER_NAMES).orElse(false);
 
-        Client client = clientManager.search().online(player);
+        final Clan viewerClan = clanManager.getClanByPlayer(viewer).orElse(null);
+        final Long2ObjectMap<ClanRelation> relations = clanMapService.relations(viewer);
+        final String world = viewer.getWorld().getName();
 
-        if(locationCaptions && (boolean) client.getProperty(ClientProperty.MAP_POINTS_OF_INTEREST).orElse(false)) {
-            adminClanLocations(event);
-        }
+        for (PlayerMark mark : cursorService.getMarks()) {
+            if (!mark.getWorld().equals(world)) {
+                continue;
+            }
 
-        boolean playerNames = (boolean) client.getProperty(ClientProperty.MAP_PLAYER_NAMES).orElse(false);
+            if (mark.getUuid().equals(viewer.getUniqueId())) {
+                event.getCursors().add(cursor(mark, MapCursor.Type.PLAYER, null));
+                continue;
+            }
+            if (administrating) {
+                event.getCursors().add(cursor(mark, MapCursor.Type.PLAYER, null));
+                continue;
+            }
+            if (viewerClan == null || mark.getClanId() == null) {
+                continue;
+            }
 
-        for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
-            if (otherPlayer.isDead()) continue;
-            if (otherPlayer.getWorld().equals(player.getWorld())) {
-                float yaw = otherPlayer.getLocation().getYaw();
-                if (yaw < 0.0F) {
-                    yaw += 360.0F;
-                }
-                byte direction = (byte) (int) ((Math.abs(yaw) + 11.25D) / 22.5D);
-                if (direction > 15) {
-                    direction = 0;
-                }
-                int x = otherPlayer.getLocation().getBlockX();
-                int z = otherPlayer.getLocation().getBlockZ();
-
-                MinimapPlayerCursorEvent cursorEvent = null;
-                if (client.isAdministrating()) {
-                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.PLAYER, null);
-                } else {
-                    Clan bClan = clanManager.getClanByPlayer(otherPlayer).orElse(null);
-
-                    if (aClan == null) {
-                        if (player == otherPlayer) {
-                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.PLAYER, null);
-                        }
-                    } else {
-                        if (bClan != null) {
-                            if (aClan == bClan) {
-                                if (player == otherPlayer) {
-                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.PLAYER, null);
-                                } else {
-                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_MARKER, (playerCaptions && playerNames) ? otherPlayer.getName() : null);
-                                }
-                            } else if (aClan.isAllied(bClan)) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.FRAME,  (playerCaptions && playerNames) ? otherPlayer.getName() : null);
-                            } else if (pillageHandler.isPillaging(aClan, bClan) || pillageHandler.isPillaging(bClan, aClan)) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_MARKER, null);
-                            }
-                        }
-                    }
-                }
-                if (cursorEvent != null) {
-                    Bukkit.getPluginManager().callEvent(cursorEvent);
-                    event.getCursors().add(new ExtraCursor(x, z, (player == otherPlayer) || (cursorEvent.isDisplay()),
-                            cursorEvent.getType(), direction, otherPlayer.getWorld().getName(), true, cursorEvent.getCaption()));
+            final ClanRelation relation = relations.get((long) mark.getClanId());
+            if (relation == null) {
+                continue;
+            }
+            switch (relation) {
+                case SELF -> event.getCursors()
+                        .add(cursor(mark, MapCursor.Type.BLUE_MARKER, captions ? mark.getName() : null));
+                case ALLY, ALLY_TRUST -> event.getCursors()
+                        .add(cursor(mark, MapCursor.Type.FRAME, captions ? mark.getName() : null));
+                case PILLAGE -> event.getCursors().add(cursor(mark, MapCursor.Type.RED_MARKER, null));
+                default -> {
+                    // Enemies and neutrals stay hidden, as before.
                 }
             }
         }
 
-        if (aClan != null && aClan.getCore().isSet()) {
-            Location coreLoc = Objects.requireNonNull(aClan.getCore().getPosition());
-            event.getCursors().add(new ExtraCursor(coreLoc.getBlockX(), coreLoc.getBlockZ(), true,
-                    MapCursor.Type.MANSION, (byte) 8, player.getWorld().getName(), true, null));
+        if (viewerClan != null && viewerClan.getCore().isSet()) {
+            final Location core = Objects.requireNonNull(viewerClan.getCore().getPosition());
+            event.getCursors().add(new ExtraCursor(core.getBlockX(), core.getBlockZ(), true,
+                    MapCursor.Type.MANSION, (byte) 8, world, true, null));
         }
     }
 
-    private void adminClanLocations(MinimapExtraCursorEvent event) {
-        addAdminClan(event, "Fields", MapCursor.Type.RED_X, "Fields");
-        addAdminClan(event, "Red Shops", MapCursor.Type.BANNER_RED, "Red Shops");
-        addAdminClan(event, "Blue Shops", MapCursor.Type.BANNER_BLUE, "Blue Shops");
-        addAdminClan(event, "Green Shops", MapCursor.Type.BANNER_LIME, "Green Shops");
-        addAdminClan(event, "Yellow Shops", MapCursor.Type.BANNER_YELLOW, "Yellow Shops");
-    }
-
-    private void addAdminClan(MinimapExtraCursorEvent event, String clanName, MapCursor.Type cursor, String caption) {
-        Clan clan = clanCache.computeIfAbsent(clanName, c -> clanManager.getClanByName(clanName).orElse(null));
-        if (clan != null && clan.getCore().isSet()) {
-            Location loc = Objects.requireNonNull(clan.getCore().getPosition());
-            event.getCursors().add(new ExtraCursor(loc.getBlockX(), loc.getBlockZ(), true,
-                    cursor, (byte) 8, loc.getWorld().getName(), true, caption));
-        }
+    private ExtraCursor cursor(PlayerMark mark, MapCursor.Type type, String caption) {
+        return new ExtraCursor(mark.getX(), mark.getZ(), true, type, mark.getDirection(),
+                mark.getWorld(), true, caption);
     }
 }

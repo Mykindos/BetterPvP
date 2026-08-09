@@ -59,17 +59,17 @@ public class ZoneListSubCommand extends Command {
         }
 
         if (byNamespace.isEmpty()) {
-            UtilMessage.message(player, "Zones", "No zones are registered.");
+            UtilMessage.simpleMessage(player, "Zones", "No zones are registered.");
             return;
         }
 
         if (filter != null && !byNamespace.containsKey(filter)) {
-            UtilMessage.message(player, "Zones", "<red>No zones in namespace <yellow>%s</yellow>.", filter);
+            UtilMessage.simpleMessage(player, "Zones", "<red>No zones in namespace <yellow>%s</yellow>.", filter);
             return;
         }
 
         final int total = byNamespace.values().stream().mapToInt(List::size).sum();
-        UtilMessage.message(player, "Zones", "<yellow>%s</yellow> zones across <yellow>%s</yellow> namespace(s)%s",
+        UtilMessage.simpleMessage(player, "Zones", "<yellow>%s</yellow> zones across <yellow>%s</yellow> namespace(s)%s",
                 total, byNamespace.size(), filter != null ? " <gray>(filtered: " + filter + ")" : "");
 
         for (Map.Entry<String, List<Zone>> entry : byNamespace.entrySet()) {
@@ -80,18 +80,18 @@ public class ZoneListSubCommand extends Command {
 
             final List<Zone> zones = entry.getValue();
             if (filter == null && zones.size() > FOLD_THRESHOLD) {
-                UtilMessage.message(player, "Zones", "<aqua>%s</aqua> <gray>— %s zones <dark_gray>(/zone list %s to expand)",
+                UtilMessage.simpleMessage(player, "Zones", "<aqua>%s</aqua> <gray>— %s zones <dark_gray>(/zone list %s to expand)",
                         namespace, zones.size(), namespace);
                 continue;
             }
 
-            UtilMessage.message(player, "Zones", "<aqua>%s</aqua> <gray>(%s)", namespace, zones.size());
+            UtilMessage.simpleMessage(player, "Zones", "<aqua>%s</aqua> <gray>(%s)", namespace, zones.size());
             zones.sort(Comparator.comparing(zone -> zone.getKey().value()));
             for (Zone zone : zones) {
                 final String marker = zone.isDiscoverable() ? "<gold>✦</gold> " : "";
                 final String tags = zone.getTags().isEmpty() ? "" : " <dark_gray>" + zone.getTags();
                 final String world = zone.getWorld() != null ? " <dark_gray>(" + zone.getWorld().getName() + ")" : "";
-                UtilMessage.message(player, "Zones", "  %s<white>%s</white> <gray>%s%s%s",
+                UtilMessage.simpleMessage(player, "Zones", "  %s<white>%s</white> <gray>%s%s%s",
                         marker, zone.getKey().value(), plain(zone.getDisplayName()), tags, world);
             }
         }

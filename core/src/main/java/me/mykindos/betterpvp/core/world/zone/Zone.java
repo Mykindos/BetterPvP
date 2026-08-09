@@ -79,6 +79,18 @@ public final class Zone {
     }
 
     /**
+     * @param world the world the column is in
+     * @param x     block x
+     * @param y     a representative height in the column, for bounds whose extent depends on it
+     * @param z     block z
+     * @return whether this zone covers the whole column, ignoring its height. See
+     * {@link ZoneBounds#containsColumn(World, int, int, int)}.
+     */
+    public boolean containsColumn(@NotNull World world, int x, int y, int z) {
+        return bounds.containsColumn(world, x, y, z);
+    }
+
+    /**
      * @param other another zone's key
      * @return whether this zone has that identity
      */
