@@ -169,6 +169,18 @@ skills:
       successCooldownDecreasePerLevel: 0.1
       channelTimeCooldownMultiplier: 1.0
       channelTimeCooldownMultiplierDecreasePerLevel: 0.0
+    predatorsmark:
+      enabled: true
+      maxlevel: 3
+      cooldown: 30.0
+      cooldownDecreasePerLevel: 3.0
+      baseRange: 16.0
+      rangeIncreasePerLevel: 2.0
+      baseDuration: 5.0
+      durationIncreasePerLevel: 1.0
+      baseExtraDamage: 2.0
+      extraDamageIncreasePerLevel: 0.5
+      aimToleranceDegrees: 20.0
   knight:
     vanguardsmight:
       cooldown: 15.0
