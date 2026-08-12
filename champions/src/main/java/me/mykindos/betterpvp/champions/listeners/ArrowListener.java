@@ -71,12 +71,6 @@ public class ArrowListener implements Listener {
 
         event.setDamage(baseArrowDamage * bowChargeTracker.getCharge(arrow));
         event.setCritical(critArrowsEnabled && arrow.isCritical());
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onProjectileDelay(DamageEvent event) {
-        if (event.getProjectile() == null) return;
-
         event.setDamageDelay(0);
     }
 

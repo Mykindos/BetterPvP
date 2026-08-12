@@ -81,7 +81,7 @@ public class DamageEvent extends CustomCancellableEvent {
     // Combat settings
     private boolean knockback;
     private boolean hurtAnimation = true;
-    private long damageDelay;
+    private Long damageDelay;
 
     /**
      * Attack strength completion of the swing that caused this damage, 0 to 1. Stays at 1 for anything that
@@ -253,6 +253,22 @@ public class DamageEvent extends CustomCancellableEvent {
     @Nullable
     public Projectile getProjectile() {
         return damageSource.isIndirect() && damageSource.getDirectEntity() instanceof Projectile projectile ? projectile : null;
+    }
+
+    /**
+     * Sets the damage delay for this damage event.
+     * @param damageDelay the new damage delay, or null to reset to default
+     */
+    public void setDamageDelay(long damageDelay) {
+        this.damageDelay = damageDelay;
+    }
+
+    /**
+     * Gets the damage delay for this damage event.
+     * @return the damage delay, or the default delay if not set
+     */
+    public long getDamageDelay() {
+        return damageDelay != null ? damageDelay : cause.getDefaultDelay();
     }
 
     /**

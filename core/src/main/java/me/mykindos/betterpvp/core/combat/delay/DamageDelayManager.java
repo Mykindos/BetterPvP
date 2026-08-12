@@ -110,21 +110,6 @@ public class DamageDelayManager {
     }
     
     /**
-     * Sets default delays based on damage cause
-     * @param event the damage event to set delays for
-     */
-    public void setDefaultDelays(DamageEvent event) {
-        if (event.getDamageDelay() != 0) {
-            return; // Delay already set
-        }
-        
-        long defaultDelay = event.getCause().getDefaultDelay();
-        event.setDamageDelay(defaultDelay);
-        
-        log.debug("Set default delay of {} ms for cause: {}", defaultDelay, event.getCause().getName()).submit();
-    }
-    
-    /**
      * Pre-event phase: checks whether the damage is currently gated by an active delay.
      * Must be called BEFORE the DamageEvent is fired, using the damager as it stands at
      * that point (may still be null for skill-applied environmental damage).
@@ -156,9 +141,6 @@ public class DamageDelayManager {
                 return false;
             }
         }
-
-        // Set default delays if not already set
-        setDefaultDelays(event);
 
         // Apply effect modifiers now that the real damager is known
         applyEffectModifiers(event);
