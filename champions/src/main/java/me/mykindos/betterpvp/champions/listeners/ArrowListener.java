@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Trident;
@@ -31,7 +32,7 @@ public class ArrowListener implements Listener {
     private double baseArrowDamage;
 
     @Inject
-    @Config(path = "combat.crit-arrows", defaultValue = "true")
+    @Config(path = "combat.crit-arrows", defaultValue = "false")
     private boolean critArrowsEnabled;
 
     private final Champions champions;
@@ -70,6 +71,7 @@ public class ArrowListener implements Listener {
         if (arrow == null) return;
 
         event.setDamage(baseArrowDamage * bowChargeTracker.getCharge(arrow));
+        Bukkit.broadcastMessage("damage: " + event.getDamage() + " crit: " + arrow.isCritical() + " charge: " + bowChargeTracker.getCharge(arrow) + "crit arrows: " + critArrowsEnabled);
         event.setCritical(critArrowsEnabled && arrow.isCritical());
     }
 
