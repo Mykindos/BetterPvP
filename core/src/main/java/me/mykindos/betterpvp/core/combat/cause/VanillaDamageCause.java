@@ -24,7 +24,14 @@ public class VanillaDamageCause implements DamageCause {
     private final EntityDamageEvent.DamageCause vanillaCause;
     @With
     private TriState trueDamage = TriState.NOT_SET;
-    
+    @With
+    private Long defaultDelay = null;
+
+    public VanillaDamageCause(EntityDamageEvent.DamageCause vanillaCause, TriState trueDamage) {
+        this.vanillaCause = vanillaCause;
+        this.trueDamage = trueDamage;
+    }
+
     @Override
     public String getName() {
         return vanillaCause.name();
@@ -57,11 +64,13 @@ public class VanillaDamageCause implements DamageCause {
     
     @Override
     public long getDefaultDelay() {
+        if (defaultDelay != null) {
+            return defaultDelay;
+        }
+
         return switch (vanillaCause) {
             case ENTITY_ATTACK, CUSTOM -> DEFAULT_DELAY;
             case SUFFOCATION, FIRE, LAVA, VOID, THORNS, WORLD_BORDER, CONTACT, CAMPFIRE -> 500L;
-            //every 25 ticks
-            case POISON -> (long) ((25d/20) * 1000L);
             case FREEZE -> 2000L;
             default -> 1000L;
         };

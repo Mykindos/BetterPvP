@@ -17,6 +17,14 @@ public class PoisonEffect extends VanillaEffectType implements HealthBarTint {
             TextColor.color(170, 255, 90),  // lime overflow
             TextColor.color(26, 60, 26));   // dark green empty
 
+    public double getDamage(long level) {
+        return level * 2;
+    }
+
+    public double getInterval(long level) {
+        return Math.max(0.75, 1.25 - (level - 1) * 0.25);
+    }
+
     @Override
     public String getName() {
         return "Poison";
@@ -34,20 +42,20 @@ public class PoisonEffect extends VanillaEffectType implements HealthBarTint {
 
     @Override
     public String getDescription(int level) {
-        return "<white>Poison " + UtilFormat.getRomanNumeral(level) + "</white> deals <val>" + (level * 2) + "</val> damage every <stat>" + (25d/20d) + "</stat> seconds";
+        return "<white>Poison " + UtilFormat.getRomanNumeral(level) + "</white> deals <val>" + getDamage(level) + "</val> damage every <stat>" + getInterval(level) + "</stat> seconds";
     }
 
     @Override
     public String getGenericDescription() {
-        return "<white>" + getName() + "</white>" + " deals <green>2</green> damage per level every <yellow>" + (25d/20d) + "</yellow> seconds";
+        return "<white>" + getName() + "</white>" + " deals <green>" + getDamage(1) + "</green> damage per level every <yellow>" + getInterval(1) + "</yellow> seconds";
     }
 
     @Override
     public Component getGenericDescriptionComponent() {
         return Translations.component("core.effect.poison.generic",
                 Component.text(getName(), NamedTextColor.WHITE),
-                Component.text("3", NamedTextColor.GREEN),
-                Component.text(String.valueOf(25d / 20d), NamedTextColor.YELLOW));
+                Component.text(getDamage(1), NamedTextColor.GREEN),
+                Component.text(getInterval(1), NamedTextColor.YELLOW));
     }
 
     // Tint the health bar poison-green while active.

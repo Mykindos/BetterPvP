@@ -65,7 +65,7 @@ public class EffectTypes {
     public static final EffectType SILENCE = createEffectType(new SilenceEffect());
     public static final EffectType VULNERABILITY = createEffectType(new VulnerabilityEffect());
     public static final EffectType STUN = createEffectType(new StunEffect());
-    public static final EffectType POISON = createEffectType(new PoisonEffect());
+    public static final PoisonEffect POISON = createEffectType(new PoisonEffect());
     public static final EffectType NAUSEA = createEffectType(new NauseaEffect());
     public static final EffectType NO_JUMP = createEffectType(new NoJumpEffect());
     public static final EffectType PIN = createEffectType(new PinEffect());
@@ -109,7 +109,7 @@ public class EffectTypes {
     public static final EffectType NIGHT_VISION = createEffectType(new NightVisionEffect());
     // </editor-fold>
 
-    public static EffectType createEffectType(EffectType effectType) {
+    public static <T extends EffectType> T createEffectType(T effectType) {
         log.info("Added effect: {}", effectType.getName()).submit();
         effectTypes.add(effectType);
         return effectType;
