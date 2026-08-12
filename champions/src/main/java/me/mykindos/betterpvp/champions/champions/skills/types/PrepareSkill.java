@@ -29,6 +29,13 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
         }
     }
 
+    /**
+     * Whether this player has prepared this skill and not yet spent it.
+     */
+    public boolean isPrepared(Player player) {
+        return active.contains(player.getUniqueId());
+    }
+
     @Override
     public boolean canUse(Player player) {
         if (active.contains(player.getUniqueId())) {

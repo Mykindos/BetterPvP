@@ -9,6 +9,10 @@ class:
     no-knockback-received-when-slowed:
       enabled: true
       isBuff: false
+    bow:
+      arrowDamage: 0.0
+      overrideArrowDamage: true
+      onlyWhilePrepared: true
 chat:
   skill:
     preview: false

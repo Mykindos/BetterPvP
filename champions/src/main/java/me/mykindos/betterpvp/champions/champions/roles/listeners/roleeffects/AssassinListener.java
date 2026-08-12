@@ -5,18 +5,21 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.champions.combat.BowChargeTracker;
 import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PlayerCombatFeatureStateChangeEvent;
-import me.mykindos.betterpvp.core.combat.modifiers.DamageOperator;
-import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -27,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -44,18 +48,27 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
     private boolean noKnockbackReceivedWhenSlowedIsEnabled;
     private boolean noKnockbackReceivedWhenSlowedIsBuff;
+
+    private double bowArrowDamage;
+    private boolean bowOverrideArrowDamage;
+    private boolean bowOnlyWhilePrepared;
     // </editor-fold>
 
     private final RoleManager roleManager;
     private final EffectManager effectManager;
     private final CombatFeaturesService combatFeaturesService;
+    private final ChampionsSkillManager skillManager;
+    private final BowChargeTracker bowChargeTracker;
 
     @Inject
     public AssassinListener(Champions champions, RoleManager roleManager, EffectManager effectManager,
-                            CombatFeaturesService combatFeaturesService) {
+                            CombatFeaturesService combatFeaturesService, ChampionsSkillManager skillManager,
+                            BowChargeTracker bowChargeTracker) {
         this.roleManager = roleManager;
         this.effectManager = effectManager;
         this.combatFeaturesService = combatFeaturesService;
+        this.skillManager = skillManager;
+        this.bowChargeTracker = bowChargeTracker;
         loadConfig(champions.getConfig());
 
         ArrayList<RoleEffect> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
@@ -88,32 +101,44 @@ public class AssassinListener implements Listener, ConfigAccessor {
         if (event.isCancelled()) return;
         if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
 
-        if (event.getDamager() instanceof Player damager) {
-            if (meleeDealsNoKnockbackIsEnabled) {
-                if (roleManager.hasRole(damager, Role.ASSASSIN) && combatFeaturesService.isActive(damager)) {
-                    event.setKnockback(false);
-                }
-            }
+        if (meleeDealsNoKnockbackIsEnabled && event.getDamager() instanceof Player damager && isAssassin(damager)) {
+            event.setKnockback(false);
         }
 
-        if (event.getDamagee() instanceof Player damagee) {
-            if (!noKnockbackReceivedWhenSlowedIsEnabled || effectManager.hasEffect(damagee, EffectTypes.SLOWNESS)) {
-                if (roleManager.hasRole(damagee, Role.ASSASSIN) && combatFeaturesService.isActive(damagee)) {
-                    event.setKnockback(false);
-                }
+        if (noKnockbackReceivedWhenSlowedIsEnabled && event.getDamagee() instanceof Player damagee && isAssassin(damagee)) {
+            if (effectManager.hasEffect(damagee, EffectTypes.SLOWNESS)) {
+                event.setKnockback(false);
             }
         }
-
     }
 
+    /**
+     * Assassins draw a weaker bow. Their arrows land for a configured flat damage instead of the generic
+     * arrow damage, still scaled by how far the bow was drawn so a tap shot is not worth a full draw.
+     */
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onAssassinArrowDamage(DamageEvent event) {
-        if (!(event.getProjectile() instanceof AbstractArrow)) return;
-        if (event.getProjectile().getShooter() instanceof Player player) {
-            if (roleManager.hasRole(player, Role.ASSASSIN) && combatFeaturesService.isActive(player)) {
-                event.addModifier(new GenericModifier("Assassin Arrows", DamageOperator.MULTIPLIER, 0));
-            }
-        }
+        if (!bowOverrideArrowDamage) return;
+        if (!(event.getProjectile() instanceof AbstractArrow arrow)) return;
+        if (!(arrow.getShooter() instanceof Player shooter) || !isAssassin(shooter)) return;
+
+        event.setDamage(bowArrowDamage * bowChargeTracker.getCharge(arrow));
+    }
+
+    /**
+     * With this on, an assassin's bow is purely a delivery tool for their bow skills - loosing it without
+     * a prepared skill does nothing. Cancelling here at {@link EventPriority#LOWEST} keeps the preparation
+     * intact, since {@code PrepareArrowSkill} only spends it on an uncancelled shot.
+     */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onAssassinShootBow(EntityShootBowEvent event) {
+        if (!bowOnlyWhilePrepared) return;
+        if (!(event.getEntity() instanceof Player player) || !isAssassin(player)) return;
+        if (hasPreparedBowSkill(player)) return;
+
+        event.setCancelled(true);
+        player.sendActionBar(Translations.component("champions.combat.assassin-bow-not-prepared")
+                .color(NamedTextColor.RED));
     }
 
     /**
@@ -147,6 +172,17 @@ public class AssassinListener implements Listener, ConfigAccessor {
         }
     }
 
+    private boolean isAssassin(Player player) {
+        return roleManager.hasRole(player, Role.ASSASSIN) && combatFeaturesService.isActive(player);
+    }
+
+    private boolean hasPreparedBowSkill(Player player) {
+        return skillManager.getObjects().values().stream()
+                .filter(skill -> skill.getType() == SkillType.BOW)
+                .filter(PrepareSkill.class::isInstance)
+                .anyMatch(skill -> ((PrepareSkill) skill).isPrepared(player));
+    }
+
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         this.meleeDealsNoKnockbackIsEnabled = config.getOrSaveBoolean("class.assassin.melee-deals-no-knockback.enabled", true);
@@ -157,6 +193,9 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
         this.noKnockbackReceivedWhenSlowedIsEnabled = config.getOrSaveBoolean("class.assassin.no-knockback-received-when-slowed.enabled", true);
         this.noKnockbackReceivedWhenSlowedIsBuff = config.getOrSaveBoolean("class.assassin.no-knockback-received-when-slowed.isBuff", false);
+
+        this.bowArrowDamage = config.getOrSaveObject("class.assassin.bow.arrowDamage", 0.0, Double.class);
+        this.bowOverrideArrowDamage = config.getOrSaveBoolean("class.assassin.bow.overrideArrowDamage", true);
+        this.bowOnlyWhilePrepared = config.getOrSaveBoolean("class.assassin.bow.onlyWhilePrepared", true);
     }
 }
-
