@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.WorldHandler;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -24,6 +25,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.List;
@@ -139,4 +142,19 @@ public class CombatLogListener implements Listener {
         combatLogManager.removeObject(event.getPlayer().getUniqueId().toString());
     }
 
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        for (LivingEntity livingEntity : event.getWorld().getLivingEntities()) {
+            combatLogManager.removeStaleCombatLogEntity(livingEntity);
+        }
+    }
+
+    @EventHandler
+    public void onEntitiesLoad(final EntitiesLoadEvent event) {
+        for (Entity entity : event.getEntities()) {
+            if (entity instanceof LivingEntity livingEntity) {
+                combatLogManager.removeStaleCombatLogEntity(livingEntity);
+            }
+        }
+    }
 }
