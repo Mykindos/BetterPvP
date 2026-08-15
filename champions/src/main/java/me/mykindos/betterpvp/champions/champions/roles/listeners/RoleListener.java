@@ -85,12 +85,12 @@ public class RoleListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
         final LivingEntity livingEntity = event.getLivingEntity();
-        livingEntity.getWorld().playSound(livingEntity.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
 
         if (!(livingEntity instanceof Player player)) {
             return;
         }
 
+        livingEntity.getWorld().playSound(livingEntity.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
         if (!shouldShowRoleChangeMessage(player, event.getCause())) {
             return;
         }

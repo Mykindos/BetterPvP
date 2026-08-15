@@ -181,6 +181,19 @@ skills:
       hitWindow: 3.0
       baseCooldownReduction: 7.0
       cooldownReductionPerLevel: 2.2
+    illusion:
+      enabled: true
+      maxlevel: 3
+      cooldown: 18.0
+      cooldownDecreasePerLevel: 2.0
+      baseDuration: 4.0
+      durationIncreasePerLevel: 1.0
+      speed: 0.2806
+      turnRate: 16.0
+      health: 20.0
+      slownessStrength: 2
+      slownessRadius: 4.0
+      slownessDuration: 3.0
   knight:
     vanguardsmight:
       cooldown: 15.0
