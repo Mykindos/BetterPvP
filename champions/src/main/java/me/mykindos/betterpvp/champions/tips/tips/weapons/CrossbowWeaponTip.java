@@ -15,6 +15,10 @@ import org.bukkit.entity.Player;
 public class CrossbowWeaponTip extends ChampionsTip {
 
     @Inject
+    @Config(path = "combat.crossbow.disabled")
+    private boolean crossbowsDisabled;
+
+    @Inject
     @Config(path = "combat.crossbow.cooldownEnabled")
     private boolean crossbowCooldownEnabled;
 
@@ -48,6 +52,6 @@ public class CrossbowWeaponTip extends ChampionsTip {
 
     @Override
     public boolean isValid(Player player, Role role) {
-        return true;
+        return !crossbowsDisabled;
     }
 }

@@ -63,6 +63,7 @@ combat:
   arrow-base-damage: 6.0
   crit-arrows: true
   crossbow:
+    disabled: false
     cooldownDuration: 1.5
     cooldownEnabled: true
 damage:
