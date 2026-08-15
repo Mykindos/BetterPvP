@@ -78,6 +78,7 @@ public class RoleBuild {
             case BOW -> getBow();
             case GLOBAL -> getGlobal();
             case PASSIVE_B -> getPassiveB();
+            case TRAIT -> null; // Traits are innate to the role, not slotted into a build
         };
 
     }
@@ -91,6 +92,7 @@ public class RoleBuild {
             case BOW -> setBow(skill);
             case GLOBAL -> setGlobal(skill);
             case PASSIVE_B -> setPassiveB(skill);
+            case TRAIT -> { /* Traits are innate to the role, not slotted into a build */ }
         }
     }
 
@@ -119,6 +121,7 @@ public class RoleBuild {
             case BOW -> buildSkill = bow;
             case GLOBAL -> buildSkill = global;
             case PASSIVE_B -> buildSkill = passiveB;
+            case TRAIT -> buildSkill = null;
         }
         if (buildSkill == null || buildSkill.getSkill() == null) {
             return Component.empty();

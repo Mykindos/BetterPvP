@@ -233,7 +233,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
             setSkill(warlock, SkillType.SWORD, "Leech", 4);
             setSkill(warlock, SkillType.AXE, "Bloodshed", 5);
             setSkill(warlock, SkillType.PASSIVE_A, "Frailty", 1);
-            setSkill(warlock, SkillType.PASSIVE_B, "Soul Harvest", 2);
+            setSkill(warlock, SkillType.PASSIVE_B, "Siphon", 2);
 
             builds.addAll(List.of(knight, ranger, brute, mage, assassin, warlock));
 

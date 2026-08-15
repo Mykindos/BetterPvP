@@ -227,7 +227,7 @@ public abstract class Skill implements IChampionsSkill {
         }
     }
 
-    private String getPath(String name) {
+    protected String getPath(String name) {
         String path;
         if (getClassType() != null) {
             path = "skills." + getClassType().name().toLowerCase() + "." + getName().toLowerCase().replace(" ", "") + "." + name;

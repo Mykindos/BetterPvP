@@ -12,9 +12,9 @@ import me.mykindos.betterpvp.core.client.stats.StatFilterType;
 import me.mykindos.betterpvp.core.client.stats.impl.GenericStat;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.server.Period;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -43,6 +43,8 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
     private static GenericStat[] getAllSkills(ChampionsSkillManager skillManager) {
         return skillManager.getObjects().values().stream()
                 .filter(Skill::isEnabled)
+                // Traits are never equipped, so they can never accrue play time towards this
+                .filter(skill -> skill.getType().isSelectable())
                 .map(skill ->
                         new GenericStat(ChampionsSkillStat.builder()
                                 .action(ChampionsSkillStat.Action.TIME_PLAYED)

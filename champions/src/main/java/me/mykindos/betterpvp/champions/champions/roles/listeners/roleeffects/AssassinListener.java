@@ -11,13 +11,11 @@ import me.mykindos.betterpvp.champions.combat.BowChargeTracker;
 import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PlayerCombatFeatureStateChangeEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.ConfigAccessor;
@@ -25,7 +23,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,9 +39,6 @@ public class AssassinListener implements Listener, ConfigAccessor {
     // <editor-fold defaultstate="collapsed" desc="Config">
     private boolean meleeDealsNoKnockbackIsEnabled;
     private boolean meleeDealsNoKnockbackIsBuff;
-
-    private boolean speedBuffIsEnabled;
-    private boolean speedBuffIsBuff;
 
     private boolean noKnockbackReceivedWhenSlowedIsEnabled;
     private boolean noKnockbackReceivedWhenSlowedIsBuff;
@@ -75,12 +69,6 @@ public class AssassinListener implements Listener, ConfigAccessor {
         if (meleeDealsNoKnockbackIsEnabled) {
             TextComponent meleeDealsNoKnockbackDescription = Component.text("Melee attacks deal no knockback");
             sinPassives.add(new RoleEffect(meleeDealsNoKnockbackDescription, meleeDealsNoKnockbackIsBuff));
-        }
-
-        if (speedBuffIsEnabled) {
-            TextComponent speedBuffDescription = Component.text("Permanently granted ")
-                    .append(Component.text("Speed 2").color(NamedTextColor.WHITE));
-            sinPassives.add(new RoleEffect(speedBuffDescription, speedBuffIsBuff));
         }
 
         if (noKnockbackReceivedWhenSlowedIsEnabled) {
@@ -141,37 +129,6 @@ public class AssassinListener implements Listener, ConfigAccessor {
                 .color(NamedTextColor.RED));
     }
 
-    /**
-     * Blur Passive
-     */
-    @UpdateEvent(delay = 500)
-    public void checkRoleBuffs() {
-        if (!speedBuffIsEnabled) {
-            return;
-        }
-
-        for (LivingEntity livingEntity : roleManager.getLivingEntities()) {
-            Role role = roleManager.getRole(livingEntity).orElse(null);
-            if (role == Role.ASSASSIN
-                    && (!(livingEntity instanceof Player player) || combatFeaturesService.isActive(player))) {
-                effectManager.addEffect(livingEntity, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true, false, null);
-            } else {
-                effectManager.removeEffect(livingEntity, EffectTypes.SPEED, "Assassin", false);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onCombatFeatureStateChange(PlayerCombatFeatureStateChangeEvent event) {
-        if (event.isActive()) {
-            return;
-        }
-
-        if (roleManager.hasRole(event.getPlayer(), Role.ASSASSIN)) {
-            effectManager.removeEffect(event.getPlayer(), EffectTypes.SPEED, "Assassin", false);
-        }
-    }
-
     private boolean isAssassin(Player player) {
         return roleManager.hasRole(player, Role.ASSASSIN) && combatFeaturesService.isActive(player);
     }
@@ -187,9 +144,6 @@ public class AssassinListener implements Listener, ConfigAccessor {
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
         this.meleeDealsNoKnockbackIsEnabled = config.getOrSaveBoolean("class.assassin.melee-deals-no-knockback.enabled", true);
         this.meleeDealsNoKnockbackIsBuff = config.getOrSaveBoolean("class.assassin.melee-deals-no-knockback.isBuff", true);
-
-        this.speedBuffIsEnabled = config.getOrSaveBoolean("class.assassin.speed-buff.enabled", true);
-        this.speedBuffIsBuff = config.getOrSaveBoolean("class.assassin.speed-buff.isBuff", true);
 
         this.noKnockbackReceivedWhenSlowedIsEnabled = config.getOrSaveBoolean("class.assassin.no-knockback-received-when-slowed.enabled", true);
         this.noKnockbackReceivedWhenSlowedIsBuff = config.getOrSaveBoolean("class.assassin.no-knockback-received-when-slowed.isBuff", false);

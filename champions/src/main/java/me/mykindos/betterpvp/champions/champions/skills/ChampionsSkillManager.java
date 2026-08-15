@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.skills.traits.Trait;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -11,6 +12,7 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -56,8 +58,34 @@ public class ChampionsSkillManager extends Manager<String, Skill> {
         getObjects().values().forEach(Skill::reload);
     }
 
+    /**
+     * The skills a player of this role can put into a build. Traits are excluded: they belong to the role
+     * rather than to a build, so they are never selectable.
+     *
+     * @param role The role
+     * @return The selectable skills for the role
+     */
     public List<Skill> getSkillsForRole(Role role) {
-        return objects.values().stream().filter(skill -> skill.getClassType() == role || skill.getType() == SkillType.GLOBAL).toList();
+        return objects.values().stream()
+                .filter(skill -> skill.getType().isSelectable())
+                .filter(skill -> skill.getClassType() == role || skill.getType() == SkillType.GLOBAL)
+                .toList();
+    }
+
+    /**
+     * The traits innately held by every player of this role, in a stable display order.
+     *
+     * @param role The role
+     * @return The enabled traits for the role
+     */
+    public List<Trait> getTraitsForRole(Role role) {
+        return objects.values().stream()
+                .filter(Trait.class::isInstance)
+                .map(Trait.class::cast)
+                .filter(trait -> trait.getClassType() == role)
+                .filter(Trait::isEnabled)
+                .sorted(Comparator.comparing(Trait::getName))
+                .toList();
     }
 
 }

@@ -8,13 +8,13 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.traits.Trait;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -82,6 +82,17 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
                         .append(Component.text("❤", TextColor.color(255, 0, 0))),
                 Component.empty()
         ));
+
+        final List<Trait> traits = skillManager.getTraitsForRole(role);
+        if (!traits.isEmpty()) {
+            for (Trait trait : traits) {
+                roleLore.add(Component.text("❖ ", NamedTextColor.LIGHT_PURPLE)
+                        .append(trait.getDisplayName().color(NamedTextColor.LIGHT_PURPLE))
+                        .append(Component.text(": ", NamedTextColor.GRAY))
+                        .append(trait.getSummary().color(NamedTextColor.GRAY)));
+            }
+            roleLore.add(Component.empty());
+        }
 
         if (shouldShowPassives) {
 

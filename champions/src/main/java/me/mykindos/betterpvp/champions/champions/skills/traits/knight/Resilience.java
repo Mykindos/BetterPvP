@@ -1,22 +1,20 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.global;
+package me.mykindos.betterpvp.champions.champions.skills.traits.knight;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.traits.Trait;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,16 +22,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
 @Singleton
 @BPvPListener
-public class Resilience extends Skill implements PassiveSkill, BuffSkill {
+public class Resilience extends Trait implements PassiveSkill, BuffSkill, DefensiveSkill {
 
-    private double baseDurationReduction;
-
-    private double durationReductionPerLevel;
+    private double durationReduction;
 
     @Inject
     public Resilience(Champions champions, ChampionsManager championsManager) {
@@ -47,26 +44,17 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
 
     @Override
     public Component[] getDescription(int level) {
-        Component reduction = getValueComponent(this::getDurationReduction, level, 1, 0, "%");
-        return Translations.componentLines(
-                "champions.skill.global.resilience.description",
-                reduction
-        );
-    }
-
-    public double getDurationReduction(int level) {
-        return baseDurationReduction + (durationReductionPerLevel * (level - 1));
+        return traitDescription(traitValue(durationReduction, 0, "%"));
     }
 
     @Override
-    public Role getClassType() {
-        return null;
+    public @NotNull Role getClassType() {
+        return Role.KNIGHT;
     }
 
     @Override
-    public SkillType getType() {
-
-        return SkillType.GLOBAL;
+    public Material getIcon() {
+        return Material.SHIELD;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -82,10 +70,8 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
         if (!event.getEffect().getEffectType().isNegative()) return;
         if (event.getEffect().getEffectType().isSpecial()) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
-            double reduction = 1.0 - (getDurationReduction(level) / 100);
-            event.getEffect().setLength((long) (event.getEffect().getRawLength() * reduction));
+        if (getLevel(player) > 0) {
+            event.getEffect().setLength((long) (event.getEffect().getRawLength() * getRemainingFraction()));
         }
     }
 
@@ -97,12 +83,12 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
         if (event.getAction() != EntityPotionEffectEvent.Action.ADDED) return;
         if (!UtilEffect.isNegativePotionEffect(event.getNewEffect())) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (getLevel(player) > 0) {
             UtilServer.runTaskLater(champions, () -> {
                 player.removePotionEffect(event.getNewEffect().getType());
-                double reduction = 1.0 - (getDurationReduction(level) / 100);
-                UtilEffect.applyCraftEffect(player, (new PotionEffect(event.getNewEffect().getType(), (int) (event.getNewEffect().getDuration() * reduction), event.getNewEffect().getAmplifier())));
+                UtilEffect.applyCraftEffect(player, new PotionEffect(event.getNewEffect().getType(),
+                        (int) (event.getNewEffect().getDuration() * getRemainingFraction()),
+                        event.getNewEffect().getAmplifier()));
             }, 1);
         }
     }
@@ -112,17 +98,17 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player player)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
-            UtilServer.runTaskLater(champions, () -> {
-                double reduction = 1.0 - (getDurationReduction(level) / 100);
-                event.setDuration((float) (event.getDuration() * reduction));
-            }, 1);
+        if (getLevel(player) > 0) {
+            UtilServer.runTaskLater(champions, () -> event.setDuration((float) (event.getDuration() * getRemainingFraction())), 1);
         }
     }
 
-    public void loadSkillConfig() {
-        baseDurationReduction = getConfig("baseDurationReduction", 30.0, Double.class);
-        durationReductionPerLevel = getConfig("durationReductionPerLevel", 15.0, Double.class);
+    private double getRemainingFraction() {
+        return 1.0 - (durationReduction / 100);
+    }
+
+    @Override
+    protected void loadTraitConfig() {
+        durationReduction = getConfig("durationReduction", 30.0, Double.class);
     }
 }

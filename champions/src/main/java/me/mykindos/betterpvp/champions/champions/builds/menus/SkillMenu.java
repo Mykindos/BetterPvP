@@ -7,14 +7,15 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.SkillButton;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.traits.Trait;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -28,6 +29,10 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SkillMenu extends AbstractGui implements Windowed {
 
@@ -83,6 +88,15 @@ public class SkillMenu extends AbstractGui implements Windowed {
             });
 
 
+        // Traits sit beneath the skill point counter, in the same column, since they are what the role gives
+        // the player for free rather than something they spend points on.
+        int traitSlotNumber = 17;
+        for (Trait trait : skillManager.getTraitsForRole(role)) {
+            if (traitSlotNumber > 44) break;
+            setItem(traitSlotNumber, getTrait(trait));
+            traitSlotNumber += 9;
+        }
+
         int slotNumber = 0;
         int swordSlotNumber = 1;
         int axeSlotNumber = 10;
@@ -120,6 +134,27 @@ public class SkillMenu extends AbstractGui implements Windowed {
         }
 
         setBackground(Menu.BACKGROUND_ITEM);
+    }
+
+    private static SimpleItem getTrait(Trait trait) {
+        List<Component> lore = new ArrayList<>();
+        lore.add(Translations.component("champions.menu.trait.innate").color(NamedTextColor.LIGHT_PURPLE));
+        lore.add(Component.empty());
+        Arrays.stream(trait.getDescription(trait.getTraitLevel()))
+                .map(line -> line.colorIfAbsent(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
+                .forEach(lore::add);
+
+        final ItemView.ItemViewBuilder builder = ItemView.builder()
+                .material(trait.getIcon())
+                .displayName(trait.getDisplayName().color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD))
+                .lore(lore)
+                .flag(ItemFlag.HIDE_ATTRIBUTES);
+
+        if (trait.getTags() != null) {
+            builder.prelore(trait.getTags());
+        }
+
+        return builder.hideAdditionalTooltip(true).frameLore(true).build().toSimpleItem();
     }
 
     private static SimpleItem getSkillType(Material material, String name) {
