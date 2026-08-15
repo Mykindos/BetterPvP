@@ -45,9 +45,9 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
     private final DisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private final EffectManager effectManager;
-    private double poisonDuration;
-    private int poisonLevel;
-    private double poisonDurationIncreasePerLevel;
+    private double weaknessDuration;
+    private int weaknessLevel;
+    private double weaknessDurationIncreasePerLevel;
     private double speed;
     private double radius;
     private double radiusIncreasePerLevel;
@@ -77,17 +77,17 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
 
     @Override
     public Component[] getDescription(int level) {
-        Component poisonDuration = getValueComponent(this::getPoisonDuration, level);
+        Component weaknessDuration = getValueComponent(this::getWeaknessDuration, level);
         Component cooldown = getValueComponent(this::getCooldown, level);
         Component energy = getValueComponent(this::getEnergyPerSecond, level);
         Component pestilence = Translations.component("champions.skill.mage.pestilence.name").color(NamedTextColor.WHITE);
-        Component poisonI = Translations.component("champions.skill.effect.poison",
-                Component.text("I")).color(NamedTextColor.WHITE);
-        return Translations.componentLines("champions.skill.mage.pestilence.description", poisonDuration, cooldown, energy, pestilence, poisonI);
+        Component weakness = Translations.component("champions.skill.effect.weakness",
+                Component.text(UtilFormat.getRomanNumeral(getWeaknessLevel(level)))).color(NamedTextColor.WHITE);
+        return Translations.componentLines("champions.skill.mage.pestilence.description", weaknessDuration, cooldown, energy, pestilence, weakness);
     }
 
-    public double getPoisonDuration(int level) {
-        return poisonDuration + ((level - 1) * poisonDurationIncreasePerLevel);
+    public double getWeaknessDuration(int level) {
+        return weaknessDuration + ((level - 1) * weaknessDurationIncreasePerLevel);
     }
 
     private float getEnergyPerSecond(int level) {
@@ -102,8 +102,8 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
         return speed;
     }
 
-    public int getPoisonLevel(int level) {
-        return poisonLevel;
+    public int getWeaknessLevel(int level) {
+        return weaknessLevel;
     }
 
     @Override
@@ -169,8 +169,8 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
                 (long) (expirySeconds * 1000),
                 effectManager,
                 getRadius(level),
-                getPoisonDuration(level),
-                getPoisonLevel(level)
+                getWeaknessDuration(level),
+                getWeaknessLevel(level)
         );
         final double speed = Math.max(getSpeed(level) * 0.1, getSpeed(level) * data.getCharge());
         projectile.redirect(player.getEyeLocation().getDirection().multiply(speed));
@@ -209,9 +209,9 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
 
     @Override
     public void loadSkillConfig() {
-        poisonDuration = getConfig("poisonDuration", 3.0, Double.class);
-        poisonDurationIncreasePerLevel = getConfig("poisonDurationIncreasePerLevel", 0.5, Double.class);
-        poisonLevel = getConfig("poisonLevel", 1, Integer.class);
+        weaknessDuration = getConfig("weaknessDuration", 3.0, Double.class);
+        weaknessDurationIncreasePerLevel = getConfig("weaknessDurationIncreasePerLevel", 0.5, Double.class);
+        weaknessLevel = getConfig("weaknessLevel", 1, Integer.class);
         speed = getConfig("speed", 1.0, Double.class);
         radius = getConfig("radius", 8.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);

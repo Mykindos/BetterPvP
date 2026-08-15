@@ -31,17 +31,17 @@ public class PestilenceProjectile extends Projectile {
     private final Set<LivingEntity> hitEntities = new HashSet<>();
     private final EffectManager effectManager;
     private final double radius;
-    private final double poisonDuration;
-    private final int poisonLevel;
+    private final double weaknessDuration;
+    private final int weaknessLevel;
     private long lastTargetTime;
 
-    public PestilenceProjectile(@Nullable Player caster, double hitboxSize, Location location, long aliveTime, EffectManager effectManager, double radius, double poisonDuration, int poisonLevel) {
+    public PestilenceProjectile(@Nullable Player caster, double hitboxSize, Location location, long aliveTime, EffectManager effectManager, double radius, double weaknessDuration, int weaknessLevel) {
         super(caster, hitboxSize, location, aliveTime);
         this.lastTargetTime = getCreationTime();
         this.effectManager = effectManager;
         this.radius = radius;
-        this.poisonDuration = poisonDuration;
-        this.poisonLevel = poisonLevel;
+        this.weaknessDuration = weaknessDuration;
+        this.weaknessLevel = weaknessLevel;
     }
 
     @Override
@@ -101,17 +101,17 @@ public class PestilenceProjectile extends Projectile {
             return CollisionResult.IMPACT;
         }
 
-        // Apply poison
+        // Apply weakness
         LivingEntity livingEntity = (LivingEntity) hitEntity;
         hitEntities.add(livingEntity);
         new SoundEffect(Sound.ENTITY_SILVERFISH_DEATH, 1f, 0.5f).play(livingEntity.getLocation());
         new SoundEffect(Sound.ENTITY_SILVERFISH_DEATH, 1f, 0.5f).play(location);
         this.effectManager.addEffect(livingEntity,
                 caster,
-                EffectTypes.POISON,
+                EffectTypes.WEAKNESS,
                 "Pestilence",
-                poisonLevel,
-                (long) (poisonDuration * 1000));
+                weaknessLevel,
+                (long) (weaknessDuration * 1000));
 
         // Redirect if possible, otherwise, remove
         final List<LivingEntity> nearby = UtilEntity.getNearbyEnemies(caster, location, radius);

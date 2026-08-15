@@ -660,9 +660,9 @@ skills:
       energyDecreasePerLevel: 2.0
       cooldown: 16.0
       cooldownDecreasePerLevel: 2.0
-      poisonDuration: 5.0
-      poisonDurationIncreasePerLevel: 1.0
-      poisonLevel: 2
+      weaknessDuration: 5.0
+      weaknessDurationIncreasePerLevel: 1.0
+      weaknessLevel: 2
       radius: 8.0
       speed: 40.0
       radiusIncreasePerLevel: 0.0
