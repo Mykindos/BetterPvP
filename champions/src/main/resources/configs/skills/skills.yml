@@ -676,6 +676,22 @@ skills:
       baseDuration: 2.0
       durationIncreasePerLevel: 0.0
       duration: 2.0
+    blocktoss:
+      enabled: true
+      maxlevel: 5
+      cooldown: 10.0
+      cooldownDecreasePerLevel: 1.0
+      baseCharge: 0.6
+      chargeIncreasePerLevel: 0.2
+      baseDamage: 5.0
+      damageIncreasePerLevel: 1.0
+      baseRadius: 3.0
+      radiusIncreasePerLevel: 0.0
+      baseSpeed: 1.5
+      speedIncreasePerLevel: 0.1
+      hitBoxSize: 1.0
+      size: 0.6
+      sizePerLevel: 0.2
   brute:
     adrenaline:
       enabled: true
@@ -746,22 +762,6 @@ skills:
       damageIncreasePerLevel: 1.0
       baseCharge: 0.5
       chargeIncreasePerLevel: 0.25
-    blocktoss:
-      enabled: true
-      maxlevel: 5
-      cooldown: 10.0
-      cooldownDecreasePerLevel: 1.0
-      baseCharge: 0.6
-      chargeIncreasePerLevel: 0.2
-      baseDamage: 5.0
-      damageIncreasePerLevel: 1.0
-      baseRadius: 3.0
-      radiusIncreasePerLevel: 0.0
-      baseSpeed: 1.5
-      speedIncreasePerLevel: 0.1
-      hitBoxSize: 1.0
-      size: 0.6
-      sizePerLevel: 0.2
     colossus:
       enabled: true
       maxlevel: 3

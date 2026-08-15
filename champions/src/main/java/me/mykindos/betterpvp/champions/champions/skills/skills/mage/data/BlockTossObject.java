@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.brute.data;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.data;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.BlockTossObject;
+import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.BlockTossObject;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChargeSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
@@ -87,7 +87,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
         Component charge = getValueComponent(this::getChargePerSecond, level, 100, 2, "%");
         Component cooldown = getValueComponent(this::getCooldown, level);
         return Translations.componentLines(
-                "champions.skill.brute.block-toss.description",
+                "champions.skill.mage.block-toss.description",
                 damage,
                 charge,
                 cooldown
@@ -117,7 +117,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
 
     @Override
     public Role getClassType() {
-        return Role.BRUTE;
+        return Role.MAGE;
     }
 
     @Override
