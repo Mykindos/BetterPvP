@@ -44,6 +44,10 @@ public class BattleFatigueListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
+        if (!fatigueManager.isEnabled()) {
+            return; // skip the killer and clan-core lookups entirely
+        }
+
         final Player player = event.getPlayer();
         final DeathContext context = new DeathContext(
                 player.getUniqueId(),

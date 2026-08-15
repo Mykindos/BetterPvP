@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.fatigue;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.fatigue.events.PlayerFatigueGainEvent;
 import me.mykindos.betterpvp.clans.clans.fatigue.events.PlayerFatigueTierChangeEvent;
 import me.mykindos.betterpvp.clans.clans.fatigue.factor.FatigueFactor;
@@ -26,6 +27,12 @@ import java.util.UUID;
  * <p>
  * State is session-only: entries live in the in-memory map and are evicted once
  * a player has fully recovered or logged off.
+ * <p>
+ * {@code clans.fatigue.enabled} is the master switch. It is deliberately checked
+ * here rather than in each consumer: every downstream behaviour (the respawn
+ * hold, the punishments, the lengthened home cast) is driven by the tier this
+ * manager resolves, so reporting {@link FatigueTier#FRESH} and never accruing
+ * score switches the whole feature off at one point.
  */
 @Singleton
 @BPvPListener
@@ -33,6 +40,11 @@ import java.util.UUID;
 public class BattleFatigueManager extends Manager<String, BattleFatigue> implements Listener {
 
     private final Set<FatigueFactor> factors;
+
+    @Getter
+    @Inject
+    @Config(path = "clans.fatigue.enabled", defaultValue = "false")
+    private boolean enabled;
 
     @Inject
     @Config(path = "clans.fatigue.decayPerSecond", defaultValue = "0.8")
@@ -84,6 +96,9 @@ public class BattleFatigueManager extends Manager<String, BattleFatigue> impleme
     }
 
     public FatigueTier getTier(UUID uuid) {
+        if (!enabled) {
+            return FatigueTier.FRESH;
+        }
         return getObject(uuid).map(BattleFatigue::getTier).orElse(FatigueTier.FRESH);
     }
 
@@ -91,8 +106,15 @@ public class BattleFatigueManager extends Manager<String, BattleFatigue> impleme
      * Process a death: evaluate every factor, fold them into a gain, update the
      * score and tier, and fire the appropriate event. Returns the resolved tier
      * so the caller (the listener) can decide whether to trigger the hold.
+     * <p>
+     * Returns {@link FatigueTier#FRESH} without recording anything while the
+     * feature is disabled.
      */
     public FatigueTier recordDeath(Player player, DeathContext context) {
+        if (!enabled) {
+            return FatigueTier.FRESH;
+        }
+
         final BattleFatigue state = getOrCreate(player.getUniqueId());
         state.pruneOlderThan(deathHistoryWindowSeconds * 1000L);
 
@@ -165,9 +187,17 @@ public class BattleFatigueManager extends Manager<String, BattleFatigue> impleme
     /**
      * Passive recovery. Runs once a second, bleeding the score down and emitting
      * a tier-change event if a player drops back into a calmer band.
+     * <p>
+     * While disabled this also drains any residual state, so "disabled" always
+     * means "nobody is carrying fatigue".
      */
     @UpdateEvent(delay = 1000)
     public void decay() {
+        if (!enabled) {
+            objects.clear();
+            return;
+        }
+
         objects.entrySet().removeIf(entry -> {
             final BattleFatigue state = entry.getValue();
             if (state.isRespawnHold()) {

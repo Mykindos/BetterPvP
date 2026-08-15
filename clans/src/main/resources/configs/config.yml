@@ -19,6 +19,10 @@ clans:
   coins:
     percentCoinsDroppedOnDeath: 0.1
     dropCoinsOnDeath: true
+  fatigue:
+    # Master switch. When false no fatigue is scored, so the respawn hold,
+    # the slowness punishment and the lengthened /c home cast never trigger.
+    enabled: false
   map:
     enabled: true
     maxMapDistance: 640
