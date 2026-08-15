@@ -9,21 +9,16 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.ComboAttackData;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
@@ -110,51 +105,17 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         int level = getLevel(damager);
         if (level > 0) {
 
-            ComboAttackData comboAttackData = repeat.computeIfAbsent(damager, v -> new ComboAttackData(event.getDamagee().getUniqueId(), 0, System.currentTimeMillis()));
-
-            if (comboAttackData.getLastTarget() != event.getDamagee().getUniqueId()) {
-                repeat.remove(damager);
-                return;
-            }
+            ComboAttackData comboAttackData = repeat.computeIfAbsent(damager, v -> new ComboAttackData(0, System.currentTimeMillis()));
 
             double cur = comboAttackData.getDamageIncrement();
             event.addModifier(new SkillDamageModifier.Flat(this, cur));
 
             comboAttackData.setDamageIncrement(Math.min(cur + getDamageIncrement(level), getMaxDamageIncrement(level)));
-            comboAttackData.setLastTarget(event.getDamagee().getUniqueId());
             comboAttackData.setLast(System.currentTimeMillis());
 
             damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * comboAttackData.getDamageIncrement())));
 
         }
-    }
-
-
-    /**
-     * All sword, axe, and bow skills cancel. Otherwise, if it is an interact or toggle skill it should also cancel
-     * @param skill the skill
-     * @return {@code true} if the skill should cancel a combo attack, {@code false} otherwise
-     */
-    private boolean shouldCancelCombo(IChampionsSkill skill) {
-        if (skill.getType() == SkillType.SWORD || skill.getType() == SkillType.AXE || skill.getType() == SkillType.BOW) {
-            return true;
-        }
-        return skill instanceof ToggleSkill || skill instanceof InteractSkill;
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onSkillUse(PlayerUseSkillEvent event) {
-        final Player player = event.getPlayer();
-        final int level = getLevel(player);
-        if (level <= 0) return;
-        if (!repeat.containsKey(player)) return;
-
-        if (!shouldCancelCombo(event.getSkill())) return;
-
-        final ComboAttackData data = repeat.remove(player);
-        if (data == null) return;
-        endInfo(player, level, data.getDamageIncrement());
-
     }
 
     @UpdateEvent(delay = 50)

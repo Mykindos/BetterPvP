@@ -187,7 +187,6 @@ public class WaypointPatrolBehavior implements SceneBehavior {
                 }
                 if (!navigator.advance(mob, waypoints.get(index).getLocation(), speed)) {
                     abandonLeg(mob);
-                    Bukkit.broadcastMessage("asd");
                     return;
                 }
                 checkProgress(mob);

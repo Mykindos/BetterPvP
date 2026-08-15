@@ -58,8 +58,8 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener, Debuf
         Component[] detail = Translations.componentLines(
                 "champions.skill.effect.poison.detail",
                 poisonDetail,
-                Component.text(String.valueOf(poisonStrength * 3), NamedTextColor.GREEN),
-                Component.text("1.25", NamedTextColor.YELLOW)
+                Component.text(String.valueOf(poisonStrength * 2), NamedTextColor.GREEN),
+                Component.text("0.9", NamedTextColor.YELLOW)
         );
         Component[] result = new Component[components.length + 1 + detail.length];
         System.arraycopy(components, 0, result, 0, components.length);

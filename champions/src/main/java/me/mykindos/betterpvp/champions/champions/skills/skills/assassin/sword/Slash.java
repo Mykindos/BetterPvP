@@ -13,8 +13,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
-import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
-import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -22,22 +21,21 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.util.RayTraceResult;
 
 import java.util.Collection;
@@ -45,8 +43,6 @@ import java.util.Collection;
 @Singleton
 @BPvPListener
 public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, OffensiveSkill, DamageSkill {
-
-    private final DamageLogManager damageLogManager;
 
     private double distance;
     private double distanceIncreasePerLevel;
@@ -56,9 +52,8 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     private double damageIncreasePerLevel;
 
     @Inject
-    public Slash(Champions champions, ChampionsManager championsManager, DamageLogManager damageLogManager) {
+    public Slash(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-        this.damageLogManager = damageLogManager;
     }
 
     @Override
@@ -70,13 +65,19 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     public Component[] getDescription(int level) {
         Component distance = getValueComponent(this::getDistance, level);
         Component damage = getValueComponent(this::getDamage, level);
+        Component cooldownReduction = getValueComponent(this::getCooldownDecrease, level);
         Component cooldown = getValueComponent(this::getCooldown, level);
         return Translations.componentLines(
                 "champions.skill.assassin.slash.description",
                 distance,
                 damage,
+                cooldownReduction,
                 cooldown
         );
+    }
+
+    public double getCooldownDecrease(int level) {
+        return cooldownReduction + (cooldownReductionPerLevel * (level - 1));
     }
 
     public double getDistance(int level) {
@@ -145,16 +146,15 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         }
     }
 
-    @EventHandler
-    public void onEntityDeath(EntityDeathEvent event) {
-        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
-        if(lastDamager != null && lastDamager.getDamager() instanceof Player player) {
-            int level = getLevel(player);
-            if(level > 0) {
-                championsManager.getCooldowns().removeCooldown(player, getName(), false);
-            }
-        }
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onHit(DamageEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE) && !event.hasReason(getName())) return;
 
+        int level = getLevel(player);
+        if (level > 0) {
+            championsManager.getCooldowns().reduceCooldown(player, getName(), getCooldownDecrease(level));
+        }
     }
 
     @Override
@@ -183,5 +183,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
+        cooldownReduction = getConfig("cooldownReduction", 4.0, Double.class);
+        cooldownReductionPerLevel = getConfig("cooldownReductionPerLevel", 0.0, Double.class);
     }
 }
