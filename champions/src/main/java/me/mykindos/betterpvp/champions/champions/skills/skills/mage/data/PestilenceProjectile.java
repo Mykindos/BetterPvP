@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.projectile.Projectile;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -55,12 +54,11 @@ public class PestilenceProjectile extends Projectile {
         final Collection<Player> receivers = location.getNearbyPlayers(60);
         for (Location point : interpolateLine()) {
             // Play travel particles
-            Particle.DUST.builder()
+            Particle.TRIAL_OMEN.builder()
                     .location(point)
                     .count(1)
                     .extra(0.5)
                     .offset(0.1, 0.1, 0.1)
-                    .data(new Particle.DustOptions(Color.fromRGB(0, (int) (Math.random() * 100 + 155), 0), (float) this.hitboxSize * 2))
                     .receivers(receivers)
                     .spawn();
         }
