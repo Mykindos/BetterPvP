@@ -333,7 +333,8 @@ public abstract class Skill implements IChampionsSkill {
     /**
      * Returns a styled value {@link Component} for a level-dependent skill value.
      * Mirrors {@link #getValueString} colouring: values that change between this
-     * level and the next render green, static values render yellow.
+     * level and the next render green, static values render yellow. Varying values
+     * are also followed by the gain the next level would bring, e.g. {@code 5.0 (+1.0)}.
      *
      * @param method a method that takes the level
      * @param level  the level of the skill
@@ -361,11 +362,7 @@ public abstract class Skill implements IChampionsSkill {
      * @return a coloured component holding the formatted value
      */
     public Component getValueComponent(IntToDoubleFunction method, int level, double multiplier, int decimalPlaces) {
-        double currentValue = method.applyAsDouble(level) * multiplier;
-        double nextValue = method.applyAsDouble(level + 1) * multiplier;
-        // if the value is the same next level it is static (yellow), otherwise it varies (green)
-        NamedTextColor color = currentValue == nextValue ? NamedTextColor.YELLOW : NamedTextColor.GREEN;
-        return Component.text(UtilFormat.formatNumber(currentValue, decimalPlaces, true), color);
+        return getValueComponent(method, level, multiplier, decimalPlaces, "");
     }
 
     /**
@@ -382,9 +379,24 @@ public abstract class Skill implements IChampionsSkill {
     public Component getValueComponent(IntToDoubleFunction method, int level, double multiplier, int decimalPlaces, String suffix) {
         double currentValue = method.applyAsDouble(level) * multiplier;
         double nextValue = method.applyAsDouble(level + 1) * multiplier;
-        // if the value is the same next level it is static (yellow), otherwise it varies (green)
-        NamedTextColor color = currentValue == nextValue ? NamedTextColor.YELLOW : NamedTextColor.GREEN;
-        return Component.text(UtilFormat.formatNumber(currentValue, decimalPlaces, true) + suffix, color);
+
+        // if the value is the same next level it is static (yellow) and has no gain to preview
+        if (currentValue == nextValue) {
+            return Component.text(UtilFormat.formatNumber(currentValue, decimalPlaces, true) + suffix, NamedTextColor.YELLOW);
+        }
+
+        // it is a varying value, needs to be green
+        final Component value = Component.text(UtilFormat.formatNumber(currentValue, decimalPlaces, true) + suffix, NamedTextColor.GREEN);
+        if (level >= getMaxLevel()) {
+            return value;
+        }
+
+        // show what putting another point into this skill would do, e.g. "5.0 (+1.0)"
+        final double difference = nextValue - currentValue;
+        final String sign = difference > 0 ? "+" : "-";
+        return value.append(Component.text(" (", NamedTextColor.GRAY))
+                .append(Component.text(sign + UtilFormat.formatNumber(Math.abs(difference), decimalPlaces, true), NamedTextColor.GREEN))
+                .append(Component.text(")", NamedTextColor.GRAY));
     }
 
     /**

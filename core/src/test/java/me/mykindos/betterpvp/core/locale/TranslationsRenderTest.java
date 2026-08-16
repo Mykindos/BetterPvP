@@ -2,12 +2,17 @@ package me.mykindos.betterpvp.core.locale;
 
 import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -137,6 +142,74 @@ class TranslationsRenderTest {
         final List<Component> result = ComponentWrapper.wrapIfMarked(rendered);
         assertEquals(1, result.size());
         assertSame(rendered, result.get(0));
+    }
+
+    /**
+     * Mirrors the shape {@code Skill#getValueComponent} produces for a level-dependent skill value: a
+     * coloured value followed by the gain the next level would bring, e.g. {@code 8.0 (-1.0)}. Skill
+     * descriptions pass this in as a MessageFormat argument ({@code Cooldown: {2}}), so the argument's
+     * children must survive translation substitution.
+     */
+    private static Component skillValueWithNextLevelDelta() {
+        return Component.text("8.0", NamedTextColor.GREEN)
+                .append(Component.text(" (", NamedTextColor.GRAY))
+                .append(Component.text("-1.0", NamedTextColor.GREEN))
+                .append(Component.text(")", NamedTextColor.GRAY));
+    }
+
+    /** Flattens a rendered component into (text, effective colour) pairs, applying style inheritance. */
+    private static void flatten(Component component, @Nullable TextColor inherited, List<String> out) {
+        final TextColor colour = component.style().color() == null ? inherited : component.style().color();
+        if (component instanceof TextComponent text && !text.content().isEmpty()) {
+            out.add(text.content() + "@" + (colour == null ? "none" : colour.toString()));
+        }
+        for (Component child : component.children()) {
+            flatten(child, colour, out);
+        }
+    }
+
+    @Test
+    @DisplayName("a multi-child skill value argument keeps its text through substitution in every locale")
+    void skillValueArgumentSurvivesTranslation() {
+        // core.command.balance.view is "Balance: {0}" / "Saldo: {0}" - the same shape as a skill's
+        // "Cooldown: {2}" line, so it exercises the argument substitution skill descriptions rely on.
+        final Component line = Translations.component("core.command.balance.view", skillValueWithNextLevelDelta());
+
+        assertEquals("Balance: 8.0 (-1.0)", PLAIN.serialize(Translations.render(line, "en")));
+        assertEquals("Saldo: 8.0 (-1.0)", PLAIN.serialize(Translations.render(line, "es")));
+        // A locale with no bundle shipped must still fall back to English with the delta intact.
+        assertEquals("Balance: 8.0 (-1.0)", PLAIN.serialize(Translations.render(line, "hi")));
+    }
+
+    @Test
+    @DisplayName("the next-level delta keeps its green value / grey bracket colouring after translation")
+    void skillValueArgumentKeepsColoursThroughTranslation() {
+        final Component line = Translations.component("core.command.balance.view", skillValueWithNextLevelDelta());
+
+        for (String tag : new String[]{"en", "es"}) {
+            final List<String> parts = new ArrayList<>();
+            flatten(Translations.render(line, tag), null, parts);
+            assertTrue(parts.contains("8.0@" + NamedTextColor.GREEN), "value lost its green in " + tag + ": " + parts);
+            assertTrue(parts.contains(" (@" + NamedTextColor.GRAY), "opening bracket lost its grey in " + tag + ": " + parts);
+            assertTrue(parts.contains("-1.0@" + NamedTextColor.GREEN), "delta lost its green in " + tag + ": " + parts);
+            assertTrue(parts.contains(")@" + NamedTextColor.GRAY), "closing bracket lost its grey in " + tag + ": " + parts);
+        }
+    }
+
+    @Test
+    @DisplayName("a wrapped description line keeps the delta attached to its value")
+    void skillValueArgumentSurvivesWrapping() {
+        // Lore is word-wrapped per-viewer after rendering; the delta must not be dropped by that pass.
+        final Component marked = ComponentWrapper.markForWrap(
+                Translations.component("core.command.balance.view", skillValueWithNextLevelDelta()), 10);
+        final List<Component> wrapped = ComponentWrapper.wrapIfMarked(Translations.render(marked, "en"));
+
+        final StringBuilder joined = new StringBuilder();
+        for (Component wrappedLine : wrapped) {
+            joined.append(PLAIN.serialize(wrappedLine));
+        }
+        assertTrue(joined.toString().replace("\n", "").contains("(-1.0)"),
+                "wrapped line lost the next-level delta: " + joined);
     }
 
     @Test
