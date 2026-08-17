@@ -30,6 +30,7 @@ import java.util.Objects;
 
 @Singleton
 @CustomLog
+@Deprecated
 public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
 
     @Inject
