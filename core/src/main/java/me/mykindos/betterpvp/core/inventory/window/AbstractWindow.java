@@ -289,7 +289,7 @@ public abstract class AbstractWindow implements Window, GuiParent {
             Player viewer = getViewer();
             if(!Bukkit.isPrimaryThread()) {
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), viewer::closeInventory);
-                log.error("Attempted to open window from non-primary thread for player {}", viewer.getName());
+                log.error("Attempted to open window from non-primary thread for player {}", viewer.getName()).submit();
                 return;
             }
 

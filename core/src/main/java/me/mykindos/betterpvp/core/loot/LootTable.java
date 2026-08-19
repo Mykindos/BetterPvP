@@ -82,6 +82,13 @@ public class LootTable {
 
     /**
      * Generates a loot bundle based on this loot table.
+     * <p>
+     * Rolling happens in two phases. The <b>base phase</b> performs {@link #rollCountFunction} rolls using
+     * this table's {@link #replacementStrategy}. The <b>bonus phase</b> then performs any rolls supplied
+     * through the {@link ExpressionEngine#VAR_BONUS_ROLLS} context input, always drawing <i>with</i>
+     * replacement from a fresh candidate pool so that a bonus roll is worth the same on a narrow table as
+     * on a wide one. Entries that declare {@link ReplacementStrategy#WITHOUT_REPLACEMENT} on themselves
+     * remain one-per-bundle across both phases.
      *
      * @param context The context in which the loot is being generated.
      * @return The generated loot bundle, not guaranteed to be populated with any entries.
@@ -91,21 +98,42 @@ public class LootTable {
         final List<Loot<?, ?>> loot = new ArrayList<>(guaranteedLoot);
         loot.removeIf(l -> !l.getCondition().test(context));
 
-        // 2. Roll count
-        int rolls = rollCountFunction.apply(context);
-        if (rolls <= 0) {
+        // 2. Roll counts
+        final int rolls = Math.max(0, rollCountFunction.apply(context));
+        final int bonusRolls = resolveBonusRolls(context);
+        if (weightedEntries.isEmpty() || (rolls <= 0 && bonusRolls <= 0)) {
             return finalizeBundle(context, loot);
         }
 
-        // 3. Snapshot candidates
-        final List<WeightedEntry> candidates = new ArrayList<>(weightedEntries);
+        // 3. Base phase, honouring this table's replacement strategy
+        final int rolled = performRolls(context, loot, new ArrayList<>(weightedEntries), rolls, 0, true);
+
+        // 4. Bonus phase, always with replacement against a fresh pool
+        if (bonusRolls > 0) {
+            performRolls(context, loot, bonusCandidates(loot), bonusRolls, rolled, false);
+        }
+
+        return finalizeBundle(context, loot);
+    }
+
+    /**
+     * Performs {@code rolls} weighted draws against {@code candidates}, appending results to {@code loot}.
+     *
+     * @param startIndex          the roll index the first draw reports as {@link ExpressionEngine#VAR_ROLL_INDEX},
+     *                            so the index stays monotonic across both phases.
+     * @param applyTableStrategy  whether this table's {@link #replacementStrategy} may remove drawn candidates.
+     *                            Per-entry overrides apply regardless.
+     * @return the roll index the next phase should start from.
+     */
+    private int performRolls(@NotNull LootContext context, @NotNull List<Loot<?, ?>> loot,
+                             @NotNull List<WeightedEntry> candidates, int rolls, int startIndex,
+                             boolean applyTableStrategy) {
         if (candidates.isEmpty()) {
-            return finalizeBundle(context, loot);
+            return startIndex + rolls;
         }
 
-        // 4. Perform rolls
         for (int i = 0; i < rolls; i++) {
-            final LootContext rollContext = context.withInput(ExpressionEngine.VAR_ROLL_INDEX, i)
+            final LootContext rollContext = context.withInput(ExpressionEngine.VAR_ROLL_INDEX, startIndex + i)
                     .withInput(ExpressionEngine.VAR_BUNDLE_SIZE, loot.size());
 
             // base weights for this roll, then distribution adjustments
@@ -135,9 +163,7 @@ public class LootTable {
                 if (r < cumulative) {
                     loot.add(candidate);
 
-                    final ReplacementStrategy strategy = candidate.getReplacementStrategy()
-                            .orElse(this.replacementStrategy);
-                    if (strategy == ReplacementStrategy.WITHOUT_REPLACEMENT) {
+                    if (removesCandidate(candidate, applyTableStrategy)) {
                         candidates.remove(j);
                     }
                     break;
@@ -146,7 +172,53 @@ public class LootTable {
             if (candidates.isEmpty()) break;
         }
 
-        return finalizeBundle(context, loot);
+        return startIndex + rolls;
+    }
+
+    /**
+     * Whether awarding {@code candidate} takes it out of the pool for the remainder of the phase. A loot
+     * entry that declares its own strategy always wins; otherwise the table's strategy applies, and only
+     * during the base phase.
+     */
+    private boolean removesCandidate(@NotNull Loot<?, ?> candidate, boolean applyTableStrategy) {
+        final ReplacementStrategy own = candidate.getReplacementStrategy();
+        if (own != null && own != ReplacementStrategy.UNSET) {
+            return own == ReplacementStrategy.WITHOUT_REPLACEMENT;
+        }
+        return applyTableStrategy && this.replacementStrategy == ReplacementStrategy.WITHOUT_REPLACEMENT;
+    }
+
+    /**
+     * Whether this entry declares itself one-per-bundle, as opposed to inheriting the table's strategy.
+     */
+    private boolean declaresOnePerBundle(@NotNull Loot<?, ?> candidate) {
+        return candidate.getReplacementStrategy() == ReplacementStrategy.WITHOUT_REPLACEMENT;
+    }
+
+    /**
+     * The candidate pool for the bonus phase: every weighted entry, minus those that opted into
+     * {@link ReplacementStrategy#WITHOUT_REPLACEMENT} themselves and have already been awarded. The table's
+     * own strategy is deliberately ignored here, which is what makes bonus rolls draw with replacement.
+     */
+    private @NotNull List<WeightedEntry> bonusCandidates(@NotNull List<Loot<?, ?>> awarded) {
+        final List<WeightedEntry> candidates = new ArrayList<>(weightedEntries.size());
+        for (WeightedEntry entry : weightedEntries) {
+            final Loot<?, ?> candidate = entry.getLoot();
+            if (declaresOnePerBundle(candidate) && awarded.contains(candidate)) continue;
+            candidates.add(entry);
+        }
+        return candidates;
+    }
+
+    /**
+     * Reads {@link ExpressionEngine#VAR_BONUS_ROLLS} from the context, coercing to a non-negative int.
+     */
+    private int resolveBonusRolls(@NotNull LootContext context) {
+        final Object raw = context.getInput(ExpressionEngine.VAR_BONUS_ROLLS);
+        if (raw instanceof Number number) {
+            return Math.max(0, (int) Math.round(number.doubleValue()));
+        }
+        return 0;
     }
 
     private LootBundle finalizeBundle(LootContext context, List<Loot<?, ?>> loot) {

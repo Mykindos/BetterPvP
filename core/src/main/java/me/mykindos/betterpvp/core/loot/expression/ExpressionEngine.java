@@ -32,6 +32,12 @@ public final class ExpressionEngine {
     public static final String VAR_BUNDLE_SIZE = "bundle_size";
     public static final String VAR_HISTORY_SIZE = "history_size";
     public static final String VAR_SOURCE = "source";
+    /**
+     * Extra rolls contributed by the caller on top of the table's own roll count. Supplied through
+     * {@link LootContext#withInput(String, Object)}; see {@code LootTable#generateLoot} for how the
+     * bonus phase differs from the base phase.
+     */
+    public static final String VAR_BONUS_ROLLS = "bonus_rolls";
 
     private static final int MAX_EXPRESSION_LENGTH = 512;
     /** Namespace prefix for built-in helper functions; call as {@code fn:clamp(...)}. */
@@ -73,6 +79,8 @@ public final class ExpressionEngine {
         if (compiled == null) return null;
 
         final MapContext jc = new MapContext();
+        // Default so an expression can reference bonus_rolls without the caller having supplied it.
+        jc.set(VAR_BONUS_ROLLS, 0);
         for (Map.Entry<String, Object> e : context.getInputs().entrySet()) {
             jc.set(e.getKey(), e.getValue());
         }

@@ -73,7 +73,7 @@ public class InventoryUtilsImpl implements InventoryUtils {
             }
         } catch (Exception ex) {
             player.closeInventory();
-            log.error("Failed to open inventory for player " + player.getName(), ex);
+            log.error("Failed to open inventory for player " + player.getName(), ex).submit();
         }
 
     }

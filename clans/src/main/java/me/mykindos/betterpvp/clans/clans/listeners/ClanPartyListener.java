@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.parties.PartyMember;
 import me.mykindos.betterpvp.core.parties.PartyMemberFilter;
 import me.mykindos.betterpvp.core.parties.events.PartyCreateEvent;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.Zones;
 import org.bukkit.Bukkit;
@@ -36,11 +35,6 @@ public class ClanPartyListener implements Listener {
 
         Player player = Bukkit.getPlayer(event.getParty().getPartyLeader());
         if (player == null) return;
-
-        if (!zoneManager.hasTagAt(player.getLocation(), Zones.SAFE)) {
-            UtilMessage.message(player, "clans.prefix", "clans.party.shops-only");
-            return;
-        }
 
         clanManager.getClanByPlayer(event.getParty().getPartyLeader()).ifPresent(clan -> {
             if (event.getFilter() == PartyMemberFilter.CLAN) {
