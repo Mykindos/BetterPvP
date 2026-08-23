@@ -65,7 +65,7 @@ public class CombatLog {
         combatLogSheep.remove();
         CraftInventoryPlayer inventory = UtilInventory.getOfflineInventory(playerName, owner);
         if (inventory == null) {
-            log.error("Failed to retrieve offline inventory for {} ({}) while processing combat log", playerName, owner);
+            log.error("Failed to retrieve offline inventory for {} ({}) while processing combat log", playerName, owner).submit();
             return;
         }
 
