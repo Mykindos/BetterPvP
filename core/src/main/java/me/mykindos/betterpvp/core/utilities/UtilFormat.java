@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.text.WordUtils;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.bukkit.Bukkit;
@@ -355,5 +357,9 @@ public class UtilFormat {
         } else {
             return "a";
         }
+    }
+
+    public static String getTextFromComponent(Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
     }
 }
