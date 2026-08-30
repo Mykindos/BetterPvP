@@ -35,6 +35,14 @@ skills:
       baseDuration: 2.0
       durationIncreasePerLevel: 2.0
       poisonStrength: 1
+    hairtrigger:
+      enabled: true
+      maxlevel: 3
+      tagResetTime: 3.0
+      tagResetTimeIncreasePerLevel: 1.5
+      requiredTagsOnEnemy: 3
+      taggedDamageIncreaseAmount: 2.0
+      shootArrowWindUpTime: 0.5
     backstab:
       enabled: true
       maxlevel: 3
