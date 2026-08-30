@@ -22,12 +22,12 @@ public class ClansCommandLoader extends CommandLoader {
 
     public void loadCommands(String packageName) {
 
-        Reflections reflections = new Reflections(packageName);
+        final Reflections reflections = new Reflections(packageName);
 
-        Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
+        final Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
         loadAll(classes);
 
-        Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(SubCommand.class);
+        final Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(SubCommand.class);
         loadSubCommands(subCommandClasses);
 
         plugin.saveConfig();

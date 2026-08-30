@@ -101,10 +101,12 @@ public class ItemRegistry {
         return fallbackItems.get(material);
     }
 
+    @Nullable("When no item exists for this key")
     public BaseItem getItem(@NotNull NamespacedKey key) {
         return items.get(key);
     }
 
+    @Nullable("When no item exists for this key")
     public BaseItem getItem(@NotNull String namespacedKey) {
         NamespacedKey namespacedKeyObj = NamespacedKey.fromString(namespacedKey);
         if (namespacedKeyObj == null) {

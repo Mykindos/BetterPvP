@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.core.vault.restriction.ClanVaultRestrictions;
+import me.mykindos.betterpvp.clans.commands.BrigadierClansCommandLoader;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.fields.Fields;
@@ -72,6 +73,9 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Inject
         private ClansSidebarListener sidebar;
 
+        @Inject
+        private BrigadierClansCommandLoader brigadierClansCommandLoader;
+
         @Override
         public String getName() {
             return "reload";
@@ -92,6 +96,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
             clans.reload();
             clans.getReloadables().forEach(Reloadable::reload);
 
+            brigadierClansCommandLoader.reload();
             commandLoader.reload(clans.getClass().getPackageName());
             tipManager.reloadTips(clans);
 

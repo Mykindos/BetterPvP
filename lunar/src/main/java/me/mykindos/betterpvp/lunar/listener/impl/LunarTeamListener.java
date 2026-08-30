@@ -28,7 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Optional;
 
 @Singleton
@@ -143,17 +143,16 @@ public class LunarTeamListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onKick(final ClanKickMemberEvent event) {
-        if (event.getTarget().getGamer().isOnline()) {
-            Player player = event.getTarget().getGamer().getPlayer();
-            if (player == null) return;
-            UtilServer.runTaskLater(lunar, () -> {
-                this.updateTeam(event.getPlayer());
 
-                for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
-                    this.updateTeam(onlinePlayer);
-                }
-            }, 2L);
-        }
+        Player player = event.getClanMember().getPlayer();
+        if (player == null) return;
+        UtilServer.runTaskLater(lunar, () -> {
+            this.updateTeam(event.getPlayer());
+
+            for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
+                this.updateTeam(onlinePlayer);
+            }
+        }, 2L);
     }
 
 }

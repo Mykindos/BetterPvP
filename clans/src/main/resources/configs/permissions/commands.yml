@@ -1,0 +1,111 @@
+clan:
+  requiredRank: PLAYER
+  enabled: true
+  setdominance:
+    requiredRank: ADMIN
+    enabled: true
+  info:
+    requiredRank: PLAYER
+    enabled: true
+  neutral:
+    requiredRank: PLAYER
+    enabled: true
+  ally:
+    requiredRank: PLAYER
+    enabled: true
+  trust:
+    requiredRank: PLAYER
+    enabled: true
+  create:
+    requiredRank: PLAYER
+    enabled: true
+  promote:
+    requiredRank: PLAYER
+    enabled: true
+  kick:
+    requiredRank: PLAYER
+    enabled: true
+  demote:
+    requiredRank: PLAYER
+    enabled: true
+  join:
+    requiredRank: PLAYER
+    enabled: true
+  invite:
+    requiredRank: PLAYER
+    enabled: true
+  setcore:
+    requiredRank: PLAYER
+    enabled: true
+  disband:
+    requiredRank: PLAYER
+    enabled: true
+  enemy:
+    requiredRank: PLAYER
+    enabled: true
+  leave:
+    requiredRank: PLAYER
+    enabled: true
+  claim:
+    requiredRank: PLAYER
+    enabled: true
+  unclaim:
+    requiredRank: PLAYER
+    enabled: true
+  stuck:
+    requiredRank: PLAYER
+    enabled: true
+  setbanner:
+    requiredRank: PLAYER
+    enabled: true
+  list:
+    requiredRank: PLAYER
+    enabled: true
+  logs:
+    requiredRank: PLAYER
+    enabled: true
+  untrust:
+    requiredRank: PLAYER
+    enabled: true
+  core:
+    requiredRank: PLAYER
+    enabled: true
+  setsafe:
+    requiredRank: ADMIN
+    enabled: true
+  bank:
+    requiredRank: PLAYER
+    enabled: true
+    withdraw:
+      requiredRank: PLAYER
+      enabled: true
+    deposit:
+      requiredRank: PLAYER
+      enabled: true
+  triggerrecovery:
+    requiredRank: ADMIN
+    enabled: true
+  setexp:
+    requiredRank: ADMIN
+    enabled: true
+  setenergy:
+    requiredRank: ADMIN
+    enabled: true
+  rename:
+    requiredRank: ADMIN
+    enabled: true
+  addoutskirts:
+    requiredRank: ADMIN
+    enabled: true
+  help:
+    requiredRank: PLAYER
+    enabled: true
+  playerclans:
+    requiredRank: ADMIN
+    enabled: true
+  clanplayers:
+    requiredRank: ADMIN
+    enabled: true
+  killlogs:
+    requiredRank: PLAYER
+    enabled: true

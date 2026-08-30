@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.shops.commands.loader.BrigadierShopsCommandLoader;
 import me.mykindos.betterpvp.shops.commands.loader.ShopsCommandLoader;
 import me.mykindos.betterpvp.shops.injector.ShopsInjectorModule;
 import me.mykindos.betterpvp.shops.listener.ShopsListenerLoader;
@@ -60,6 +61,9 @@ public class Shops extends BPvPPlugin {
 
             var shopsListenerLoader = injector.getInstance(ShopsListenerLoader.class);
             shopsListenerLoader.registerListeners(PACKAGE);
+
+            var brigadierCommandLoader = injector.getInstance(BrigadierShopsCommandLoader.class);
+            brigadierCommandLoader.loadCommands(PACKAGE);
 
             var shopsCommandLoader = injector.getInstance(ShopsCommandLoader.class);
             shopsCommandLoader.loadCommands(PACKAGE);
