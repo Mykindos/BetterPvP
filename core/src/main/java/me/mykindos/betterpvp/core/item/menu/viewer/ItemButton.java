@@ -7,7 +7,13 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.loot.Loot;
+import me.mykindos.betterpvp.core.loot.LootTable;
+import me.mykindos.betterpvp.core.loot.LootTableRegistry;
+import me.mykindos.betterpvp.core.loot.item.ItemLoot;
+import me.mykindos.betterpvp.core.loot.menu.ItemDropTablesMenu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.RecipeRegistries;
@@ -19,6 +25,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -26,7 +33,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
@@ -38,20 +49,40 @@ public class ItemButton extends ControlItem<AbstractGui> {
     private volatile Result cachedResult;
     private volatile ItemProvider cachedProvider;
 
-    private record Result(LinkedList<Recipe<?>> recipes, LinkedList<Recipe<?>> usages) {}
+    private record Result(LinkedList<Recipe<?>> recipes, LinkedList<Recipe<?>> usages,
+                          List<ItemDropTablesMenu.Appearance> dropTableAppearances) {}
 
     public ItemButton(ItemInstance item) {
         this.itemInstance = item;
 
-        RecipeRegistries registries = JavaPlugin.getPlugin(Core.class)
-                .getInjector().getInstance(RecipeRegistries.class);
+        Core core = JavaPlugin.getPlugin(Core.class);
+        RecipeRegistries registries = core.getInjector().getInstance(RecipeRegistries.class);
+        LootTableRegistry lootTableRegistry = core.getInjector().getInstance(LootTableRegistry.class);
+        ItemFactory itemFactory = core.getInjector().getInstance(ItemFactory.class);
 
         CompletableFuture<LinkedList<Recipe<?>>> recipesFuture =
                 registries.getResolver().lookup(new ExactResultParameter(item.getBaseItem()));
         CompletableFuture<LinkedList<Recipe<?>>> usagesFuture =
                 registries.getResolver().lookup(new ExactIngredientParameter(item.getBaseItem()));
 
-        this.loadFuture = recipesFuture.thenCombine(usagesFuture, Result::new)
+        this.loadFuture = recipesFuture.thenCombine(usagesFuture, (recipes, usages) -> {
+                    // Build drop-table appearances (pure in-memory, no I/O)
+                    NamespacedKey itemKey = itemFactory.getItemRegistry().getKey(item.getBaseItem());
+                    List<ItemDropTablesMenu.Appearance> appearances = new ArrayList<>();
+                    if (itemKey != null) {
+                        for (LootTable table : lootTableRegistry.getLoaded().values()) {
+                            for (Map.Entry<Loot<?, ?>, Float> entry : table.getChances().entrySet()) {
+                                if (entry.getKey() instanceof ItemLoot<?> itemLoot
+                                        && itemLoot.getItemKey().equals(itemKey)) {
+                                    appearances.add(new ItemDropTablesMenu.Appearance(
+                                            table.getId(), entry.getKey(), entry.getValue()));
+                                }
+                            }
+                        }
+                        appearances.sort(Comparator.comparingDouble(ItemDropTablesMenu.Appearance::chance).reversed());
+                    }
+                    return new Result(recipes, usages, appearances);
+                })
                 .whenComplete((res, ex) -> {
                     if (ex != null) {
                         log.error("Error loading recipes for item {}", itemInstance.getBaseItem().getClass().getSimpleName()).submit();
@@ -68,6 +99,9 @@ public class ItemButton extends ControlItem<AbstractGui> {
                         }
                         if (!res.usages.isEmpty()) {
                             builder.action(ClickActions.RIGHT, Component.text("View Usages"));
+                        }
+                        if (!res.dropTableAppearances.isEmpty()) {
+                            builder.action(ClickActions.MIDDLE, Component.text("View Drop Tables"));
                         }
                         cachedProvider = builder.build();
                     }
@@ -99,6 +133,30 @@ public class ItemButton extends ControlItem<AbstractGui> {
             return;
         }
 
+        // Resolve the previous menu for the back button
+        Windowed previous = getGui() instanceof Windowed windowed ? windowed : null;
+        for (Window window : getWindows()) {
+            if (window instanceof AbstractSingleWindow single
+                    && window.getViewer() == player
+                    && single.getGui() instanceof Windowed windowed) {
+                previous = windowed;
+                break;
+            }
+        }
+
+        // Middle-click → show drop tables
+        if (clickType == ClickType.MIDDLE) {
+            List<ItemDropTablesMenu.Appearance> appearances = cachedResult.dropTableAppearances;
+            if (appearances.isEmpty()) return;
+
+            for (Player viewer : getGui().findAllCurrentViewers()) {
+                new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN).play(viewer);
+            }
+            new ItemDropTablesMenu(appearances, previous).show(player);
+            return;
+        }
+
+        // Left-click → recipes  /  Right-click → usages
         LinkedList<Recipe<?>> result;
         if (clickType.isLeftClick()) {
             result = cachedResult.recipes;
@@ -110,16 +168,6 @@ public class ItemButton extends ControlItem<AbstractGui> {
 
         if (result.isEmpty()) {
             return;
-        }
-
-        Windowed previous = getGui() instanceof Windowed windowed ? windowed : null;
-        for (Window window : getWindows()) {
-            if (window instanceof AbstractSingleWindow single
-                    && window.getViewer() == player
-                    && single.getGui() instanceof Windowed windowed) {
-                previous = windowed;
-                break;
-            }
         }
 
         for (Player viewer : getGui().findAllCurrentViewers()) {

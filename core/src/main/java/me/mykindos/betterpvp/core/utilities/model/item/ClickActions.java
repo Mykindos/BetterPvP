@@ -52,7 +52,10 @@ public enum ClickActions implements ClickAction {
             .appendSpace()
             .append(Component.translatable("space.-4").font(Resources.Font.SPACE))
             .append(Component.text("\uE075", NamedTextColor.WHITE).font(Key.key("betterpvp", "glyph_16"))),
-            ClickType.SHIFT_RIGHT);
+            ClickType.SHIFT_RIGHT),
+
+    MIDDLE(Component.text("Middle Click", NamedTextColor.WHITE),
+            ClickType.MIDDLE);
 
     @Getter
     private final Component component;
