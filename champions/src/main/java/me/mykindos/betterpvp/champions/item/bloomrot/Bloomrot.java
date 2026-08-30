@@ -6,14 +6,26 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.interaction.component.InteractionContainerComponent;
 import me.mykindos.betterpvp.core.interaction.input.InteractionInputs;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.InfectedBloomingCrystal;
+import me.mykindos.betterpvp.core.item.impl.MagicEssence;
+import me.mykindos.betterpvp.core.item.impl.MagicSeal;
+import me.mykindos.betterpvp.core.item.impl.PolariteChunk;
+import me.mykindos.betterpvp.core.item.impl.ToxicCrystal;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 
 import java.util.List;
 
@@ -21,6 +33,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ItemKey("champions:bloomrot")
 public class Bloomrot extends WeaponItem implements Reloadable {
+    private transient boolean registered;
 
     private final ItemFactory itemFactory;
     private final NectarOfDecay nectarOfDecayAbility;
@@ -54,4 +67,29 @@ public class Bloomrot extends WeaponItem implements Reloadable {
         nectarOfDecayAbility.setCloudSeconds(config.getConfig("cloudSeconds", 6.0, Double.class));
         nectarOfDecayAbility.setHealPercent(config.getConfig("healPercent", 0.80, Double.class));
     }
-} 
+
+
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry,
+                                ItemFactory itemFactory,
+                                InfectedBloomingCrystal infectedBloomingCrystal,
+                                ToxicCrystal toxicCrystal
+    ) {
+        if (registered) return;
+        registered = true;
+        String[] pattern = new String[] {
+                "CI ",
+                "IS ",
+                "  S"
+        };
+
+        final BaseItem stick = itemFactory.getFallbackItem(Material.STICK);
+
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('C', new RecipeIngredient(toxicCrystal, 1));
+        builder.setIngredient('I', new RecipeIngredient(infectedBloomingCrystal, 1));
+        builder.setIngredient('S', new RecipeIngredient(stick, 1));
+        registry.registerRecipe(new NamespacedKey("champions", "bloomrot"), builder.build());
+    }
+}
