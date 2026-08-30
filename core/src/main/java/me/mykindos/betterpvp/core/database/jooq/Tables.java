@@ -36,6 +36,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKillstreak;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopRating;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTotalAchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetWorldLogsForBlock;
+import me.mykindos.betterpvp.core.database.jooq.tables.GrafanaConfig;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
@@ -67,7 +68,6 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakR
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchievementCompletionsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
-
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -848,6 +848,11 @@ public class Tables {
             pageLimit
         );
     }
+
+    /**
+     * The table <code>public.grafana_config</code>.
+     */
+    public static final GrafanaConfig GRAFANA_CONFIG = GrafanaConfig.GRAFANA_CONFIG;
 
     /**
      * The table <code>public.ignores</code>.

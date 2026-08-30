@@ -8,11 +8,14 @@ import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsBuilds;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKillContributions;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKilldeathData;
 import me.mykindos.betterpvp.champions.database.jooq.tables.ChampionsKills;
+import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaRolePlaytimeSnapshot;
+import me.mykindos.betterpvp.champions.database.jooq.tables.GrafanaSkillKdrSnapshot;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsBuildsRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillContributionsRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKilldeathDataRecord;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsKillsRecord;
-
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.GrafanaRolePlaytimeSnapshotRecord;
+import me.mykindos.betterpvp.champions.database.jooq.tables.records.GrafanaSkillKdrSnapshotRecord;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -34,4 +37,6 @@ public class Keys {
     public static final UniqueKey<ChampionsKillContributionsRecord> CHAMPIONS_KILL_CONTRIBUTIONS_PKEY = Internal.createUniqueKey(ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS, DSL.name("champions_kill_contributions_pkey"), new TableField[] { ChampionsKillContributions.CHAMPIONS_KILL_CONTRIBUTIONS.CONTRIBUTION_ID }, true);
     public static final UniqueKey<ChampionsKilldeathDataRecord> CHAMPIONS_KILLDEATH_DATA_UK = Internal.createUniqueKey(ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA, DSL.name("champions_killdeath_data_uk"), new TableField[] { ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA.MATCHUP, ChampionsKilldeathData.CHAMPIONS_KILLDEATH_DATA.METRIC }, true);
     public static final UniqueKey<ChampionsKillsRecord> CHAMPIONS_KILLS_PKEY = Internal.createUniqueKey(ChampionsKills.CHAMPIONS_KILLS, DSL.name("champions_kills_pkey"), new TableField[] { ChampionsKills.CHAMPIONS_KILLS.KILL_ID }, true);
+    public static final UniqueKey<GrafanaRolePlaytimeSnapshotRecord> GRAFANA_ROLE_PLAYTIME_SNAPSHOT_PKEY = Internal.createUniqueKey(GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT, DSL.name("grafana_role_playtime_snapshot_pkey"), new TableField[] { GrafanaRolePlaytimeSnapshot.GRAFANA_ROLE_PLAYTIME_SNAPSHOT.ID }, true);
+    public static final UniqueKey<GrafanaSkillKdrSnapshotRecord> GRAFANA_SKILL_KDR_SNAPSHOT_PKEY = Internal.createUniqueKey(GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT, DSL.name("grafana_skill_kdr_snapshot_pkey"), new TableField[] { GrafanaSkillKdrSnapshot.GRAFANA_SKILL_KDR_SNAPSHOT.ID }, true);
 }

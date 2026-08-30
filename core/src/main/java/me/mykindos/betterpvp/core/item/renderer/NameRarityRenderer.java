@@ -22,6 +22,11 @@ public class NameRarityRenderer implements ItemNameRenderer {
         this.name = name;
     }
 
+    /** Returns the raw name component (no rarity/purity colouring applied). */
+    public Component getRawName() {
+        return name;
+    }
+
     @Override
     public Component createName(ItemInstance item) {
         // Check for purity-based name color override ONLY if attuned

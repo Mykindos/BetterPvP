@@ -4,9 +4,6 @@
 package me.mykindos.betterpvp.core.database.jooq;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsRealm;
 import me.mykindos.betterpvp.core.database.jooq.tables.AchievementCompletionsSeason;
@@ -39,6 +36,7 @@ import me.mykindos.betterpvp.core.database.jooq.tables.GetTopKillstreak;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTopRating;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetTotalAchievementCompletions;
 import me.mykindos.betterpvp.core.database.jooq.tables.GetWorldLogsForBlock;
+import me.mykindos.betterpvp.core.database.jooq.tables.GrafanaConfig;
 import me.mykindos.betterpvp.core.database.jooq.tables.Ignores;
 import me.mykindos.betterpvp.core.database.jooq.tables.KillContributions;
 import me.mykindos.betterpvp.core.database.jooq.tables.Kills;
@@ -70,13 +68,15 @@ import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopKillstreakR
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTopRatingRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetTotalAchievementCompletionsRecord;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.GetWorldLogsForBlockRecord;
-
 import org.jooq.Catalog;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -863,6 +863,11 @@ public class Public extends SchemaImpl {
     }
 
     /**
+     * The table <code>public.grafana_config</code>.
+     */
+    public final GrafanaConfig GRAFANA_CONFIG = GrafanaConfig.GRAFANA_CONFIG;
+
+    /**
      * The table <code>public.ignores</code>.
      */
     public final Ignores IGNORES = Ignores.IGNORES;
@@ -990,6 +995,7 @@ public class Public extends SchemaImpl {
             GetTopRating.GET_TOP_RATING,
             GetTotalAchievementCompletions.GET_TOTAL_ACHIEVEMENT_COMPLETIONS,
             GetWorldLogsForBlock.GET_WORLD_LOGS_FOR_BLOCK,
+            GrafanaConfig.GRAFANA_CONFIG,
             Ignores.IGNORES,
             KillContributions.KILL_CONTRIBUTIONS,
             Kills.KILLS,

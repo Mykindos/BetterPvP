@@ -41,7 +41,7 @@ public class SearchCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>Usage: /search <item|player></green>"));
+        UtilMessage.message(player, "Search", UtilMessage.deserialize("<green>Usage: /search <item|player|online></green>"));
     }
 
     @Singleton

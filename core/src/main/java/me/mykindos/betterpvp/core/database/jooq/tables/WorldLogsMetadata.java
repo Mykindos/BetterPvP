@@ -4,18 +4,11 @@
 package me.mykindos.betterpvp.core.database.jooq.tables;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import me.mykindos.betterpvp.core.database.jooq.Indexes;
 import me.mykindos.betterpvp.core.database.jooq.Keys;
 import me.mykindos.betterpvp.core.database.jooq.Public;
 import me.mykindos.betterpvp.core.database.jooq.tables.records.WorldLogsMetadataRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
@@ -30,6 +23,8 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Collection;
 
 
 /**
@@ -71,7 +66,7 @@ public class WorldLogsMetadata extends TableImpl<WorldLogsMetadataRecord> {
     /**
      * The column <code>public.world_logs_metadata.meta_value</code>.
      */
-    public final TableField<WorldLogsMetadataRecord, String> META_VALUE = createField(DSL.name("meta_value"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<WorldLogsMetadataRecord, String> META_VALUE = createField(DSL.name("meta_value"), SQLDataType.CLOB.nullable(false), this, "");
 
     private WorldLogsMetadata(Name alias, Table<WorldLogsMetadataRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -105,11 +100,6 @@ public class WorldLogsMetadata extends TableImpl<WorldLogsMetadataRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
-    }
-
-    @Override
-    public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.WORLD_LOGS_METADATA_KEY_VALUE_INDEX, Indexes.WORLD_LOGS_METADATA_VALUE_INDEX);
     }
 
     @Override

@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_LOG_MESSAGES_BY_CONTEXT_AND_ACTION;
 import static me.mykindos.betterpvp.core.database.jooq.Tables.GET_LOG_MESSAGES_BY_CONTEXT_AND_VALUE;
@@ -79,6 +78,7 @@ public class LogRepository {
 
         return logs;
     }
+
 
     public void purgeLogs(int days, int limit) {
 
