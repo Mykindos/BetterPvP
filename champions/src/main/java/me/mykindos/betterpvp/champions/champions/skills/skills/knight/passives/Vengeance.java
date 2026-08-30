@@ -5,36 +5,74 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.VengeanceData;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.Bukkit;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class Vengeance extends Skill implements PassiveSkill, Listener, OffensiveSkill, DamageSkill {
-    private final WeakHashMap<Player, Integer> playerNumHitsMap = new WeakHashMap<>();
-    private final WeakHashMap<Player, BukkitTask> playerTasks = new WeakHashMap<>();
+    private final WeakHashMap<Player, VengeanceData> playerDataMap = new WeakHashMap<>();
+
     private double baseDamage;
     private double damageIncreasePerLevel;
-    private double baseMaxDamage;
-    private double maxDamageIncreasePerLevel;
-    private double expirationTime;
-    private double expirationTimeIncreasePerLevel;
+
+    /**
+     * The number of melee hits a player can take before reaching max stacks.
+     */
+    private int maxStacks;
+
+    private long expirationTimeInMillis;
+
+    private final PermanentComponent stacksActionBar = new PermanentComponent(
+            gamer -> {
+                final @Nullable Player player = gamer.getPlayer();
+                if (player == null || !player.isOnline()) return null;
+
+                final @Nullable VengeanceData abilityData = playerDataMap.get(player);
+                if (abilityData == null) return null;
+
+                final int hitsTaken = abilityData.getHitsTaken();
+                final int hitsThatCanBeTaken = Math.max(0, maxStacks - hitsTaken);
+
+                return Component.text("Hits Taken" + ":" + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
+                        .append(Component.text("\u25A0".repeat(hitsTaken)).color(NamedTextColor.GREEN))
+                        .append(Component.text("\u25A0".repeat(hitsThatCanBeTaken)).color(NamedTextColor.RED));
+            }
+    );
 
     @Inject
     public Vengeance(Champions champions, ChampionsManager championsManager) {
@@ -42,18 +80,11 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     }
 
     @Override
-    public String getName() {
-        return "Vengeance";
-    }
-
-    @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For every hit you took since last damaging",
-                "an enemy, your damage will increase by " + getValueString(this::getDamage, level) + " damage",
-                "up to a maxiumum of " + getValueString(this::getMaxDamage, level) + " extra damage",
-                "",
-                "Extra damage will reset after "+ getValueString(this::getExpirationTime, level) + " seconds"
+                "Every hit you take will increase",
+                "the damage of your next melee",
+                "attack by " + getValueString(this::getDamage, level) + " damage.",
         };
     }
 
@@ -61,12 +92,95 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    public double getMaxDamage(int level) {
-        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerTakeDamage(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)
+                || !event.getBukkitCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
+        if (!(event.getDamagee() instanceof Player player)) return;
+
+        final int level = getLevel(player);
+        if (level <= 0) return;
+
+        final @NotNull VengeanceData abilityData = playerDataMap.computeIfAbsent(player, p -> new VengeanceData());
+        if (abilityData.getHitsTaken() >= maxStacks) return;
+
+        abilityData.setLastTimeWhenTakenDamage(System.currentTimeMillis());
+        abilityData.setHitsTaken(abilityData.getHitsTaken() + 1);
     }
 
-    public double getExpirationTime(int level) {
-        return expirationTime;
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerHitEnemy(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
+        if (!(event.getDamager() instanceof Player player)) return;
+
+        final @Nullable VengeanceData abilityData = playerDataMap.get(player);
+        if (abilityData == null || abilityData.getHitsTaken() <= 0) return;
+
+        final int level = getLevel(player);
+        if (level <= 0) return;  // Shouldn't happen since the player has ability data but no harm in checking
+
+        final double extraDamage = abilityData.getHitsTaken() * getDamage(level);
+        event.addModifier(new SkillDamageModifier.Flat(this, extraDamage));
+
+        final float pitch = 0.0f - (abilityData.getHitsTaken() * 0.5f);
+
+        player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1.0f, pitch);
+
+        playerDataMap.remove(player);
+    }
+
+    @UpdateEvent
+    public void onUpdate() {
+        final Iterator<Player> iterator = playerDataMap.keySet().iterator();
+        while (iterator.hasNext()) {
+            final Player player = iterator.next();
+            if (!player.isOnline() || player.isDead() || !player.isValid()) {
+                iterator.remove();
+                continue;
+            }
+
+            final int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
+                continue;
+            }
+
+            final @NotNull VengeanceData abilityData = playerDataMap.get(player);
+
+            // If doing pull, don't worry about stacks expiring right now.
+            if (UtilTime.elapsed(abilityData.getLastTimeWhenTakenDamage(), expirationTimeInMillis)) {
+                player.playSound(player, Sound.ENTITY_ITEM_BREAK, 1.0f, 1.5f);
+                iterator.remove();
+            }
+
+            final int green = 165 - ((abilityData.getHitsTaken() * 165) / maxStacks);
+            final Color color = Color.fromRGB(255, green, 0);
+
+            // Play some particles to signify inward pull
+            Particle.DUST.builder()
+                    .color(color)
+                    .count(1)
+                    .extra(0)
+                    .offset(0.5, 0.5, 0.5)
+                    .location(player.getLocation().add(0.0, player.getHeight()/2, 0.0))
+                    .receivers(30)
+                    .spawn();
+        }
+    }
+
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().add(900, stacksActionBar);
+    }
+
+    @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().remove(stacksActionBar);
+    }
+
+    @Override
+    public String getName() {
+        return "Vengeance";
     }
 
     @Override
@@ -79,65 +193,13 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
         return SkillType.PASSIVE_B;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(DamageEvent event) {
-        if (!(event.getDamagee() instanceof Player player)) return;
-
-        if (event.getDamager() instanceof Player) {
-            int numHits = playerNumHitsMap.getOrDefault(player, 0);
-            numHits++;
-            playerNumHitsMap.put(player, numHits);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onHit(DamageEvent event) {
-        if (!(event.getDamager() instanceof Player player)) return;
-        if (event.isCancelled()) return;
-        if (event.getBukkitCause() != DamageCause.ENTITY_ATTACK) return;
-
-        int level = getLevel(player);
-        if (level > 0) {
-            int numHitsTaken = playerNumHitsMap.getOrDefault(player, 0);
-            double damageIncrease = Math.min(getMaxDamage(level), numHitsTaken * getDamage(level));
-
-            event.addModifier(new SkillDamageModifier.Flat(this, damageIncrease));
-
-            playerNumHitsMap.put(player, 0);
-
-            if (playerTasks.containsKey(player)) {
-                playerTasks.get(player).cancel();
-                playerTasks.remove(player);
-            }
-
-            BukkitTask task = Bukkit.getScheduler().runTaskLater(champions, () -> {
-                playerNumHitsMap.put(player, 0);
-                playerTasks.remove(player);
-            }, (long) getExpirationTime(level) * 20L);
-
-            playerTasks.put(player, task);
-        }
-
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        playerNumHitsMap.put(player, 0);
-        if (playerTasks.containsKey(player)) {
-            playerTasks.get(player).cancel();
-            playerTasks.remove(player);
-        }
-    }
-
     @Override
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 0.75, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.25, Double.class);
-        baseMaxDamage = getConfig("baseMaxDamage", 1.5, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 0.5, Double.class);
-        expirationTime = getConfig("expirationTime", 6.0, Double.class);
-        expirationTimeIncreasePerLevel = getConfig("expirationTimeIncreasePerLevel", 0.0, Double.class);
-    }
+        maxStacks = getConfig("maxStacks", 3, Integer.class);
 
+        final double expirationTimeInSeconds = getConfig("expirationTime", 6.0, Double.class);
+        expirationTimeInMillis = (long) (expirationTimeInSeconds * 1000L);
+    }
 }
