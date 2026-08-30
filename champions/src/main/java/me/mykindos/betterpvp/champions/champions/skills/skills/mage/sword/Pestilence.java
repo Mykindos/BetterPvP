@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -82,7 +83,9 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
                 "for a maximum of " + getValueString(this::getPoisonDuration, level) + " seconds.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
-                "Energy: " + getValueString(this::getEnergyPerSecond, level)
+                "Energy: " + getValueString(this::getEnergyPerSecond, level),
+                "",
+                EffectTypes.POISON.getDescription(poisonLevel)
         };
     }
 
