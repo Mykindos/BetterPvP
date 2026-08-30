@@ -216,6 +216,11 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
 
+        if (event.getEntityType() == EntityType.WITHER) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (event.getBlock().getType() == Material.FARMLAND && event.getTo() == Material.DIRT) {
             event.setCancelled(true);
         }
