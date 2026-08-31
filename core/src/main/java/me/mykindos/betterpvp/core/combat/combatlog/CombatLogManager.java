@@ -21,4 +21,16 @@ public class CombatLogManager extends Manager<String, CombatLog> {
     public Optional<CombatLog> getCombatLogBySheep(LivingEntity target) {
         return getObjects().values().stream().filter(cl -> cl.getCombatLogSheep().getUniqueId().equals(target.getUniqueId())).findFirst();
     }
+
+    public void removeStaleCombatLogEntity(final LivingEntity livingEntity) {
+        if (!livingEntity.getPersistentDataContainer().has(CombatLog.COMBAT_LOG_KEY)) {
+            return;
+        }
+
+        if (getCombatLogBySheep(livingEntity).isPresent()) {
+            return;
+        }
+
+        livingEntity.remove();
+    }
 }
