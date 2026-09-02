@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,11 +56,6 @@ public class Blur extends Trait implements PassiveSkill, BuffSkill, MovementSkil
     @Override
     public @NotNull Role getClassType() {
         return Role.ASSASSIN;
-    }
-
-    @Override
-    public Material getIcon() {
-        return Material.FEATHER;
     }
 
     @UpdateEvent(delay = 500)

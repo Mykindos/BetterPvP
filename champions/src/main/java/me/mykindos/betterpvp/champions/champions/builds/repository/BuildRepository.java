@@ -63,6 +63,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
                 boolean active = buildRecord.getValue(CHAMPIONS_BUILDS.ACTIVE) == 1;
                 build.setActive(active);
+                build.setName(buildRecord.getValue(CHAMPIONS_BUILDS.NAME));
 
                 String sword = buildRecord.getValue(CHAMPIONS_BUILDS.SWORD);
                 setSkill(build, SkillType.SWORD, sword);
@@ -145,6 +146,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
                     .set(CHAMPIONS_BUILDS.PASSIVE_B, getSkillDatabaseValue(build.getPassiveB()))
                     .set(CHAMPIONS_BUILDS.GLOBAL, getSkillDatabaseValue(build.getGlobal()))
                     .set(CHAMPIONS_BUILDS.ACTIVE, build.isActive() ? 1 : 0)
+                    .set(CHAMPIONS_BUILDS.NAME, build.getName())
                     .onConflict(CHAMPIONS_BUILDS.CLIENT, CHAMPIONS_BUILDS.ROLE, CHAMPIONS_BUILDS.ID).doNothing()
                     .execute();
         }).exceptionally(ex -> {
@@ -170,6 +172,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
                     .set(CHAMPIONS_BUILDS.PASSIVE_B, getSkillDatabaseValue(build.getPassiveB()))
                     .set(CHAMPIONS_BUILDS.GLOBAL, getSkillDatabaseValue(build.getGlobal()))
                     .set(CHAMPIONS_BUILDS.ACTIVE, build.isActive() ? 1 : 0 )
+                    .set(CHAMPIONS_BUILDS.NAME, build.getName())
                     .onConflict(CHAMPIONS_BUILDS.CLIENT, CHAMPIONS_BUILDS.ROLE, CHAMPIONS_BUILDS.ID)
                     .doUpdate()
                     .set(CHAMPIONS_BUILDS.SWORD, getSkillDatabaseValue(build.getSwordSkill()))
@@ -179,6 +182,7 @@ public class BuildRepository implements IRepository<RoleBuild> {
                     .set(CHAMPIONS_BUILDS.PASSIVE_B, getSkillDatabaseValue(build.getPassiveB()))
                     .set(CHAMPIONS_BUILDS.GLOBAL, getSkillDatabaseValue(build.getGlobal()))
                     .set(CHAMPIONS_BUILDS.ACTIVE, build.isActive() ? 1 : 0)
+                    .set(CHAMPIONS_BUILDS.NAME, build.getName())
                     .execute();
 
             log.info("Saved build for {} role {}", build.getClientId(), build.getRole().getName()).submit();

@@ -1,0 +1,1 @@
+ALTER TABLE champions_builds ADD COLUMN IF NOT EXISTS name VARCHAR(16);

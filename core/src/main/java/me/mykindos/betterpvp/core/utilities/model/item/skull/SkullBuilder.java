@@ -1,48 +1,56 @@
 package me.mykindos.betterpvp.core.utilities.model.item.skull;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import lombok.CustomLog;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.profile.PlayerTextures;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.UUID;
 
-@CustomLog
+/**
+ * Builds a {@link Material#PLAYER_HEAD} carrying an arbitrary skin.
+ * <p>
+ * The profile is always given a stable UUID and the texture as a literal {@code textures} property rather than a
+ * skin URL on a blank profile: outgoing items are decoded and re-encoded by the packet remapper, and a profile
+ * with neither a UUID nor a resolvable name does not survive that round trip - the client renders a bare head.
+ */
 public class SkullBuilder {
+
+    private static final String TEXTURE_PREFIX = "{\"textures\":{\"SKIN\":{\"url\":\"";
+    private static final String TEXTURE_SUFFIX = "\"}}}";
 
     private final ItemStack itemStack;
 
+    /**
+     * @param texture either the base64 texture value or the {@code textures.minecraft.net} skin URL
+     */
     public SkullBuilder(String texture) {
-        PlayerProfile profile = Bukkit.createProfile(null, "a"); // Get a new player profile
-        PlayerTextures textures = profile.getTextures();
-        URL urlObject;
-        try {
-            urlObject = new URL(texture); // The URL to the skin, for example: https://textures.minecraft.net/texture/18813764b2abc94ec3c3bc67b9147c21be850cdf996679703157f4555997ea63a
-        } catch (MalformedURLException exception) {
-            String decoded = new String(Base64.getDecoder().decode(texture));
-            // We simply remove the "beginning" and "ending" part of the JSON, so we're left with only the URL. You could use a proper
-            // JSON parser for this, but that's not worth it. The String will always start exactly with this stuff anyway
-            final String url = decoded.substring("{\"textures\":{\"SKIN\":{\"url\":\"".length(), decoded.length() - "\"}}}".length());
-            try {
-                urlObject = new URL(url);
-            } catch (MalformedURLException e) {
-                log.error("Invalid skull texture URL: {}", url, e);
-                itemStack = new ItemStack(Material.PLAYER_HEAD);
-                return;
-            }
-        }
-        textures.setSkin(urlObject); // Set the skin of the player profile to the URL
-        profile.setTextures(textures); // Set the textures back to the profile
+        final String encoded = encode(texture);
+        // Derived from the texture so the same skin always resolves to the same profile, and two different
+        // skins never collide on one.
+        final UUID id = UUID.nameUUIDFromBytes(encoded.getBytes(StandardCharsets.UTF_8));
+
+        final PlayerProfile profile = Bukkit.createProfile(id, id.toString().replace("-", "").substring(0, 16));
+        profile.setProperty(new ProfileProperty("textures", encoded));
 
         itemStack = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(profile); // Set the owning player of the head to the player profile
+        final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+        meta.setPlayerProfile(profile);
         itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * @return the given texture as a base64 value, wrapping a bare skin URL into one
+     */
+    private static String encode(String texture) {
+        if (!texture.startsWith("http")) {
+            return texture;
+        }
+        return Base64.getEncoder().encodeToString((TEXTURE_PREFIX + texture + TEXTURE_SUFFIX).getBytes(StandardCharsets.UTF_8));
     }
 
     public ItemStack build() {

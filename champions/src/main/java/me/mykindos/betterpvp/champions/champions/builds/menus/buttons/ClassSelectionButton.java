@@ -1,123 +1,62 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
-import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
-import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
-import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
-import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
-import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
-import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
-import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
-import me.mykindos.betterpvp.champions.champions.skills.traits.Trait;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.button.FlashingButton;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * A class's helmet in the class selector. Clicking it makes the class the one the rest of the menu describes.
+ */
+public class ClassSelectionButton extends ControlItem<ClassSelectionMenu> {
 
+    private static final int DESCRIPTION_WIDTH = 35;
 
-public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
-
-    private final BuildManager buildManager;
     private final Role role;
-    private final double reduction;
-    private final RoleBuild roleBuild;
-    private final ChampionsSkillManager skillManager;
-    private final Windowed parent;
-    private final boolean shouldShowPassives;
 
-    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role,
-                                @Nullable RoleBuild roleBuild, Windowed parent, boolean shouldShowPassives) {
-        super();
-        this.buildManager = buildManager;
+    public ClassSelectionButton(Role role) {
         this.role = role;
-        this.skillManager = skillManager;
-        this.roleBuild = roleBuild;
-        this.parent = parent;
-        this.shouldShowPassives = shouldShowPassives;
-        if (roleBuild != null) {
-            if (roleBuild.getRole() == role) {
-                this.setFlashing(true);
-                this.setFlashPeriod(1000L);
-            }
-        }
-
-        this.reduction = role.getHealth();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        final GamerBuilds builds = buildManager.getObject(player.getUniqueId()).orElseThrow();
-        new BuildMenu(builds, role, buildManager, skillManager, roleBuild, parent).show(player);
+        if (!ClickActions.LEFT.accepts(clickType)) {
+            SoundEffect.WRONG_ACTION.play(player);
+            return;
+        }
+
+        if (getGui().getSelected() == role) {
+            return;
+        }
+
+        getGui().setSelected(role);
+        getGui().updateControlItems();
         SoundEffect.HIGH_PITCH_PLING.play(player);
     }
 
     @Override
     public ItemProvider getItemProvider(ClassSelectionMenu gui) {
-        final Component standardComponent = role.getDisplayName().color(role.getColor()).decorate(TextDecoration.BOLD);
-        final Component flashComponent = Component.empty().append(Translations.component("core.menu.button.click-me.name").color(NamedTextColor.GREEN)).appendSpace().append(standardComponent);
-
-        List<Component> roleLore = new ArrayList<>(List.of(
-                Component.empty()
-                        .append(Translations.component("champions.menu.class.health").color(NamedTextColor.GRAY))
-                        .appendSpace()
-                        .append(Component.text(UtilFormat.formatNumber(reduction), TextColor.color(255, 0, 0)))
-                        .appendSpace()
-                        .append(Component.text("❤", TextColor.color(255, 0, 0))),
-                Component.empty()
-        ));
-
-        final List<Trait> traits = skillManager.getTraitsForRole(role);
-        if (!traits.isEmpty()) {
-            for (Trait trait : traits) {
-                roleLore.add(Component.text("❖ ", NamedTextColor.LIGHT_PURPLE)
-                        .append(trait.getDisplayName().color(NamedTextColor.LIGHT_PURPLE))
-                        .append(Component.text(": ", NamedTextColor.GRAY))
-                        .append(trait.getSummary().color(NamedTextColor.GRAY)));
-            }
-            roleLore.add(Component.empty());
-        }
-
-        if (shouldShowPassives) {
-
-            // Use a default because not every role has a passive
-            ArrayList<RoleEffect> roleEffects = RoleManager.rolePassiveDescs.getOrDefault(role, null);
-            if (roleEffects == null) {
-                roleLore.add(Translations.component("champions.menu.class.no-effects").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD));
-                roleLore.add(Component.text(""));
-            } else {
-                roleLore.add(Translations.component("champions.menu.class.effects").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD));
-                for (RoleEffect roleEffect : roleEffects) {
-                    roleLore.add(Component.text("- ").append(roleEffect.getDescription()));
-                }
-                roleLore.add(Component.text(""));
-            }
-
-        }
-
-        roleLore.add(Translations.component("champions.menu.class.manage-builds").color(NamedTextColor.GRAY));
-
-        return ItemView.builder().material(role.getChestplate())
-                .displayName(this.isFlashing() ? flashComponent : standardComponent)
-                .lore(roleLore)
+        return ItemView.builder()
+                .material(role.getHelmet())
+                .displayName(role.getDisplayName().color(role.getColor()).decorate(TextDecoration.BOLD))
+                .lore(Component.empty())
+                .lore(ComponentWrapper.markForWrap(role.getSummaryComponent(), DESCRIPTION_WIDTH))
+                .action(ClickActions.LEFT, Translations.component("champions.menu.class.select"))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .glow(this.isFlash())
+                .glow(gui.getSelected() == role)
+                .hideAdditionalTooltip(true)
                 .build();
     }
 }

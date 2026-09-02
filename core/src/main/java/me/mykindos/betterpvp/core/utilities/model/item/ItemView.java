@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities.model.item;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
+import io.papermc.paper.datacomponent.item.DyedItemColor;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -48,6 +50,11 @@ public class ItemView implements ItemProvider {
     @Builder.Default boolean hideTooltip = false;
     @Builder.Default boolean hideAdditionalTooltip = false;
     @Nullable @Builder.Default @Range(from = 0, to = Integer.MAX_VALUE) Integer customModelData = null;
+    /**
+     * Tint applied through {@link DataComponentTypes#DYED_COLOR}. Any item can carry it, but it only shows on
+     * a model whose layer declares a {@code minecraft:dye} tint source.
+     */
+    @Nullable Color dyedColor;
     @Nullable Material fallbackMaterial;
     @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) int amount = 1;
     @Builder.Default @Range(from = -1, to = Integer.MAX_VALUE) Integer durability = 0;
@@ -180,6 +187,10 @@ public class ItemView implements ItemProvider {
 
         if (customModelData != null) {
             itemStack.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addFloat(customModelData).build());
+        }
+
+        if (dyedColor != null) {
+            itemStack.setData(DataComponentTypes.DYED_COLOR, DyedItemColor.dyedItemColor(dyedColor));
         }
 
         if (maxStackSize != null && maxStackSize > 0) {

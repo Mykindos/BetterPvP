@@ -1,166 +1,170 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.SkillButton;
+import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.SkillTabButton;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.traits.Trait;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
-import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+
+/**
+ * The build editor. One skill slot is open at a time: the six tabs down the left and bottom choose which,
+ * and the grid on the right lists every skill the class has for it.
+ */
 public class SkillMenu extends AbstractGui implements Windowed {
 
-    private final RoleBuild roleBuild;
-    private final RoleBuild promptBuild;
-    private final BuildManager buildManager;
+    /*
+    Menu slots look like this:
 
-    public SkillMenu(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous, RoleBuild promptBuild) {
+    # # # # # # # # #  (0-8)
+    h # # l # s s s s  (9-17)
+    c # # b # s s s s  (18-26)
+    # # # # # # # # #  (27-35)
+    S # # B # # # # #  (36-44)
+    # A a b g # # # <  (45-53)
+
+    h/c/l/b: the armour the player is wearing, s: the skills of the open tab,
+    S/A/a/b/g/B: the sword, axe, passive A, passive B, global and bow tabs, <: the back button
+     */
+    private static final int[] SKILL_SLOTS = {14, 15, 16, 17, 23, 24, 25, 26};
+    private static final int BACK_SLOT = 53;
+    private static final int[] TAB_SLOTS = {36, 45, 46, 47, 48, 39};
+    private static final SkillType[] TABS = {SkillType.SWORD, SkillType.AXE, SkillType.PASSIVE_A,
+            SkillType.PASSIVE_B, SkillType.GLOBAL, SkillType.BOW};
+
+    private static final Map<EquipmentSlot, Integer> ARMOUR_SLOTS = Map.of(
+            EquipmentSlot.HEAD, 9,
+            EquipmentSlot.CHEST, 18,
+            EquipmentSlot.LEGS, 12,
+            EquipmentSlot.FEET, 21);
+
+    /**
+     * The slot label each armour piece takes its placeholder name from.
+     */
+    private static final Map<EquipmentSlot, String> ARMOUR_LABELS = Map.of(
+            EquipmentSlot.HEAD, "helmet",
+            EquipmentSlot.CHEST, "chestplate",
+            EquipmentSlot.LEGS, "leggings",
+            EquipmentSlot.FEET, "boots");
+
+    @Getter
+    private final RoleBuild roleBuild;
+    private final BuildManager buildManager;
+    private final Map<SkillType, List<Skill>> skills;
+    @Nullable
+    private final Windowed previous;
+
+    /**
+     * The slot the grid is currently listing. Every tab and grid item reads from this, so switching tabs
+     * re-renders the menu rather than reopening it.
+     */
+    @Getter
+    @Setter
+    private SkillType selectedTab = SkillType.SWORD;
+
+    /**
+     * @param player       the player the menu is being opened for
+     * @param builds       the builds of that player
+     * @param role         the role the build belongs to
+     * @param build        the one-indexed build id
+     * @param buildManager the BuildManager, used to persist the build on close
+     * @param skillManager the champions SkillManager
+     * @param previous     the window the back button returns to. Null closes the menu instead
+     * @param promptBuild  the optional build the player is being prompted to create. Null if empty
+     */
+    public SkillMenu(Player player, GamerBuilds builds, Role role, int build, BuildManager buildManager,
+                     ChampionsSkillManager skillManager, @Nullable Windowed previous, @Nullable RoleBuild promptBuild) {
         super(9, 6);
-        this.promptBuild = promptBuild;
         this.roleBuild = builds.getBuilds().stream().filter(b -> b.getRole() == role && b.getId() == build).findFirst().orElseThrow();
         this.buildManager = buildManager;
+        this.previous = previous;
+        this.skills = skillManager.getSkillsForRole(role).stream()
+                .filter(skill -> skill.getType() != null)
+                .filter(Skill::isEnabled)
+                .sorted(Comparator.comparing(Skill::getName))
+                .collect(Collectors.groupingBy(Skill::getType));
 
-        BackButton backButton = new BackButton(previous);
-        if (promptBuild != null) {
-            if (promptBuild.getRole() != role || promptBuild.getId() != build) {
-                backButton.setFlashing(true);
-            }
+        ARMOUR_SLOTS.forEach((equipmentSlot, slot) -> setItem(slot, armourItem(player, role, equipmentSlot)));
+
+        for (int index = 0; index < TAB_SLOTS.length; index++) {
+            setItem(TAB_SLOTS[index], new SkillTabButton(TABS[index], roleBuild));
         }
 
-        setItem(((this.getWidth() * this.getHeight()) - 1), backButton);
-
-        // Indicator items
-        setItem(0, getSkillType(Material.IRON_SWORD, "Sword Skills"));
-        setItem(9, getSkillType(Material.IRON_AXE, "Axe Skills"));
-        setItem(18, getSkillType(Material.BOW, "Bow Skills"));
-        setItem(27, getSkillType(Material.RED_DYE, "Class Passive A Skills"));
-        setItem(36, getSkillType(Material.ORANGE_DYE, "Class Passive B Skills"));
-        setItem(45, getSkillType(Material.YELLOW_DYE, "Global Passive Skills"));
-
-
-            setItem(8, new ControlItem<SkillMenu>() {
-                @Override
-                public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-                    // ignored
-                }
-
-                @Override
-                public ItemProvider getItemProvider(SkillMenu gui) {
-                    if(roleBuild.getPoints() == 0) {
-                        return ItemView.builder()
-                                .material(Material.BARRIER)
-                                .displayName(Translations.component("champions.menu.skill.no-points").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
-                                .build();
-                    }
-
-                    return ItemView.builder()
-                            .material(Material.NETHER_STAR)
-                            .amount(roleBuild.getPoints())
-                            .displayName(Translations.component("champions.menu.skill.points-remaining", Component.text(roleBuild.getPoints())).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
-                            .build();
-                }
-            });
-
-
-        // Traits sit beneath the skill point counter, in the same column, since they are what the role gives
-        // the player for free rather than something they spend points on.
-        int traitSlotNumber = 17;
-        for (Trait trait : skillManager.getTraitsForRole(role)) {
-            if (traitSlotNumber > 44) break;
-            setItem(traitSlotNumber, getTrait(trait));
-            traitSlotNumber += 9;
+        for (int index = 0; index < SKILL_SLOTS.length; index++) {
+            setItem(SKILL_SLOTS[index], new SkillButton(index, roleBuild, promptBuild));
         }
 
-        int slotNumber = 0;
-        int swordSlotNumber = 1;
-        int axeSlotNumber = 10;
-        int bowSlotNumber = 19;
-        int passiveASlotNumber = 28;
-        int passiveBSlotNumber = 37;
-        int globalSlotNumber = 46;
-
-        for (Skill skill : skillManager.getSkillsForRole(role)) {
-            if (skill == null) continue;
-            if (skill.getType() == null) continue;
-            if (!skill.isEnabled()) continue;
-            if (skill.getType() == SkillType.SWORD) {
-                slotNumber = swordSlotNumber;
-                swordSlotNumber++;
-            } else if (skill.getType() == SkillType.AXE) {
-                slotNumber = axeSlotNumber;
-                axeSlotNumber++;
-            } else if (skill.getType() == SkillType.BOW) {
-                slotNumber = bowSlotNumber;
-                bowSlotNumber++;
-            } else if (skill.getType() == SkillType.PASSIVE_A) {
-                slotNumber = passiveASlotNumber;
-                passiveASlotNumber++;
-            } else if (skill.getType() == SkillType.PASSIVE_B) {
-                slotNumber = passiveBSlotNumber;
-                passiveBSlotNumber++;
-            } else if (skill.getType() == SkillType.GLOBAL) {
-                slotNumber = globalSlotNumber;
-                globalSlotNumber++;
-            }
-
-
-            setItem(slotNumber, new SkillButton(skill, roleBuild, promptBuild));
-        }
-
-        setBackground(Menu.BACKGROUND_ITEM);
+        setItem(BACK_SLOT, new BackButton(previous, Key.key("betterpvp", "menu/icon/shadowed/cross_icon"), null));
     }
 
-    private static SimpleItem getTrait(Trait trait) {
-        List<Component> lore = new ArrayList<>();
-        lore.add(Translations.component("champions.menu.trait.innate").color(NamedTextColor.LIGHT_PURPLE));
-        lore.add(Component.empty());
-        Arrays.stream(trait.getDescription(trait.getTraitLevel()))
-                .map(line -> line.colorIfAbsent(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
-                .forEach(lore::add);
-
-        final ItemView.ItemViewBuilder builder = ItemView.builder()
-                .material(trait.getIcon())
-                .displayName(trait.getDisplayName().color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD))
-                .lore(lore)
-                .flag(ItemFlag.HIDE_ATTRIBUTES);
-
-        if (trait.getTags() != null) {
-            builder.prelore(trait.getTags());
-        }
-
-        return builder.hideAdditionalTooltip(true).frameLore(true).build().toSimpleItem();
+    /**
+     * The skills this class can put into the given slot, in the order they are laid out in the grid.
+     *
+     * @param type the skill slot
+     * @return the skills for that slot, empty if the class has none
+     */
+    public List<Skill> getSkills(SkillType type) {
+        return skills.getOrDefault(type, List.of());
     }
 
-    private static SimpleItem getSkillType(Material material, String name) {
+    /**
+     * The skill occupying a grid position for the open tab.
+     *
+     * @param index the position in the grid
+     * @return the skill there, or null if the tab has fewer skills than that
+     */
+    @Nullable
+    public Skill getSkill(int index) {
+        final List<Skill> open = getSkills(selectedTab);
+        return index < open.size() ? open.get(index) : null;
+    }
+
+    /**
+     * The armour the player is actually wearing, so the build reads against their real kit. A piece that is
+     * not the class's own stands in as the plain class piece instead.
+     */
+    private static SimpleItem armourItem(Player player, Role role, EquipmentSlot equipmentSlot) {
+        final Material material = role.getMaterial(equipmentSlot);
+        final ItemStack worn = player.getInventory().getItem(equipmentSlot);
+        if (worn != null && worn.getType() == material) {
+            return new SimpleItem(worn.clone());
+        }
+
+        final Component name = Translations.component("champions.menu.build.armor." + ARMOUR_LABELS.get(equipmentSlot),
+                role.getDisplayName());
         return ItemView.builder()
                 .material(material)
-                .displayName(Component.text(name, NamedTextColor.GREEN, TextDecoration.BOLD))
+                .displayName(name.color(role.getColor()).decorate(TextDecoration.BOLD))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build()
                 .toSimpleItem();
@@ -169,13 +173,15 @@ public class SkillMenu extends AbstractGui implements Windowed {
     @Override
     public Window show(@NonNull Player player) {
         final Window window = Windowed.super.show(player);
-        window.addCloseHandler(() -> buildManager.getBuildRepository().update(roleBuild));
+        window.addCloseHandler(() -> {
+            buildManager.getBuildRepository().update(roleBuild);
+        });
         return window;
     }
 
     @NotNull
     @Override
     public Component getTitle() {
-        return Translations.component("champions.menu.skill.title");
+        return Component.text("<shift:-38><glyph:menu_build_editor_0><shift:-1><glyph:menu_build_editor_1>").font(NEXO);
     }
 }

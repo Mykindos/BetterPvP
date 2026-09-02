@@ -20,7 +20,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -62,11 +61,6 @@ public class SoulHarvest extends Trait implements PassiveSkill, BuffSkill, Healt
     @Override
     public @NotNull Role getClassType() {
         return Role.WARLOCK;
-    }
-
-    @Override
-    public Material getIcon() {
-        return Material.SOUL_LANTERN;
     }
 
     @EventHandler

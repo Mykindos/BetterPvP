@@ -5,7 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
+import me.mykindos.betterpvp.champions.combat.RoleBowService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -22,11 +24,16 @@ public class PromptBuildCommand extends Command {
 
     private final BuildManager buildManager;
     private final ChampionsSkillManager championsSkillManager;
+    private final RoleManager roleManager;
+    private final RoleBowService roleBowService;
 
     @Inject
-    public PromptBuildCommand(BuildManager buildManager, ChampionsSkillManager championsSkillManager) {
+    public PromptBuildCommand(BuildManager buildManager, ChampionsSkillManager championsSkillManager,
+                              RoleManager roleManager, RoleBowService roleBowService) {
         this.buildManager = buildManager;
         this.championsSkillManager = championsSkillManager;
+        this.roleManager = roleManager;
+        this.roleBowService = roleBowService;
     }
 
     @Override
@@ -51,7 +58,7 @@ public class PromptBuildCommand extends Command {
 
         }
         RoleBuild promptBuild = buildManager.getRandomBuild(player, role, 4);
-        new ClassSelectionMenu(buildManager, championsSkillManager, promptBuild, false).show(player);
+        new ClassSelectionMenu(player, buildManager, championsSkillManager, roleManager, roleBowService, promptBuild).show(player);
     }
 
     @Override

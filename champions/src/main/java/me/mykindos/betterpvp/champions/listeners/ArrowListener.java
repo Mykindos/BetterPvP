@@ -5,8 +5,12 @@ import com.google.inject.Singleton;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.UseCooldown;
 import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.combat.BowChargeTracker;
+import me.mykindos.betterpvp.champions.combat.RoleBowService;
+import me.mykindos.betterpvp.core.combat.CombatFeaturesService;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -29,9 +33,9 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Baseline projectile behaviour for bows and crossbows: a flat configured damage scaled by draw
+ * Baseline projectile behaviour for bows and crossbows: the shooter's configured bow damage scaled by draw
  * strength, no damage delay, arrows that never linger long enough to hit twice, and a rate limit on
- * crossbows. Roles and skills layer on top of this.
+ * crossbows. Skills layer on top of this.
  */
 @Singleton
 @BPvPListener
@@ -43,10 +47,6 @@ public class ArrowListener implements Listener {
      * on the default group would lock those too.
      */
     private static final Key CROSSBOW_COOLDOWN_GROUP = Key.key("betterpvp", "vanilla_crossbow");
-
-    @Inject
-    @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
-    private double baseArrowDamage;
 
     @Inject
     @Config(path = "combat.crit-arrows", defaultValue = "false")
@@ -67,12 +67,20 @@ public class ArrowListener implements Listener {
     private final Champions champions;
     private final BowChargeTracker bowChargeTracker;
     private final ItemFactory itemFactory;
+    private final RoleBowService roleBowService;
+    private final RoleManager roleManager;
+    private final CombatFeaturesService combatFeaturesService;
 
     @Inject
-    public ArrowListener(Champions champions, BowChargeTracker bowChargeTracker, ItemFactory itemFactory) {
+    public ArrowListener(Champions champions, BowChargeTracker bowChargeTracker, ItemFactory itemFactory,
+                         RoleBowService roleBowService, RoleManager roleManager,
+                         CombatFeaturesService combatFeaturesService) {
         this.champions = champions;
         this.bowChargeTracker = bowChargeTracker;
         this.itemFactory = itemFactory;
+        this.roleBowService = roleBowService;
+        this.roleManager = roleManager;
+        this.combatFeaturesService = combatFeaturesService;
     }
 
     /**
@@ -165,8 +173,8 @@ public class ArrowListener implements Listener {
     }
 
     /**
-     * Replaces vanilla's velocity-derived arrow damage with our flat base damage, scaled by how far the
-     * bow was drawn. The flat damage and the charge scaling must be applied together in one handler -
+     * Replaces vanilla's velocity-derived arrow damage with the shooter's flat bow damage, scaled by how far
+     * the bow was drawn. The flat damage and the charge scaling must be applied together in one handler -
      * handlers at the same priority run in an order the JVM does not define, so splitting them lets the
      * flat damage land after the scaling and wipe it.
      * <p>
@@ -178,9 +186,23 @@ public class ArrowListener implements Listener {
         AbstractArrow arrow = asArrow(event.getProjectile());
         if (arrow == null) return;
 
-        event.setDamage(baseArrowDamage * bowChargeTracker.getCharge(arrow));
+        event.setDamage(roleBowService.getArrowDamage(shooterRole(arrow)) * bowChargeTracker.getCharge(arrow));
         event.setCritical(critArrowsEnabled && arrow.isCritical());
         event.setDamageDelay(0);
+    }
+
+    /**
+     * The class the arrow was loosed by, or null if it was not loosed by a player playing one. A player whose
+     * champions features are switched off shoots the base arrow rather than their class's, the same as
+     * anything else on the server that draws a bow.
+     */
+    @Nullable
+    private Role shooterRole(AbstractArrow arrow) {
+        if (!(arrow.getShooter() instanceof Player shooter) || !combatFeaturesService.isActive(shooter)) {
+            return null;
+        }
+
+        return roleManager.getRole(shooter).orElse(null);
     }
 
     /**

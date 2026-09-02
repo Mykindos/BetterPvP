@@ -10,8 +10,7 @@ class:
       enabled: true
       isBuff: false
     bow:
-      arrowDamage: 0.0
-      overrideArrowDamage: true
+      arrowDamage: 4.0
       onlyWhilePrepared: true
 chat:
   skill:

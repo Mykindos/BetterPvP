@@ -159,18 +159,18 @@ public class RoleManager {
             return;
         }
 
-        switch (role.get()) {
-            case RANGER, ASSASSIN -> {
-                if (!humanEntity.getInventory().contains(Material.BOW)) {
-                    humanEntity.getInventory().addItem(getItem(Material.BOW));
-                }
-
-                final ItemStack arrow = new ItemStack(Material.ARROW);
-                final ItemStack arrowItem = getItem(arrow);
-                arrowItem.setAmount(role.get() == Role.RANGER ? 64 : 32);
-                humanEntity.getInventory().addItem(arrowItem);
-            }
+        if (!role.get().isUsesBow()) {
+            return;
         }
+
+        if (!humanEntity.getInventory().contains(Material.BOW)) {
+            humanEntity.getInventory().addItem(getItem(Material.BOW));
+        }
+
+        final ItemStack arrow = new ItemStack(Material.ARROW);
+        final ItemStack arrowItem = getItem(arrow);
+        arrowItem.setAmount(role.get() == Role.RANGER ? 64 : 32);
+        humanEntity.getInventory().addItem(arrowItem);
     }
 
     private boolean setRole(@NotNull LivingEntity livingEntity, @Nullable Role role, @NotNull RoleChangeCause cause) {

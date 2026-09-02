@@ -4,12 +4,9 @@
 package me.mykindos.betterpvp.champions.database.jooq.tables;
 
 
-import java.util.Collection;
-
 import me.mykindos.betterpvp.champions.database.jooq.Keys;
 import me.mykindos.betterpvp.champions.database.jooq.Public;
 import me.mykindos.betterpvp.champions.database.jooq.tables.records.ChampionsBuildsRecord;
-
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Name;
@@ -26,6 +23,8 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
+
+import java.util.Collection;
 
 
 /**
@@ -98,6 +97,11 @@ public class ChampionsBuilds extends TableImpl<ChampionsBuildsRecord> {
      * The column <code>public.champions_builds.active</code>.
      */
     public final TableField<ChampionsBuildsRecord, Integer> ACTIVE = createField(DSL.name("active"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>public.champions_builds.name</code>.
+     */
+    public final TableField<ChampionsBuildsRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(16), this, "");
 
     private ChampionsBuilds(Name alias, Table<ChampionsBuildsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

@@ -25,6 +25,11 @@ public class RoleBuild {
     private final int id;
 
     private boolean active;
+    /**
+     * The player-chosen name for this build, or null while it is still unnamed.
+     */
+    @Nullable
+    private String name;
     @Nullable
     private BuildSkill swordSkill;
     @Nullable
@@ -205,6 +210,7 @@ public class RoleBuild {
 
     public RoleBuild copy() {
         RoleBuild other = new RoleBuild(clientId, clientUUID, role, id);
+        other.setName(getName());
         other.setSwordSkill(getSwordSkill() != null ? getSwordSkill().copy() : null);
         other.setAxeSkill(getAxeSkill() != null ? getAxeSkill().copy() : null);
         other.setBow(getBow() != null ? getBow().copy() : null);

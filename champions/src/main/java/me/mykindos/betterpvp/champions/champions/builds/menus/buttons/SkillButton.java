@@ -30,26 +30,35 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
+/**
+ * One position in the build editor's skill grid. The grid lists whichever slot's tab is open, so the button
+ * resolves its skill from the menu on every render and every click rather than holding one.
+ */
 public class SkillButton extends FlashingButton<SkillMenu> {
 
-    private final Skill skill;
+    private final int index;
     private final RoleBuild roleBuild;
     private final RoleBuild promptBuild;
 
     /**
-     *
-     * @param skill
-     * @param roleBuild
+     * @param index       the position of this button in the grid
+     * @param roleBuild   the build being edited
      * @param promptBuild The optional rolebuild to prompt the player to create. Null if empty
      */
-    public SkillButton(Skill skill, RoleBuild roleBuild, @Nullable RoleBuild promptBuild) {
-        this.skill = skill;
+    public SkillButton(int index, RoleBuild roleBuild, @Nullable RoleBuild promptBuild) {
+        this.index = index;
         this.roleBuild = roleBuild;
         this.promptBuild = promptBuild;
     }
 
     @Override
     public ItemProvider getItemProvider(SkillMenu gui) {
+        final Skill skill = gui.getSkill(index);
+        if (skill == null) {
+            setFlashing(false);
+            return empty();
+        }
+
         BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());
         int level = buildSkill != null && buildSkill.getSkill() == skill ? buildSkill.getLevel() : 0;
         int displayLevel = Math.max(1, level);
@@ -63,13 +72,13 @@ public class SkillButton extends FlashingButton<SkillMenu> {
                 .decoration(TextDecoration.ITALIC, false)).toList());
 
         // if this is the correct role/build, configure flashing and desired level
-        int desiredLevel = configurePromptState(builder);
+        int desiredLevel = configurePromptState(builder, skill);
 
-        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(this.skill));
+        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(skill));
         if (active) {
-            buildActiveItem(builder, displayLevel, desiredLevel);
+            buildActiveItem(builder, skill, displayLevel, desiredLevel);
         } else {
-            buildInactiveItem(builder, desiredLevel);
+            buildInactiveItem(builder, skill, desiredLevel);
         }
 
         if (displayLevel < skill.getMaxLevel()) {
@@ -83,7 +92,19 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         return builder.hideAdditionalTooltip(true).frameLore(true).build();
     }
 
-    private int configurePromptState(ItemView.ItemViewBuilder builder) {
+    /**
+     * The placeholder for a grid position the open tab has no skill for.
+     */
+    private static ItemView empty() {
+        return ItemView.builder()
+                .material(Material.PAPER)
+                .itemModel(Key.key("betterpvp", "menu/gui/classes/empty_skill"))
+                .displayName(Translations.component("champions.menu.skill.empty-slot").color(NamedTextColor.DARK_GRAY))
+                .hideAdditionalTooltip(true)
+                .build();
+    }
+
+    private int configurePromptState(ItemView.ItemViewBuilder builder, Skill skill) {
         // return immediately if this is not the prompted role/build context
         if (promptBuild == null || promptBuild.getRole() != roleBuild.getRole()) {
             return 0;
@@ -94,15 +115,15 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             return 0;
         }
 
-        BuildSkill promptBuildSkill = promptBuild.getBuildSkill(this.skill.getType());
-        BuildSkill currentBuildSkill = roleBuild.getBuildSkill(this.skill.getType());
+        BuildSkill promptBuildSkill = promptBuild.getBuildSkill(skill.getType());
+        BuildSkill currentBuildSkill = roleBuild.getBuildSkill(skill.getType());
 
-        if (roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(this.skill))) {
+        if (roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(skill))) {
             return configureDesiredPromptSkill(promptBuildSkill, currentBuildSkill);
         }
 
         // we don't want this skill, flash if we currently have it
-        this.setFlashing(currentBuildSkill != null && currentBuildSkill.getSkill().equals(this.skill));
+        this.setFlashing(currentBuildSkill != null && currentBuildSkill.getSkill().equals(skill));
         return 0;
     }
 
@@ -117,8 +138,8 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         return promptBuildSkill.getLevel();
     }
 
-    private void buildActiveItem(ItemView.ItemViewBuilder builder, int displayLevel, int desiredLevel) {
-        builder.material(Material.PAPER).itemModel(Key.key("minecraft", "written_book"));
+    private void buildActiveItem(ItemView.ItemViewBuilder builder, Skill skill, int displayLevel, int desiredLevel) {
+        builder.material(Material.PAPER).itemModel(skill.getIcon());
         builder.glow(true);
         builder.amount(displayLevel);
 
@@ -135,8 +156,8 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         builder.displayName(isFlashing() ? flashingComponent : standardComponent);
     }
 
-    private void buildInactiveItem(ItemView.ItemViewBuilder builder, int desiredLevel) {
-        builder.material(Material.PAPER).itemModel(Key.key("minecraft", "book"));
+    private void buildInactiveItem(ItemView.ItemViewBuilder builder, Skill skill, int desiredLevel) {
+        builder.material(Material.PAPER).itemModel(skill.getIcon());
 
         Component standardComponent = skill.getDisplayName().color(NamedTextColor.RED);
         Component flashingComponent = Component.empty()
@@ -150,6 +171,12 @@ public class SkillButton extends FlashingButton<SkillMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (clickType == ClickType.DOUBLE_CLICK) return;
+
+        final Skill skill = getGui().getSkill(index);
+        if (skill == null) {
+            return;
+        }
+
         RoleBuild previous = roleBuild.copy();
 
         BuildSkill buildSkill = roleBuild.getBuildSkill(skill.getType());

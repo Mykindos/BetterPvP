@@ -12,7 +12,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,13 +44,6 @@ public abstract class Trait extends Skill {
      */
     @Override
     public abstract @NotNull Role getClassType();
-
-    /**
-     * The material used for this trait's icon in the build editor.
-     *
-     * @return the icon material
-     */
-    public abstract Material getIcon();
 
     /**
      * A single short line describing this trait, shown under the role's health in the role selector. Keep it

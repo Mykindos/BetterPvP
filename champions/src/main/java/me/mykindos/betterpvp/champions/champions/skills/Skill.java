@@ -39,6 +39,7 @@ import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
@@ -212,6 +213,21 @@ public abstract class Skill implements IChampionsSkill {
         final String classPart = getClassType() != null ? getClassType().name().toLowerCase() : "global";
         final String skillPart = getName().toLowerCase().replace(" ", "-");
         return Translations.component("champions.skill." + classPart + "." + skillPart + ".name");
+    }
+
+    /**
+     * The item model this skill is drawn with in menus, derived from {@link #getName()} so that no skill
+     * needs an override: {@code "Excessive Force"} resolves to
+     * {@code betterpvp:menu/gui/classes/skills/excessive_force}. The resource pack carries a model for
+     * every skill, with unmatched ones pointing at the blank skill slot.
+     *
+     * @return the item model key for this skill's icon
+     */
+    public Key getIcon() {
+        final String iconName = getName().toLowerCase()
+                .replaceAll("[^a-z0-9]+", "_")
+                .replaceAll("^_+|_+$", "");
+        return Key.key("betterpvp", "menu/gui/classes/skills/" + iconName);
     }
 
     @Override

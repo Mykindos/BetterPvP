@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -50,11 +49,6 @@ public class Resilience extends Trait implements PassiveSkill, BuffSkill, Defens
     @Override
     public @NotNull Role getClassType() {
         return Role.KNIGHT;
-    }
-
-    @Override
-    public Material getIcon() {
-        return Material.SHIELD;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

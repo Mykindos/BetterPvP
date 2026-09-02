@@ -168,6 +168,21 @@ public class ChampionsBuildsRecord extends UpdatableRecordImpl<ChampionsBuildsRe
         return (Integer) get(9);
     }
 
+    /**
+     * Setter for <code>public.champions_builds.name</code>.
+     */
+    public ChampionsBuildsRecord setName(String value) {
+        set(10, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.champions_builds.name</code>.
+     */
+    public String getName() {
+        return (String) get(10);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -191,7 +206,7 @@ public class ChampionsBuildsRecord extends UpdatableRecordImpl<ChampionsBuildsRe
     /**
      * Create a detached, initialised ChampionsBuildsRecord
      */
-    public ChampionsBuildsRecord(Long client, String role, Integer id, String sword, String axe, String bow, String passiveA, String passiveB, String global, Integer active) {
+    public ChampionsBuildsRecord(Long client, String role, Integer id, String sword, String axe, String bow, String passiveA, String passiveB, String global, Integer active, String name) {
         super(ChampionsBuilds.CHAMPIONS_BUILDS);
 
         setClient(client);
@@ -204,6 +219,7 @@ public class ChampionsBuildsRecord extends UpdatableRecordImpl<ChampionsBuildsRe
         setPassiveB(passiveB);
         setGlobal(global);
         setActive(active);
+        setName(name);
         resetChangedOnNotNull();
     }
 }
