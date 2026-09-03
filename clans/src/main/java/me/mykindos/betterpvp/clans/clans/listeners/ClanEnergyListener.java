@@ -36,6 +36,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -207,6 +208,10 @@ public class ClanEnergyListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreakEnergyOutsideOfFields(BlockBreakEvent event) {
+        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+            return;
+        }
+
         if (event.getBlock().getType().name().contains("AMETHYST_BUD") || event.getBlock().getType() == Material.AMETHYST_CLUSTER) {
 
             if (!clanManager.isFields(event.getPlayer().getLocation())) {
@@ -247,6 +252,10 @@ public class ClanEnergyListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreakBlock(BlockBreakEvent event) {
+        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+            return;
+        }
+
         if(!blockTagManager.isPlayerPlaced(event.getBlock())){
             if (UtilMath.RANDOM.nextDouble() > 0.8) {
                 ItemStack energyItem = EnergyItem.SHARD.generateItem(2, true);
