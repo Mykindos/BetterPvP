@@ -13,6 +13,10 @@ import org.jetbrains.annotations.Nullable;
  * profession gate, the loot table, and respawn timing. The archetype-specific block (e.g. {@code tree:}, {@code ore:},
  * {@code fishing:}) is exposed verbatim via {@link #getArchetypeSection()} so each archetype reads its own knobs.
  * <p>
+ * {@code fixedSpeed} pins every player's mining speed inside the node to one value, in the block-break framework's
+ * scaled units, so a starter pickaxe and a netherite one break the same block in the same time. Omit it (or leave it at
+ * zero) and the node mines at whatever the held tool resolves to.
+ * <p>
  * {@code respawn} is either a delay in seconds ({@link #getRespawnSeconds()}) or the sentinel {@code none}/{@code
  * never} (case-insensitive), which marks the node {@link #isOneShot()} — harvested once and never restored. Each
  * archetype is responsible for early-outing its own respawn logic when {@link #isOneShot()} is set.
@@ -32,12 +36,13 @@ public final class ResourceNodeDefinition {
     private final @Nullable String lootTable;
     private final double respawnSeconds;
     private final boolean oneShot;
+    private final int fixedSpeed;
     private final ConfigurationSection root;
 
     private ResourceNodeDefinition(String id, String archetype, @Nullable String matchName,
                                    @Nullable String profession, int level, String displayName,
                                    @Nullable String lootTable, double respawnSeconds, boolean oneShot,
-                                   ConfigurationSection root) {
+                                   int fixedSpeed, ConfigurationSection root) {
         this.id = id;
         this.archetype = archetype;
         this.matchName = matchName;
@@ -47,7 +52,15 @@ public final class ResourceNodeDefinition {
         this.lootTable = lootTable;
         this.respawnSeconds = respawnSeconds;
         this.oneShot = oneShot;
+        this.fixedSpeed = fixedSpeed;
         this.root = root;
+    }
+
+    /**
+     * @return whether this node pins mining speed for everyone inside it
+     */
+    public boolean hasFixedSpeed() {
+        return fixedSpeed > 0;
     }
 
     /**
@@ -85,6 +98,7 @@ public final class ResourceNodeDefinition {
                 config.getString("lootTable"),
                 respawn.getSeconds(),
                 respawn.isOneShot(),
+                Math.max(0, config.getInt("fixedSpeed", 0)),
                 config);
     }
 

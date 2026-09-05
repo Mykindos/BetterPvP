@@ -11,7 +11,9 @@ import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.ZoneProvider;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +29,9 @@ import java.util.stream.Stream;
  * O(1) chunk-PDC lookup ({@link ClanManager#getClanByChunk}) and returns that clan's territory {@link Zone}. The chunk
  * PDC remains the runtime source of truth; this provider simply exposes it through the zone framework, so
  * {@code zoneManager.getZoneAt(location)} and the player enter/exit events now cover clan land.
+ * <p>
+ * The zone also carries the {@link me.mykindos.betterpvp.core.world.zone.ZoneGameMode game mode} its land is played
+ * in, so the enforcement tick asks the zone rather than re-deriving clan membership itself.
  * <p>
  * Per-clan zones are built lazily and cached by clan id; the cache is evicted on disband. The zone's bounds delegate to
  * the live clan, so claiming/unclaiming needs no zone rebuild. Territory protection is enforced by handling
@@ -68,7 +73,24 @@ public class ClanZoneProvider implements ZoneProvider, Listener {
                 .bounds(new ClanTerritoryBounds(clan))
                 .priority(ClanZones.CLAN_TERRITORY_PRIORITY)
                 .tag(ClanZones.TERRITORY)
+                .gameMode(player -> gameModeIn(clan, player))
                 .build());
+    }
+
+    /**
+     * Who gets to play survival on a clan's land: its own members, and anyone in a clan actively pillaging it.
+     * Everybody else is a visitor and stays in adventure, which is what stops a stranger digging into a base the
+     * territory rules would have denied anyway.
+     */
+    private @NotNull GameMode gameModeIn(@NotNull Clan clan, @NotNull Player player) {
+        final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+        if (playerClan == null) {
+            return GameMode.ADVENTURE;
+        }
+        if (clan.equals(playerClan) || clanManager.getPillageHandler().isPillaging(playerClan, clan)) {
+            return GameMode.SURVIVAL;
+        }
+        return GameMode.ADVENTURE;
     }
 
     @EventHandler

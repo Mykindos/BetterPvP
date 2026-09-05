@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.world.zone.ZoneInteractEvent;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import net.kyori.adventure.key.Key;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -60,6 +59,19 @@ public class ResourceNodeManager implements Listener {
 
     public void clear() {
         byZoneKey.clear();
+    }
+
+    /** @return every currently loaded node, for services that sweep across all of them rather than react to one */
+    public @NotNull java.util.Collection<ResourceNodeProp> nodes() {
+        return byZoneKey.values();
+    }
+
+    /**
+     * @param zoneKey a zone's key
+     * @return the node gated by that zone, or null if the zone is not a resource node's
+     */
+    public @Nullable ResourceNodeProp byZone(@NotNull Key zoneKey) {
+        return byZoneKey.get(zoneKey);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

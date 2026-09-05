@@ -20,12 +20,14 @@ import java.util.Optional;
 public final class DegradeChain {
 
     private final List<Stage> stages;
+    private final boolean showTimer;
 
-    private DegradeChain(@NotNull List<Stage> stages) {
+    private DegradeChain(@NotNull List<Stage> stages, boolean showTimer) {
         if (stages.isEmpty()) {
             throw new IllegalArgumentException("A degrade chain needs at least one stage");
         }
         this.stages = List.copyOf(stages);
+        this.showTimer = showTimer;
     }
 
     /**
@@ -33,11 +35,24 @@ public final class DegradeChain {
      * {@code chain} config form)
      */
     public static @NotNull DegradeChain ofMaterials(@NotNull List<String> materials) {
-        return new DegradeChain(materials.stream().map(material -> new Stage(material, null, false)).toList());
+        return of(materials.stream().map(material -> new Stage(material, null, false)).toList());
     }
 
     public static @NotNull DegradeChain of(@NotNull List<Stage> stages) {
-        return new DegradeChain(stages);
+        return new DegradeChain(stages, true);
+    }
+
+    public static @NotNull DegradeChain of(@NotNull List<Stage> stages, boolean showTimer) {
+        return new DegradeChain(stages, showTimer);
+    }
+
+    /**
+     * Whether a point of this chain announces its remaining respawn on a floating timer while it is depleted. On by
+     * default; turned off for chains whose regrowth is not worth telling anyone about, so a busy field does not become
+     * a wall of countdowns.
+     */
+    public boolean showTimer() {
+        return showTimer;
     }
 
     /**

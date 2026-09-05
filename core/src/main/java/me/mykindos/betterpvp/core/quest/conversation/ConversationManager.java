@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.quest.primitive.QuestPrimitiveHandlers;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -90,6 +91,23 @@ public class ConversationManager {
         ConversationDefinition def = registry.get(conversationId).orElse(null);
         if (def == null) {
             log.warn("Tried to start unknown conversation {}", conversationId).submit();
+            return false;
+        }
+        return start(player, def);
+    }
+
+    /**
+     * Starts a conversation from a definition held in hand rather than looked up by id — the entry point for dialogue
+     * built in code (see {@link Conversations}), which never goes near the content table or the editor.
+     * <p>
+     * The session holds the definition itself, so everything downstream works identically whichever way it arrived.
+     *
+     * @return true if the conversation actually started
+     */
+    public boolean start(Player player, ConversationDefinition def) {
+        if (inConversation(player)) {
+            UtilMessage.simpleMessage(player, "Quest", "You are already in a conversation.");
+            SoundEffect.LOW_PITCH_PLING.play(player);
             return false;
         }
         ConvNode start = def.startNode().orElse(null);
@@ -174,6 +192,9 @@ public class ConversationManager {
         for (PrimitiveData action : chosen.getActions()) {
             handlers.run(player, action);
         }
+        if (chosen.getThen() != null) {
+            chosen.getThen().accept(player);
+        }
         resolveOutcome(session, player, chosen.getOutcome());
     }
 
@@ -241,13 +262,29 @@ public class ConversationManager {
         ConvNode node = session.getDefinition().node(session.getCurrentNodeId()).orElse(null);
         if (node == null) return true;
         ConvNodeData data = node.getData();
-        return revealedChars(session, data) >= data.getBody().length();
+        final String body = bodyFor(session, data);
+        return revealedChars(session, data, body) >= body.length();
+    }
+
+    /**
+     * The current node's line as this reader sees it. A translated line has to be flattened per player before anything
+     * measures it, because the typewriter counts characters and the renderer counts pixels.
+     */
+    private String bodyFor(ConversationSession session, ConvNodeData data) {
+        final Player player = Bukkit.getPlayer(session.getPlayerId());
+        return ConversationText.resolve(data.getBodyKey(), data.getBody(),
+                player == null ? null : player.locale(), data.getBodyArgs());
     }
 
     private List<ConvResponse> availableOptions(Player player, ConversationSession session) {
         List<ConvResponse> available = new ArrayList<>();
         for (ConvResponse response : session.getDefinition().responses(session.getCurrentNodeId())) {
             boolean allowed = response.getConditions().stream().allMatch(c -> handlers.evaluate(player, c));
+            // A code-built gate stacks with the data-driven ones rather than replacing them, so a response carrying
+            // both has to satisfy both.
+            if (allowed && response.getWhen() != null) {
+                allowed = response.getWhen().test(player);
+            }
             if (allowed) available.add(response);
         }
         return available;
@@ -257,16 +294,25 @@ public class ConversationManager {
         ConvNode node = session.getDefinition().node(session.getCurrentNodeId()).orElse(null);
         if (node == null) return null;
         ConvNodeData data = node.getData();
+        final Player player = Bukkit.getPlayer(session.getPlayerId());
+        if (player == null) return null;
 
-        final int shownChars = revealedChars(session, data);
+        final String body = bodyFor(session, data);
+        final int shownChars = revealedChars(session, data, body);
         playTypingSound(session, shownChars);
 
-        return renderer.render(data, shownChars, session.getSelectedIndex());
+        // Only the options this player can actually pick are drawn, so the list they read matches the list they
+        // scroll through.
+        final List<String> labels = new ArrayList<>();
+        for (ConvResponse response : availableOptions(player, session)) {
+            labels.add(ConversationText.resolve(response.getLabelKey(), response.getLabel(), player.locale(),
+                    response.getLabelArgs()));
+        }
+        return renderer.render(body, data.getSpeaker(), labels, shownChars, session.getSelectedIndex());
     }
 
     /** Characters of the body revealed so far by the typewriter (full length when there is no typewriter). */
-    private int revealedChars(ConversationSession session, ConvNodeData data) {
-        final String body = data.getBody();
+    private int revealedChars(ConversationSession session, ConvNodeData data, String body) {
         if (data.getTypewriterCps() <= 0) return body.length();
         final long elapsed = System.currentTimeMillis() - session.getNodeStartMillis();
         return (int) Math.min(body.length(), (elapsed / 1000.0) * data.getTypewriterCps());

@@ -6,6 +6,9 @@
 #   FIELDS    - the area is a Fields-style resource zone (resource-node harvesting + isFields() checks)
 # priority : resolution priority on overlap (higher wins); defaults to 50 (SERVER_REGION_PRIORITY).
 # display  : the zone's display name; defaults to the region name.
+# gamemode : the mode players inside are put in (survival | adventure | creative). Omit it and the zone has no
+#            opinion, so whatever it sits on decides - in the clans world that is the wilderness, which is survival.
+#            Set it where an area is played differently from its surroundings.
 # world    : (optional, file-level) the Bukkit world these regions live in; defaults to the main world.
 
 spawn:
@@ -18,3 +21,13 @@ fields:
   tags:
     - fields
   priority: 40
+
+# The starter mine outside spawn. Safe (no PvP) but survival, because a new player has to be able to swing a pickaxe
+# in it - the node's own break rules decide what is mineable, not the game mode. Priority above spawn so it still wins
+# if the two regions overlap.
+training_mine:
+  tags:
+    - safe
+  priority: 60
+  display: "Training Mine"
+  gamemode: survival

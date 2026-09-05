@@ -1,0 +1,51 @@
+# The training mine outside spawn — a new player's first pickaxe swing.
+#
+# Binds to every Mapper region named 'training_mine'. Tag the region 'safe' (so PvP is off) but NOT 'no_build':
+# the node's own rule handles mining, and no_build would deny it before this ever sees the break.
+#
+# The node's own zone puts players inside it in survival, so the mine is swingable wherever it is placed - no game-mode
+# wiring needed here. Only the area *around* it needs a 'gamemode: survival' in zones/<continent>.yml, and only if you
+# want players building out there too.
+#
+# 'personal_ore' means each player depletes it separately: everyone sees it whole until they mine it themselves,
+# and their ore comes back on their own timer. Nobody can strip it before a new player gets there, and nobody
+# arrives to a mine someone else has already emptied.
+#
+# 'fixedSpeed' pins mining speed for everyone inside, whatever they are holding. It is a pacing knob, not a balance
+# one: it means the first pickaxe a player is ever handed is not a worse experience than a veteran's netherite, and
+# it sets how long a pass takes.
+#
+# TUNING NOTE: set 'fixedSpeed' so a full pass takes about as long as 'respawn'. Then the last block is mined at
+# roughly the moment the first comes back, so nobody ever stands around waiting for the mine, and the rate cap is
+# enforced by the mining itself rather than by idling.
+
+archetype: personal_ore
+match:
+  name: training_mine
+profession: Mining
+level: 0
+displayName: "Training Mine"
+
+# Long enough that a pass is worth pacing, short enough that dying in a starter set is not the end of the evening.
+respawn: 300
+
+# Scaled units (vanilla speed x 15) — see ToolMiningSpeed. 60 mines like a stone pickaxe.
+fixedSpeed: 60
+
+chains:
+  # The only thing this mine yields. Bloomstone has exactly one use — the quartermaster trades a fixed pile of it for
+  # a starter set — so the mine cannot pay out through any route it was not designed for, whatever the timer says.
+  bloomstone:
+    - material: copper_ore
+      lootTable: training_mine
+    - stone
+  # The matrix. Stone erodes to cobblestone and then to un-mineable deepslate, so the room cannot be hollowed out.
+  # Timers are off: nobody is standing here waiting for stone to come back, and a countdown on every wall block
+  # would bury the ones that matter.
+  erosion:
+    timer: false
+    stages:
+      - stone
+      - cobblestone
+      - material: deepslate
+        unbreakable: true

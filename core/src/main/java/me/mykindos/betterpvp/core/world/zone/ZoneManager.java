@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.world.zone;
 
 import com.google.inject.Singleton;
 import net.kyori.adventure.key.Key;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -195,6 +196,44 @@ public class ZoneManager {
             }
         }
         return false;
+    }
+
+    /**
+     * The game mode the zones at a player's location want them in, or {@code null} if none of them has an opinion.
+     * <p>
+     * Every zone covering the location is considered, not just the highest-priority one: the winner is the
+     * highest-priority zone whose {@link Zone#getGameMode() resolver} actually answers, so a small area that declares a
+     * mode overrides the larger one it sits inside, while zones that only exist to protect or decorate (terrain, safe
+     * regions) simply abstain and let the area around them decide. When nothing matches, the world's
+     * {@link #setDefaultZone default zone} gets the last word.
+     * <p>
+     * Callers own the fallback for a {@code null} answer - the zone framework has no view on what an unzoned place
+     * should play like.
+     *
+     * @param player the player to resolve for
+     * @return the resolved game mode, or {@code null} if no zone claims one
+     */
+    public @Nullable GameMode getGameModeAt(@NotNull Player player) {
+        final Location location = player.getLocation();
+        Zone winner = null;
+        GameMode resolved = null;
+        for (Zone zone : getZonesAt(location)) {
+            if (zone.getGameMode() == null || (winner != null && zone.getPriority() <= winner.getPriority())) {
+                continue;
+            }
+            final GameMode gameMode = zone.getGameMode().resolve(player);
+            if (gameMode != null) {
+                winner = zone;
+                resolved = gameMode;
+            }
+        }
+        if (resolved != null) {
+            return resolved;
+        }
+
+        final World world = location.getWorld();
+        final Zone fallback = world == null ? null : defaultZones.get(world.getUID());
+        return fallback == null || fallback.getGameMode() == null ? null : fallback.getGameMode().resolve(player);
     }
 
     private static Zone highest(Zone best, java.util.Iterator<Zone> candidates) {

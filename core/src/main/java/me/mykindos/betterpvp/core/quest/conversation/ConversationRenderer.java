@@ -17,9 +17,11 @@ import java.util.List;
  * dialogue box, the typewriter-revealed body text, the speaker nameplate, and (once the body is
  * fully revealed) the response list and input hint.
  * <p>
- * Pure with respect to conversation state — it reads a {@link ConvNodeData} plus the current
- * typewriter/selection position and returns the drawn component; flow and side effects stay in
- * {@link ConversationManager}. Every element is positioned with {@link FontCanvas#space(int)} cursor
+ * Pure with respect to conversation state — it is handed already-resolved text plus the current
+ * typewriter/selection position and returns the drawn component; flow, translation and side effects
+ * stay in {@link ConversationManager}. It is given the responses the player can actually pick rather
+ * than every response on the node, so a gated option is not drawn under an option list it cannot
+ * be scrolled to. Every element is positioned with {@link FontCanvas#space(int)} cursor
  * shifts that are paid back so the box's net advance — which the client centers on — never changes
  * as text types out.
  */
@@ -29,16 +31,15 @@ public class ConversationRenderer {
     private static final int BOX_WIDTH = 209;
     private static final int BOX_PADDING = 10;
 
-    Component render(ConvNodeData data, int shownChars, int selectedIndex) {
-        final String body = data.getBody();
-        final String shown = body.substring(0, Math.max(0, shownChars));
+    Component render(String body, String speaker, List<String> responseLabels, int shownChars, int selectedIndex) {
+        final String shown = body.substring(0, Math.clamp(shownChars, 0, body.length()));
 
         final FontCanvas canvas = new FontCanvas();
         drawBox(canvas);
         drawBody(canvas, body, shown);
-        drawNameplate(canvas, data.getSpeaker());
+        drawNameplate(canvas, speaker);
         if (shownChars >= body.length()) {
-            drawResponsesAndHint(canvas, data.getResponses(), selectedIndex);
+            drawResponsesAndHint(canvas, responseLabels, selectedIndex);
         }
         return canvas.build();
     }
@@ -98,7 +99,7 @@ public class ConversationRenderer {
     }
 
     // Responses (if any) followed by the input hint — only reached once the body is fully revealed.
-    private void drawResponsesAndHint(FontCanvas canvas, List<ConvResponse> responses, int selectedIndex) {
+    private void drawResponsesAndHint(FontCanvas canvas, List<String> responses, int selectedIndex) {
         String hint = "to close";
         if (!responses.isEmpty()) {
             drawResponses(canvas, responses, selectedIndex);
@@ -110,7 +111,7 @@ public class ConversationRenderer {
         canvas.space(-(6 + 8 + 3 + UtilFont.textWidth(hint)));
     }
 
-    private void drawResponses(FontCanvas canvas, List<ConvResponse> responses, int selectedIndex) {
+    private void drawResponses(FontCanvas canvas, List<String> responses, int selectedIndex) {
         final int responseWidth = 134;
         canvas.space(-(responseWidth / 2));
         canvas.glyph('\uE002', NamedTextColor.WHITE, "conversation");
@@ -120,7 +121,7 @@ public class ConversationRenderer {
         int yOffset = responses.size() == 1 ? 59 : 69;
         int lastLineWidth = 0;
         for (int i = 0; i < responses.size(); i++) {
-            final ConvResponse response = responses.get(i);
+            final String label = responses.get(i);
             final boolean selected = i == selectedIndex;
             if (lastLineWidth != 0) {
                 canvas.space(-lastLineWidth);
@@ -130,11 +131,11 @@ public class ConversationRenderer {
             } else {
                 drawNumberMarker(canvas, yOffset);
             }
-            canvas.text(response.getLabel(), selected ? NamedTextColor.YELLOW : NamedTextColor.WHITE, "offset/up_" + yOffset);
+            canvas.text(label, selected ? NamedTextColor.YELLOW : NamedTextColor.WHITE, "offset/up_" + yOffset);
 
             yOffset -= 8 + 2;
             // charWidth already includes the 1px spacing, so the string's full advance IS textWidth.
-            lastLineWidth = UtilFont.textWidth(response.getLabel()) + 2;
+            lastLineWidth = UtilFont.textWidth(label) + 2;
         }
 
         // Pay back the block's net movement: -(w/2) jump, +(w+1) box, -(w-12) step inside, telescoped

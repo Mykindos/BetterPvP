@@ -38,7 +38,7 @@ public final class ClanInfoModel {
 
         final Component emoji;
         final Component territory;
-        if (zone == null) {
+        if (zone == null || zone.hasTag(Zones.WILDERNESS)) {
             emoji = Component.text("<glyph:floating_island_icon>", NamedTextColor.WHITE);
             territory = Translations.component("clans.sidebar.wilderness").color(NamedTextColor.GRAY);
         } else if (zone.hasTag(Zones.SAFE)) {

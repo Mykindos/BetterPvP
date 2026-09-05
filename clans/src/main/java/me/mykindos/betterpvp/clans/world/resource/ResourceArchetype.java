@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.world.resource;
 
 import dev.brauw.mapper.region.CuboidRegion;
 import dev.brauw.mapper.region.Region;
+import me.mykindos.betterpvp.core.framework.blockbreak.rule.BlockBreakRule;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -9,6 +10,8 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -91,6 +94,47 @@ public interface ResourceArchetype {
      */
     default boolean onFish(@NotNull ResourceNodeProp node, @NotNull Player player, @NotNull PlayerFishEvent event) {
         return false;
+    }
+
+    /**
+     * The points of {@code node} that are currently regrowing for {@code viewer}, so their remaining time can be shown
+     * floating on the block.
+     * <p>
+     * Asking per viewer is what lets one method serve both kinds of node: an archetype with shared state ignores the
+     * argument and answers the same for everyone, while a per-player one answers from that player's own state. The
+     * caller never has to know which it is holding.
+     * <p>
+     * Points whose chain has {@link DegradeChain#showTimer()} turned off are left out here rather than filtered later:
+     * whether a countdown is worth showing is a property of the chain, which the archetype can see and a renderer
+     * cannot.
+     *
+     * @param viewer whose regrowth to report, or null to ask an archetype with shared state for everyone's
+     * @return the regrowing points, or an empty collection for an archetype that has none to report
+     */
+    default @NotNull Collection<RespawnPoint> respawningPoints(@NotNull ResourceNodeProp node, @Nullable Player viewer) {
+        return List.of();
+    }
+
+    /**
+     * @return true if {@link #respawningPoints} gives different answers to different players, so each needs their own
+     * countdown rather than one everybody shares
+     */
+    default boolean timersArePerPlayer() {
+        return false;
+    }
+
+    /**
+     * Break rules this archetype wants applied to {@code player} for as long as they stand inside {@code node}, on top
+     * of whatever the node's own configuration contributes. Registered on zone entry and withdrawn on exit by
+     * {@link NodeBreakRuleService}.
+     * <p>
+     * The returned rules are held per player, so an archetype whose state is per player can close over the player here
+     * and answer from a matcher that only sees the block.
+     *
+     * @return the rules to register, or an empty list for an archetype that needs none
+     */
+    default @NotNull List<BlockBreakRule> breakRules(@NotNull ResourceNodeProp node, @NotNull Player player) {
+        return List.of();
     }
 
     /**

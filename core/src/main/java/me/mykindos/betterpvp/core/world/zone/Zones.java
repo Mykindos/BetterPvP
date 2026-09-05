@@ -22,4 +22,11 @@ public final class Zones {
 
     /** Marks a zone where block placement and breaking should be denied by default. */
     public static final String NO_BUILD = "no_build";
+
+    /**
+     * Marks a zone as open, unowned land: claimable, and displayed as wilderness rather than as a named area. A world
+     * covers its whole self with one of these when "outside everything else" is a real place with its own rules
+     * (in clans, survival mode) rather than the absence of one.
+     */
+    public static final String WILDERNESS = "wilderness";
 }

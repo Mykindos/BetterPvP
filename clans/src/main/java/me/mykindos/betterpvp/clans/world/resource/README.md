@@ -29,7 +29,21 @@ level: 25                         # minimum profession level to harvest (gate). 
 displayName: "Copper Mine"        # label text. Default: the file name.
 lootTable: copper_mine            # loot-table id resolved from Supabase (tree/fishing). Ore sets loot per-chain — see below.
 respawn: 45                       # seconds before a harvested node restores, or none|never for a node that never does.
+fixedSpeed: 60                    # optional: pin mining speed inside the node (scaled units). Omit for normal tools.
 ```
+
+### Fixed mining speed (`fixedSpeed`)
+
+By default a node is mined at whatever the held tool resolves to, so a netherite pickaxe strips it far faster than a
+wooden one. Setting `fixedSpeed` pins the speed for **everyone inside the node** to that one value, whatever they are
+holding — the rule is applied on entering the node's zone and withdrawn on leaving.
+
+The value is in the block-break framework's scaled units (vanilla speed × 15), so the constants in `ToolMiningSpeed`
+are the reference points: `30` mines like wood, `60` like stone, `90` like iron, `120` like diamond.
+
+This is a **pacing** knob rather than a balance one: it lets a node be tuned so a full pass takes a known amount of
+time regardless of the player's gear, which is what makes a starter area feel the same on a first login as it does to
+a returning veteran. Omit the key (or set it to `0`) and the node mines normally.
 
 ### One-shot nodes (`respawn: none`)
 
@@ -64,6 +78,18 @@ Per archetype, one-shot means:
 - `name:Some Name` — overrides `displayName` for this placement.
 
 So one YAML file can drive many regions, each individually tuned by its own tags.
+
+### Game mode
+
+A node's zone puts everyone inside it in **survival**, in every world, because a node is by definition somewhere you
+harvest. Outside any area that says otherwise players are in adventure, so a mine placed in the spawn world or on an
+island is mineable for the same reason one in the wilderness is — you do not have to arrange anything for it.
+
+What may actually be taken out of the node is still the node's decision (profession gate, chains, break rules); the
+game mode only decides whether the client is allowed to swing at all.
+
+If the *surroundings* of a node should also be survival (a starter area you want players to be able to build in, say),
+that is a property of the surrounding zone: give its entry in `zones/<continent>.yml` a `gamemode: survival`.
 
 ### Labels
 
@@ -195,6 +221,102 @@ node (`respawn: none`) is immune to this multiplier — it never restores no mat
 
 ---
 
+## Personal ore nodes (`archetype: personal_ore`)
+
+The same mining model as `ore`, except **each player depletes the node separately**. Everyone sees it whole until they
+mine it themselves, and each player's ore comes back on their own timer. Two people can stand in the same mine and see
+different walls.
+
+This is the archetype for a starter mine. A shared field is a race — arrive late and it is stripped — which is the
+right pressure somewhere worth fighting over and the wrong first impression for someone who just logged in. It is the
+wrong archetype for contested content, for exactly the same reason.
+
+```yaml
+archetype: personal_ore
+match: { name: training_mine }
+profession: Mining
+level: 0
+displayName: "Training Mine"
+respawn: 300
+fixedSpeed: 60                    # usually paired: every pickaxe mines this node at the same rate
+chains:
+  bloomstone:
+    - material: copper_ore
+      lootTable: training_mine
+    - stone
+  erosion:
+    - stone
+    - cobblestone
+    - { material: deepslate, unbreakable: true }
+```
+
+`chains`, `level`, `profession` and `respawn` all mean exactly what they do for `ore`. Three things differ:
+
+**The world block never changes.** It stays the intact ore forever, and each player is sent their own view of it. So
+the mine always looks full to a fresh arrival, admin tooling and world edits see the real blocks, and there is no state
+in the world to get out of step. It also means an operator looking at the mine is *not* seeing what any given player
+sees — the only way to inspect that is to mine it yourself.
+
+**A stage with no `lootTable` drops nothing**, where `ore` would fall back to the block's vanilla drops. Vanilla drops
+come from the world block, which here is deliberately not what the player mined, so falling back would hand out intact
+ore however far down the chain they actually were. Give every stage that should drop something a loot table; erosion
+stages dropping nothing is usually what you want anyway.
+
+**`respawn: none` is not supported.** A one-shot personal node would have to keep every player's rows forever. It is
+logged and treated as a normal respawn. Use `ore` on an island world for one-shot content — the world is already
+per-instance there, so it is per-player by construction.
+
+### Where the state lives
+
+In the database (`personal_mine_points`), one row per depleted point, not in a server-local cache. Two reasons, and
+both matter:
+
+- **A relog must not refill the mine.** There is no world state to re-read at load, so without a record the node comes
+  back whole the moment a player reconnects — and a respawn timer you can skip by pressing quit is not a timer. The
+  persistence is what makes the pacing real.
+- **Spawn may be sharded.** A player who hops shards has to find the mine as they left it, and a file in one shard's
+  data folder is invisible to the other.
+
+Rows are read when a player *enters* the node and dropped from memory when they quit; anything already respawned while
+they were away is cleared on the way in. Rows left by players who never come back are pruned after a day.
+
+
+---
+
+## Respawn timers
+
+Every depleted ore block floats the time left until it comes back, on each of its **uncovered** faces, counting down as
+`04m 32s` and running from red at the moment it was mined to green as it returns. This applies to `ore` and
+`personal_ore` alike and needs no configuration to turn on.
+
+Visibility follows the node. A shared node shows one countdown everybody reads, because everyone is waiting on the same
+block. A `personal_ore` node shows each player their own, hidden from everyone else, because two people standing
+together are waiting on different things.
+
+Three things keep the entity count down: only uncovered faces get one (a block set in a wall shows one face, a fully
+buried one shows none), the displays carry a short view range so the client stops drawing them beyond ~12 blocks, and a
+per-player node draws only the 8 nearest points to each player.
+
+### Turning it off for a chain (`timer`)
+
+A chain can opt out, for regrowth not worth announcing — so a field does not become a wall of countdowns over material
+nobody is waiting on. Erosion chains never respawn and so never had a timer to suppress; this is for **resource**
+chains you would rather kept quiet.
+
+A chain is written either as a bare list of stages, or as a block with its stages under `stages` and chain-level
+options beside them. Both mean the same thing where they overlap, so nothing existing needs rewriting:
+
+```yaml
+chains:
+  copper: [copper_ore, stone]     # a bare list — timers on, as normal
+  gravel:                         # a block, for a chain that sets an option
+    timer: false
+    stages: [gravel, stone]
+```
+
+
+---
+
 ## Tree nodes (`archetype: tree`)
 
 Bind to a **perspective** region (a point with a facing). The marker's **location is the paste anchor** and its **yaw
@@ -274,6 +396,9 @@ the `fish`/item entry types).
 | Add/spawn a node | tag a Mapper region + a `scenes/props/<name>.yml` |
 | Share config across nodes | a `parent:` template (deep-merged; template-only files in a subfolder) |
 | Per-placement tuning | region tags `level:NN`, `name:...` |
+| Per-player depletion | `archetype: personal_ore` |
+| One speed for every pickaxe | `fixedSpeed:` on the node |
+| Quieten a chain's countdowns | `timer: false` on the chain |
 | Drops | a loot table by id in **Supabase** |
 | Tree visuals | `.schem` files in `plugins/Clans/schematics/` |
 | Mining XP per ore | Progression `mining.xpPerBlock` |

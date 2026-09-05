@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.world.zone.discovery.ZoneDiscovery;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +43,8 @@ public final class Zone {
     private final ZoneRuleContainer rules;
     /** Discovery notification config; when non-null this zone is {@link #isDiscoverable() discoverable}. */
     private final ZoneDiscovery discovery;
+    /** The game mode players inside are put in, or null if this zone has no opinion. */
+    private final ZoneGameMode gameMode;
 
     @Builder
     private Zone(@NotNull Key key,
@@ -52,7 +53,8 @@ public final class Zone {
                 int priority,
                 @Singular Set<String> tags,
                 @Nullable ZoneRuleContainer rules,
-                @Nullable ZoneDiscovery discovery) {
+                @Nullable ZoneDiscovery discovery,
+                @Nullable ZoneGameMode gameMode) {
         this.key = Objects.requireNonNull(key, "key");
         this.bounds = Objects.requireNonNull(bounds, "bounds");
         this.displayName = displayName != null ? displayName : Component.text(UtilFormat.cleanString(key.value()));
@@ -60,6 +62,7 @@ public final class Zone {
         this.tags = Set.copyOf(tags);
         this.rules = rules != null ? rules : new ZoneRuleContainer();
         this.discovery = discovery;
+        this.gameMode = gameMode;
     }
 
     /**

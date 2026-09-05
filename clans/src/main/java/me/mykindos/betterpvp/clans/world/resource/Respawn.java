@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.clans.world.resource;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.NavigableMap;
 import java.util.Map;
+import java.util.NavigableMap;
 
 /**
  * Pure respawn maths shared by every archetype, extracted from the old Fields system so it is unit-testable.
@@ -39,8 +39,29 @@ public final class Respawn {
      * @return true once enough time has elapsed for the node to respawn
      */
     public static boolean isReady(long lastUsedMs, double delaySeconds, double speedModifier, long nowMs) {
+        return remainingMs(lastUsedMs, delaySeconds, speedModifier, nowMs) <= 0;
+    }
+
+    /**
+     * How much longer until a harvested node restores — the same sum {@link #isReady} makes, kept rather than reduced
+     * to a boolean so a countdown can be shown.
+     *
+     * @param lastUsedMs    when the node was last harvested (epoch millis)
+     * @param delaySeconds  the base respawn delay in seconds
+     * @param speedModifier the {@link #speedBuff} multiplier; values {@code <= 0} are treated as 1.0
+     * @param nowMs         the current time (epoch millis)
+     * @return the remaining time in millis, never negative
+     */
+    public static long remainingMs(long lastUsedMs, double delaySeconds, double speedModifier, long nowMs) {
+        return Math.max(0L, totalMs(delaySeconds, speedModifier) - (nowMs - lastUsedMs));
+    }
+
+    /**
+     * @return the full respawn duration in millis once {@code speedModifier} is applied — the denominator a progress
+     * bar or colour ramp needs alongside {@link #remainingMs}
+     */
+    public static long totalMs(double delaySeconds, double speedModifier) {
         final double modifier = speedModifier <= 0 ? 1.0 : speedModifier;
-        final long requiredMs = (long) (delaySeconds * 1000.0 / modifier);
-        return nowMs - lastUsedMs >= requiredMs;
+        return (long) (delaySeconds * 1000.0 / modifier);
     }
 }

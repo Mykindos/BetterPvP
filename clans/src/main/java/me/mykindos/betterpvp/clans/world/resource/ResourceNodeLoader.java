@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.ZoneGameMode;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
 import net.kyori.adventure.key.Key;
@@ -34,6 +35,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -436,6 +438,10 @@ public class ResourceNodeLoader extends SceneObjectLoader {
                 .displayName(Component.text(displayName))
                 .bounds(RegionBounds.of(bounds))
                 .priority(ClanZones.SERVER_REGION_PRIORITY + 5)
+                // A node is somewhere you harvest, so it puts players in survival wherever it is placed - a mine in the
+                // spawn world is mineable for the same reason one in the wilderness is. What may actually be taken out
+                // of it is still ResourceNodeRule's decision, not the game mode's.
+                .gameMode(ZoneGameMode.of(GameMode.SURVIVAL))
                 .tag("resource_node");
         archetype.zoneTags().forEach(builder::tag);
         final Zone zone = builder.rules(rules).build();

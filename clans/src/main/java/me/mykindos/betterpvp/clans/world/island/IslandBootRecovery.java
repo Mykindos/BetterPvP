@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.world.SurvivalWorlds;
 import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -39,12 +38,10 @@ public class IslandBootRecovery implements Listener {
     private final CompletableFuture<Void> recovered = new CompletableFuture<>();
 
     @Inject
-    public IslandBootRecovery(@NotNull Clans clans, @NotNull IslandInstanceRepository repository, @NotNull IslandWorldProvisioner provisioner,
-                               @NotNull SurvivalWorlds survivalWorlds) {
+    public IslandBootRecovery(@NotNull Clans clans, @NotNull IslandInstanceRepository repository, @NotNull IslandWorldProvisioner provisioner) {
         this.clans = clans;
         this.repository = repository;
         this.provisioner = provisioner;
-        survivalWorlds.register(world -> world.getName().startsWith("islands/"));
     }
 
     /**

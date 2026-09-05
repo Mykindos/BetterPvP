@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,6 +25,7 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -815,6 +817,29 @@ public class UtilBlock {
         } else {
             nmsWorld.levelEvent(2001, position, net.minecraft.world.level.block.Block.getId(capturedState));
         }
+    }
+
+    /**
+     * The same break particles and sound as {@link #playBlockEffect(Block, BlockData)}, sent to one player instead of
+     * broadcast to everyone nearby.
+     * <p>
+     * Needed wherever a block's state is per viewer: broadcasting a break announces it to players for whom that block
+     * never changed, and they would see a block shatter and stay standing. The level-event ids are identical, so a
+     * targeted break is indistinguishable from a broadcast one to the player who caused it.
+     *
+     * @param player the only player who should see and hear it
+     * @param block  the block being broken
+     * @param data   the block data to shatter — captured before the change, since the block may already have moved on
+     */
+    public static void playBlockEffect(@NotNull Player player, @NotNull Block block, @NotNull BlockData data) {
+        final BlockState capturedState = ((CraftBlockData) data).getState();
+        final BlockPos position = ((CraftBlock) block).getPosition();
+        final int event = capturedState.getBlock() instanceof BaseFireBlock ? 1009 : 2001;
+        final int argument = capturedState.getBlock() instanceof BaseFireBlock
+                ? 0
+                : net.minecraft.world.level.block.Block.getId(capturedState);
+        ((CraftPlayer) player).getHandle().connection
+                .send(new ClientboundLevelEventPacket(event, position, argument, false));
     }
 
     /**

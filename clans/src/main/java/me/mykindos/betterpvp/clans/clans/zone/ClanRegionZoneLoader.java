@@ -18,18 +18,22 @@ import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.core.world.zone.NoBuildRule;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
+import me.mykindos.betterpvp.core.world.zone.ZoneGameMode;
 import me.mykindos.betterpvp.core.world.zone.ZoneLoader;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
 import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -46,6 +50,8 @@ import java.util.Optional;
  *     {@link NoBuildRule} attached to the zone).</li>
  *     <li>{@link ClanZones#FIELDS} — the area is a Fields resource zone (enforced by the Fields listeners).</li>
  * </ul>
+ * An entry may also set {@code gamemode}, which is how an area declares the mode it is played in (a training mine
+ * inside a protected spawn is {@code survival}); leave it out and the zone has no opinion.
  * Reuses the same {@link ServerStartLoadStrategy}/{@link ModuleReloadLoadStrategy} lifecycle as the clans scene
  * loaders, so it reloads on server start and on a module reload.
  */
@@ -85,6 +91,27 @@ public class ClanRegionZoneLoader extends ZoneLoader {
             loaded += loadFile(file);
         }
         log.info("Loaded {} clan region zone(s) from {} continent file(s)", loaded, files.length).submit();
+    }
+
+    /**
+     * An area declaring the mode it is played in. Left unset the zone abstains and whatever it sits on decides, which
+     * is what a plain safe or no-build region wants; set, it wins over that ground for everyone inside - a mine inside
+     * a no-build spawn is survival because it says so.
+     *
+     * @param value the configured mode name, or null if the entry does not set one
+     * @param name  the zone name, for logging
+     * @return the parsed game mode, or empty if unset or unrecognised
+     */
+    private Optional<GameMode> gameMode(@Nullable String value, @NotNull String name) {
+        if (value == null || value.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(GameMode.valueOf(value.toUpperCase(Locale.ROOT)));
+        } catch (IllegalArgumentException exception) {
+            log.warn("Clan zone '{}' has unknown gamemode '{}' - ignoring", name, value).submit();
+            return Optional.empty();
+        }
     }
 
     /**
@@ -134,6 +161,7 @@ public class ClanRegionZoneLoader extends ZoneLoader {
                     .priority(priority)
                     .rules(rules);
             tags.forEach(builder::tag);
+            gameMode(config.getString(name + ".gamemode"), name).ifPresent(mode -> builder.gameMode(ZoneGameMode.of(mode)));
 
             register(builder.build());
             loaded++;

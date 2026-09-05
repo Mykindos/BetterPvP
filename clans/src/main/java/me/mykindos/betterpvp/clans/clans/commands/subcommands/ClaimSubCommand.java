@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
@@ -92,8 +93,9 @@ public class ClaimSubCommand extends ClanSubCommand {
             return;
         }
 
+        // Wilderness is a zone now, and it is exactly the land that is meant to be claimable.
         final Zone zoneAt = zoneManager.getZoneAt(player.getLocation());
-        if (zoneAt != null) {
+        if (zoneAt != null && !zoneAt.hasTag(Zones.WILDERNESS)) {
             UtilMessage.message(player, "Clans", "You cannot claim here.");
             return;
         }

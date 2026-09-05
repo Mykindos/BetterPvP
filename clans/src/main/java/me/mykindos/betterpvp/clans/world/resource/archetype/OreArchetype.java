@@ -7,36 +7,33 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.clans.world.resource.BlockReplacementStore;
 import me.mykindos.betterpvp.clans.world.resource.DegradeChain;
+import me.mykindos.betterpvp.clans.world.resource.DegradeChains;
 import me.mykindos.betterpvp.clans.world.resource.ResourceArchetype;
 import me.mykindos.betterpvp.clans.world.resource.ResourceLoot;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeManager;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeProp;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeSpeed;
 import me.mykindos.betterpvp.clans.world.resource.Respawn;
+import me.mykindos.betterpvp.clans.world.resource.RespawnPoint;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -88,7 +85,7 @@ public class OreArchetype implements ResourceArchetype {
 
     @Override
     public void onActivate(@NotNull ResourceNodeProp node) {
-        final List<DegradeChain> chains = parseChains(node.getDefinition().getRoot());
+        final List<DegradeChain> chains = DegradeChains.parse(node.getDefinition().getRoot());
         if (chains.isEmpty()) {
             log.warn("Ore node '{}' has no valid 'chains' - skipping snapshot", node.getDefinition().getId()).submit();
             return;
@@ -96,7 +93,7 @@ public class OreArchetype implements ResourceArchetype {
 
         final OreField field = new OreField(chains);
         // Snapshot only resource first-stages (materials that are never something another chain degrades into).
-        final Map<Material, DegradeChain> snapshotMaterials = resourceMaterials(chains);
+        final Map<Material, DegradeChain> snapshotMaterials = DegradeChains.resourceMaterials(chains);
         final CuboidRegion region = (CuboidRegion) node.getRegion();
         final Location min = region.getMin();
         final Location max = region.getMax();
@@ -182,14 +179,7 @@ public class OreArchetype implements ResourceArchetype {
         block.setType(nextMaterial, false);
 
         // drop
-        Location dropLocation = block.getLocation().toCenterLocation();
-        final AttributeInstance attribute = Objects.requireNonNull(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE));
-        final RayTraceResult result = player.rayTraceBlocks(attribute.getValue());
-        if (result != null) {
-            dropLocation = result.getHitPosition().toLocation(block.getWorld());
-            final Vector direction = player.getLocation().getDirection();
-            dropLocation.subtract(direction.multiply(0.5)); // drop slightly closer to the player than the hit block's center
-        }
+        final Location dropLocation = ResourceLoot.dropLocation(player, block);
 
         if (stage.lootTable() != null) {
             loot.award(stage.lootTable(), player, dropLocation);
@@ -221,6 +211,30 @@ public class OreArchetype implements ResourceArchetype {
     }
 
     @Override
+    public @NotNull Collection<RespawnPoint> respawningPoints(@NotNull ResourceNodeProp node, @Nullable Player viewer) {
+        final OreField field = fields.get(node.getId());
+        if (field == null || node.getDefinition().isOneShot()) {
+            return List.of(); // a one-shot node is not coming back, so there is nothing to count down to
+        }
+        final double respawn = node.getDefinition().getRespawnSeconds();
+        final double modifier = speed.getBonusMultiplier();
+        final long total = Respawn.totalMs(respawn, modifier);
+        final long now = System.currentTimeMillis();
+
+        final List<RespawnPoint> points = new ArrayList<>();
+        for (OrePoint point : field.orePoints.values()) {
+            if (point.active || !point.chain.showTimer()) {
+                continue;
+            }
+            final long remaining = Respawn.remainingMs(point.lastMinedMs, respawn, modifier, now);
+            if (remaining > 0) {
+                points.add(new RespawnPoint(point.x, point.y, point.z, remaining, total));
+            }
+        }
+        return points;
+    }
+
+    @Override
     public void tick(@NotNull ResourceNodeProp node) {
         final OreField field = fields.get(node.getId());
         if (field == null || node.getDefinition().isOneShot()) {
@@ -248,68 +262,6 @@ public class OreArchetype implements ResourceArchetype {
 
     private static long pack(int x, int y, int z) {
         return ((long) (x & 0x3FFFFFF) << 38) | ((long) (z & 0x3FFFFFF) << 12) | (y & 0xFFF);
-    }
-
-    /**
-     * Parses {@code chains} (a map of named chains; each value is a list of stages, and each stage is either a plain
-     * material string or an object with {@code material}, an optional {@code lootTable}, and an optional
-     * {@code unbreakable} flag). The chain key is a readable label only and carries no behaviour. Chains shorter than
-     * two stages are dropped (nothing to degrade to).
-     */
-    private static @NotNull List<DegradeChain> parseChains(@Nullable ConfigurationSection root) {
-        final List<DegradeChain> chains = new ArrayList<>();
-        if (root == null) {
-            return chains;
-        }
-        final ConfigurationSection chainsSection = root.getConfigurationSection("chains");
-        if (chainsSection == null) {
-            return chains;
-        }
-        for (String name : chainsSection.getKeys(false)) {
-            final DegradeChain chain = parseChain(chainsSection.getList(name));
-            if (chain != null) {
-                chains.add(chain);
-            }
-        }
-        return chains;
-    }
-
-    private static @Nullable DegradeChain parseChain(@Nullable Object entry) {
-        if (!(entry instanceof List<?> list) || list.size() < 2) {
-            return null;
-        }
-        final List<DegradeChain.Stage> stages = new ArrayList<>(list.size());
-        for (Object element : list) {
-            stages.add(parseStage(element));
-        }
-        return DegradeChain.of(stages);
-    }
-
-    private static @NotNull DegradeChain.Stage parseStage(@Nullable Object element) {
-        if (element instanceof Map<?, ?> map) {
-            final Object lootTable = map.get("lootTable");
-            return new DegradeChain.Stage(String.valueOf(map.get("material")),
-                    lootTable == null ? null : lootTable.toString(),
-                    Boolean.TRUE.equals(map.get("unbreakable")));
-        }
-        return new DegradeChain.Stage(String.valueOf(element), null, false);
-    }
-
-    /**
-     * Maps every chain's first (intact) material to that chain — each chain head is a <i>resource</i> that is
-     * snapshotted and respawns. This includes a head that another chain also degrades into (e.g. {@code stone}, the head
-     * of the erosion chain that {@code copper}/{@code diamond} step down to), so its blocks are snapshotted and respawn
-     * rather than eroding permanently.
-     */
-    private static @NotNull Map<Material, DegradeChain> resourceMaterials(@NotNull List<DegradeChain> chains) {
-        final Map<Material, DegradeChain> resources = new HashMap<>();
-        for (DegradeChain chain : chains) {
-            final Material material = Material.matchMaterial(chain.first());
-            if (material != null) {
-                resources.putIfAbsent(material, chain);
-            }
-        }
-        return resources;
     }
 
     /** Per-node snapshot of the ore points inside the field, plus its degrade chains. */

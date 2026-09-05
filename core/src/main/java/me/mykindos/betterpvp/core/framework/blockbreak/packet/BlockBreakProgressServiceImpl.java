@@ -50,7 +50,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.player.PlayerInputEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -916,16 +915,28 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
             return;
         }
 
-        final BlockDamageEvent damage = new BlockDamageEvent(player, block, face, held, true);
-        Bukkit.getPluginManager().callEvent(damage);
+        // Creative follows vanilla's creative-destroy path, which is a shorter sequence than survival's:
+        // ServerPlayerGameMode fires the left-click interact and then destroys, and never fires BlockDamageEvent -
+        // that one belongs to survival digging, which creative skips entirely.
+        final boolean creative = player.getGameMode() == GameMode.CREATIVE;
 
-        if (damage.isCancelled()) {
-            restoreAndAck(player, block, sequence);
-            return;
+        if (!creative) {
+            final BlockDamageEvent damage = new BlockDamageEvent(player, block, face, held, true);
+            Bukkit.getPluginManager().callEvent(damage);
+
+            if (damage.isCancelled()) {
+                restoreAndAck(player, block, sequence);
+                return;
+            }
         }
 
+        // A cancelled left-click stops a survival dig, but must not stop a creative destroy. Every creative break
+        // comes through this path (creative is always predicted instant), and this same event is what the zone system
+        // reads as an INTERACT - so a zone that denies interacting, as a resource node does, would otherwise swallow
+        // the destroy before BlockBreakEvent was ever raised. Breaking is decided by the break event; let it get there
+        // and answer for itself.
         final PlayerInteractEvent interact = new PlayerInteractEvent(player, Action.LEFT_CLICK_BLOCK, held, block, face);
-        if (!interact.callEvent()) {
+        if (!interact.callEvent() && !creative) {
             restoreAndAck(player, block, sequence);
             return;
         }

@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
-import me.mykindos.betterpvp.clans.world.SurvivalWorlds;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -48,7 +47,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -127,7 +125,6 @@ public class ClansWorldListener extends ClanListener {
     private final ItemFactory itemFactory;
     private final BlockTagManager blockTagHandler;
     private final ZoneManager zoneManager;
-    private final SurvivalWorlds survivalWorlds;
     public static final String AGGRESSIVE_RODDER_UNLOCKED = "aggressive_rodder_unlocked";
 
     @Inject
@@ -144,7 +141,7 @@ public class ClansWorldListener extends ClanListener {
     public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans,
                               final EffectManager effectManager, final EnergyService energyService, final CooldownManager cooldownManager,
                               final WorldBlockHandler worldBlockHandler, ItemRegistry itemRegistry, ItemFactory itemFactory, BlockTagManager blockTagHandler,
-                              ZoneManager zoneManager, SurvivalWorlds survivalWorlds) {
+                              ZoneManager zoneManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
@@ -155,7 +152,6 @@ public class ClansWorldListener extends ClanListener {
         this.itemFactory = itemFactory;
         this.blockTagHandler = blockTagHandler;
         this.zoneManager = zoneManager;
-        this.survivalWorlds = survivalWorlds;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -725,70 +721,6 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(final PlayerQuitEvent event) {
         event.getPlayer().removeMetadata("clan", this.clans);
-    }
-
-    @UpdateEvent(delay = 250)
-    public void checkGamemode() {
-        for (final Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getGameMode() == GameMode.CREATIVE
-                    || player.getGameMode() == GameMode.SPECTATOR
-                    || this.effectManager.hasEffect(player, EffectTypes.FROZEN)) {
-                continue;
-            }
-
-            if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
-                if (this.survivalWorlds.allows(player.getWorld())) {
-                    if (player.getGameMode() == GameMode.ADVENTURE) {
-                        player.setGameMode(GameMode.SURVIVAL);
-                    }
-                    continue;
-                }
-
-                final Client client = this.clientManager.search().online(player);
-                if (!client.isAdministrating() && player.getGameMode() == GameMode.SURVIVAL) {
-                    player.setGameMode(GameMode.ADVENTURE);
-                }
-                continue;
-            }
-
-            final Optional<Clan> locationClanOptional = this.clanManager.getClanByLocation(player.getLocation());
-            if (locationClanOptional.isEmpty()) {
-                if (player.getGameMode() == GameMode.ADVENTURE) {
-                    player.setGameMode(GameMode.SURVIVAL);
-                }
-                continue;
-            }
-
-            final Clan locationClan = locationClanOptional.get();
-
-            if (locationClan.getName().equalsIgnoreCase("Fields")) {
-                if (player.getGameMode() == GameMode.ADVENTURE) {
-                    player.setGameMode(GameMode.SURVIVAL);
-                }
-                continue;
-            }
-
-            this.clanManager.getClanByPlayer(player).ifPresentOrElse(playerClan -> {
-                if (locationClan.equals(playerClan)) {
-                    if (player.getGameMode() == GameMode.ADVENTURE) {
-                        player.setGameMode(GameMode.SURVIVAL);
-                    }
-                    return;
-                }
-
-                if (this.clanManager.getPillageHandler().isPillaging(playerClan, locationClan)) {
-                    if (player.getGameMode() == GameMode.ADVENTURE) {
-                        player.setGameMode(GameMode.SURVIVAL);
-                    }
-                    return;
-                }
-
-                player.setGameMode(GameMode.ADVENTURE);
-
-            }, () -> player.setGameMode(GameMode.ADVENTURE));
-
-
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
