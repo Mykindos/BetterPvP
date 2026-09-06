@@ -42,6 +42,15 @@ public class ConvResponse {
     private List<PrimitiveData> actions = new ArrayList<>();
     private ConvOutcome outcome = new ConvOutcome();
 
+    /**
+     * Marks this as the answer a skip takes when it passes this node without the player choosing.
+     * <p>
+     * Skipping still runs a response's side effects, because a skipped tutorial that quietly withholds the pickaxe it
+     * was meant to hand over is a bug rather than a shortcut. That makes <em>which</em> answer gets taken matter: with
+     * nothing marked, a skip takes the first available one, which is wrong whenever the generous option is not first.
+     */
+    private boolean onSkip;
+
     /** Extra visibility gate for a code-built response, ANDed with {@link #conditions}. Null means no extra gate. */
     @JsonIgnore
     private transient @Nullable Predicate<Player> when;

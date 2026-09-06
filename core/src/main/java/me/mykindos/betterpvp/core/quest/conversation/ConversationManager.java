@@ -3,12 +3,18 @@ package me.mykindos.betterpvp.core.quest.conversation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Setter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.offhand.OffhandExecutor;
+import me.mykindos.betterpvp.core.quest.conversation.event.ConversationEndEvent;
+import me.mykindos.betterpvp.core.quest.conversation.event.ConversationNodeEnterEvent;
+import me.mykindos.betterpvp.core.quest.conversation.event.ConversationNodeExitEvent;
+import me.mykindos.betterpvp.core.quest.conversation.event.ConversationResponseEvent;
 import me.mykindos.betterpvp.core.quest.model.PrimitiveData;
 import me.mykindos.betterpvp.core.quest.primitive.QuestPrimitiveHandlers;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -18,6 +24,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +47,18 @@ public class ConversationManager {
 
     private static final NamespacedKey FREEZE_KEY = new NamespacedKey("betterpvp", "conversation_freeze");
 
+    /** Ceiling on how many responses a skip will take, so a conversation that loops cannot hang one. */
+    private static final int MAX_SKIP_STEPS = 128;
+
     private final ClientManager clientManager;
     private final ConversationRegistry registry;
     private final QuestPrimitiveHandlers handlers;
     private final ConversationRenderer renderer = new ConversationRenderer();
     private final Map<UUID, ConversationSession> sessions = new ConcurrentHashMap<>();
+
+    /** Answers a node's {@code await} key. Unset means nothing ever holds, which is the plain-dialogue case. */
+    @Setter
+    private @Nullable ConversationGate gate;
 
     /**
      * Confirms the selected response on an offhand press. Registered on the gamer
@@ -105,6 +119,17 @@ public class ConversationManager {
      * @return true if the conversation actually started
      */
     public boolean start(Player player, ConversationDefinition def) {
+        return start(player, def, ConversationOptions.standalone());
+    }
+
+    /**
+     * Starts a conversation whose presentation is partly somebody else's - a cutscene, which has already gated the
+     * player and owns the screen. Flow, gating and completion are identical either way; only the freeze, the action
+     * bar and the backdrop are skipped.
+     *
+     * @return true if the conversation actually started
+     */
+    public boolean start(Player player, ConversationDefinition def, ConversationOptions options) {
         if (inConversation(player)) {
             UtilMessage.simpleMessage(player, "Quest", "You are already in a conversation.");
             SoundEffect.LOW_PITCH_PLING.play(player);
@@ -114,28 +139,67 @@ public class ConversationManager {
         if (start == null) return false;
 
         final Gamer gamer = clientManager.search().online(player).getGamer();
-        if (gamer.isInCombat()) {
+        // A managed conversation is already inside something that took the player out of the world, so the combat
+        // check has been made by whoever started it - and refusing here would abort a cutscene mid-flight.
+        if (options.isFreeze() && gamer.isInCombat()) {
             UtilMessage.simpleMessage(player, "Quest", "You cannot start a conversation while in combat.");
             SoundEffect.LOW_PITCH_PLING.play(player);
             return false;
         }
 
         final UUID id = player.getUniqueId();
-        final ConversationActionBar bar = new ConversationActionBar(g -> {
+        final ConversationActionBar bar = options.isOwnActionBar() ? new ConversationActionBar(g -> {
             ConversationSession s = sessions.get(id);
             return s == null ? null : render(s);
-        });
+        }) : null;
 
-        ConversationSession session = new ConversationSession(id, gamer, def, bar);
+        ConversationSession session = new ConversationSession(id, gamer, def, bar, options);
         sessions.put(id, session);
-        gamer.getActionBarOverrides().push(100, bar);
+        if (bar != null) {
+            gamer.getActionBarOverrides().push(100, bar);
+        }
         gamer.setOffhandExecutor(100, confirmExecutor);
         // Pin the cursor mid-hotbar so scrolling can go either way and keys 1-3 stay free for direct selection.
         player.getInventory().setHeldItemSlot(5);
-        freeze(player);
+        if (options.isFreeze()) {
+            freeze(player);
+        }
         new SoundEffect(Sound.ENTITY_VILLAGER_AMBIENT, 1.2f, 0.5f).play(player);
         goToNode(session, player, start.getId());
         return true;
+    }
+
+    /**
+     * Hands an already-running conversation's presentation over to its caller.
+     * <p>
+     * This is what a response growing a camera track needs: the dialogue was standalone a moment ago - frozen player,
+     * its own action bar, its own backdrop - and now sits inside a cutscene that owns all three. Releasing them here
+     * rather than restarting the conversation is what lets it carry on from the node it was already on.
+     */
+    public void manage(Player player) {
+        final ConversationSession session = sessions.get(player.getUniqueId());
+        if (session == null || !session.getOptions().isOwnActionBar()) {
+            return;
+        }
+        if (session.getActionBar() != null) {
+            session.getGamer().getActionBarOverrides().remove(session.getActionBar());
+            session.setActionBar(null);
+        }
+        if (session.getOptions().isFreeze()) {
+            unfreeze(player);
+        }
+        session.setOptions(ConversationOptions.managedByCaller());
+    }
+
+    /**
+     * This player's conversation as it should look right now, for a caller that owns the screen and is compositing the
+     * dialogue into its own layout.
+     *
+     * @return the drawn dialogue, or null if they are not in a conversation
+     */
+    public @Nullable Component renderFor(Player player) {
+        final ConversationSession session = sessions.get(player.getUniqueId());
+        return session == null ? null : render(session);
     }
 
     private void freeze(Player player) {
@@ -187,7 +251,11 @@ public class ConversationManager {
             return;
         }
         int index = Math.min(Math.max(0, session.getSelectedIndex()), options.size() - 1);
-        ConvResponse chosen = options.get(index);
+        choose(session, player, options.get(index));
+    }
+
+    /** Takes a response: its side effects, then its announcement, then wherever it leads. */
+    private void choose(ConversationSession session, Player player, ConvResponse chosen) {
         // Side effects fire first, regardless of where the outcome leads.
         for (PrimitiveData action : chosen.getActions()) {
             handlers.run(player, action);
@@ -195,7 +263,44 @@ public class ConversationManager {
         if (chosen.getThen() != null) {
             chosen.getThen().accept(player);
         }
+        UtilServer.callEvent(new ConversationResponseEvent(player, session.getDefinition().getId(),
+                session.getCurrentNodeId() == null ? "" : session.getCurrentNodeId(),
+                chosen.getId() == null ? "" : chosen.getId()));
         resolveOutcome(session, player, chosen.getOutcome());
+    }
+
+    /** Whether this player is sitting on a revealed line with responses they have not answered yet. */
+    public boolean isAwaitingChoice(Player player) {
+        final ConversationSession session = sessions.get(player.getUniqueId());
+        return session != null && isBodyRevealed(session) && !availableOptions(player, session).isEmpty();
+    }
+
+    /**
+     * Runs the rest of a conversation without the player, for a skip.
+     * <p>
+     * Every response's side effects still fire - skipping is opting out of <em>reading</em>, not out of receiving what
+     * the dialogue hands over. At each unanswered choice it takes the response marked
+     * {@link ConvResponse#isOnSkip()}, or the first available one if none is.
+     * <p>
+     * Bounded rather than run to completion: dialogue is allowed to loop back on itself, and a conversation whose
+     * skip-default happens to form a cycle would otherwise hang the server rather than end a cutscene.
+     */
+    public void fastForward(Player player) {
+        for (int step = 0; step < MAX_SKIP_STEPS && inConversation(player); step++) {
+            final ConversationSession session = sessions.get(player.getUniqueId());
+            if (session == null) return;
+
+            final List<ConvResponse> options = availableOptions(player, session);
+            if (options.isEmpty()) {
+                end(player, true);
+                return;
+            }
+            choose(session, player, options.stream().filter(ConvResponse::isOnSkip).findFirst().orElse(options.getFirst()));
+        }
+        if (inConversation(player)) {
+            log.warn("Fast-forwarding conversation for {} hit the step limit; it likely loops", player.getName()).submit();
+            end(player, true);
+        }
     }
 
     /** Apply a response's outcome to conversation flow. */
@@ -237,14 +342,27 @@ public class ConversationManager {
     private void end(Player player, boolean completed) {
         ConversationSession session = sessions.remove(player.getUniqueId());
         if (session == null) return;
-        session.getGamer().getActionBarOverrides().remove(session.getActionBar());
+        if (session.getCurrentNodeId() != null) {
+            UtilServer.callEvent(new ConversationNodeExitEvent(player, session.getDefinition().getId(),
+                    session.getCurrentNodeId()));
+        }
+        if (session.getActionBar() != null) {
+            session.getGamer().getActionBarOverrides().remove(session.getActionBar());
+        }
         session.getGamer().removeOffhandExecutor(100);
-        unfreeze(player);
+        if (session.getOptions().isFreeze()) {
+            unfreeze(player);
+        }
         new SoundEffect(Sound.ENTITY_VILLAGER_NO, 0.8f, 0.5f).play(player);
         session.getCompletion().complete(completed);
+        UtilServer.callEvent(new ConversationEndEvent(player, session.getDefinition().getId(), completed));
     }
 
     private void goToNode(ConversationSession session, Player player, String nodeId) {
+        final String leaving = session.getCurrentNodeId();
+        if (leaving != null) {
+            UtilServer.callEvent(new ConversationNodeExitEvent(player, session.getDefinition().getId(), leaving));
+        }
         session.setCurrentNodeId(nodeId);
         session.setSelectedIndex(0);
         session.setNodeStartMillis(System.currentTimeMillis());
@@ -255,12 +373,14 @@ public class ConversationManager {
                 player.playSound(player.getLocation(), voice, 1f, 1f);
             }
         });
+        UtilServer.callEvent(new ConversationNodeEnterEvent(player, session.getDefinition().getId(), nodeId));
     }
 
     /** Whether the current node's typewriter reveal has finished. Input and the response box wait on this. */
     private boolean isBodyRevealed(ConversationSession session) {
         ConvNode node = session.getDefinition().node(session.getCurrentNodeId()).orElse(null);
         if (node == null) return true;
+        if (isHeld(session, node)) return false;
         ConvNodeData data = node.getData();
         final String body = bodyFor(session, data);
         return revealedChars(session, data, body) >= body.length();
@@ -298,7 +418,7 @@ public class ConversationManager {
         if (player == null) return null;
 
         final String body = bodyFor(session, data);
-        final int shownChars = revealedChars(session, data, body);
+        final int shownChars = isHeld(session, node) ? 0 : revealedChars(session, data, body);
         playTypingSound(session, shownChars);
 
         // Only the options this player can actually pick are drawn, so the list they read matches the list they
@@ -308,7 +428,29 @@ public class ConversationManager {
             labels.add(ConversationText.resolve(response.getLabelKey(), response.getLabel(), player.locale(),
                     response.getLabelArgs()));
         }
-        return renderer.render(body, data.getSpeaker(), labels, shownChars, session.getSelectedIndex());
+        return renderer.render(body, data.getSpeaker(), labels, shownChars, session.getSelectedIndex(),
+                session.getOptions().isDrawBackdrop());
+    }
+
+    /**
+     * Whether this node is still waiting on its {@code await} key.
+     * <p>
+     * While it is, the node's clock is pushed forward every tick, so the typewriter starts from the instant the hold
+     * lifts rather than from when the node was reached - the difference between a line that begins as the camera
+     * lands and one that is already half-typed by then.
+     */
+    private boolean isHeld(ConversationSession session, ConvNode node) {
+        final String await = node.getData().getAwait();
+        if (gate == null || await == null || await.isBlank()) {
+            return false;
+        }
+        final Player player = Bukkit.getPlayer(session.getPlayerId());
+        if (player == null || !gate.isHeld(player, await)) {
+            return false;
+        }
+        session.setNodeStartMillis(System.currentTimeMillis());
+        session.setShownCharCount(0);
+        return true;
     }
 
     /** Characters of the body revealed so far by the typewriter (full length when there is no typewriter). */

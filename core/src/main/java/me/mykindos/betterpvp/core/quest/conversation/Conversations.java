@@ -145,6 +145,18 @@ public final class Conversations {
         }
 
         /**
+         * Holds this line until {@code key} is released - the way a line is paced to start exactly as a cutscene
+         * camera lands rather than while it is still moving. Use
+         * {@link me.mykindos.betterpvp.core.cutscene.signal.Signal#beatKey} to name a camera beat.
+         * <p>
+         * A key nobody is holding never holds at all, so the same conversation still plays normally on its own.
+         */
+        public @NotNull NodeBuilder await(@NotNull String key) {
+            data.setAwait(key);
+            return this;
+        }
+
+        /**
          * Typewriter speed for this line in characters per second; {@code 0} shows the whole line at once. Overrides
          * the conversation's {@link Builder#typewriterCps}.
          */
@@ -177,6 +189,15 @@ public final class Conversations {
 
         private final ConvResponse response = new ConvResponse();
 
+        /**
+         * Names this response, so a cutscene beat can wait on this particular answer being chosen rather than on the
+         * node it was asked from. Optional - an unnamed response still works, it just cannot be singled out.
+         */
+        public @NotNull ResponseBuilder id(@NotNull String id) {
+            response.setId(id);
+            return this;
+        }
+
         /** The response text, written literally. Prefer {@link #labelKey} so it can be translated. */
         public @NotNull ResponseBuilder label(@NotNull String label) {
             response.setLabel(label);
@@ -191,6 +212,15 @@ public final class Conversations {
         public @NotNull ResponseBuilder labelKey(@NotNull String labelKey, @NotNull ComponentLike @NotNull ... args) {
             response.setLabelKey(labelKey);
             response.setLabelArgs(components(args));
+            return this;
+        }
+
+        /**
+         * Marks this as the answer taken when a skip passes this node. Without one, a skip takes the first response
+         * the player could have picked - so mark the generous answer whenever that is not the first.
+         */
+        public @NotNull ResponseBuilder onSkip() {
+            response.setOnSkip(true);
             return this;
         }
 

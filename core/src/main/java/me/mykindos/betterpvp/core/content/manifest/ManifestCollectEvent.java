@@ -23,6 +23,7 @@ public class ManifestCollectEvent extends CustomEvent {
     private final List<Map<String, Object>> zones = new ArrayList<>();
     private final List<Map<String, Object>> professions = new ArrayList<>();
     private final List<Map<String, Object>> npcFactories = new ArrayList<>();
+    private final List<Map<String, Object>> cutscenes = new ArrayList<>();
     private final List<QuestPrimitive> primitives = new ArrayList<>();
 
     public void addItem(String key, String displayName, String source, @Nullable String material, List<String> tags) {
@@ -54,6 +55,23 @@ public class ManifestCollectEvent extends CustomEvent {
 
     public void addPrimitive(QuestPrimitive primitive) {
         primitives.add(primitive);
+    }
+
+    /**
+     * Declares a cutscene the code owns.
+     * <p>
+     * Cutscenes are built in code, so they belong here rather than in the content table: a console-authored quest or
+     * conversation that points at one gets a picker of ids that are guaranteed to exist, with no publish step between
+     * writing a cutscene and being able to reference it.
+     *
+     * @param beats the camera beat ids, so the console can offer a starting point as well as a cutscene
+     */
+    public void addCutscene(String id, String displayName, List<String> beats) {
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("key", id);
+        row.put("display_name", displayName);
+        row.put("beats", beats);
+        cutscenes.add(row);
     }
 
     public void addNpcFactory(String factory, String type) {

@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.item.runeslot.RuneSlotDistributionRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.loot.LootTableRegistry;
 import me.mykindos.betterpvp.core.quest.QuestRegistry;
-import me.mykindos.betterpvp.core.quest.cinematic.CinematicRegistry;
 import me.mykindos.betterpvp.core.quest.conversation.ConversationRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.event.Listener;
@@ -46,7 +45,6 @@ public class ContentPublishListener implements Listener {
     private final LootTableRegistry lootTableRegistry;
     private final QuestRegistry questRegistry;
     private final ConversationRegistry conversationRegistry;
-    private final CinematicRegistry cinematicRegistry;
     private final PurityDistributionRegistry purityDistributionRegistry;
     private final PurityReforgeBiasRegistry purityReforgeBiasRegistry;
     private final RuneSlotDistributionRegistry runeSlotDistributionRegistry;
@@ -56,7 +54,7 @@ public class ContentPublishListener implements Listener {
     @Inject
     public ContentPublishListener(Core core, Database database, LootTableRegistry lootTableRegistry,
                                   QuestRegistry questRegistry, ConversationRegistry conversationRegistry,
-                                  CinematicRegistry cinematicRegistry, PurityDistributionRegistry purityDistributionRegistry,
+                                  PurityDistributionRegistry purityDistributionRegistry,
                                   PurityReforgeBiasRegistry purityReforgeBiasRegistry,
                                   RuneSlotDistributionRegistry runeSlotDistributionRegistry) {
         this.core = core;
@@ -64,7 +62,6 @@ public class ContentPublishListener implements Listener {
         this.lootTableRegistry = lootTableRegistry;
         this.questRegistry = questRegistry;
         this.conversationRegistry = conversationRegistry;
-        this.cinematicRegistry = cinematicRegistry;
         this.purityDistributionRegistry = purityDistributionRegistry;
         this.purityReforgeBiasRegistry = purityReforgeBiasRegistry;
         this.runeSlotDistributionRegistry = runeSlotDistributionRegistry;
@@ -115,7 +112,6 @@ public class ContentPublishListener implements Listener {
             lootTableRegistry.reload();
             questRegistry.reload();
             conversationRegistry.reload();
-            cinematicRegistry.reload();
         });
     }
 

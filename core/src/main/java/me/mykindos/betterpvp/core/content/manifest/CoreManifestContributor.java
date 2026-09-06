@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.content.manifest;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.cutscene.Cutscene;
+import me.mykindos.betterpvp.core.cutscene.CutsceneRegistry;
+import me.mykindos.betterpvp.core.cutscene.camera.Beat;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.quest.primitive.QuestPrimitiveRegistry;
@@ -27,14 +30,36 @@ public class CoreManifestContributor implements Listener {
     private final ZoneManager zoneManager;
     private final QuestPrimitiveRegistry primitiveRegistry;
     private final SceneObjectFactoryManager factoryManager;
+    private final CutsceneRegistry cutsceneRegistry;
 
     @Inject
     public CoreManifestContributor(ItemRegistry itemRegistry, ZoneManager zoneManager,
-                                   QuestPrimitiveRegistry primitiveRegistry, SceneObjectFactoryManager factoryManager) {
+                                   QuestPrimitiveRegistry primitiveRegistry, SceneObjectFactoryManager factoryManager,
+                                   CutsceneRegistry cutsceneRegistry) {
         this.itemRegistry = itemRegistry;
         this.zoneManager = zoneManager;
         this.primitiveRegistry = primitiveRegistry;
         this.factoryManager = factoryManager;
+        this.cutsceneRegistry = cutsceneRegistry;
+    }
+
+    /**
+     * A cutscene's beat ids, read by building it with no viewer.
+     * <p>
+     * A factory is free to depend on the player it is handed - that is the point of registering a factory rather than
+     * an instance - so one may well refuse to build without one. The console only wants the shape, and a cutscene
+     * listed without its beats is far better than a manifest that fails to publish, so that case degrades quietly.
+     */
+    private List<String> beatsOf(CutsceneRegistry.CutsceneScript script) {
+        try {
+            final Cutscene cutscene = script.getFactory().apply(null);
+            if (!cutscene.hasCamera()) {
+                return List.of();
+            }
+            return cutscene.getCamera().getBeats().stream().map(Beat::getId).toList();
+        } catch (RuntimeException exception) {
+            return List.of();
+        }
     }
 
     @EventHandler
@@ -50,6 +75,10 @@ public class CoreManifestContributor implements Listener {
                     vanilla ? key.getKey().toUpperCase() : null,
                     List.of());
         });
+
+        for (CutsceneRegistry.CutsceneScript script : cutsceneRegistry.all()) {
+            event.addCutscene(script.getId(), script.getDisplayName(), beatsOf(script));
+        }
 
         for (Zone zone : zoneManager.getAllZones()) {
             event.addZone(

@@ -14,8 +14,7 @@ public enum ContentType {
     LOOT_TABLE("loot_table"),
     SAGA("saga"),
     QUEST("quest"),
-    CONVERSATION("conversation"),
-    CINEMATIC("cinematic");
+    CONVERSATION("conversation");
 
     private final String key;
 

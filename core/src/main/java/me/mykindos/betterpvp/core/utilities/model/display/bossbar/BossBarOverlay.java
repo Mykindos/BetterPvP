@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.model.display.bossbar;
 
+import lombok.Setter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
@@ -8,6 +9,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,17 @@ public class BossBarOverlay {
             Component.translatable("newlayer").font(Resources.Font.SPACE);
 
     private final List<DisplayObject<Component>> overlays = new ArrayList<>();
+
+    /**
+     * While set, the only overlay drawn - every other one is held rather than removed, so it comes back untouched
+     * once this is cleared.
+     * <p>
+     * A cutscene needs this for two reasons. The obvious one is that a framed shot should not have the clan HUD
+     * hanging over it. The load-bearing one is that stacked boss bars push this slot down the screen, and the
+     * cutscene's top letterbox bar is positioned relative to it - so anything else drawing here would move the bar.
+     */
+    @Setter
+    private @Nullable DisplayObject<Component> exclusive;
     private final BossBar bar = BossBar.bossBar(
             Component.empty(), 1f, BossBar.Color.WHITE, BossBar.Overlay.PROGRESS);
 
@@ -96,7 +109,7 @@ public class BossBarOverlay {
 
         final List<Component> outputs = new ArrayList<>();
         synchronized (lock) {
-            for (DisplayObject<Component> overlay : overlays) {
+            for (DisplayObject<Component> overlay : exclusive == null ? overlays : List.of(exclusive)) {
                 Component component = overlay.getProvider().apply(gamer);
                 if (component == null) continue;
 

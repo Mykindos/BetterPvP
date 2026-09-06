@@ -33,5 +33,11 @@ public class ConvNodeData {
     private int typewriterCps = 30;
     private String voiceLineKey = "";
     private int delayTicks = 0;
+    /**
+     * Holds this line until something outside the conversation releases the key - a cutscene camera reaching a beat,
+     * say. Blank means the line speaks as soon as it is reached. Resolved by whatever
+     * {@link ConversationGate} is registered, so the key means nothing here.
+     */
+    private String await = "";
     private List<ConvResponse> responses = new ArrayList<>();
 }

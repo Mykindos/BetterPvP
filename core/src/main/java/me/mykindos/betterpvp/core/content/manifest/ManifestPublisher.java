@@ -83,6 +83,7 @@ public class ManifestPublisher implements Listener {
             upsertSimple(dsl, "game_professions", event.getProfessions(), List.of("display_name", "max_level"));
             upsertPrimitives(dsl, event.getPrimitives());
             rebuildNpcFactories(dsl, event.getNpcFactories());
+            upsertCutscenes(dsl, event.getCutscenes());
             log.info("Published manifest: {} items, {} zones, {} professions, {} primitives, {} npc-factory types",
                     event.getItems().size(), event.getZones().size(), event.getProfessions().size(),
                     event.getPrimitives().size(), event.getNpcFactories().size()).submit();
@@ -141,6 +142,23 @@ public class ManifestPublisher implements Listener {
                     .execute();
         }
         prune(dsl, "game_zones", keys(rows));
+    }
+
+    private void upsertCutscenes(DSLContext dsl, List<Map<String, Object>> rows) {
+        if (rows.isEmpty()) return;
+        for (Map<String, Object> r : rows) {
+            String[] beats = ((List<String>) r.get("beats")).toArray(new String[0]);
+            dsl.insertInto(table(name("game_cutscenes")),
+                            field(name("key"), String.class), field(name("display_name"), String.class),
+                            field(name("beats"), String[].class))
+                    .values((String) r.get("key"), (String) r.get("display_name"), beats)
+                    .onConflict(field(name("key"), String.class))
+                    .doUpdate()
+                    .set(field(name("display_name"), String.class), (String) r.get("display_name"))
+                    .set(field(name("beats"), String[].class), beats)
+                    .execute();
+        }
+        prune(dsl, "game_cutscenes", keys(rows));
     }
 
     /** Upsert tables whose non-key columns are plain scalar values. */

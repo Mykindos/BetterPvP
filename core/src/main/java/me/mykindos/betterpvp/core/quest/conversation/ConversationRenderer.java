@@ -32,10 +32,23 @@ public class ConversationRenderer {
     private static final int BOX_PADDING = 10;
 
     Component render(String body, String speaker, List<String> responseLabels, int shownChars, int selectedIndex) {
+        return render(body, speaker, responseLabels, shownChars, selectedIndex, true);
+    }
+
+    /**
+     * @param drawBackdrop whether to draw the darkening fog behind the box. A cutscene draws its own letterbox and
+     *                     composites the dialogue into it, so it turns this off rather than stacking two backdrops and
+     *                     leaving a visible seam where they overlap.
+     */
+    Component render(String body, String speaker, List<String> responseLabels, int shownChars, int selectedIndex,
+                     boolean drawBackdrop) {
         final String shown = body.substring(0, Math.clamp(shownChars, 0, body.length()));
 
         final FontCanvas canvas = new FontCanvas();
-        drawBox(canvas);
+        if (drawBackdrop) {
+            drawFog(canvas);
+        }
+        drawDialogueBox(canvas);
         drawBody(canvas, body, shown);
         drawNameplate(canvas, speaker);
         if (shownChars >= body.length()) {
@@ -44,9 +57,9 @@ public class ConversationRenderer {
         return canvas.build();
     }
 
-    // Letterbox bars + dialogue background, then step inside the box. The step is paid back after the
-    // body (in drawBody) so the box's net advance is untouched and it never shifts while typing.
-    private void drawBox(FontCanvas canvas) {
+    // The darkening fog behind the dialogue, drawn as a net-zero block so it can simply be left out. A cutscene
+    // already paints its own letterbox over the same region and compositing both would double-darken the overlap.
+    private void drawFog(FontCanvas canvas) {
         final TextComponent.Builder bars = Component.text();
         int offset = 0;
         for (int i = 0; i < 12; i++) {
@@ -55,8 +68,13 @@ public class ConversationRenderer {
             offset += 256;
         }
         canvas.append(Component.translatable("offset.-" + offset / 2, bars.build()).font(Resources.Font.SPACE));
+        canvas.space(-offset);
+    }
 
-        canvas.space(-offset).glyph('\uE001', NamedTextColor.WHITE, "conversation");
+    // The dialogue background, then step inside the box. The step is paid back after the body (in drawBody) so the
+    // box's net advance is untouched and it never shifts while typing.
+    private void drawDialogueBox(FontCanvas canvas) {
+        canvas.glyph('\uE001', NamedTextColor.WHITE, "conversation");
         canvas.space(-(BOX_WIDTH + 1 - BOX_PADDING));
     }
 

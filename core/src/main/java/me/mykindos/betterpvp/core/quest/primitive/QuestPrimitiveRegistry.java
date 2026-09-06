@@ -66,7 +66,8 @@ public class QuestPrimitiveRegistry {
                 new QuestPrimitive("action.play_sound", "action", "Play sound", Map.of("key", p("string"), "volume", Map.of("type", "float", "default", 1), "pitch", Map.of("type", "float", "default", 1))),
                 new QuestPrimitive("action.send_message", "action", "Send message", Map.of("message", p("text"))),
                 new QuestPrimitive("action.start_conversation", "action", "Start conversation", Map.of("conversation", contentRef("conversation"))),
-                new QuestPrimitive("action.start_cinematic", "action", "Start cinematic", Map.of("cinematic", contentRef("cinematic"))),
+                new QuestPrimitive("action.start_cutscene", "action", "Start cutscene", Map.of("cutscene", req("cutscene_ref"))),
+                new QuestPrimitive("action.begin_cinematic", "action", "Begin cutscene camera (keeps dialogue running)", Map.of("cutscene", req("cutscene_ref"))),
                 new QuestPrimitive("action.fire_event", "action", "Fire event", Map.of("key", req("string"))),
                 new QuestPrimitive("action.teleport", "action", "Teleport", Map.of("zone", req("zone_ref"))),
 
