@@ -1,6 +1,38 @@
 skills:
   # canUseWhileSlowed, canUseWhileSilenced, canUseWhileLevitating, and canUseInLiquid are optional config options
   assassin:
+    meditation:
+      enabled: true
+      maxlevel: 1
+      cooldown: 24.0
+      cooldownDecreasePerLevel: 0.0
+      duration: 4.0
+      healingInterval: 0.5
+      healingPerTick: 1.5
+      finalHealingPerTick: 3.5
+      finalPhaseDuration: 1.0
+      minimumCancelTime: 1.0
+      exitDamageReduction: 0.35
+      exitResistanceDuration: 1.5
+      burstReflectRatio: 0.6
+      burstMaxDamage: 12.0
+      burstRadius: 4.0
+      burstKnockback: 1.2
+      burstTelegraph: 0.5
+    predatorsmark:
+      enabled: true
+      maxlevel: 1
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 0.0
+      markDuration: 7.0
+      range: 20.0
+      blindDuration: 1.5
+      lungeSpeed: 1.5
+      lungeStopDistance: 3.0
+      maxLungeDuration: 2.0
+      huntDuration: 8.0
+      returnWindow: 4.0
+      returnMaxDistance: 40.0
     leap:
       enabled: true
       cooldown: 9.0
