@@ -59,4 +59,13 @@ public interface CooldownSkill extends IChampionsSkill {
         return false;
     }
 
+    /**
+     * Whether the skill will accept another activation right now even though it is tracked as in use or already
+     * on cooldown - for multi-step skills that re-use the same input for each step (e.g. mark, then lunge, then
+     * escape). Checked by {@link me.mykindos.betterpvp.champions.champions.skills.listeners.SkillListener}.
+     */
+    default boolean canReactivate(Player player) {
+        return false;
+    }
+
 }

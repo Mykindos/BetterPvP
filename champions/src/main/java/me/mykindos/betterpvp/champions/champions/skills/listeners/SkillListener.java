@@ -156,8 +156,8 @@ public class SkillListener implements Listener {
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (cooldownSkill.isDelayedSkill()) {
 
-                // if they already have a cooldown, prevent as usual
-                if (cooldownManager.hasCooldown(player, skill.getName())) {
+                // on cooldown and not mid-sequence - prevent as usual
+                if (cooldownManager.hasCooldown(player, skill.getName()) && !cooldownSkill.canReactivate(player)) {
                     if (cooldownSkill.showCooldownFinished()) {
                         cooldownManager.informCooldown(player, skill.getName());
                     }
@@ -168,6 +168,11 @@ public class SkillListener implements Listener {
                 // prevent spamming by cancelling if player is already tracked as using a delayed skill
                 final @NotNull UUID id = player.getUniqueId();
                 if (delayedCooldowns.containsKey(id)) {
+                    // ...unless this is the same skill advancing to its next step (e.g. mark -> lunge)
+                    DelayedEntry pending = delayedCooldowns.get(id);
+                    if (pending.skill == cooldownSkill && cooldownSkill.canReactivate(player)) {
+                        return;
+                    }
                     event.setCancelled(true);
                     return;
                 }
@@ -264,7 +269,8 @@ public class SkillListener implements Listener {
 
                 for (BuildSkill buildSkill : build.getActiveSkills()) {
                     // Skip if not a toggle skill
-                    if (!(buildSkill.getSkill() instanceof ToggleSkill)) continue;
+                    if (!(buildSkill.getSkill() instanceof ToggleSkill toggleSkill)
+                            || !toggleSkill.canToggleWith(droppedItem)) continue;
 
                     // Check if they have booster
                     int level = getLevel(player, buildSkill);
