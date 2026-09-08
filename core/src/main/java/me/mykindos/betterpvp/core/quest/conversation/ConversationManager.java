@@ -269,10 +269,16 @@ public class ConversationManager {
         resolveOutcome(session, player, chosen.getOutcome());
     }
 
-    /** Whether this player is sitting on a revealed line with responses they have not answered yet. */
+    /**
+     * Whether this player's current line is fully revealed and waiting on them to press something.
+     * <p>
+     * True for a line with responses to pick between <em>and</em> for a terminal one: closing is done with the same
+     * confirm key, so a caller that has to hand the player an input surface has to hand it over for both. A line still
+     * typing itself out is waiting on nothing and is not included.
+     */
     public boolean isAwaitingChoice(Player player) {
         final ConversationSession session = sessions.get(player.getUniqueId());
-        return session != null && isBodyRevealed(session) && !availableOptions(player, session).isEmpty();
+        return session != null && isBodyRevealed(session);
     }
 
     /**

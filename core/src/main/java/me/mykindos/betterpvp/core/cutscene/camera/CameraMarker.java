@@ -1,11 +1,15 @@
 package me.mykindos.betterpvp.core.cutscene.camera;
 
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The invisible marker a viewer's camera is welded to for the length of a cutscene.
@@ -46,6 +50,7 @@ public class CameraMarker {
             display.setSilent(true);
             display.setInvulnerable(true);
             display.setTeleportDuration(INTERPOLATION_TICKS);
+            display.setViewRange(512);
         });
     }
 
@@ -63,7 +68,7 @@ public class CameraMarker {
      */
     public void attach(@NotNull Player viewer) {
         viewer.setGameMode(GameMode.SPECTATOR);
-        viewer.setSpectatorTarget(camera);
+        spectate(viewer);
     }
 
     /** Where the marker is now - what the viewer's own body is kept near so the world streams around the shot. */
@@ -80,8 +85,17 @@ public class CameraMarker {
             viewer.setGameMode(GameMode.SPECTATOR);
         }
         if (viewer.getSpectatorTarget() != camera) {
-            viewer.setSpectatorTarget(camera);
+            spectate(viewer);
         }
+    }
+
+    private void spectate(@NonNull Player viewer) {
+        viewer.teleport(camera.getLocation());
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+            if (viewer.getGameMode() == GameMode.SPECTATOR) {
+                viewer.setSpectatorTarget(camera);
+            }
+        }, 5);
     }
 
     /** Moves the camera, letting the client interpolate across the single tick to get there. */

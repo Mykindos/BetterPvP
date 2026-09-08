@@ -27,7 +27,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,6 +54,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * outgoing damage, skill activation and block interaction, so this class adds only what spectator does not defend:
  * dismounting the camera, teleporting away from it, and losing the player entirely to a disconnect. A second layer of
  * freezing on top of that would be two gates where the game already has one.
+ * <p>
+ * The exception is a dialogue line waiting on the viewer - one with responses to pick between, or a last one that
+ * only a confirm will close - both of which are pressed on a hotbar spectator does not draw. For exactly as long as
+ * one is on screen the viewer is put back into survival and every gate spectator was providing is asserted by hand
+ * instead - see {@link #syncResponder}.
  *
  * @see Cutscene
  */
@@ -146,6 +153,9 @@ public class CutsceneManager implements Listener {
         }
 
         sessions.put(player.getUniqueId(), session);
+        // Blanks the client's view of the inventory for the length of the session. Nothing is moved: see the
+        // suppression in ItemPacketRemapper for why that is the whole design.
+        player.updateInventory();
         if (cutscene.hasCamera()) {
             hud.attach(player, session);
         }
@@ -261,7 +271,9 @@ public class CutsceneManager implements Listener {
      */
     private void followCamera(@NotNull Player player, @NotNull CutsceneSession session) {
         final CameraMarker marker = session.getMarker();
-        if (marker == null) {
+        if (marker == null || session.isResponding()) {
+            // Answering a question: the body is standing in the shot itself, so there is nothing to follow and
+            // re-asserting the spectator target would take the hotbar straight back off them.
             return;
         }
 
@@ -334,6 +346,7 @@ public class CutsceneManager implements Listener {
             return;
         }
 
+        syncResponder(player, session);
         if (session.hasCamera()) {
             followCamera(player, session);
         }
@@ -367,6 +380,60 @@ public class CutsceneManager implements Listener {
         }
     }
 
+    /**
+     * Hands the viewer their body back for exactly as long as a dialogue line is waiting on them, and takes it away
+     * again the moment they have answered or closed it.
+     * <p>
+     * Spectator has no hotbar, which is the surface the response cursor is scrolled and confirmed on, so a line asked
+     * mid-cutscene would otherwise be unanswerable - and a terminal line is no different, since the key that closes it
+     * is the same key. A line still typing itself out is not waiting on anything and stays in spectator, so survival
+     * is held for the window where it buys something and no longer.
+     * <p>
+     * Everything spectator was doing for free has to be asserted by hand for the width of that window: invisibility so
+     * neither the world nor the viewer's own first-person arm shows a body standing in the shot, invulnerability so
+     * nothing can reach them, and no gravity so a camera in open air is not somewhere they fall out of. Movement and
+     * facing are held by {@link #onMove}, and the hotbar the survival body brings with it is already empty on the
+     * client for the whole session.
+     */
+    private void syncResponder(@NotNull Player player, @NotNull CutsceneSession session) {
+        final boolean prompting = session.hasCamera() && conversations.isAwaitingChoice(player);
+        if (prompting == session.isResponding()) {
+            return;
+        }
+        if (prompting) {
+            openResponder(player, session);
+        } else {
+            closeResponder(player, session);
+        }
+    }
+
+    private void openResponder(@NotNull Player player, @NotNull CutsceneSession session) {
+        final CameraMarker marker = session.getMarker();
+        if (marker == null) {
+            return;
+        }
+        session.setResponding(true);
+        player.setSpectatorTarget(null);
+        player.teleport(marker.getLocation());
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setInvisible(true);
+        player.setInvulnerable(true);
+        player.setGravity(false);
+    }
+
+    /** Drops the survival window. Puts the camera back only while the cutscene is still running. */
+    private void closeResponder(@NotNull Player player, @NotNull CutsceneSession session) {
+        session.setResponding(false);
+        player.setInvisible(false);
+        player.setInvulnerable(false);
+        player.setGravity(true);
+
+        final CameraMarker marker = session.getMarker();
+        if (marker != null && !session.isFinished()) {
+            marker.attach(player);
+        }
+    }
+
     /** Ends a session and gives the viewer back their body. */
     private void finish(@NotNull CutsceneSession session, boolean completed) {
         if (session.isFinished()) {
@@ -379,6 +446,9 @@ public class CutsceneManager implements Listener {
 
         final Player player = session.getPlayer();
         if (player != null) {
+            if (session.isResponding()) {
+                closeResponder(player, session);
+            }
             if (session.getDefinition().hasDialogue() && conversations.inConversation(player)) {
                 // Run the rest of the dialogue out rather than dropping it: its responses carry the things the
                 // cutscene was there to hand over, and a skip should cost the reading, not the rewards.
@@ -389,6 +459,7 @@ public class CutsceneManager implements Listener {
                 }
             }
             hud.detach(player, session);
+            player.updateInventory();
             restore(player, session);
             if (completed && session.getDefinition().isRecordView()) {
                 views.record(player, session.getCutsceneId());
@@ -424,7 +495,11 @@ public class CutsceneManager implements Listener {
         session.exitEffects();
         final Player player = session.getPlayer();
         if (player != null) {
+            if (session.isResponding()) {
+                closeResponder(player, session);
+            }
             hud.detach(player, session);
+            player.updateInventory();
         }
         final CameraMarker marker = session.getMarker();
         if (marker != null) {
@@ -447,6 +522,13 @@ public class CutsceneManager implements Listener {
         // Deferred a tick: changing game mode and teleporting inside the join event itself is unreliable.
         UtilServer.runTaskLater(core, () -> {
             player.setSpectatorTarget(null);
+            // A disconnect during a response window leaves these on the saved player, unlike the game mode.
+            player.setInvisible(false);
+            player.setInvulnerable(false);
+            player.setGravity(true);
+            // Nothing to give back: the cutscene hid the inventory on the client only, so a disconnect through one
+            // costs the view and never the items. This just draws the real one again.
+            player.updateInventory();
             if (location != null) {
                 player.teleport(location);
             }
@@ -481,6 +563,31 @@ public class CutsceneManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onStopSpectating(PlayerStopSpectatingEntityEvent event) {
         if (isWatching(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Holds the shot while the viewer is out of spectator to answer. Cancelling the move puts them back at the
+     * position <em>and</em> the facing they came from, so neither walking nor the mouse moves the camera.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onMove(PlayerMoveEvent event) {
+        // PlayerTeleportEvent is a move event, and the moves this class makes itself are not the ones being held.
+        if (event instanceof PlayerTeleportEvent) {
+            return;
+        }
+        final CutsceneSession session = sessions.get(event.getPlayer().getUniqueId());
+        if (session != null && session.isResponding()) {
+            event.setCancelled(true);
+        }
+    }
+
+    /** The hotbar is an answer sheet for the length of a question, not an inventory to throw things out of. */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDrop(PlayerDropItemEvent event) {
+        final CutsceneSession session = sessions.get(event.getPlayer().getUniqueId());
+        if (session != null && session.isResponding()) {
             event.setCancelled(true);
         }
     }

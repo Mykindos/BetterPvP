@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.cutscene.CutsceneManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -38,6 +39,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -171,6 +173,10 @@ public class ItemPacketRemapper implements PacketListener, Listener {
     private void onSetPlayerInventory(PacketSendEvent event) {
         final WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(event);
         final Player viewer = event.getPlayer() instanceof Player player ? player : null;
+        if (viewer != null && core.getInjector().getInstance(CutsceneManager.class).isWatching(viewer)) {
+            packet.setStack(ItemStack.EMPTY);
+            return;
+        }
         packet.setStack(mapTo(packet.getStack(), viewer));
     }
 
@@ -182,6 +188,16 @@ public class ItemPacketRemapper implements PacketListener, Listener {
             return;
         }
         final Player viewer = event.getPlayer() instanceof Player player ? player : null;
+        // A cutscene viewer is shown an empty inventory for the length of the session, so the hotbar the survival
+        // body brings back to answer a question with does not put their gear on screen mid-shot. Suppressed here
+        // rather than by emptying the inventory, because nothing that is never moved can be lost: a crash costs the
+        // view and never the items, and there is no restore step to get wrong. Only their own window is touched.
+        if (viewer != null && packet.getWindowId() == 0
+                && core.getInjector().getInstance(CutsceneManager.class).isWatching(viewer)) {
+            packet.setItems(new ArrayList<>(Collections.nCopies(packet.getItems().size(), ItemStack.EMPTY)));
+            packet.setCarriedItem(ItemStack.EMPTY);
+            return;
+        }
         final List<ItemStack> items = packet.getItems().stream()
                         .map(item -> mapTo(item, viewer))
                         .toList();
@@ -198,6 +214,11 @@ public class ItemPacketRemapper implements PacketListener, Listener {
         }
 
         final Player viewer = event.getPlayer() instanceof Player player ? player : null;
+        if (viewer != null && (packet.getWindowId() == 0 || packet.getWindowId() == -2)
+                && core.getInjector().getInstance(CutsceneManager.class).isWatching(viewer)) {
+            packet.setItem(ItemStack.EMPTY);
+            return;
+        }
         packet.setItem(mapTo(packet.getItem(), viewer));
     }
 

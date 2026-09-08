@@ -70,6 +70,10 @@ public class CutsceneSession {
     @Setter
     private int sneakTicks;
 
+    /** Whether the viewer currently has their body back to answer a dialogue question with their hotbar. */
+    @Setter
+    private boolean responding;
+
     /** The action-bar surface this cutscene has taken over, and the boss-bar overlay carrying the top letterbox bar. */
     @Setter
     private @Nullable CutsceneActionBar actionBar;
