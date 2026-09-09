@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.voyage;
 
+import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

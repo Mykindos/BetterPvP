@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.clans.world.island;
 
-import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
+import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;

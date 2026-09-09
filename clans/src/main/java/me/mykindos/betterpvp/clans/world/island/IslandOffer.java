@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.clans.world.crew.CrewService;
 import me.mykindos.betterpvp.clans.world.travel.Destination;
 import me.mykindos.betterpvp.clans.world.voyage.Landfall;
 import me.mykindos.betterpvp.clans.world.voyage.VoyageService;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
+import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;

@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.clans.world.island;
 
-import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
+import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import com.google.inject.Provider;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;

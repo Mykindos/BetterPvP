@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.voyage;
 
+import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

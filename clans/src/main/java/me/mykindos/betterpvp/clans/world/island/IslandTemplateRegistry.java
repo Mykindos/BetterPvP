@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageTiming;
+import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.voyage;
 
+import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.world.crew.Crew;
 import me.mykindos.betterpvp.clans.world.crew.CrewService;

@@ -1,0 +1,71 @@
+# Every place a player can be. See the Site Framework reference:
+# https://outline.betterpvp.net/doc/site-framework-T5MqndTHVB
+#
+# world:      adopt <world name> | clone <template folder> | own <folder>
+# lifecycle:  PERMANENT | POOLED | ON_DEMAND | OWNED
+# admission:  open | party | private  (modules contribute their own, e.g. clan)
+# selection:  fill-first or spread
+# rejoin:     RESUME | REINSTANCE | ANCHOR      rejoin-at: EXACT | SPAWN_POINT
+# dormancy:   ALWAYS_LOADED or UNLOAD_WHEN_EMPTY. An ON_DEMAND site is always reaped once empty.
+
+aldenmark:
+  display-name: "Aldenmark"
+  icon: GRASS_BLOCK
+  world:
+    adopt: "Aldenmark"
+  lifecycle: PERMANENT
+  admission: open
+  anchorable: true
+  rejoin: RESUME
+  rejoin-at: EXACT
+  voyage:
+    min-seconds: 60
+    max-seconds: 120
+    chance: 0.25
+  arrival:
+    distribution: random
+
+spawn:
+  display-name: "Spawn"
+  icon: BEACON
+  world:
+    clone: "templates/spawn"
+  lifecycle: POOLED
+  min: 2
+  max: 8
+  capacity: 40
+  admission: open
+  selection: fill-first
+  fallback: aldenmark
+  anchorable: true
+  rejoin: RESUME
+  rejoin-at: SPAWN_POINT
+  arrival:
+    distribution: first
+
+lost-isle:
+  display-name: "Uncharted Isle"
+  icon: MAP
+  world:
+    clone: "templates/isle_a"
+  lifecycle: ON_DEMAND
+  admission: party
+  anchorable: false
+  rejoin: ANCHOR
+  voyage:
+    min-seconds: 45
+    max-seconds: 120
+    chance: 0.25
+
+camp:
+  display-name: "Camp"
+  icon: CAMPFIRE
+  world:
+    own: "camps"
+  lifecycle: OWNED
+  admission: clan
+  anchorable: true
+  rejoin: RESUME
+  rejoin-at: EXACT
+  dormancy: UNLOAD_WHEN_EMPTY
+  dormancy-grace-seconds: 300
