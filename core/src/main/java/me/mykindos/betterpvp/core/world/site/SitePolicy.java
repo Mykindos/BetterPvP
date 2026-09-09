@@ -50,7 +50,7 @@ public class SitePolicy {
     @Builder.Default
     @NotNull Lifecycle lifecycle = Lifecycle.PERMANENT;
 
-    /** Instances kept warm ahead of demand. Only meaningful for {@link Lifecycle#POOLED}. */
+    /** Instances provisioned ahead of demand, so a party arriving never waits on a world being made. */
     @Builder.Default
     int min = 0;
 

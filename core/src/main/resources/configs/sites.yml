@@ -7,6 +7,7 @@
 # selection:  fill-first or spread
 # rejoin:     RESUME | REINSTANCE | ANCHOR      rejoin-at: EXACT | SPAWN_POINT
 # dormancy:   ALWAYS_LOADED or UNLOAD_WHEN_EMPTY. An ON_DEMAND site is always reaped once empty.
+# min:        instances kept provisioned ahead of demand, so a party never waits on a world clone.
 
 aldenmark:
   display-name: "Aldenmark"
@@ -49,9 +50,11 @@ lost-isle:
   world:
     clone: "templates/isle_a"
   lifecycle: ON_DEMAND
+  min: 1
   admission: party
   anchorable: false
   rejoin: ANCHOR
+  dormancy-grace-seconds: 120
   voyage:
     min-seconds: 45
     max-seconds: 120
@@ -61,7 +64,7 @@ camp:
   display-name: "Camp"
   icon: CAMPFIRE
   world:
-    own: "camps"
+    own: "camps/"
   lifecycle: OWNED
   admission: clan
   anchorable: true
