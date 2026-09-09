@@ -20,65 +20,75 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * The open water a crew crosses. A private world per voyage, cloned from one template and deleted when they land.
+ * The staging world a crew occupies while a voyage is in progress. One world per voyage, cloned from a single template
+ * and deleted on arrival.
  * <p>
- * Not a site: you cannot travel to it, be returned to it, or see it in a navigator. It is a staging world the sailing
- * package makes for itself, which is why it holds no catalogue row and no instance record. One spare is kept ready so
- * casting off does not wait on a world being copied.
+ * This is deliberately not a {@code Site}. It cannot be travelled to directly, returned to on login, or listed in the
+ * navigator, so it has no catalogue row and no instance record. One spare world is kept cloned ahead of demand so that
+ * starting a voyage does not wait on a file copy.
  */
 @CustomLog
 @BPvPListener
 @Singleton
 public class Ocean implements Listener {
 
-    /** Ocean worlds sit under the site root so a crash-left one is swept with everything else disposable. */
+    /** These worlds live under the site root so that one left behind by a crash is swept up with the rest. */
     public static final String WORLD_PREFIX = SiteWorlds.worldNamePrefix("ocean");
 
     private final SiteWorlds worlds;
     private final SiteInstances instances;
     private final ShipService shipService;
     private final WorldContentService contentService;
+    private final VoyageCues cues;
 
-    /** The spare, cloned ahead of demand. Held as a name rather than a world so it can be claimed without loading. */
+    /** The spare, cloned ahead of demand. Held as a name rather than a World so it can be claimed while unloaded. */
     private final AtomicReference<String> spare = new AtomicReference<>();
 
+    /** Worlds handed out by {@link #claim} and not yet released. Excludes the spare, which holds no players. */
+    private final Set<String> crossings = ConcurrentHashMap.newKeySet();
+
     @Inject
-    @Config(path = "clans.voyage.ocean-template", defaultValue = "templates/islands/limbo")
+    @Config(path = "clans.voyage.ocean-template", defaultValue = "templates/islands/ocean")
     private String template;
 
     @Inject
     public Ocean(@NotNull SiteWorlds worlds, @NotNull SiteInstances instances, @NotNull ShipService shipService,
-                 @NotNull WorldContentService contentService, @NotNull ClientManager clientManager) {
+                 @NotNull WorldContentService contentService, @NotNull ClientManager clientManager,
+                 @NotNull VoyageCues cues) {
         this.worlds = worlds;
         this.instances = instances;
         this.shipService = shipService;
         this.contentService = contentService;
+        this.cues = cues;
 
-        // The open sea is off-limits for building: it is somebody else's ship in a world deleted on arrival.
+        // Building is disabled here: the ship belongs to another player and the world is deleted on arrival.
         contentService.register(new WorldContentBinding(
                 WorldSelector.prefixed(WORLD_PREFIX), () -> List.of(new OceanContent(clientManager))));
     }
 
-    /** Clones the first spare once boot recovery has finished sweeping folders it might otherwise delete. */
+    /** Clones the first spare after boot recovery finishes, so its folder sweep does not delete the new world. */
     @EventHandler
     public void onServerStart(@NotNull ServerStartEvent event) {
         instances.whenRecovered().thenRun(this::keepSpare);
     }
 
     /**
-     * Takes a stretch of ocean for a crossing, using the spare if one is ready and cloning otherwise. A replacement is
+     * Reserves a world for a voyage, using the spare if one is ready and cloning otherwise. A replacement spare is
      * started either way.
      *
-     * @return the world the crew will sail on
+     * @return the world the crew will occupy for the voyage
      */
     public @NotNull CompletableFuture<World> claim() {
         final String claimed = spare.getAndSet(null);
@@ -86,38 +96,73 @@ public class Ocean implements Listener {
                 ? worlds.open(source(), nextWorldName())
                 : worlds.open(source(), claimed);
 
-        return opened.whenComplete((world, ex) -> keepSpare());
+        return opened.whenComplete((world, ex) -> {
+            if (world != null) {
+                crossings.add(world.getName());
+            }
+            keepSpare();
+        });
     }
 
-    /** Gives a stretch of ocean back. The world is deleted: nothing on it outlives the crossing. */
+    /** Releases a world once its voyage has ended. The world is deleted, so nothing in it is persisted. */
     public @NotNull CompletableFuture<Void> release(@NotNull String worldName) {
+        crossings.remove(worldName);
         shipService.clearAssignments(worldName);
         return worlds.destroy(worldName).exceptionally(ex -> {
-            log.warn("Could not release ocean world {}", worldName, ex).submit();
+            log.warn("Could not release staging world {}", worldName, ex).submit();
             return null;
         });
     }
 
     /**
-     * Puts the crew's own ship in their patch of ocean.
+     * Teleports a player back onto the ship if they leave it while a voyage is running.
      * <p>
-     * The template names no vessel, only an empty mooring, so the hull is whichever one they were standing on when
-     * they set the course. Reloading the world's content rather than only pasting blocks is what brings the helm and
-     * the quartermaster with it: they are ordinary data-points inside the structure, and something has to install them.
+     * At a dock, leaving the ship is how a player leaves a crew. In here it cannot mean that, because the destination
+     * is already chosen and the world contains no land, so without this a player would be stuck in open water until
+     * the voyage ended.
+     */
+    @EventHandler
+    public void onOverboard(@NotNull PlayerMoveEvent event) {
+        if (!event.hasChangedBlock()) {
+            return;
+        }
+
+        final World water = event.getTo().getWorld();
+        if (!crossings.contains(water.getName())) {
+            return;
+        }
+
+        final Berth deck = shipService.berths(water).stream().findFirst().orElse(null);
+        if (deck == null || !deck.isCrewable() || deck.contains(event.getTo())) {
+            return;
+        }
+
+        // Same world, so no passengers need detaching and Sailors is not involved.
+        event.getPlayer().teleportAsync(deck.getBoard());
+        cues.hauledAboard(event.getPlayer());
+    }
+
+    /**
+     * Places the crew's own ship structure into the staging world.
+     * <p>
+     * The template declares an empty berth and no ship, so the structure pasted in is the one the crew departed from
+     * and a single template serves every ship. Reloading world content rather than only pasting blocks is what brings
+     * the helm and the quartermaster across: they are data points inside the structure and something has to install
+     * them.
      *
-     * @return the moored berth, or empty if the template has no mooring at all
+     * @return the berth the ship was placed at, or empty if the template declares no berth
      */
     public @NotNull Optional<Berth> moor(@NotNull World ocean, @NotNull Crew crew) {
         final Berth mooring = shipService.berths(ocean).stream().findFirst().orElse(null);
         if (mooring == null) {
-            log.warn("Ocean world '{}' has no '{}' marker - the crew has nothing to stand on",
+            log.warn("Staging world '{}' has no '{}' marker, so the ship cannot be placed",
                     ocean.getName(), ShipService.BERTH_POINT).submit();
             return Optional.empty();
         }
 
         final String vessel = vesselOf(crew);
         if (vessel.isEmpty()) {
-            log.warn("Could not tell which ship crew '{}' sailed from - mooring left empty", crew.getCaptain()).submit();
+            log.warn("Could not resolve the ship crew '{}' departed from, berth left empty", crew.getCaptain()).submit();
             return Optional.of(mooring);
         }
 
@@ -127,7 +172,7 @@ public class Ocean implements Listener {
         return shipService.berth(ocean, mooring.getId());
     }
 
-    /** The structure the crew boarded at the dock, read back off the berth they mustered at. */
+    /** The ship structure the crew departed from, read from the berth the crew was formed at. */
     private @NotNull String vesselOf(@NotNull Crew crew) {
         final World origin = Bukkit.getWorld(crew.getWorldName());
         if (origin == null) {
@@ -145,7 +190,7 @@ public class Ocean implements Listener {
         worlds.open(source(), worldName)
                 .thenAccept(world -> spare.set(world.getName()))
                 .exceptionally(ex -> {
-                    log.warn("Could not prepare a spare ocean", ex).submit();
+                    log.warn("Could not prepare a spare staging world", ex).submit();
                     return null;
                 });
     }

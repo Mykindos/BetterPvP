@@ -6,10 +6,10 @@ import me.mykindos.betterpvp.clans.world.crew.Crew;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A crew at sea: who is aboard, where they are headed, and how long they have been going.
+ * One voyage in progress: the crew on it, the destination, the staging world and the start time.
  * <p>
- * The crew is frozen for the duration, so this holds it rather than re-reading membership — a captain who logs out
- * mid-crossing must not take everyone else's voyage with them.
+ * The crew is fixed for the duration, so it is held here rather than looked up again. A captain who disconnects part
+ * way through must not end the voyage for everyone else.
  */
 @Getter
 public class Voyage {
@@ -18,7 +18,7 @@ public class Voyage {
     private final Landfall destination;
     private final VoyageTiming timing;
 
-    /** The private stretch of ocean they are crossing, released when they land. */
+    /** The staging world the crew occupies, released when the voyage ends. */
     private final String ocean;
 
     private final long startedAt;
@@ -36,7 +36,7 @@ public class Voyage {
         return Math.max(0, (now - startedAt) / 1000L);
     }
 
-    /** Whether land is sighted on this roll. */
+    /** Whether this roll arrives at the destination. */
     public boolean arrives(long now, double sample) {
         return timing.arrives(elapsedSeconds(now), sample);
     }

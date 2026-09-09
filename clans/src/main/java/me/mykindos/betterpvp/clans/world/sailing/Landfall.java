@@ -9,29 +9,29 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The far side of a crossing: what a crew is sailing towards, and what happens when they sight it.
+ * The destination of a voyage, and what happens when the crew arrives there.
  * <p>
- * Putting people ashore is the destination's own business rather than the service's, because the two kinds of place a
- * ship can reach do it differently. A world that is always there only has to pick which of its docks the crew lands at.
- * A discovery island is not there at all while they are sailing — it is cloned at the moment they arrive — so its shore
- * cannot be resolved in advance, and asking for it early would leave a world standing empty for the whole voyage.
+ * Placing the crew is the destination's responsibility rather than the service's, because the two kinds of site behave
+ * differently. A permanent site only has to choose which of its arrival points to use. An on-demand site does not exist
+ * while the voyage is running, since its world is cloned on arrival, so its location cannot be resolved in advance and
+ * resolving it early would hold an empty world open for the whole voyage.
  *
- * @see VoyageService for the crossing itself
+ * @see VoyageService for the voyage itself
  */
 public interface Landfall {
 
-    /** The name of the place, shown while sailing and on arrival. */
+    /** The display name, shown during the voyage and on arrival. */
     @NotNull Component displayName();
 
-    /** How long the crossing to it takes. */
+    /** The arrival schedule for voyages to this destination. */
     @NotNull VoyageTiming timing();
 
     /**
-     * Puts the crew ashore, creating the place they have been sailing to if it does not exist until they get there.
-     * Called once, when land is sighted, with the sailors still standing on their stretch of ocean.
+     * Places the crew at the destination, provisioning it first if it does not exist yet. Called once on arrival, with
+     * the players still in the staging world.
      *
-     * @param sailors everyone still aboard, the captain first
-     * @return whether they landed; {@code false} turns the ship around
+     * @param sailors the players still on the voyage, captain first
+     * @return whether they were placed. {@code false} returns them to their origin instead.
      */
     @NotNull CompletableFuture<Boolean> setAshore(@NotNull List<Player> sailors);
 }
