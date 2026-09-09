@@ -21,9 +21,7 @@ import java.util.UUID;
 /**
  * Generates the discovery island offers shown at a helm. Each offer is an unallocated {@link IslandOffer} — no world
  * is cloned until a crew actually sails to one and gets there. Offers are cached per player for a short window so the
- * menu does not reshuffle mid-interaction, and are regenerated with fresh place-names once that window expires. Only
- * templates {@link IslandHostRouter} considers servable from this server are offered, so the navigator never
- * advertises an island it cannot deliver.
+ * menu does not reshuffle mid-interaction, and are regenerated with fresh place-names once that window expires.
  */
 @Singleton
 public class IslandOfferProvider implements DestinationProvider {
@@ -33,7 +31,6 @@ public class IslandOfferProvider implements DestinationProvider {
     private final IslandAllocationTracker allocationTracker;
     private final IslandAllocator allocator;
     private final TravelTransport transport;
-    private final IslandHostRouter router;
     private final CrewService crewService;
     private final VoyageService voyageService;
     private final Cache<UUID, List<Destination>> offerCache;
@@ -49,14 +46,13 @@ public class IslandOfferProvider implements DestinationProvider {
     @Inject
     public IslandOfferProvider(@NotNull IslandTemplateRegistry templateRegistry, @NotNull IslandInstanceManager instanceManager,
                                @NotNull IslandAllocationTracker allocationTracker, @NotNull IslandAllocator allocator,
-                               @NotNull TravelTransport transport, @NotNull IslandHostRouter router,
+                               @NotNull TravelTransport transport,
                                @NotNull CrewService crewService, @NotNull VoyageService voyageService) {
         this.allocationTracker = allocationTracker;
         this.templateRegistry = templateRegistry;
         this.instanceManager = instanceManager;
         this.allocator = allocator;
         this.transport = transport;
-        this.router = router;
         this.crewService = crewService;
         this.voyageService = voyageService;
         this.offerCache = Caffeine.newBuilder()
@@ -90,13 +86,13 @@ public class IslandOfferProvider implements DestinationProvider {
                 allocator, transport, crewService, voyageService, maxInstances);
     }
 
-    /** Everywhere this server could actually deliver somebody to, in a fresh order each time. */
+    /** Everywhere a player can actually be sent, in a fresh order each time. */
     private @NotNull List<IslandTemplate> servableTemplates() {
         final List<IslandTemplate> candidates = new ArrayList<>();
         for (IslandTemplate template : templateRegistry.all()) {
             // Not every template is a place to visit. The open sea a crew crosses is allocated the same way and lives
             // in the same registry, but offering it would sell passage to an empty ocean.
-            if (router.isServable(template) && !VoyageService.LIMBO_TEMPLATE.equals(template.getKey())) {
+            if (!VoyageService.LIMBO_TEMPLATE.equals(template.getKey())) {
                 candidates.add(template);
             }
         }

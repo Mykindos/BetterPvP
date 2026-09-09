@@ -35,7 +35,6 @@ public class IslandWarmPool implements Listener {
     private final IslandInstanceManager instanceManager;
     private final IslandInstanceRepository repository;
     private final IslandBootRecovery bootRecovery;
-    private final IslandHostRouter router;
     private final Map<String, Deque<IslandInstance>> pools = new ConcurrentHashMap<>();
     private final Set<String> refilling = ConcurrentHashMap.newKeySet();
 
@@ -46,13 +45,12 @@ public class IslandWarmPool implements Listener {
     @Inject
     public IslandWarmPool(@NotNull IslandWorldProvisioner provisioner, @NotNull IslandTemplateRegistry templateRegistry,
                            @NotNull IslandInstanceManager instanceManager, @NotNull IslandInstanceRepository repository,
-                           @NotNull IslandBootRecovery bootRecovery, @NotNull IslandHostRouter router) {
+                           @NotNull IslandBootRecovery bootRecovery) {
         this.provisioner = provisioner;
         this.templateRegistry = templateRegistry;
         this.instanceManager = instanceManager;
         this.repository = repository;
         this.bootRecovery = bootRecovery;
-        this.router = router;
     }
 
     /**
@@ -85,15 +83,10 @@ public class IslandWarmPool implements Listener {
         return Optional.of(instance);
     }
 
-    /**
-     * Provisions up to the configured quota per template, in the background, for every locally-hosted template
-     * below it. A template hosted on another server is never pre-provisioned here.
-     */
+    /** Provisions up to the configured quota per template, in the background, for every template below it. */
     public void refill() {
         for (IslandTemplate template : templateRegistry.all()) {
-            if (router.isLocal(template)) {
-                refillTemplate(template);
-            }
+            refillTemplate(template);
         }
     }
 

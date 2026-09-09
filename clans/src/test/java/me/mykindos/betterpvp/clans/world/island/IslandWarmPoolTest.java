@@ -44,9 +44,6 @@ class IslandWarmPoolTest {
     @Mock
     private IslandBootRecovery bootRecovery;
 
-    @Mock
-    private IslandHostRouter router;
-
     private IslandWarmPool warmPool;
 
     private static IslandTemplate template(String key) {
@@ -55,7 +52,7 @@ class IslandWarmPoolTest {
 
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {
-        warmPool = new IslandWarmPool(provisioner, templateRegistry, instanceManager, repository, bootRecovery, router);
+        warmPool = new IslandWarmPool(provisioner, templateRegistry, instanceManager, repository, bootRecovery);
         final Field sizeField = IslandWarmPool.class.getDeclaredField("sizePerTemplate");
         sizeField.setAccessible(true);
         sizeField.set(warmPool, 2);
@@ -120,19 +117,16 @@ class IslandWarmPoolTest {
     }
 
     @Test
-    @DisplayName("refill provisions for local templates and skips non-local ones")
-    void refillSkipsNonLocalTemplates() {
-        final IslandTemplate local = template("solo");
-        final IslandTemplate remote = template("duo");
-        when(templateRegistry.all()).thenReturn(List.of(local, remote));
-        when(router.isLocal(local)).thenReturn(true);
-        when(router.isLocal(remote)).thenReturn(false);
-
-        when(provisioner.provision(eq(local), any(UUID.class))).thenReturn(new CompletableFuture<>());
+    @DisplayName("refill provisions for every registered template")
+    void refillCoversEveryTemplate() {
+        final IslandTemplate first = template("solo");
+        final IslandTemplate second = template("duo");
+        when(templateRegistry.all()).thenReturn(List.of(first, second));
+        when(provisioner.provision(any(IslandTemplate.class), any(UUID.class))).thenReturn(new CompletableFuture<>());
 
         warmPool.refill();
 
-        verify(provisioner).provision(eq(local), any(UUID.class));
-        verify(provisioner, never()).provision(eq(remote), any(UUID.class));
+        verify(provisioner).provision(eq(first), any(UUID.class));
+        verify(provisioner).provision(eq(second), any(UUID.class));
     }
 }

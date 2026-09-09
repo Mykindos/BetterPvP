@@ -5,10 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Decides where an {@link IslandInstance} for a template comes from. A local implementation provisions (or claims
- * from the warm pool) on this server; a future remote implementation would ask whichever server
- * {@link IslandHostRouter} names to allocate one and hand back its {@link IslandHandle} instead. Callers never need
- * to know which happened.
+ * Decides where an {@link IslandInstance} for a template comes from, provisioning one or claiming it from the warm
+ * pool. Which server a place lives on is answered by {@code Placement} in core, not here.
  */
 public interface IslandAllocator {
 

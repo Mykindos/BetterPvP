@@ -14,9 +14,8 @@ import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
 import me.mykindos.betterpvp.clans.world.island.CrewAllocationPolicy;
 import me.mykindos.betterpvp.clans.world.island.InstanceAllocationPolicy;
 import me.mykindos.betterpvp.clans.world.island.IslandAllocator;
-import me.mykindos.betterpvp.clans.world.island.RoutingIslandAllocator;
-import me.mykindos.betterpvp.clans.world.island.RoutingTravelTransport;
-import me.mykindos.betterpvp.clans.world.island.SoloAllocationPolicy;
+import me.mykindos.betterpvp.clans.world.island.LocalIslandAllocator;
+import me.mykindos.betterpvp.clans.world.island.LocalTravelTransport;
 import me.mykindos.betterpvp.clans.world.island.TravelTransport;
 import me.mykindos.betterpvp.clans.world.travel.TravelGuard;
 import me.mykindos.betterpvp.clans.world.travel.guard.AllocatingTravelGuard;
@@ -62,12 +61,10 @@ public class ClansInjectorModule extends AbstractModule {
         // crewmate of theirs.
         bind(InstanceAllocationPolicy.class).to(CrewAllocationPolicy.class);
 
-        // Where a discovery island instance comes from, and how a player physically gets to one. Both are routed
-        // per-template (allocation) or per-handle (delivery) by IslandHostRouter, so hosting can be split across
-        // servers on a per-template basis rather than as a single global local/remote switch. The local
-        // implementations stay bound as concrete classes so the routers can compose them directly.
-        bind(IslandAllocator.class).to(RoutingIslandAllocator.class);
-        bind(TravelTransport.class).to(RoutingTravelTransport.class);
+        // Where a discovery island instance comes from, and how a player physically gets to one. Which server holds
+        // a place is Placement's question now, so these are bound straight to their local implementations.
+        bind(IslandAllocator.class).to(LocalIslandAllocator.class);
+        bind(TravelTransport.class).to(LocalTravelTransport.class);
     }
 
 }

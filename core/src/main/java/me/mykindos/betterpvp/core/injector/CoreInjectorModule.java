@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.framework.server.VelocityCrossServerMessageSer
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.server.network.PluginMessagingNetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.server.orchestration.CoreOrchestrationGatewayProvider;
+import me.mykindos.betterpvp.core.world.site.SiteModule;
 import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 
 @CustomLog
@@ -34,6 +35,8 @@ public class CoreInjectorModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Core.class).toInstance(plugin);
+
+        install(new SiteModule());
 
         bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
         bind(IFilterService.class).to(DatabaseFilterService.class);

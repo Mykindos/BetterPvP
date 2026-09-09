@@ -47,7 +47,7 @@ public class IslandTemplateRegistry {
         final Set<String> keys = config.getKeys(false);
         for (String key : keys) {
             if (key.equals("hosting")) {
-                // Not a template - IslandHostRouter reads this section for which server hosts each template.
+                // Not a template. Left over from per-template server hosting, which Placement owns now.
                 continue;
             }
 

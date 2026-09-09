@@ -36,7 +36,3 @@ limbo:
   display-name: "The Open Sea"
   template-folder: "templates/islands/limbo"
   icon: WATER_BUCKET
-
-# Which server hosts each island template, by key. A template with no entry here defaults to the server it is
-# running on. Leave empty for an all-local setup.
-hosting: { }

@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.clans.world.island.command;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.world.island.IslandHostRouter;
 import me.mykindos.betterpvp.clans.world.island.IslandInstanceManager;
 import me.mykindos.betterpvp.clans.world.island.IslandTemplate;
 import me.mykindos.betterpvp.clans.world.island.IslandTemplateRegistry;
@@ -33,15 +32,13 @@ public class IslandCreateSubCommand extends Command {
     private final Clans clans;
     private final IslandTemplateRegistry templateRegistry;
     private final IslandInstanceManager instanceManager;
-    private final IslandHostRouter router;
 
     @Inject
     public IslandCreateSubCommand(@NotNull Clans clans, @NotNull IslandTemplateRegistry templateRegistry,
-                                   @NotNull IslandInstanceManager instanceManager, @NotNull IslandHostRouter router) {
+                                   @NotNull IslandInstanceManager instanceManager) {
         this.clans = clans;
         this.templateRegistry = templateRegistry;
         this.instanceManager = instanceManager;
-        this.router = router;
     }
 
     @Override
@@ -70,13 +67,6 @@ public class IslandCreateSubCommand extends Command {
         }
 
         final IslandTemplate template = templateOptional.get();
-        if (!router.isLocal(template)) {
-            UtilMessage.simpleMessage(player, "Islands", Component.text("Island template ", NamedTextColor.RED)
-                    .append(Component.text(template.getKey(), NamedTextColor.YELLOW))
-                    .append(Component.text(" is hosted by '" + router.hostFor(template) + "', not this server.", NamedTextColor.RED)));
-            return;
-        }
-
         instanceManager.allocate(template).thenAccept(instance ->
                 UtilServer.runTask(clans, () -> {
                     if (!player.isOnline()) {
