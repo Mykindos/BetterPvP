@@ -5,9 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.world.crew.Crew;
 import me.mykindos.betterpvp.core.scene.indicator.IndicatorService;
-import me.mykindos.betterpvp.core.world.WorldHandler;
-import me.mykindos.betterpvp.core.world.travel.ServerLocation;
-import me.mykindos.betterpvp.core.world.travel.TravelHistory;
+import me.mykindos.betterpvp.core.world.site.Residency;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -32,18 +30,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Sailors {
 
     private final IndicatorService indicators;
-    private final TravelHistory travelHistory;
-    private final WorldHandler worldHandler;
+    private final Residency residency;
 
     /** Players currently being teleported by this class, checked by {@link #isOurs}. */
     private final Set<UUID> relocating = ConcurrentHashMap.newKeySet();
 
     @Inject
-    public Sailors(@NotNull IndicatorService indicators, @NotNull TravelHistory travelHistory,
-                   @NotNull WorldHandler worldHandler) {
+    public Sailors(@NotNull IndicatorService indicators, @NotNull Residency residency) {
         this.indicators = indicators;
-        this.travelHistory = travelHistory;
-        this.worldHandler = worldHandler;
+        this.residency = residency;
     }
 
     /** The crew members who are online. Offline members are skipped rather than blocking the voyage. */
@@ -109,10 +104,8 @@ public class Sailors {
         player.eject();
     }
 
-    /** The location to return a player to when a voyage has no destination available: their origin, else spawn. */
+    /** The location to return a player to when a voyage has no destination available. */
     public @NotNull Location turnBack(@NotNull Player player) {
-        return travelHistory.origin(player)
-                .flatMap(ServerLocation::toLocation)
-                .orElseGet(worldHandler::getSpawnLocation);
+        return residency.fallback(player);
     }
 }

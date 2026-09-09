@@ -4,9 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.world.WorldHandler;
-import me.mykindos.betterpvp.core.world.travel.ServerLocation;
-import me.mykindos.betterpvp.core.world.travel.TravelHistory;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -16,22 +13,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * Lets a player walk out of a site under their own steam, back to wherever they set out from.
+ * Lets a player leave a site of their own accord, sending them to their anchor.
  */
 @CustomLog
 @Singleton
 public class SiteExitService {
 
     private final SiteInstances instances;
-    private final TravelHistory travelHistory;
-    private final WorldHandler worldHandler;
+    private final Residency residency;
 
     @Inject
-    public SiteExitService(@NotNull SiteInstances instances, @NotNull TravelHistory travelHistory,
-                           @NotNull WorldHandler worldHandler) {
+    public SiteExitService(@NotNull SiteInstances instances, @NotNull Residency residency) {
         this.instances = instances;
-        this.travelHistory = travelHistory;
-        this.worldHandler = worldHandler;
+        this.residency = residency;
     }
 
     public @NotNull Optional<SiteInstance> currentInstance(@NotNull Player player) {
@@ -49,10 +43,7 @@ public class SiteExitService {
             return;
         }
 
-        final Location destination = travelHistory.origin(player)
-                .flatMap(ServerLocation::toLocation)
-                .orElseGet(worldHandler::getSpawnLocation);
-
+        final Location destination = residency.fallback(player);
         player.teleportAsync(destination).thenAccept(arrived -> {
             if (!Boolean.TRUE.equals(arrived)) {
                 log.warn("Player {} failed to teleport off site world {}", player.getName(), player.getWorld().getName()).submit();

@@ -18,9 +18,7 @@ import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
-import me.mykindos.betterpvp.core.world.travel.ServerLocation;
 import me.mykindos.betterpvp.clans.world.ship.ShipService;
-import me.mykindos.betterpvp.core.world.travel.TravelHistory;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -180,11 +178,6 @@ public class Clans extends BPvPPlugin {
     public void onDisable() {
         clanManager.getRepository().processPropertyUpdates(false);
         if (injector != null) {
-            // Island worlds are deleted by IslandBootRecovery at next boot, so anyone still inside one must be moved
-            // out before their logout location is saved into a world that won't exist on rejoin. Synchronous: async
-            // tasks don't run reliably during disable.
-            evacuateIslandOccupants();
-
             // Un-paste every ship before the worlds save. The hulls are drawn fresh each boot from their structures, so
             // letting them reach disk would bake a copy into the map that no longer tracks the structure it came from.
             injector.getInstance(ShipService.class).restoreAll();
@@ -196,22 +189,6 @@ public class Clans extends BPvPPlugin {
 
             // Persist the minimap cache synchronously so a restart keeps the generated map instead of re-caching it.
             injector.getInstance(MapHandler.class).saveMapDataNow();
-        }
-    }
-
-    private void evacuateIslandOccupants() {
-        final TravelHistory travelHistory = injector.getInstance(TravelHistory.class);
-        final WorldHandler worldHandler = injector.getInstance(WorldHandler.class);
-        for (World world : Bukkit.getWorlds()) {
-            if (!world.getName().startsWith("islands/")) {
-                continue;
-            }
-            for (Player player : world.getPlayers()) {
-                final Location destination = travelHistory.origin(player)
-                        .flatMap(ServerLocation::toLocation)
-                        .orElseGet(worldHandler::getSpawnLocation);
-                player.teleport(destination);
-            }
         }
     }
 }

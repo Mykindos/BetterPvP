@@ -19,9 +19,9 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * The single entry point for sending a player to a {@link Destination}. Runs every registered {@link TravelGuard},
- * records where the traveller came from, and hands off to {@link DepartureController} for the departure ceremony.
- * The destination itself performs the actual relocation once the ceremony completes.
+ * The single entry point for sending a player to a {@link Destination}. Runs every registered {@link TravelGuard} and
+ * hands off to {@link DepartureController} for the departure ceremony. The destination itself performs the actual
+ * relocation once the ceremony completes.
  */
 @Singleton
 @CustomLog
@@ -29,15 +29,13 @@ public class TravelService {
 
     private final ClientManager clientManager;
     private final DepartureController departureController;
-    private final TravelHistory travelHistory;
     private final Set<TravelGuard> guards;
 
     @Inject
     public TravelService(ClientManager clientManager, DepartureController departureController,
-                          TravelHistory travelHistory, Set<TravelGuard> guards) {
+                          Set<TravelGuard> guards) {
         this.clientManager = clientManager;
         this.departureController = departureController;
-        this.travelHistory = travelHistory;
         this.guards = guards;
     }
 
@@ -55,13 +53,11 @@ public class TravelService {
             }
         }
 
-        travelHistory.recordOrigin(traveller);
         departureController.begin(traveller, destination, () -> completeVoyage(traveller, destination));
     }
 
     /**
-     * Travels with no departure hold — the guards and origin-recording still apply, but the destination receives the
-     * traveller at once.
+     * Travels with no departure hold. The guards still apply, but the destination receives the traveller at once.
      * <p>
      * For departures that already have their own ceremony to sit through. A ship's crossing is minutes of waiting at
      * sea; making the captain stand still for three seconds first only delays the part that is the wait.
@@ -71,7 +67,6 @@ public class TravelService {
             return;
         }
 
-        travelHistory.recordOrigin(traveller);
         completeVoyage(traveller, destination);
     }
 

@@ -4,9 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.WorldHandler;
-import me.mykindos.betterpvp.core.world.travel.ServerLocation;
-import me.mykindos.betterpvp.core.world.travel.TravelHistory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,15 +26,10 @@ import java.util.Optional;
 public class SiteOccupancyListener implements Listener {
 
     private final SiteInstances instances;
-    private final TravelHistory travelHistory;
-    private final WorldHandler worldHandler;
 
     @Inject
-    public SiteOccupancyListener(@NotNull SiteInstances instances, @NotNull TravelHistory travelHistory,
-                                 @NotNull WorldHandler worldHandler) {
+    public SiteOccupancyListener(@NotNull SiteInstances instances) {
         this.instances = instances;
-        this.travelHistory = travelHistory;
-        this.worldHandler = worldHandler;
     }
 
     @EventHandler
@@ -60,9 +52,8 @@ public class SiteOccupancyListener implements Listener {
     }
 
     /**
-     * Decides what happens to somebody who logs in inside a site's world. A live instance takes them back, since a
-     * brief disconnect should not cost a run. One that is gone leaves them standing in a world nothing owns, so they
-     * are sent back where they set out from.
+     * Counts in a player who logs in inside a live instance. Where they log in at all is {@link Residency}'s, which
+     * runs before this and has already moved anybody whose instance is gone.
      */
     @EventHandler
     public void onJoin(@NotNull PlayerJoinEvent event) {
@@ -72,15 +63,9 @@ public class SiteOccupancyListener implements Listener {
             return;
         }
 
-        final Optional<SiteInstance> instance = instances.byWorld(world.getName());
-        if (instance.isPresent() && instance.get().getState() == SiteInstance.State.READY) {
-            instances.enter(instance.get(), player.getUniqueId());
-            return;
-        }
-
-        player.teleportAsync(travelHistory.origin(player)
-                .flatMap(ServerLocation::toLocation)
-                .orElseGet(worldHandler::getSpawnLocation));
+        instances.byWorld(world.getName())
+                .filter(instance -> instance.getState() == SiteInstance.State.READY)
+                .ifPresent(instance -> instances.enter(instance, player.getUniqueId()));
     }
 
     private void release(@NotNull Player player) {
