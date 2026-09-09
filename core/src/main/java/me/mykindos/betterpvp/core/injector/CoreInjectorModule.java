@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgress
 import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgressServiceImpl;
 import me.mykindos.betterpvp.core.framework.blockbreak.resolver.BlockBreakResolver;
 import me.mykindos.betterpvp.core.framework.blockbreak.resolver.DefaultBlockBreakResolver;
+import me.mykindos.betterpvp.core.framework.net.NetModule;
 import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.VelocityCrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
@@ -37,6 +38,7 @@ public class CoreInjectorModule extends AbstractModule {
     protected void configure() {
         bind(Core.class).toInstance(plugin);
 
+        install(new NetModule());
         install(new SiteModule());
         install(new TravelModule());
 

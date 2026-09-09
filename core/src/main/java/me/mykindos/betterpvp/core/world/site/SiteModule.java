@@ -10,6 +10,6 @@ public class SiteModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(Placement.class).to(LocalPlacement.class);
+        bind(Placement.class).toProvider(PlacementProvider.class);
     }
 }

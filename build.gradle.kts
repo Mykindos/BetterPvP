@@ -104,6 +104,7 @@ subprojects {
     tasks.withType<ShadowJar>().configureEach {
         relocate("com.github.benmanes.caffeine", "me.mykindos.betterpvp.caffeine")
         relocate("com.jeff_media.morepersistentdatatypes", "me.mykindos.morepersistentdatatypes")
+        relocate("redis.clients.jedis", "me.mykindos.betterpvp.jedis")
         archiveBaseName.set(project.name)
         archiveVersion.set("")
         archiveClassifier.set("")

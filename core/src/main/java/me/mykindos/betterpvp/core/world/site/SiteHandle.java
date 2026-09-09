@@ -11,8 +11,20 @@ import java.util.UUID;
 @Value
 public class SiteHandle {
 
+    /**
+     * The instance id of a handle that names a server but not yet an instance on it.
+     * <p>
+     * A party sent to another server needs an instance when they arrive, not before they leave, so the handle can
+     * name the destination without one existing yet.
+     */
+    public static final UUID PENDING = new UUID(0L, 0L);
+
     @NotNull UUID instanceId;
     @NotNull SiteKey key;
     @NotNull String server;
     @NotNull String world;
+
+    public boolean isPending() {
+        return PENDING.equals(instanceId);
+    }
 }

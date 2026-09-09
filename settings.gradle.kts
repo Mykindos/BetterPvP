@@ -154,6 +154,9 @@ dependencyResolutionManagement {
             // Library - Guice
             library("guice", "com.google.inject", "guice").version("7.0.0")
 
+            // Library - Redis
+            library("jedis", "redis.clients", "jedis").version("5.2.0")
+
             // Bundled Libraries
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("junit-jupiter", "mockbukkit"))
