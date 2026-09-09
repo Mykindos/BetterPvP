@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class ClanChatChannel implements IChatChannel {
 
@@ -24,5 +25,10 @@ public class ClanChatChannel implements IChatChannel {
     @Override
     public Collection<? extends Player> getAudience(Player sender) {
         return clan.getMembersAsPlayers();
+    }
+
+    @Override
+    public @NotNull Optional<String> getNetworkKey(@NotNull Player sender) {
+        return Optional.of(String.valueOf(clan.getId()));
     }
 }

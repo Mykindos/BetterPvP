@@ -10,15 +10,18 @@ import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
+import me.mykindos.betterpvp.core.chat.network.NetworkChannels;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
+import java.util.List;
 import java.util.Optional;
 
 @BPvPListener
@@ -26,16 +29,33 @@ import java.util.Optional;
 public class ClansChatListener extends ClanListener {
 
     @Inject
-    public ClansChatListener(ClanManager clanManager, ClientManager clientManager) {
+    public ClansChatListener(ClanManager clanManager, ClientManager clientManager, NetworkChannels networkChannels) {
         super(clanManager, clientManager);
+
+        networkChannels.register(ChatChannel.CLAN, key -> audienceOf(key, false));
+        networkChannels.register(ChatChannel.ALLIANCE, key -> audienceOf(key, true));
+    }
+
+    /** The members of a clan who are on this server, and its allies' too when the message went to the alliance. */
+    private List<Player> audienceOf(String clanId, boolean includeAllies) {
+        final Optional<Clan> clan = clanManager.getClanById(Long.parseLong(clanId));
+        if (clan.isEmpty()) {
+            return List.of();
+        }
+
+        final List<Player> players = clan.get().getMembersAsPlayers();
+        if (includeAllies) {
+            clan.get().getAlliances().forEach(alliance -> players.addAll(alliance.getClan().getMembersAsPlayers()));
+        }
+        return players;
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onChatReceived(ChatReceivedEvent event) {
         Clan targetClan = clanManager.getClanByPlayer(event.getTarget()).orElse(null);
-        Clan senderClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+        Clan senderClan = clanManager.getClanByClient(event.getClient()).orElse(null);
 
-        String playerName = UtilFormat.spoofNameForLunar(event.getPlayer().getName());
+        String playerName = UtilFormat.spoofNameForLunar(event.getClient().getName());
 
         if (event.getChannel() == ChatChannel.SERVER) {
 

@@ -60,6 +60,7 @@ public abstract class Leaderboard<E, T> implements Describable {
     private final ConcurrentHashMap<SearchOptions, ConcurrentSkipListSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
+    private final LeaderboardSync sync;
     private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
     private static int INITIAL_DELAY = 0;
     private static int DELAY_BETWEEN_UPDATE = 0;
@@ -71,6 +72,7 @@ public abstract class Leaderboard<E, T> implements Describable {
 
     protected Leaderboard(BPvPPlugin plugin) {
         this.database = plugin.getInjector().getInstance(Database.class);
+        this.sync = plugin.getInjector().getInstance(LeaderboardSync.class);
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
@@ -219,7 +221,10 @@ public abstract class Leaderboard<E, T> implements Describable {
             }
         }
 
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> types);
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> {
+            announceIfMoved(types);
+            return types;
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -240,6 +245,13 @@ public abstract class Leaderboard<E, T> implements Describable {
             synchronized (types) {
                 types.put(options, indexNow);
             }
+        }
+    }
+
+    /** Lets the other servers know their copy of the standing is behind, when this change actually moved it. */
+    private void announceIfMoved(Map<SearchOptions, Integer> types) {
+        if (!types.isEmpty()) {
+            sync.changed(this);
         }
     }
 
@@ -287,6 +299,8 @@ public abstract class Leaderboard<E, T> implements Describable {
                 types.put(options, indexNow);
             }
         }
+
+        announceIfMoved(types);
         return types;
     }
 

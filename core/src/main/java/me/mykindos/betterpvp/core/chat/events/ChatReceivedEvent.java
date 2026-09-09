@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -16,7 +17,8 @@ import org.bukkit.entity.Player;
 @Setter
 public class ChatReceivedEvent extends CustomCancellableEvent {
 
-    private final Player player;
+    /** The sender, or null when they are on another server and only their {@link #client} is known here. */
+    private final @Nullable Player player;
     private final Client client;
     private final Player target;
     private final ChatChannel channel;
@@ -25,7 +27,7 @@ public class ChatReceivedEvent extends CustomCancellableEvent {
     private Component message;
     private Component prefix;
 
-    public ChatReceivedEvent(Player player, Client client, Player target, ChatChannel channel, Component prefix, Component message) {
+    public ChatReceivedEvent(@Nullable Player player, Client client, Player target, ChatChannel channel, Component prefix, Component message) {
         super(true);
         this.player = player;
         this.client = client;

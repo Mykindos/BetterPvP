@@ -3,19 +3,14 @@ package me.mykindos.betterpvp.core.command.commands.general;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.chat.filter.IFilterService;
-import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
+import me.mykindos.betterpvp.core.chat.network.PrivateMessages;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -25,15 +20,11 @@ import java.util.UUID;
 @Singleton
 public class ReplyCommand extends Command {
 
-    private final ClientManager clientManager;
-    private final IFilterService filterService;
-    private final IIgnoreService ignoreService;
+    private final PrivateMessages privateMessages;
 
     @Inject
-    public ReplyCommand(ClientManager clientManager, IFilterService filterService, IIgnoreService ignoreService) {
-        this.clientManager = clientManager;
-        this.filterService = filterService;
-        this.ignoreService = ignoreService;
+    public ReplyCommand(PrivateMessages privateMessages) {
+        this.privateMessages = privateMessages;
         aliases.add("r");
     }
 
@@ -59,67 +50,20 @@ public class ReplyCommand extends Command {
             return;
         }
 
-        Optional<UUID> lastMessagedOptional = client.getProperty(ClientProperty.LAST_MESSAGED.name());
-        if (lastMessagedOptional.isEmpty()) {
+        final Optional<UUID> lastMessaged = client.getProperty(ClientProperty.LAST_MESSAGED.name());
+        if (lastMessaged.isEmpty()) {
             UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.no_target");
             return;
         }
 
-        UUID lastMessaged = lastMessagedOptional.get();
-        Player target = Bukkit.getPlayer(lastMessaged);
-        if (target == null) {
-            UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.player_not_found");
-            return;
-        }
-
-        Client targetClient = clientManager.search().online(target);
-
-        if (!player.isListed(target) && !client.hasRank(Rank.ADMIN)) {
-            UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.player_not_found");
-            return;
-        }
-
-        String message = String.join(" ", args);
-        filterService.filterMessage(message).thenAccept(filteredMessage -> {
-            boolean isClientIgnored = ignoreService.isClientIgnored(targetClient, client);
-            boolean isTargetIgnored = ignoreService.isClientIgnored(client, targetClient);
-
-            if (isTargetIgnored) {
+        final String message = String.join(" ", args);
+        privateMessages.sendTo(player, client, lastMessaged.get(), message).thenAccept(result -> {
+            if (result.getOutcome() == PrivateMessages.Outcome.IGNORING) {
                 UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.ignored",
-                        Component.text(target.getName(), NamedTextColor.YELLOW));
-                return;
+                        Component.text(result.getTargetName(), NamedTextColor.YELLOW));
+            } else if (result.getOutcome() != PrivateMessages.Outcome.DELIVERED) {
+                UtilMessage.message(player, COMMAND_PREFIX, "core.command.reply.player_not_found");
             }
-
-            final Component you = Translations.component("core.command.message.you");
-
-            if (isClientIgnored) {
-                // We still send a fake message
-                UtilMessage.message(player, MessageCommand.privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
-                        you, Component.text(target.getName()), filteredMessage));
-                client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
-                return;
-            }
-
-
-            UtilMessage.message(player, MessageCommand.privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
-                    you, Component.text(target.getName()), filteredMessage));
-            UtilMessage.message(target, MessageCommand.privateMessage(NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
-                    Component.text(player.getName()), you, filteredMessage));
-
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                if (online.equals(target) || online.equals(player)) continue;
-                if (clientManager.search().online(online).isAdministrating()) {
-                    UtilMessage.message(online, MessageCommand.privateMessage(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN,
-                            Component.text(player.getName()), Component.text(target.getName()), filteredMessage));
-                }
-            }
-
-            client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
-            targetClient.putProperty(ClientProperty.LAST_MESSAGED.name(), client.getUniqueId(), true);
-
-            log.info(player.getName() + " messaged " + target.getName() + ": " + message).submit();
-
         });
-
     }
 }
