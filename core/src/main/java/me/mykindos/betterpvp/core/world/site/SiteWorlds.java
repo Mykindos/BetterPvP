@@ -11,11 +11,14 @@ import org.bukkit.GameRules;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,6 +32,14 @@ public class SiteWorlds {
 
     /** What every cloned instance world's name begins with, whatever site it came from. */
     public static final String WORLD_ROOT = "sites/";
+
+    /**
+     * Names the template a world folder was built from, written inside the folder itself.
+     * <p>
+     * An owner who can change what their world is built from needs the old answer to compare against, and keeping it
+     * beside the folder means it cannot drift from what is actually on disk.
+     */
+    private static final String TEMPLATE_MARKER = ".site-template";
 
     private final Core core;
 
@@ -61,9 +72,24 @@ public class SiteWorlds {
     /**
      * Makes a world available and loaded. A folder already on disk is loaded as it stands, which is what adopting a
      * hand-built world and waking a dormant one both come down to. A missing folder is cloned from the site's
-     * template, or generated fresh if the site owns its folder outright.
+     * template. An owned site with no template generates one instead, since nothing says an owner's world has to
+     * start from anything in particular.
      */
     public @NotNull CompletableFuture<World> open(@NotNull WorldSource source, @NotNull String worldName) {
+        return open(source, worldName, null);
+    }
+
+    /**
+     * As {@link #open(WorldSource, String)}, with the template the owner chose rather than the one the site was
+     * configured with. An owned folder already on disk that was built from a different template is rebuilt from this
+     * one, which is the whole of what changing it comes down to.
+     * <p>
+     * A null template means the owner has not chosen, which is deliberately not the same as choosing the site's
+     * default: a folder already on disk is left exactly as it is. Otherwise a record that had not finished loading
+     * would read as "no choice" and rebuild somebody's world out from under them.
+     */
+    public @NotNull CompletableFuture<World> open(@NotNull WorldSource source, @NotNull String worldName,
+                                                  @Nullable String template) {
         final World loaded = Bukkit.getWorld(worldName);
         if (loaded != null) {
             return CompletableFuture.completedFuture(loaded);
@@ -71,7 +97,12 @@ public class SiteWorlds {
 
         final File folder = new File(Bukkit.getWorldContainer(), worldName);
         if (folder.isDirectory()) {
-            return load(worldName, folder, false);
+            if (source.getKind() != WorldSource.Kind.OWN || template == null || template.equals(builtFrom(folder))) {
+                return load(worldName, folder, false);
+            }
+
+            log.info("World '{}' was built from '{}' and is now '{}' - rebuilding", worldName, builtFrom(folder), template).submit();
+            return destroy(worldName).thenCompose(unused -> rebuild(template, worldName, folder));
         }
 
         if (source.getKind() == WorldSource.Kind.ADOPT) {
@@ -79,11 +110,46 @@ public class SiteWorlds {
                     "World '" + worldName + "' is adopted but does not exist"));
         }
 
-        if (source.getKind() == WorldSource.Kind.OWN) {
-            return load(worldName, folder, true);
+        final String seed = source.getKind() == WorldSource.Kind.CLONE
+                ? source.getValue()
+                : Objects.requireNonNullElse(template, source.getTemplate());
+
+        // An owned site with nothing to build from generates a world instead, since nothing says an owner's world
+        // has to start from anything in particular.
+        return seed == null ? load(worldName, folder, true) : rebuild(seed, worldName, folder);
+    }
+
+    private @NotNull CompletableFuture<World> rebuild(@NotNull String template, @NotNull String worldName,
+                                                      @NotNull File folder) {
+        return copyTemplate(template, worldName, folder)
+                .thenCompose(unused -> load(worldName, folder, true))
+                .thenApply(world -> {
+                    markBuiltFrom(folder, template);
+                    return world;
+                });
+    }
+
+    /** The template a folder on disk was built from, or null for one made before it was worth recording. */
+    private @Nullable String builtFrom(@NotNull File folder) {
+        final File marker = new File(folder, TEMPLATE_MARKER);
+        if (!marker.isFile()) {
+            return null;
         }
 
-        return copyTemplate(source.getValue(), worldName, folder).thenCompose(unused -> load(worldName, folder, true));
+        try {
+            return Files.readString(marker.toPath()).trim();
+        } catch (IOException unreadable) {
+            log.warn("Could not read the template marker in {}", folder, unreadable).submit();
+            return null;
+        }
+    }
+
+    private void markBuiltFrom(@NotNull File folder, @NotNull String template) {
+        try {
+            Files.writeString(new File(folder, TEMPLATE_MARKER).toPath(), template);
+        } catch (IOException unwritable) {
+            log.warn("Could not record the template for {}", folder, unwritable).submit();
+        }
     }
 
     /** Unloads a world, saving it and leaving its folder alone so it can be opened again later. */

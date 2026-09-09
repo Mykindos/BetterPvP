@@ -97,7 +97,7 @@ public class SiteRegistry implements Reloadable {
 
         final String folder = world.getString("own");
         if (folder != null) {
-            return WorldSource.own(folder);
+            return WorldSource.own(folder, world.getString("from"));
         }
 
         log.warn("Site '{}' has a 'world' block with no adopt, clone or own - skipping", id).submit();

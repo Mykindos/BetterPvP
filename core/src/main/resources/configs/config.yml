@@ -12,6 +12,10 @@ core:
       password: BetterPvP123!
       ip: 127.0.0.1:5002
       maxPoolSize: 10
+  site:
+    # Where a site's record is kept: everything about an instance its world does not hold by itself.
+    # 'local' is files under this plugin's folder. Another store registers its own name through SiteStorages.
+    storage: local
   network:
     # Which implementation carries each of these. 'auto' takes Redis when it is reachable and the proxy otherwise.
     # Another network registers its own names through NetworkTransports and they can be named here.

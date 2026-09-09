@@ -3,9 +3,14 @@ package me.mykindos.betterpvp.core.world.site;
 import me.mykindos.betterpvp.core.Core;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -84,24 +89,34 @@ class SiteInstancesTest {
     private SiteInstances instances;
     private AtomicInteger worldCounter;
 
+    private MockedStatic<Bukkit> bukkitStatic;
+
     @BeforeEach
     void setUp() {
+        bukkitStatic = Mockito.mockStatic(Bukkit.class);
+        bukkitStatic.when(Bukkit::getPluginManager).thenReturn(mock(PluginManager.class));
+
         registry = new SiteRegistry(mock(Core.class));
         registry.load(YamlConfiguration.loadConfiguration(new StringReader(CATALOGUE)));
-        instances = new SiteInstances(registry, worlds, store);
+        instances = new SiteInstances(registry, worlds, store, new SiteOwners());
         worldCounter = new AtomicInteger();
 
         when(worlds.worldNameFor(any(), any(), any())).thenAnswer(call -> {
             final Site site = call.getArgument(0);
             return "worlds/" + site.getId() + "/" + worldCounter.incrementAndGet();
         });
-        when(worlds.open(any(), anyString())).thenAnswer(call -> {
+        when(worlds.open(any(), anyString(), any())).thenAnswer(call -> {
             final World world = mock(World.class);
             when(world.getName()).thenReturn(call.getArgument(1));
             return CompletableFuture.completedFuture(world);
         });
         when(worlds.unload(anyString())).thenReturn(CompletableFuture.completedFuture(null));
         when(worlds.destroy(anyString())).thenReturn(CompletableFuture.completedFuture(null));
+    }
+
+    @AfterEach
+    void tearDown() {
+        bukkitStatic.close();
     }
 
     private SiteInstance locate(String siteId, Party party) {
@@ -234,7 +249,7 @@ class SiteInstancesTest {
         final SiteInstance located = locate("isle", Party.solo(UUID.randomUUID()));
 
         assertSame(warm, located);
-        verify(worlds, times(1)).open(any(), anyString());
+        verify(worlds, times(1)).open(any(), anyString(), any());
     }
 
     @Test

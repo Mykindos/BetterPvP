@@ -1,7 +1,7 @@
 # Every place a player can be. See the Site Framework reference:
 # https://outline.betterpvp.net/doc/site-framework-T5MqndTHVB
 #
-# world:      adopt <world name> | clone <template folder> | own <folder>
+# world:      adopt <world name> | clone <template folder> | own <folder> [+ from <template folder>]
 # lifecycle:  PERMANENT | POOLED | ON_DEMAND | OWNED
 # admission:  open | party | private  (modules contribute their own, e.g. clan)
 # selection:  fill-first or spread
@@ -96,13 +96,14 @@ fishing:
   rejoin: ANCHOR
   dormancy-grace-seconds: 120
 
-# Not built yet. Kept here because the catalogue is the design test: if a place cannot be written as a row, the model
-# is missing something.
+# One per clan, made the first time somebody sails home and kept from then on. 'from' is what a new one is copied
+# from; without it a clan would be given raw generated terrain with no dock to land at.
 camp:
   display-name: "Camp"
   icon: CAMPFIRE
   world:
     own: "camps/"
+    from: "templates/camp"
   lifecycle: OWNED
   admission: clan
   anchorable: true
@@ -110,3 +111,6 @@ camp:
   rejoin-at: EXACT
   dormancy: UNLOAD_WHEN_EMPTY
   dormancy-grace-seconds: 300
+  arrival:
+    # A camp has one landing, so a crew that sailed home comes ashore together.
+    distribution: first

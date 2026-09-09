@@ -100,6 +100,7 @@ class SiteRegistryTest {
         assertFalse(camp.getPolicy().reapsWhenEmpty(), "a camp is never destroyed");
         assertEquals(300, camp.getPolicy().getDormancyGraceSeconds());
         assertEquals(SiteKey.of("camp", 42L), camp.keyFor(42L));
+        assertNotNull(camp.getWorldSource().getTemplate(), "a new camp is copied from something rather than generated");
     }
 
     @Test

@@ -16,6 +16,10 @@ clans:
     protectionAdditionalMinutesPerMember: 2.5
     protectionBaseTimeInMinutes: 5.0
     regenerationTimeInMinutes: 5.0
+  camp:
+    # Where a camp's skins live. A clan's chosen skin is a folder name under this, and the camp world is rebuilt
+    # from it whenever the choice changes. Falls back to the camp site's own 'from' template when nothing is chosen.
+    skins: "templates/camps/"
   coins:
     percentCoinsDroppedOnDeath: 0.1
     dropCoinsOnDeath: true

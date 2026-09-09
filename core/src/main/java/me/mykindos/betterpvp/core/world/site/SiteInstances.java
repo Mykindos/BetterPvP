@@ -6,6 +6,8 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -35,12 +37,15 @@ public class SiteInstances implements Listener {
     private final SiteRegistry registry;
     private final SiteWorlds worlds;
     private final SiteStore store;
+    private final SiteOwners owners;
 
     @Inject
-    public SiteInstances(@NotNull SiteRegistry registry, @NotNull SiteWorlds worlds, @NotNull SiteStore store) {
+    public SiteInstances(@NotNull SiteRegistry registry, @NotNull SiteWorlds worlds, @NotNull SiteStore store,
+                         @NotNull SiteOwners owners) {
         this.registry = registry;
         this.worlds = worlds;
         this.store = store;
+        this.owners = owners;
     }
 
     /**
@@ -132,6 +137,7 @@ public class SiteInstances implements Listener {
         return worlds.unload(instance.getWorldName()).thenRun(() -> {
             instance.setState(SiteInstance.State.DORMANT);
             store.updateState(id, SiteInstance.State.DORMANT);
+            UtilServer.callEvent(new SiteInstanceDormantEvent(instance));
             log.info("Site instance {} ({}) is dormant", id, instance.getKey()).submit();
         });
     }
@@ -277,6 +283,12 @@ public class SiteInstances implements Listener {
         return locate(SiteKey.of(fallback), party, visited);
     }
 
+    /** Opens an instance's world from whatever its owner says it should be built from. */
+    private @NotNull CompletableFuture<World> open(@NotNull Site site, @NotNull SiteKey key,
+                                                              @NotNull String worldName) {
+        return worlds.open(site.getWorldSource(), worldName, owners.templateFor(site, key).orElse(null));
+    }
+
     private boolean hasRoom(@NotNull SiteInstance instance, @NotNull SitePolicy policy, @NotNull Party party) {
         if (policy.getCapacity() <= 0) {
             return true;
@@ -294,7 +306,7 @@ public class SiteInstances implements Listener {
 
     private @NotNull CompletableFuture<SiteInstance> wake(@NotNull Site site, @NotNull SiteInstance instance) {
         instance.setState(SiteInstance.State.PROVISIONING);
-        return worlds.open(site.getWorldSource(), instance.getWorldName()).thenApply(world -> {
+        return open(site, instance.getKey(), instance.getWorldName()).thenApply(world -> {
             instance.setState(SiteInstance.State.READY);
             store.updateState(instance.getId(), SiteInstance.State.READY);
             log.info("Woke site instance {} ({}) at world '{}'", instance.getId(), instance.getKey(), world.getName()).submit();
@@ -312,7 +324,7 @@ public class SiteInstances implements Listener {
         final SiteInstance instance = new SiteInstance(id, key, worldName, SiteInstance.State.PROVISIONING);
         instances.put(id, instance);
 
-        return worlds.open(site.getWorldSource(), worldName).thenApply(world -> {
+        return open(site, key, worldName).thenApply(world -> {
             instance.setState(SiteInstance.State.READY);
             store.save(instance);
             log.info("Provisioned site instance {} ({}) at world '{}'", id, key, world.getName()).submit();

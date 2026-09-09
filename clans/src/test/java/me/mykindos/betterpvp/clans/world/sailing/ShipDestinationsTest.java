@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.world.site.Site;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
+import me.mykindos.betterpvp.core.world.site.SiteOwners;
 import me.mykindos.betterpvp.core.world.site.SiteRegistry;
 import me.mykindos.betterpvp.core.world.travel.Destination;
 import net.kyori.adventure.text.Component;
@@ -27,6 +28,7 @@ import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,6 +67,7 @@ class ShipDestinationsTest {
                 clone: "templates/woodcutting"
               lifecycle: ON_DEMAND
             camp:
+              display-name: "Camp"
               world:
                 own: "camps/"
               lifecycle: OWNED
@@ -86,13 +89,15 @@ class ShipDestinationsTest {
     private Player player;
 
     private SiteRegistry registry;
+    private SiteOwners owners;
     private ShipDestinations destinations;
 
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {
         registry = new SiteRegistry(mock(Core.class));
         registry.load(YamlConfiguration.loadConfiguration(new StringReader(CATALOGUE)));
-        destinations = new ShipDestinations(registry, instances, crewService, voyageService, placement);
+        owners = new SiteOwners();
+        destinations = new ShipDestinations(registry, instances, crewService, voyageService, placement, owners);
 
         final Field count = ShipDestinations.class.getDeclaredField("expeditionCount");
         count.setAccessible(true);
@@ -129,9 +134,30 @@ class ShipDestinationsTest {
     }
 
     @Test
-    @DisplayName("an owned site is not something you can sail to yet")
-    void ownedSitesAreNotOffered() {
-        assertFalse(namesOffered().contains("Camp"));
+    @DisplayName("an owned site nobody has claimed for this player is not offered")
+    void anUnownedSiteIsNotOffered() {
+        assertFalse(namesOffered().contains("Camp"), "a player with no clan has no camp to sail to");
+    }
+
+    @Test
+    @DisplayName("a place the player owns is offered, and only to them")
+    void anOwnedSiteIsOfferedToItsOwner() {
+        owners.register("camp", who -> OptionalLong.of(7L));
+
+        assertTrue(namesOffered().contains("Camp"));
+    }
+
+    @Test
+    @DisplayName("an owned site is sailed to under the owner's own key, not the site's")
+    void anOwnedSiteCarriesItsOwner() {
+        owners.register("camp", who -> OptionalLong.of(7L));
+
+        final ShipDestination camp = (ShipDestination) destinations.destinationsFor(player).stream()
+                .filter(destination -> ((TextComponent) destination.displayName()).content().equals("Camp"))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(SiteKey.of("camp", 7L), camp.getSiteKey());
     }
 
     @Test
