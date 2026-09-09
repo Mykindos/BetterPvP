@@ -22,7 +22,7 @@ public class AllianceChatChannel implements IChatChannel {
     }
 
     @Override
-    public Collection<? extends Player> getAudience() {
+    public Collection<? extends Player> getAudience(Player sender) {
         List<Player> players = clan.getMembersAsPlayers();
         clan.getAlliances().forEach(alliance -> players.addAll(alliance.getClan().getMembersAsPlayers()));
         return players;

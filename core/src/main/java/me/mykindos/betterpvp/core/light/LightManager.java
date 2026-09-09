@@ -61,16 +61,12 @@ public class LightManager extends Manager<String, BPvPLight> {
             default:
                 return;
         }
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            player.sendBlockChange(location, lightData);
-        });
+        location.getWorld().getPlayers().forEach(player -> player.sendBlockChange(location, lightData));
     }
 
     private void removeLight(Location location) {
         BlockData blockData = location.getBlock().getBlockData();
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            player.sendBlockChange(location, blockData);
-        });
+        location.getWorld().getPlayers().forEach(player -> player.sendBlockChange(location, blockData));
     }
 
     public void removeLight(UUID playerID, String source) {

@@ -9,7 +9,11 @@ public interface IChatChannel {
 
     ChatChannel getChannel();
 
-    Collection<? extends Player> getAudience();
+    /**
+     * Everyone this channel delivers to when {@code sender} speaks. The sender matters because the local channel
+     * reaches whoever is around them, while the rest have a roster of their own.
+     */
+    Collection<? extends Player> getAudience(Player sender);
 
     default Rank getRequiredRank() {
         return Rank.PLAYER;

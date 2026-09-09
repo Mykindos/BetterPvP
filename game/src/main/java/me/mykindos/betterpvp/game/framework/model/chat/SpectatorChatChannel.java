@@ -19,7 +19,7 @@ public class SpectatorChatChannel implements IChatChannel {
     }
 
     @Override
-    public Collection<? extends Player> getAudience() {
+    public Collection<? extends Player> getAudience(Player sender) {
         return playerController.getSpectators().keySet();
     }
 }

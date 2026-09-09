@@ -20,7 +20,7 @@ public class StaffChatChannel implements IChatChannel {
     }
 
     @Override
-    public Collection<? extends Player> getAudience() {
+    public Collection<? extends Player> getAudience(Player sender) {
         return clientManager.getOnline().stream().filter(client -> client.getGamer().getPlayer() != null
                         && client.getRank().getId() >= Rank.TRIAL_MOD.getId())
                 .map(client -> client.getGamer().getPlayer()).toList();

@@ -90,7 +90,7 @@ public class ChatListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
 
         filterService.filterMessage(event.getMessage()).thenAccept(filteredMessage -> {
-            for (Player onlinePlayer : event.getChannel().getAudience()) {
+            for (Player onlinePlayer : event.getChannel().getAudience(player)) {
                 // If a per-recipient renderer is provided (e.g. /showitem localizing its hover item into the
                 // recipient's locale), use it for this recipient; otherwise deliver the shared filtered message.
                 final Component recipientMessage = event.getMessageRenderer() != null

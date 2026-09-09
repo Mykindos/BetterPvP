@@ -82,7 +82,7 @@ public class HumanNPC extends NPC {
      * players in range, and is the thing that re-shows it after the client discards it.
      */
     public void show() {
-        for (Player viewer : Bukkit.getOnlinePlayers()) {
+        for (Player viewer : getHandle().getLocation().getWorld().getPlayers()) {
             showTo(viewer);
         }
     }
@@ -175,7 +175,7 @@ public class HumanNPC extends NPC {
 
     /** Despawns the NPC client-side and drops its tab-list profile entry for every online player. */
     public void hide() {
-        for (Player viewer : Bukkit.getOnlinePlayers()) {
+        for (Player viewer : getHandle().getLocation().getWorld().getPlayers()) {
             hideTo(viewer);
         }
         viewers.clear();

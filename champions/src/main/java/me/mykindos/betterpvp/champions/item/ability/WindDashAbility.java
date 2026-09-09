@@ -121,9 +121,7 @@ public class WindDashAbility extends CooldownInteraction implements DisplayedInt
                 }
 
                 ticks++;
-                final Player[] receivers = Bukkit.getOnlinePlayers().stream()
-                        .map(p -> (Player) p)
-                        .toArray(Player[]::new);
+                final Player[] receivers = player.getWorld().getPlayers().toArray(Player[]::new);
                 Particle.CLOUD.builder()
                         .location(player.getLocation())
                         .count(10)
