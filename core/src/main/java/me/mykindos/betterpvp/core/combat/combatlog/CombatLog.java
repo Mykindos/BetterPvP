@@ -16,16 +16,20 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.UUID;
 
 @CustomLog
 @Getter
 public class CombatLog {
+
+    public static final NamespacedKey COMBAT_LOG_KEY = new NamespacedKey("betterpvp", "combat_log");
 
     private final UUID owner;
     private final long expiryTime;
@@ -49,6 +53,7 @@ public class CombatLog {
         combatLogSheep.setCustomNameVisible(true);
         combatLogSheep.setRemoveWhenFarAway(false);
 
+        combatLogSheep.getPersistentDataContainer().set(COMBAT_LOG_KEY, PersistentDataType.BOOLEAN, true);
     }
 
     public void onClicked(Player player, WorldHandler worldHandler, OfflineMessagesHandler offlineMessagesHandler) {
@@ -59,6 +64,10 @@ public class CombatLog {
 
         combatLogSheep.remove();
         CraftInventoryPlayer inventory = UtilInventory.getOfflineInventory(playerName, owner);
+        if (inventory == null) {
+            log.error("Failed to retrieve offline inventory for {} ({}) while processing combat log", playerName, owner).submit();
+            return;
+        }
 
         for (ItemStack stack : inventory.getContents()) {
             if (stack == null || stack.getType() == Material.AIR || stack.getType() == Material.IRON_HORSE_ARMOR) {
