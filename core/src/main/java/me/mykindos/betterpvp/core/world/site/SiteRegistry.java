@@ -71,7 +71,9 @@ public class SiteRegistry implements Reloadable {
                     icon(section.getString("icon", "GRASS_BLOCK")),
                     worldSource,
                     policy(section),
-                    timing(section.getConfigurationSection("voyage"))));
+                    timing(section.getConfigurationSection("voyage")),
+                    arrivalSection(section).getString("marker", ArrivalPoints.DEFAULT_MARKER),
+                    ArrivalDistribution.byName(arrivalSection(section).getString("distribution", "random"))));
         }
 
         log.info("Loaded {} site(s)", sites.size()).submit();
@@ -129,6 +131,11 @@ public class SiteRegistry implements Reloadable {
                 voyage.getInt("min-seconds", VoyageTiming.DEFAULT.getMinSeconds()),
                 voyage.getInt("max-seconds", VoyageTiming.DEFAULT.getMaxSeconds()),
                 voyage.getDouble("chance", VoyageTiming.DEFAULT.getChancePerRoll()));
+    }
+
+    private @NotNull ConfigurationSection arrivalSection(@NotNull ConfigurationSection section) {
+        final ConfigurationSection arrival = section.getConfigurationSection("arrival");
+        return arrival == null ? section.createSection("arrival") : arrival;
     }
 
     /**

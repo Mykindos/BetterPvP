@@ -5,10 +5,13 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -61,20 +64,41 @@ public class LocalPlacement implements Placement {
 
     @Override
     public @NotNull CompletableFuture<Boolean> send(@NotNull Player traveller, @NotNull SiteHandle handle) {
+        return sendAll(List.of(traveller), handle);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Boolean> sendAll(@NotNull Collection<Player> travellers, @NotNull SiteHandle handle) {
+        if (travellers.isEmpty()) {
+            return CompletableFuture.completedFuture(false);
+        }
+
         if (!handle.getServer().equals(currentServer())) {
-            log.warn("Cannot send {} to instance {} - it is on '{}' and remote delivery is not implemented yet",
-                    traveller.getName(), handle.getInstanceId(), handle.getServer()).submit();
+            log.warn("Cannot send {} traveller(s) to instance {} - it is on '{}' and remote delivery is not implemented yet",
+                    travellers.size(), handle.getInstanceId(), handle.getServer()).submit();
             return CompletableFuture.failedFuture(new UnsupportedOperationException(
                     "Instance '" + handle.getInstanceId() + "' is on '" + handle.getServer() + "', which this server cannot reach"));
         }
 
         final World world = Bukkit.getWorld(handle.getWorld());
         if (world == null) {
-            log.warn("Cannot send {} to instance {} - world '{}' is not loaded", traveller.getName(), handle.getInstanceId(), handle.getWorld()).submit();
+            log.warn("Cannot send anybody to instance {} - world '{}' is not loaded", handle.getInstanceId(), handle.getWorld()).submit();
             return CompletableFuture.completedFuture(false);
         }
 
-        return traveller.teleportAsync(world.getSpawnLocation());
+        final Location landing = landingIn(world, handle);
+        final List<CompletableFuture<Boolean>> arrivals = travellers.stream()
+                .map(traveller -> traveller.teleportAsync(landing))
+                .toList();
+
+        return CompletableFuture.allOf(arrivals.toArray(CompletableFuture[]::new)).thenApply(ignored -> true);
+    }
+
+    /** The spot a party is put down at, read off the site's own arrival markers. */
+    private @NotNull Location landingIn(@NotNull World world, @NotNull SiteHandle handle) {
+        return registry.get(handle.getKey().getSiteId())
+                .map(site -> ArrivalPoints.choose(world, site.getArrivalMarker(), site.getArrival()))
+                .orElseGet(world::getSpawnLocation);
     }
 
     private @NotNull String currentServer() {

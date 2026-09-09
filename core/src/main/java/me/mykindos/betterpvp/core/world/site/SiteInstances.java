@@ -294,7 +294,7 @@ public class SiteInstances implements Listener {
 
     private @NotNull CompletableFuture<SiteInstance> wake(@NotNull Site site, @NotNull SiteInstance instance) {
         instance.setState(SiteInstance.State.PROVISIONING);
-        return worlds.open(site, instance.getWorldName()).thenApply(world -> {
+        return worlds.open(site.getWorldSource(), instance.getWorldName()).thenApply(world -> {
             instance.setState(SiteInstance.State.READY);
             store.updateState(instance.getId(), SiteInstance.State.READY);
             log.info("Woke site instance {} ({}) at world '{}'", instance.getId(), instance.getKey(), world.getName()).submit();
@@ -312,7 +312,7 @@ public class SiteInstances implements Listener {
         final SiteInstance instance = new SiteInstance(id, key, worldName, SiteInstance.State.PROVISIONING);
         instances.put(id, instance);
 
-        return worlds.open(site, worldName).thenApply(world -> {
+        return worlds.open(site.getWorldSource(), worldName).thenApply(world -> {
             instance.setState(SiteInstance.State.READY);
             store.save(instance);
             log.info("Provisioned site instance {} ({}) at world '{}'", id, key, world.getName()).submit();

@@ -23,6 +23,12 @@ public class Site {
     /** How long the crossing to it takes. */
     @NotNull VoyageTiming timing;
 
+    /** The Mapper marker naming this site's landing spots. */
+    @NotNull String arrivalMarker;
+
+    /** Which of those spots a party is put down at. */
+    @NotNull ArrivalDistribution arrival;
+
     public @NotNull SiteKey key() {
         return SiteKey.of(id);
     }

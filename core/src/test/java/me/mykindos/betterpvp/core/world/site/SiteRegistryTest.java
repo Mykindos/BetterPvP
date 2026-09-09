@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ class SiteRegistryTest {
     @Test
     @DisplayName("ships every site in the catalogue")
     void shipsTheCatalogue() {
-        assertEquals(Set.of("aldenmark", "spawn", "lost-isle", "camp"),
+        assertEquals(Set.of("aldenmark", "spawn", "mining", "woodcutting", "fishing", "camp"),
                 loadShippedCatalogue().all().stream().map(Site::getId).collect(Collectors.toSet()));
     }
 
@@ -59,21 +60,29 @@ class SiteRegistryTest {
     }
 
     @Test
-    @DisplayName("a pooled hub carries its bounds, capacity and fallback")
-    void pooledHub() {
-        final SitePolicy spawn = site("spawn").getPolicy();
-        assertEquals(SitePolicy.Lifecycle.POOLED, spawn.getLifecycle());
-        assertEquals(2, spawn.getMin());
-        assertEquals(8, spawn.getMax());
-        assertEquals(40, spawn.getCapacity());
-        assertEquals("aldenmark", spawn.getFallbackSiteId());
-        assertEquals(SitePolicy.RejoinAt.SPAWN_POINT, spawn.getRejoinAt());
+    @DisplayName("a hub keeps one instance warm and knows where to overflow to")
+    void hub() {
+        final Site spawn = site("spawn");
+        assertEquals(WorldSource.Kind.ADOPT, spawn.getWorldSource().getKind());
+        assertEquals(1, spawn.getPolicy().getMin());
+        assertEquals("aldenmark", spawn.getPolicy().getFallbackSiteId());
+        assertEquals(SitePolicy.RejoinAt.SPAWN_POINT, spawn.getPolicy().getRejoinAt());
+        assertEquals(Selection.fillFirst().select(List.of(1, 5, 2)),
+                spawn.getPolicy().getSelection().select(List.of(1, 5, 2)));
+    }
+
+    @Test
+    @DisplayName("a party lands at the site's own marker, at the spot its distribution picks")
+    void arrival() {
+        assertEquals(ArrivalPoints.DEFAULT_MARKER, site("spawn").getArrivalMarker());
+        assertEquals(0, site("spawn").getArrival().select(List.of("north", "south", "east")),
+                "spawn has a front door, so everyone arrives at the same quay");
     }
 
     @Test
     @DisplayName("an expedition is party-only, reaped, and never an anchor")
     void expedition() {
-        final Site isle = site("lost-isle");
+        final Site isle = site("mining");
         assertEquals(SitePolicy.Lifecycle.ON_DEMAND, isle.getPolicy().getLifecycle());
         assertEquals(WorldSource.Kind.CLONE, isle.getWorldSource().getKind());
         assertFalse(isle.getPolicy().isAnchorable());

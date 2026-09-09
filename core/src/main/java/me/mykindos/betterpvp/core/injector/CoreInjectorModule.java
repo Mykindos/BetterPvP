@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountSer
 import me.mykindos.betterpvp.core.framework.server.network.PluginMessagingNetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.server.orchestration.CoreOrchestrationGatewayProvider;
 import me.mykindos.betterpvp.core.world.site.SiteModule;
+import me.mykindos.betterpvp.core.world.travel.TravelModule;
 import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 
 @CustomLog
@@ -37,6 +38,7 @@ public class CoreInjectorModule extends AbstractModule {
         bind(Core.class).toInstance(plugin);
 
         install(new SiteModule());
+        install(new TravelModule());
 
         bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
         bind(IFilterService.class).to(DatabaseFilterService.class);

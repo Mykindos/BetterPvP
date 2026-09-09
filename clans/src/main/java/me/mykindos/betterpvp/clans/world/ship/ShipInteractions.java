@@ -5,12 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.world.crew.Crew;
 import me.mykindos.betterpvp.clans.world.crew.CrewService;
 import me.mykindos.betterpvp.clans.world.crew.menu.CrewMenu;
-import me.mykindos.betterpvp.clans.world.island.IslandOfferProvider;
-import me.mykindos.betterpvp.clans.world.navigation.NavigationMenu;
-import me.mykindos.betterpvp.clans.world.travel.Destination;
-import me.mykindos.betterpvp.clans.world.travel.TravelService;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageDestination;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageDestinationRegistry;
+import me.mykindos.betterpvp.core.world.travel.NavigationMenu;
+import me.mykindos.betterpvp.core.world.travel.Destination;
+import me.mykindos.betterpvp.core.world.travel.TravelService;
+import me.mykindos.betterpvp.clans.world.sailing.ShipDestinations;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -61,22 +59,19 @@ public class ShipInteractions implements Listener {
     private final Map<UUID, Indicator> captainIcons = new HashMap<>();
     private final Map<String, Indicator> requestArrows = new HashMap<>();
 
-    private final VoyageDestinationRegistry voyageDestinations;
-    private final IslandOfferProvider islandOffers;
+    private final ShipDestinations destinations;
     private final TravelService travelService;
     private final ClientManager clientManager;
 
     @Inject
     public ShipInteractions(@NotNull CrewService crewService, @NotNull ShipService shipService,
                             @NotNull IndicatorService indicators, @NotNull SceneInteractionRegistry sceneInteractions,
-                            @NotNull VoyageDestinationRegistry voyageDestinations,
-                            @NotNull IslandOfferProvider islandOffers,
+                            @NotNull ShipDestinations destinations,
                             @NotNull TravelService travelService, @NotNull ClientManager clientManager) {
         this.crewService = crewService;
         this.shipService = shipService;
         this.indicators = indicators;
-        this.voyageDestinations = voyageDestinations;
-        this.islandOffers = islandOffers;
+        this.destinations = destinations;
         this.travelService = travelService;
         this.clientManager = clientManager;
 
@@ -104,28 +99,18 @@ public class ShipInteractions implements Listener {
             return;
         }
 
-        // Sailing to where you already are is not a journey. Filtered out rather than refused on click, so the menu
-        // never offers a course that cannot be set.
-        final String here = player.getWorld().getName();
-        final List<Destination> destinations = new ArrayList<>(voyageDestinations.available().stream()
-                .filter(destination -> !(destination instanceof VoyageDestination voyage)
-                        || !voyage.getWorldName().equals(here))
-                .toList());
+        // The fixed ports and the uncharted islands come back as one list: a crossing to either is the same crossing,
+        // and the only thing that marks an island out is that it is made when the crew gets there.
+        final List<Destination> courses = new ArrayList<>(destinations.destinationsFor(player));
 
-        // Resource islands sit in the same list as the fixed ports: a crossing to one is the same crossing, and the
-        // only thing that marks it out is that the place is made when the crew gets there rather than waiting for them.
-        islandOffers.destinationsFor(player).stream()
-                .filter(Destination::isReady)
-                .forEach(destinations::add);
-
-        if (destinations.isEmpty()) {
+        if (courses.isEmpty()) {
             UtilMessage.message(player, "clans.prefix.ship", "clans.ship.nowhere-to-sail");
             return;
         }
 
         // Routed through TravelService so the crossing inherits the travel guards - no leaving mid-fight, no double
         // departure - but with no hold: the crossing itself is the wait.
-        new NavigationMenu(destinations, travelService, true).show(player);
+        new NavigationMenu(courses, travelService, true).show(player);
         new SoundEffect(Sound.BLOCK_WOODEN_TRAPDOOR_OPEN, 1.2f, 0.7f).play(player);
     }
 

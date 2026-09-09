@@ -63,7 +63,7 @@ public class SiteWorlds {
      * hand-built world and waking a dormant one both come down to. A missing folder is cloned from the site's
      * template, or generated fresh if the site owns its folder outright.
      */
-    public @NotNull CompletableFuture<World> open(@NotNull Site site, @NotNull String worldName) {
+    public @NotNull CompletableFuture<World> open(@NotNull WorldSource source, @NotNull String worldName) {
         final World loaded = Bukkit.getWorld(worldName);
         if (loaded != null) {
             return CompletableFuture.completedFuture(loaded);
@@ -74,10 +74,9 @@ public class SiteWorlds {
             return load(worldName, folder, false);
         }
 
-        final WorldSource source = site.getWorldSource();
         if (source.getKind() == WorldSource.Kind.ADOPT) {
             return CompletableFuture.failedFuture(new IllegalStateException(
-                    "Site '" + site.getId() + "' adopts world '" + worldName + "', which does not exist"));
+                    "World '" + worldName + "' is adopted but does not exist"));
         }
 
         if (source.getKind() == WorldSource.Kind.OWN) {

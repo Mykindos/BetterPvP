@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.world.site;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -21,5 +22,11 @@ public interface Placement {
 
     /** Puts a player in an instance, by teleport or by handing them to another server. */
     @NotNull CompletableFuture<Boolean> send(@NotNull Player traveller, @NotNull SiteHandle handle);
+
+    /**
+     * Puts a whole party in an instance. Where in it they land is decided once for everybody, so a site that scatters
+     * its arrivals does not scatter a group that travelled together.
+     */
+    @NotNull CompletableFuture<Boolean> sendAll(@NotNull Collection<Player> travellers, @NotNull SiteHandle handle);
 
 }

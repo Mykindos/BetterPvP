@@ -11,17 +11,6 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.PlayerDeathFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
-import me.mykindos.betterpvp.clans.world.island.CrewAllocationPolicy;
-import me.mykindos.betterpvp.clans.world.island.InstanceAllocationPolicy;
-import me.mykindos.betterpvp.clans.world.island.IslandAllocator;
-import me.mykindos.betterpvp.clans.world.island.LocalIslandAllocator;
-import me.mykindos.betterpvp.clans.world.island.LocalTravelTransport;
-import me.mykindos.betterpvp.clans.world.island.TravelTransport;
-import me.mykindos.betterpvp.clans.world.travel.TravelGuard;
-import me.mykindos.betterpvp.clans.world.travel.guard.AllocatingTravelGuard;
-import me.mykindos.betterpvp.clans.world.travel.guard.AlreadyOnIslandTravelGuard;
-import me.mykindos.betterpvp.clans.world.travel.guard.CombatTravelGuard;
-import me.mykindos.betterpvp.clans.world.travel.guard.DepartingTravelGuard;
 
 public class ClansInjectorModule extends AbstractModule {
 
@@ -49,22 +38,6 @@ public class ClansInjectorModule extends AbstractModule {
         final Multibinder<FatiguePunishment> punishments = Multibinder.newSetBinder(binder(), FatiguePunishment.class);
         punishments.addBinding().to(SlownessPunishment.class);
 
-        // Travel guards. Adding a new restriction on where/when a player may travel is a single line here.
-        final Multibinder<TravelGuard> travelGuards = Multibinder.newSetBinder(binder(), TravelGuard.class);
-        travelGuards.addBinding().to(CombatTravelGuard.class);
-        travelGuards.addBinding().to(DepartingTravelGuard.class);
-        travelGuards.addBinding().to(AlreadyOnIslandTravelGuard.class);
-        travelGuards.addBinding().to(AllocatingTravelGuard.class);
-
-        // Discovery island occupancy. Solo for now; swapping to a shared/pooled policy is a single line here.
-        // Crews must land in one island together; a solo traveller still gets their own, since nobody aboard is a
-        // crewmate of theirs.
-        bind(InstanceAllocationPolicy.class).to(CrewAllocationPolicy.class);
-
-        // Where a discovery island instance comes from, and how a player physically gets to one. Which server holds
-        // a place is Placement's question now, so these are bound straight to their local implementations.
-        bind(IslandAllocator.class).to(LocalIslandAllocator.class);
-        bind(TravelTransport.class).to(LocalTravelTransport.class);
     }
 
 }

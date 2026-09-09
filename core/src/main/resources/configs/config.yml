@@ -62,6 +62,12 @@ items:
     cooldown: 20.0
     maxBlocks: 130
 command:
+  site:
+    enabled: true
+    requiredRank: ADMIN
+  leavesite:
+    enabled: true
+    requiredRank: PLAYER
   promote:
     enabled: true
     requiredRank: ADMIN

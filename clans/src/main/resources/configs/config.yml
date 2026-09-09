@@ -79,8 +79,6 @@ clans:
         tint: false
     landmarks:
       death: true
-  aldenmark:
-    world: Aldenmark
   terrain:
     # 'default' applies to every world; add a section named after a world (e.g. terrain.Aldenmark) to override it there.
     default:
@@ -165,9 +163,6 @@ server:
     fastNightCycle: true
     mainWorld: world
 command:
-  leaveisland:
-    enabled: true
-    requiredRank: PLAYER
   allychat:
     enabled: true
     requiredRank: ADMIN

@@ -8,13 +8,20 @@
 # rejoin:     RESUME | REINSTANCE | ANCHOR      rejoin-at: EXACT | SPAWN_POINT
 # dormancy:   ALWAYS_LOADED or UNLOAD_WHEN_EMPTY. An ON_DEMAND site is always reaped once empty.
 # min:        instances kept provisioned ahead of demand, so a party never waits on a world clone.
+# voyage:     how long the crossing takes. A roll every 10s once past min-seconds.
+# arrival:    which of the site's landing markers a party is put down at.
+#
+# A crew always lands together, at one spot chosen once for the whole crew.
 
+# The world name here is the only place it is configured. islands.yml bound content to 'Aldenmark' while voyages.yml
+# sailed to 'world'; whichever your server actually uses, it goes here now.
 aldenmark:
   display-name: "Aldenmark"
   icon: GRASS_BLOCK
   world:
     adopt: "Aldenmark"
   lifecycle: PERMANENT
+  min: 1
   admission: open
   anchorable: true
   rejoin: RESUME
@@ -26,40 +33,71 @@ aldenmark:
   arrival:
     distribution: random
 
+# One world today, so PERMANENT. Pooling it is this row plus a template folder: lifecycle POOLED, world clone, and
+# min/max/capacity. No code changes either way.
 spawn:
   display-name: "Spawn"
-  icon: BEACON
+  icon: OAK_BOAT
   world:
-    clone: "templates/spawn"
-  lifecycle: POOLED
-  min: 2
-  max: 8
-  capacity: 40
+    adopt: "Season-2/Spawn"
+  lifecycle: PERMANENT
+  min: 1
+  capacity: 0
   admission: open
   selection: fill-first
   fallback: aldenmark
   anchorable: true
   rejoin: RESUME
   rejoin-at: SPAWN_POINT
+  voyage:
+    min-seconds: 45
+    max-seconds: 90
+    chance: 0.3
   arrival:
+    # Spawn has a front door; everyone arrives at the same quay.
     distribution: first
 
-lost-isle:
-  display-name: "Uncharted Isle"
-  icon: MAP
+mining:
+  display-name: "Mining Isle"
+  icon: IRON_PICKAXE
   world:
-    clone: "templates/isle_a"
+    clone: "templates/islands/mining"
   lifecycle: ON_DEMAND
   min: 1
+  max: 10
   admission: party
   anchorable: false
   rejoin: ANCHOR
   dormancy-grace-seconds: 120
-  voyage:
-    min-seconds: 45
-    max-seconds: 120
-    chance: 0.25
 
+woodcutting:
+  display-name: "Woodcutting Isle"
+  icon: OAK_LOG
+  world:
+    clone: "templates/islands/woodcutting"
+  lifecycle: ON_DEMAND
+  min: 1
+  max: 10
+  admission: party
+  anchorable: false
+  rejoin: ANCHOR
+  dormancy-grace-seconds: 120
+
+fishing:
+  display-name: "Fishing Isle"
+  icon: FISHING_ROD
+  world:
+    clone: "templates/islands/fishing"
+  lifecycle: ON_DEMAND
+  min: 1
+  max: 10
+  admission: party
+  anchorable: false
+  rejoin: ANCHOR
+  dormancy-grace-seconds: 120
+
+# Not built yet. Kept here because the catalogue is the design test: if a place cannot be written as a row, the model
+# is missing something.
 camp:
   display-name: "Camp"
   icon: CAMPFIRE

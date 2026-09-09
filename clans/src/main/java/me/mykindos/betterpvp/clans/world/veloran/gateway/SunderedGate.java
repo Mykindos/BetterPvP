@@ -9,7 +9,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.clans.world.SceneSpawn;
 import me.mykindos.betterpvp.clans.world.WorldContent;
-import me.mykindos.betterpvp.clans.world.veloran.Veloran;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.zone.NoBuildRule;
@@ -60,13 +59,11 @@ public class SunderedGate implements WorldContent {
     /** Ominous label rendered floating above the portal. */
     public static final Component LABEL = Component.text("The Sundered Gate", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD);
 
-    private final Provider<Veloran> veloranProvider;
     private final GatewayPropFactory propFactory;
     private final ClientManager clientManager;
 
     @Inject
-    public SunderedGate(Provider<Veloran> veloranProvider, GatewayPropFactory propFactory, ClientManager clientManager) {
-        this.veloranProvider = veloranProvider;
+    public SunderedGate(GatewayPropFactory propFactory, ClientManager clientManager) {
         this.propFactory = propFactory;
         this.clientManager = clientManager;
     }
@@ -98,7 +95,6 @@ public class SunderedGate implements WorldContent {
         final Location markerLocation = markerRegion.get().getLocation();
         final GatewayProp prop = new GatewayProp(propFactory,
                 clientManager,
-                veloranProvider,
                 markerLocation,
                 portalRegion.get(),
                 LABEL);

@@ -20,7 +20,8 @@ class SiteWorldsTest {
     private final SiteWorlds worlds = new SiteWorlds(mock(Core.class));
 
     private static Site site(String id, WorldSource source) {
-        return new Site(id, Component.text(id), Material.GRASS_BLOCK, source, SitePolicy.builder().build(), VoyageTiming.DEFAULT);
+        return new Site(id, Component.text(id), Material.GRASS_BLOCK, source, SitePolicy.builder().build(),
+                VoyageTiming.DEFAULT, ArrivalPoints.DEFAULT_MARKER, ArrivalDistribution.random());
     }
 
     @Test

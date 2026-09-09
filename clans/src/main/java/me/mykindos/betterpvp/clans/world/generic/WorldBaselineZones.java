@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.clans.world.generic;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.world.island.IslandWorldProvisioner;
+import me.mykindos.betterpvp.core.world.site.SiteWorlds;
 import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
@@ -90,7 +90,7 @@ public class WorldBaselineZones implements Listener {
         if (world.getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
             return zone(world, "wilderness", Translations.component("clans.territory.wilderness"), true);
         }
-        if (world.getName().startsWith(IslandWorldProvisioner.WORLD_PREFIX)) {
+        if (world.getName().startsWith(SiteWorlds.WORLD_ROOT)) {
             // Keyed by world: every live instance registers its own, and two of them must not collide.
             final String key = ("island_" + world.getName()).toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_.-]", "_");
             return zone(world, key, Component.text("Island"), false);
