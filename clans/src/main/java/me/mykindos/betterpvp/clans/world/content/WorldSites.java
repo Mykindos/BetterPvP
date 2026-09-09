@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Selects the worlds a site runs in, so content can be authored against a place rather than a world name. A site that
- * adopts a world matches that one world; one that is cloned or owned matches every copy.
+ * adopts a world matches that one world, and one that is cloned or owned matches every copy.
  */
 @Singleton
 public class WorldSites {

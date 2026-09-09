@@ -18,8 +18,8 @@ import java.util.Optional;
  * <p>
  * Two players perceive each other when they are in the same world. That is the whole rule, and it is enough because
  * an instance holds exactly one world: two parties on separate copies of the same site are in separate worlds, and so
- * is a crew mid-voyage, and so is anybody in a world no site owns. Asking here rather than asking the world directly
- * is what makes the rule one decision instead of eighty.
+ * is anybody in a world no site owns. Asking here rather than asking the world directly is what makes the rule one
+ * decision instead of eighty.
  * <p>
  * Perception is not visibility. A vanished player is still perceived by this and still receives what it is used to
  * deliver, which is why they can read chat while hidden.
@@ -55,7 +55,7 @@ public class Presence {
         return viewer.getWorld().equals(other.getWorld());
     }
 
-    /** The site whose instance a player is standing in, if any. Nobody is in a site while at sea or in the hub. */
+    /** The site whose instance a player is standing in, if any. A world no site owns has no answer. */
     public @NotNull Optional<Site> siteOf(@NotNull Player player) {
         return instances.byWorld(player.getWorld().getName())
                 .flatMap(instance -> registry.get(instance.getKey().getSiteId()));

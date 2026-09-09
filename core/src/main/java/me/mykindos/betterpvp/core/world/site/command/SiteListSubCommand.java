@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * {@code /site list} — every configured site, and under each one its live instances.
+ * {@code /site list}: every configured site, and under each one its live instances.
  */
 @Singleton
 @SubCommand(SiteCommand.class)

@@ -4,20 +4,21 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * How long a crossing takes. A floor, a ceiling, and the odds on each roll in between.
+ * How long travel to a site takes. A floor, a ceiling, and the odds on each roll in between.
  * <p>
- * The roll reads no clock and no random source. Given time at sea and a sample, it says whether land is sighted.
+ * The roll reads no clock and no random source. Given an elapsed time and a sample, it says whether to arrive, which
+ * is what makes it testable without waiting.
  */
 @Value
 public class VoyageTiming {
 
-    /** Sensible crossing for a destination that has not said otherwise. */
+    /** What a site that has not said otherwise takes. */
     public static final VoyageTiming DEFAULT = new VoyageTiming(45, 120, 0.25);
 
-    /** Seconds before the first roll. No sighting can happen before this. */
+    /** Seconds before the first roll. Nothing can arrive before this. */
     int minSeconds;
 
-    /** Seconds after which arrival is certain, however the rolls have gone. */
+    /** Seconds after which arrival happens regardless of how the rolls went. */
     int maxSeconds;
 
     /** Chance each roll lands, once past the floor. */
@@ -25,15 +26,15 @@ public class VoyageTiming {
 
     public VoyageTiming(int minSeconds, int maxSeconds, double chancePerRoll) {
         this.minSeconds = Math.max(0, minSeconds);
-        // A ceiling below the floor lets the floor win, giving a fixed-length crossing.
+        // A ceiling below the floor lets the floor win, giving a fixed-length journey.
         this.maxSeconds = Math.max(this.minSeconds, maxSeconds);
         this.chancePerRoll = Math.clamp(chancePerRoll, 0.0, 1.0);
     }
 
     /**
-     * Whether the crew sights land on this roll.
+     * Whether this roll arrives.
      *
-     * @param elapsedSeconds how long they have been at sea
+     * @param elapsedSeconds how long the journey has been running
      * @param sample         a value in {@code [0, 1)}
      */
     public boolean arrives(long elapsedSeconds, double sample) {

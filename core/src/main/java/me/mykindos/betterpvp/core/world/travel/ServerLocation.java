@@ -48,8 +48,8 @@ public class ServerLocation {
     }
 
     /**
-     * Parses a stored origin. Values written before server-qualification carry no {@code server|} prefix; those are
-     * treated as belonging to the current server, matching their original meaning.
+     * Parses a stored origin. Values written before server-qualification carry no {@code server|} prefix, and those
+     * are read as belonging to the current server, which is what they originally meant.
      */
     public static @NotNull ServerLocation parse(@NotNull String stored) {
         final int separator = stored.indexOf('|');

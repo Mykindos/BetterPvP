@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * A {@link DestinationProvider} that always offers the same fixed list of destinations, regardless of who is asking.
- * Used for landmarks that exist once and are shared by every player, such as a dock's static islands.
+ * Used for places that exist once and are shared by every player.
  */
 public class StaticDestinationProvider implements DestinationProvider {
 

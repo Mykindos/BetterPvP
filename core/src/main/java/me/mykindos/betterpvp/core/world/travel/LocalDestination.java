@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /**
- * A {@link Destination} that resolves to a {@link Location} on this server — a fixed landmark, a clan core, or the
+ * A {@link Destination} that resolves to a {@link Location} on this server, such as a fixed place, a clan core or the
  * spawn point of some world. Arrival location is resolved lazily through {@code arrival} rather than captured once,
  * so a destination whose world is not currently loaded reports {@link #isReady()} as {@code false} instead of
  * teleporting into a stale location.

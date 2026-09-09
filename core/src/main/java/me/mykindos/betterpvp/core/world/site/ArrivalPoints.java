@@ -16,15 +16,15 @@ import java.util.Optional;
 
 /**
  * Where a party is put down when it reaches a world, read from that world's Mapper markers. Which marker name counts
- * is the caller's to say, since a dock and a gateway are different kinds of front door.
+ * is the caller's to say, since a site may be entered more than one way.
  */
 @CustomLog
 public final class ArrivalPoints {
 
-    /** The marker every world reachable by ship already carries, and the default for any site. */
+    /** The marker every world already carries, and the default for any site. */
     public static final String DEFAULT_MARKER = "ship_arrive";
 
-    /** One place a party can be set down, under the name its marker carries. */
+    /** One place a party can be put down, under the name its marker carries. */
     @Value
     public static class Point {
         @NotNull String name;

@@ -85,8 +85,8 @@ public class Camps implements Listener, SiteOwnership {
     }
 
     /**
-     * Reads a joining player's camp long before they could sail to it, so the answer is already in hand when a world
-     * is being opened on the main thread.
+     * Reads a joining player's camp long before they could travel to it, so the answer is already in hand when a
+     * world is being opened on the main thread.
      */
     @EventHandler
     public void onJoin(@NotNull ClientJoinEvent event) {
@@ -117,8 +117,9 @@ public class Camps implements Listener, SiteOwnership {
     /**
      * Whether a whole party may enter a camp.
      * <p>
-     * Allies count, because a crew sails as one party and is admitted or refused as one. Members only would mean a
-     * captain could not bring an ally home, and would strand that ally at sea rather than merely turning them away.
+     * Allies count, because a crew travels as one party and is admitted or refused as one. Members only would mean
+     * a captain could not bring an ally to their own camp, and that ally would be left with nowhere to go rather than
+     * merely being turned away at the door.
      */
     private boolean admits(@NotNull SiteKey key, @NotNull Set<UUID> party) {
         final Optional<Clan> owner = clanManager.getClanById(key.getOwnerId());

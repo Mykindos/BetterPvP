@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * {@code /leavesite} — returns a player to where they set out from.
+ * {@code /leavesite}: returns a player to where they set out from.
  */
 @Singleton
 public class SiteLeaveCommand extends Command {

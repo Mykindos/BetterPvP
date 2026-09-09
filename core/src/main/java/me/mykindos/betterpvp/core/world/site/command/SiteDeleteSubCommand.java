@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@code /site delete <id> [force]} — destroys an instance and its world.
+ * {@code /site delete <id> [force]}: destroys an instance and its world.
  */
 @Singleton
 @SubCommand(SiteCommand.class)

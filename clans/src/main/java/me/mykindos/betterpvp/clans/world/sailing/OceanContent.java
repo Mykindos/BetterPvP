@@ -17,14 +17,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * The rules of the open sea: look, do not touch.
+ * The building rules for an {@link Ocean} staging world, which are that nothing may be built or broken.
  * <p>
- * A crossing is a few minutes stood on someone else's ship in a world that is deleted when they arrive. Anything built
- * or broken out here is thrown away with the instance, so the only thing free building achieves is letting somebody
- * dismantle the vessel their crew is standing on.
+ * The world is deleted when the voyage ends, so anything placed in it is thrown away regardless. What free building
+ * would actually achieve is letting somebody take apart the ship the rest of the crew is standing on.
  * <p>
- * Covers the whole world rather than the hull, because everything outside the hull is ocean nobody should be editing
- * either.
+ * The rule covers the whole world rather than the ship, since there is nothing outside it worth editing either.
  */
 public class OceanContent implements WorldContent {
 

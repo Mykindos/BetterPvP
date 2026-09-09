@@ -7,8 +7,8 @@ import java.util.List;
 
 /**
  * Supplies the {@link Destination}s a player is offered by a navigator at the moment they interact with it. Unlike a
- * fixed destination list, a provider may generate its offers per player and per interaction — a fixed set of local
- * landmarks and a pool of freshly-generated discovery island offers can sit side by side behind the same interface.
+ * fixed destination list, a provider may work its offers out per player and per interaction, so a fixed set of
+ * places and a pool of freshly made instances can sit side by side behind the same interface.
  */
 @FunctionalInterface
 public interface DestinationProvider {

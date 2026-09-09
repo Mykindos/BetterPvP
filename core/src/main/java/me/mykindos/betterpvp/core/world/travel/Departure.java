@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * An in-flight voyage: a traveller mid-departure toward a {@link Destination}, tracked by {@link DepartureController}
- * from the moment they commit until they either arrive or are interrupted.
+ * A player who has committed to a {@link Destination} and is being held in place until they reach it, tracked by
+ * {@link DepartureController} until they either arrive or are interrupted.
  */
 @Getter
 public class Departure {

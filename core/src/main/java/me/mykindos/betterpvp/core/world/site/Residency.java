@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Two records back this, both in {@code site_residency}. The <i>residence</i> is the instance they were last in and
  * the spot they were standing on. The <i>anchor</i> is the last site they were in that will have them back, which is
- * not the same thing: an island released the moment its last visitor leaves cannot be somewhere a player returns to,
+ * not the same thing: a site released the moment its last occupant leaves cannot be somewhere a player returns to,
  * so it never becomes an anchor and the site before it stays.
  * <p>
  * Both are read once per session, while the connection is still being configured, and held for as long as the player
@@ -71,7 +71,7 @@ public class Residency implements Listener {
 
     /**
      * Where to send a player who has to be moved and has nowhere in particular to go, such as one leaving a site or
-     * one whose voyage found no destination. Their anchor if it is reachable from this server, otherwise spawn.
+     * one whose journey found no instance. Their anchor if it is reachable from this server, otherwise spawn.
      */
     public @NotNull Location fallback(@NotNull Player player) {
         return record(player.getUniqueId(), ResidencyStore.Kind.ANCHOR)
@@ -141,8 +141,8 @@ public class Residency implements Listener {
      * they arrived at.
      * <p>
      * The anchor is one record and not a stack, so this replaces it outright. Gating it on the site being anchorable
-     * is what makes it the last real place they were: Spawn to woodcutting to mining leaves the anchor at Spawn, so
-     * both islands can be released without anybody needing to be found a new home.
+     * is what makes it the last durable place they were: Spawn to woodcutting to mining leaves the anchor at Spawn,
+     * so both of those instances can be released without anybody being left with nowhere to go.
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(@NotNull PlayerTeleportEvent event) {

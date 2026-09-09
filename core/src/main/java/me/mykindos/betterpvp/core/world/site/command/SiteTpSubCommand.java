@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@code /site tp <id>} — teleports to an instance's world by id prefix.
+ * {@code /site tp <id>}: teleports to an instance's world by id prefix.
  */
 @Singleton
 @SubCommand(SiteCommand.class)

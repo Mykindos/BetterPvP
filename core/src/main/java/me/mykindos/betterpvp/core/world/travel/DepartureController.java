@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Owns every in-flight {@link Departure}. A departure holds a traveller in place for a short window, showing a
- * countdown title, before its arrival callback runs. Moving to a new block, taking damage, or quitting cancels it —
+ * countdown title, before its arrival callback runs. Moving to a new block, taking damage, or quitting cancels it,
  * this is the travel package's own departure ceremony and does not touch the delayed-action framework.
  */
 @BPvPListener
@@ -47,7 +47,7 @@ public class DepartureController implements Listener {
 
     /**
      * Starts a departure for {@code traveller} toward {@code destination}. Refuses re-entry if one is already active
-     * for that player. {@code onArrive} runs once the countdown elapses; relocating the player is the caller's job.
+     * for that player. {@code onArrive} runs once the countdown elapses, and relocating the player is the caller's job.
      */
     public void begin(@NotNull Player traveller, @NotNull Destination destination, @NotNull Runnable onArrive) {
         if (isDeparting(traveller)) {

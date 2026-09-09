@@ -29,8 +29,8 @@ public class NavigationMenu extends AbstractGui implements Windowed {
     }
 
     /**
-     * @param immediate skip the departure hold. For a destination whose own journey is the wait — a ship's crossing —
-     *                  standing still for three seconds first only delays it.
+     * @param immediate skip the departure hold, for a destination whose own journey is already the wait. Standing
+     *                  still for three seconds first only delays it.
      */
     public NavigationMenu(List<Destination> destinations, TravelService travelService, boolean immediate) {
         super(9, 5);

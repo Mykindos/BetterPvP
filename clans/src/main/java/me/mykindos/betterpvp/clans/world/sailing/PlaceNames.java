@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.clans.world.sailing;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Generates a small place-name for an uncharted island so it reads as a destination rather than a numbered slot.
+ * Makes up a name for an instance that has no fixed one, so it reads as a place rather than a numbered slot.
  */
 public final class PlaceNames {
 

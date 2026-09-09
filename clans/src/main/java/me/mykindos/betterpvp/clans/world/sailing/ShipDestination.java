@@ -24,12 +24,12 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A place a ship can sail to, offered at the helm.
+ * One {@link Site} offered at a ship's helm as somewhere to travel to.
  * <p>
- * One class covers every kind: a landmark that has always been there, one of several copies of a hub, and an island
- * that does not exist until the crew sights it. Which of those it is belongs to the site's own policy, and nothing
- * here has to ask. Clicking it does not teleport the clicker — it puts their whole crew to sea, and only when they
- * make landfall is an instance found for them.
+ * One class covers every kind of site, because which kind it is belongs to the site's own policy and nothing here has
+ * to ask. Clicking it does not teleport the clicker. It starts a {@link Voyage} for their whole {@link Crew}, and the
+ * instance is only located once that voyage ends, which for an instanced site is what avoids holding an empty world
+ * open for the length of the journey.
  */
 @Getter
 public class ShipDestination implements Destination, Landfall {
@@ -90,8 +90,8 @@ public class ShipDestination implements Destination, Landfall {
     }
 
     /**
-     * Sets the course. Only the captain reaches here — the helm refuses anyone else before the menu opens — and it is
-     * their crew, not they alone, that leaves.
+     * Starts the voyage. Only a captain reaches here, since the helm refuses anybody else before the menu opens, and
+     * it is their whole crew that leaves rather than they alone.
      */
     @Override
     public @NotNull CompletableFuture<Boolean> receive(@NotNull Player traveller) {

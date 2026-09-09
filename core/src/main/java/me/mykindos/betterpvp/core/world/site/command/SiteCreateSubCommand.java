@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code /site create <site> [owner]} — opens an instance without travelling to it.
+ * {@code /site create <site> [owner]}: opens an instance without travelling to it.
  */
 @Singleton
 @SubCommand(SiteCommand.class)

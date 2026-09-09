@@ -187,7 +187,7 @@ public class NetworkPlacement implements Placement, Listener {
     }
 
     /**
-     * Locates on one named server. Locally that is the ordinary path; remotely it is a promise that the server will
+     * Locates on one named server. Locally that is the ordinary path. Remotely it is a promise that the server will
      * have an instance by the time the party lands, which it keeps because their arrival makes it locate one.
      */
     private @NotNull CompletableFuture<SiteHandle> onHost(@NotNull Site site, @NotNull SiteKey key,

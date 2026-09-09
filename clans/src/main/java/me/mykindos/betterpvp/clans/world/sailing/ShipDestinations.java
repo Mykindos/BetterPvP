@@ -27,13 +27,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * What a helm offers: the ports that are always there, a handful of uncharted islands, and whatever the person at
- * the wheel owns.
+ * What a ship's helm offers: the sites that always exist, a few of the ones made on demand, and whatever the player
+ * looking at it owns.
  * <p>
- * All of them come from the same catalogue and sail the same crossing. The only thing that marks an expedition out is that
- * it is made when the crew gets there, so it is offered under a name drawn for the occasion rather than its own, and
- * only a few are shown at a time. Those names are held per player for half a minute so the menu does not reshuffle
- * under somebody who is still reading it.
+ * All of them come from the same catalogue and take the same journey. What marks an on-demand site out is that its
+ * instance is made on arrival, so it is offered under a name drawn for the occasion rather than its own and only a
+ * few are shown at a time. Those names are held per player for half a minute, so the menu does not reshuffle under
+ * somebody who is still reading it.
  */
 @Singleton
 public class ShipDestinations implements DestinationProvider {
@@ -85,8 +85,8 @@ public class ShipDestinations implements DestinationProvider {
     }
 
     /**
-     * A place belonging to whoever is looking at the helm, offered only to them. Somebody who owns nothing of the
-     * kind is offered nothing, which is how a player without a clan sees no camp.
+     * A site belonging to the player looking at the helm, offered only to them. Somebody who owns no instance of it
+     * is offered nothing, which is how a player with no clan is shown no camp.
      */
     private @NotNull Optional<Destination> owned(@NotNull Site site, @NotNull Player player) {
         if (site.getPolicy().getLifecycle() != SitePolicy.Lifecycle.OWNED) {
@@ -96,7 +96,7 @@ public class ShipDestinations implements DestinationProvider {
         return owners.keyFor(site, player).map(key -> destination(site, key, site.getDisplayName()));
     }
 
-    /** A place that exists whether or not anybody sails to it, and is offered under its own name. */
+    /** A site that exists whether or not anybody travels to it, and so is offered under its own name. */
     private boolean isPort(@NotNull Site site) {
         final SitePolicy.Lifecycle lifecycle = site.getPolicy().getLifecycle();
         return lifecycle == SitePolicy.Lifecycle.PERMANENT || lifecycle == SitePolicy.Lifecycle.POOLED;

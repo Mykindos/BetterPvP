@@ -31,7 +31,7 @@ public interface SiteDirectory {
     /**
      * Takes {@code seats} on an instance, if they are there to take.
      * <p>
-     * The check and the taking are one step. A caller that gets {@code true} has the seats and can travel; one that
+     * The check and the taking are one step. A caller that gets {@code true} has the seats and can travel. One that
      * gets {@code false} lost the race and should look elsewhere.
      *
      * @param capacity the ceiling, or zero for no ceiling
