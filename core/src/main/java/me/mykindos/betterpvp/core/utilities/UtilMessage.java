@@ -234,6 +234,10 @@ public class UtilMessage {
         return deserialize(String.format(message, args));
     }
 
+    public static String serialize(final Component component) {
+        return miniMessage.serialize(component);
+    }
+
     /**
      * Creates a component with a click event that copies text to the clipboard when clicked, and a hover event that shows "Click to Copy"
      * @param commandText The text to show in the message, which will have the hover and click events

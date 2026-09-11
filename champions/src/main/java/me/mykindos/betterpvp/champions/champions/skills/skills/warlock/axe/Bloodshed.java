@@ -116,7 +116,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
             }
 
             championsManager.getEffects().addEffect(target, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
-            UtilMessage.message(target, getName(), "champions.skill.warlock.bloodshed.gave-speed", Component.text(player.getName(), NamedTextColor.YELLOW), Translations.component("champions.skill.effect.speed", Component.text(UtilFormat.getRomanNumeral(speedStrength))).color(NamedTextColor.WHITE), Component.text(String.valueOf(getDuration(level)), NamedTextColor.GREEN));
+            UtilMessage.message(target, getName(), "champions.skill.warlock.bloodshed.gave-speed", this.championsManager.getDisplayNameAsComponent(player, target), Translations.component("champions.skill.effect.speed", Component.text(UtilFormat.getRomanNumeral(speedStrength))).color(NamedTextColor.WHITE), Component.text(String.valueOf(getDuration(level)), NamedTextColor.GREEN));
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
             healthReduction += getHealthReductionPerPlayerAffected(level);
 

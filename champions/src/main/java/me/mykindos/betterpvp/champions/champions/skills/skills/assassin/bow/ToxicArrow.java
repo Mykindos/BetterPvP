@@ -113,11 +113,9 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        final long length = (long) ((getDuration(level)) * 1000L);
-        championsManager.getEffects().addEffect(target, EffectTypes.POISON, poisonStrength, length);
-        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-        if (!(target instanceof Player damagee)) return;
-        UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        championsManager.getEffects().addEffect(target, EffectTypes.POISON, poisonStrength, (long) ((baseDuration + level) * 1000L));
+        UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(target, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(damager, target), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
     }
 
     @Override

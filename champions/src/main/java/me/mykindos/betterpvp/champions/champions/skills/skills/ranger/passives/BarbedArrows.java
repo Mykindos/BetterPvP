@@ -207,7 +207,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 BarbedTargetData barbedData = targetEntry.getValue();
 
                 if (currentTime - barbedData.hitTime > damageResetTimeMs) {
-                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.barbed-arrows.fallen-out", getDisplayName().color(NamedTextColor.GREEN), Component.text(target.getName()));
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.ranger.barbed-arrows.fallen-out", getDisplayName().color(NamedTextColor.GREEN), this.championsManager.getDisplayNameAsComponent(target, player));
                     targetIterator.remove();
                 }
             }

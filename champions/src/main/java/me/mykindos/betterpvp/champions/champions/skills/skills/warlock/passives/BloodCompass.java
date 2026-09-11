@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -247,8 +246,8 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                     show(player, nearbyAllies, target);
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
-                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(target.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN));
+                    UtilMessage.message(target, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(player, target), getDisplayName().color(NamedTextColor.GREEN));
+                    UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(target, player), getDisplayName().color(NamedTextColor.GREEN));
 
                     new BukkitRunnable() {
                         @Override

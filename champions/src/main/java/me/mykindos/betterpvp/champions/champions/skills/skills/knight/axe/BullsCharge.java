@@ -98,7 +98,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getSpeedDuration(level) * 1000L));
         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN);
-        running.put(player.getUniqueId(), System.currentTimeMillis() + (long)(getSpeedDuration(level) * 1000));
+        running.put(player.getUniqueId(), System.currentTimeMillis() + (long) (getSpeedDuration(level) * 1000));
         return true;
     }
 
@@ -134,11 +134,9 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0.0F);
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5F, 0.5F);
 
-                if (event.getDamagee() instanceof Player damaged) {
-                    UtilMessage.message(damaged, getClassType().getDisplayName(), "champions.skill.hit-by", Component.text(damager.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-                }
+                UtilMessage.message(damagee, getClassType().getDisplayName(), "champions.skill.hit-by", this.championsManager.getDisplayNameAsComponent(damager, damagee), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
 
-                UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(event.getDamagee().getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+                UtilMessage.message(damager, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(damagee, damager), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
                 running.remove(damager.getUniqueId());
             }
         }

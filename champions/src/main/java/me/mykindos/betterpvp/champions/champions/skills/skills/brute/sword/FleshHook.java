@@ -26,7 +26,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -217,8 +216,8 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
         UtilDamage.doDamage(ev);
 
         // Cues
-        UtilMessage.message(hit, getClassType().getDisplayName(), "champions.skill.brute.flesh-hook.pulled-by", Component.text(player.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
-        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", Component.text(hit.getName(), NamedTextColor.YELLOW), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(hit, getClassType().getDisplayName(), "champions.skill.brute.flesh-hook.pulled-by", this.championsManager.getDisplayNameAsComponent(player, hit), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
+        UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.hit-target", this.championsManager.getDisplayNameAsComponent(hit, player), getDisplayName().color(NamedTextColor.GREEN).append(Component.text(" " + level, NamedTextColor.GREEN)));
         new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 
         throwableItem.getItem().remove();
