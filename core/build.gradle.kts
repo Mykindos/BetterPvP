@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":orchestration"))
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
+    implementation(libs.jedis)
     implementation(libs.reflection.remapper)
     api(libs.sidebar.api)
     runtimeOnly(libs.sidebar.impl)

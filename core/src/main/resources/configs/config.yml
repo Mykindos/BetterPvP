@@ -12,6 +12,23 @@ core:
       password: BetterPvP123!
       ip: 127.0.0.1:5002
       maxPoolSize: 10
+  site:
+    # Where a site's record is kept: everything about an instance its world does not hold by itself.
+    # 'local' is files under this plugin's folder. Another store registers its own name through SiteStorages.
+    storage: local
+  network:
+    # Which implementation carries each of these. 'auto' takes Redis when it is reachable and the proxy otherwise.
+    # Another network registers its own names through NetworkTransports and they can be named here.
+    bus: auto
+    directory: auto
+    transfer: auto
+  redis:
+    # When off, messages between servers go through the proxy instead, which only works while somebody is online.
+    enabled: false
+    host: 127.0.0.1
+    port: 6379
+    password: ''
+    channel: betterpvp:bus
   tips:
     timeBetweenTips: 150.0
   exceptions:
@@ -62,6 +79,12 @@ items:
     cooldown: 20.0
     maxBlocks: 130
 command:
+  site:
+    enabled: true
+    requiredRank: ADMIN
+  leavesite:
+    enabled: true
+    requiredRank: PLAYER
   promote:
     enabled: true
     requiredRank: ADMIN

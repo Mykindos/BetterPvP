@@ -2,24 +2,22 @@ package me.mykindos.betterpvp.clans.world.ship;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
-import me.mykindos.betterpvp.clans.world.crew.menu.CrewMenu;
-import me.mykindos.betterpvp.clans.world.island.IslandOfferProvider;
-import me.mykindos.betterpvp.clans.world.navigation.NavigationMenu;
-import me.mykindos.betterpvp.clans.world.travel.Destination;
-import me.mykindos.betterpvp.clans.world.travel.TravelService;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageDestination;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageDestinationRegistry;
+import me.mykindos.betterpvp.clans.world.sailing.ShipDestinations;
+import me.mykindos.betterpvp.clans.world.ship.crew.menu.CrewMenu;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.menu.navigation.Destination;
+import me.mykindos.betterpvp.core.menu.navigation.NavigationMenu;
 import me.mykindos.betterpvp.core.scene.indicator.Indicator;
 import me.mykindos.betterpvp.core.scene.indicator.IndicatorService;
 import me.mykindos.betterpvp.core.scene.indicator.ModelIndicatorStyle;
 import me.mykindos.betterpvp.core.scene.interaction.SceneInteractionRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -61,23 +59,17 @@ public class ShipInteractions implements Listener {
     private final Map<UUID, Indicator> captainIcons = new HashMap<>();
     private final Map<String, Indicator> requestArrows = new HashMap<>();
 
-    private final VoyageDestinationRegistry voyageDestinations;
-    private final IslandOfferProvider islandOffers;
-    private final TravelService travelService;
+    private final ShipDestinations destinations;
     private final ClientManager clientManager;
 
     @Inject
     public ShipInteractions(@NotNull CrewService crewService, @NotNull ShipService shipService,
                             @NotNull IndicatorService indicators, @NotNull SceneInteractionRegistry sceneInteractions,
-                            @NotNull VoyageDestinationRegistry voyageDestinations,
-                            @NotNull IslandOfferProvider islandOffers,
-                            @NotNull TravelService travelService, @NotNull ClientManager clientManager) {
+                            @NotNull ShipDestinations destinations, @NotNull ClientManager clientManager) {
         this.crewService = crewService;
         this.shipService = shipService;
         this.indicators = indicators;
-        this.voyageDestinations = voyageDestinations;
-        this.islandOffers = islandOffers;
-        this.travelService = travelService;
+        this.destinations = destinations;
         this.clientManager = clientManager;
 
         sceneInteractions.register(ShipService.CREW_INTERACTION, (player, placement) -> openCrewBook(player));
@@ -104,28 +96,22 @@ public class ShipInteractions implements Listener {
             return;
         }
 
-        // Sailing to where you already are is not a journey. Filtered out rather than refused on click, so the menu
-        // never offers a course that cannot be set.
-        final String here = player.getWorld().getName();
-        final List<Destination> destinations = new ArrayList<>(voyageDestinations.available().stream()
-                .filter(destination -> !(destination instanceof VoyageDestination voyage)
-                        || !voyage.getWorldName().equals(here))
-                .toList());
+        final Gamer gamer = clientManager.search().online(player).getGamer();
+        if (gamer.isInCombat()) {
+            UtilMessage.message(player, "clans.prefix.ship", "clans.ship.in-combat");
+            return;
+        }
 
-        // Resource islands sit in the same list as the fixed ports: a crossing to one is the same crossing, and the
-        // only thing that marks it out is that the place is made when the crew gets there rather than waiting for them.
-        islandOffers.destinationsFor(player).stream()
-                .filter(Destination::isReady)
-                .forEach(destinations::add);
+        // The fixed ports and the uncharted islands come back as one list: a crossing to either is the same crossing,
+        // and the only thing that marks an island out is that it is made when the crew gets there.
+        final List<Destination> courses = new ArrayList<>(destinations.destinationsFor(player));
 
-        if (destinations.isEmpty()) {
+        if (courses.isEmpty()) {
             UtilMessage.message(player, "clans.prefix.ship", "clans.ship.nowhere-to-sail");
             return;
         }
 
-        // Routed through TravelService so the crossing inherits the travel guards - no leaving mid-fight, no double
-        // departure - but with no hold: the crossing itself is the wait.
-        new NavigationMenu(destinations, travelService, true).show(player);
+        new NavigationMenu(courses).show(player);
         new SoundEffect(Sound.BLOCK_WOODEN_TRAPDOOR_OPEN, 1.2f, 0.7f).play(player);
     }
 

@@ -5,7 +5,7 @@ import dev.brauw.mapper.region.PointRegion;
 import dev.brauw.mapper.region.Region;
 import dev.brauw.mapper.validation.ValidationIssue;
 import me.mykindos.betterpvp.clans.world.content.DataPointValidator;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageService;
+import me.mykindos.betterpvp.core.world.site.ArrivalPoints;
 import me.mykindos.betterpvp.core.world.schematic.StructureAnchor;
 import org.bukkit.World;
 
@@ -42,7 +42,7 @@ public class ShipValidator extends DataPointValidator {
         final List<Region> anchors = named(regions, StructureAnchor.POINT);
         final List<Region> boards = named(regions, ShipService.BOARD_POINT);
         final List<Region> helms = named(regions, ShipHelms.HELM_POINT);
-        final List<Region> arrivals = named(regions, VoyageService.ARRIVAL_POINT);
+        final List<Region> arrivals = named(regions, ArrivalPoints.DEFAULT_MARKER);
 
         requireType(issues, berths, PerspectiveRegion.class, "a perspective marker (its facing turns the hull)");
         requireType(issues, navigators, PointRegion.class, "a point");

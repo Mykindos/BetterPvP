@@ -20,7 +20,7 @@ public class TeamChatChannel implements IChatChannel {
     }
 
     @Override
-    public Collection<? extends Player> getAudience() {
+    public Collection<? extends Player> getAudience(Player sender) {
         return team.getPlayers();
     }
 }

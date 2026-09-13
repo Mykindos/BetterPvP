@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.clans.world.veloran.gateway;
 
-import com.google.inject.Provider;
 import dev.brauw.mapper.region.CuboidRegion;
-import me.mykindos.betterpvp.clans.world.veloran.Veloran;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -43,13 +41,11 @@ public class GatewayTeleportBehavior implements SceneBehavior {
     private static final NamespacedKey ATTRIBUTE_KEY = new NamespacedKey("betterpvp", "veloran_teleport");
 
     private final ClientManager clientManager;
-    private final Provider<Veloran> veloranProvider;
     private final CuboidRegion region;
     private final Set<UUID> inside = new HashSet<>();
 
-    public GatewayTeleportBehavior(ClientManager clientManager, Provider<Veloran> veloranProvider, CuboidRegion region) {
+    public GatewayTeleportBehavior(ClientManager clientManager, CuboidRegion region) {
         this.clientManager = clientManager;
-        this.veloranProvider = veloranProvider;
         this.region = region;
     }
 
@@ -91,7 +87,7 @@ public class GatewayTeleportBehavior implements SceneBehavior {
      */
     private void onEnter(Player player) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
-        final String continentName = veloranProvider.get().name();
+        final String continentName = "Veloran";
 
         // cues
         showTitle(gamer, continentName);

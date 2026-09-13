@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.world.content;
 
-import me.mykindos.betterpvp.clans.world.island.IslandWorldProvisioner;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,9 +31,8 @@ public interface WorldSelector {
         return world -> wanted.contains(world.getName());
     }
 
-    /** Every live instance cloned from one island template. */
-    static @NotNull WorldSelector islandTemplate(@NotNull String templateKey) {
-        final String prefix = IslandWorldProvisioner.worldNamePrefix(templateKey);
+    /** Every world whose name begins with a prefix, which is how one site's instances are selected. */
+    static @NotNull WorldSelector prefixed(@NotNull String prefix) {
         return world -> world.getName().startsWith(prefix);
     }
 }

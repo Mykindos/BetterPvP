@@ -15,11 +15,13 @@ import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgress
 import me.mykindos.betterpvp.core.framework.blockbreak.packet.BlockBreakProgressServiceImpl;
 import me.mykindos.betterpvp.core.framework.blockbreak.resolver.BlockBreakResolver;
 import me.mykindos.betterpvp.core.framework.blockbreak.resolver.DefaultBlockBreakResolver;
+import me.mykindos.betterpvp.core.framework.net.NetModule;
 import me.mykindos.betterpvp.core.framework.server.CrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.VelocityCrossServerMessageService;
 import me.mykindos.betterpvp.core.framework.server.network.NetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.server.network.PluginMessagingNetworkPlayerCountService;
 import me.mykindos.betterpvp.core.framework.server.orchestration.CoreOrchestrationGatewayProvider;
+import me.mykindos.betterpvp.core.world.site.SiteModule;
 import me.mykindos.betterpvp.orchestration.api.OrchestrationGateway;
 
 @CustomLog
@@ -34,6 +36,9 @@ public class CoreInjectorModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Core.class).toInstance(plugin);
+
+        install(new NetModule());
+        install(new SiteModule());
 
         bind(IDatabaseConnection.class).to(PostgresDatabaseConnection.class);
         bind(IFilterService.class).to(DatabaseFilterService.class);

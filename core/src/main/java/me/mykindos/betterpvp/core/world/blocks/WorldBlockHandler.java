@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
@@ -180,7 +181,8 @@ public class WorldBlockHandler {
             }
         }
 
-        Bukkit.getOnlinePlayers().forEach(player -> player.sendMultiBlockChange(outline));
-        UtilServer.runTaskLater(core, () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendMultiBlockChange(original)), 60 * 20L);
+        final World world = chunk.getWorld();
+        world.getPlayers().forEach(player -> player.sendMultiBlockChange(outline));
+        UtilServer.runTaskLater(core, () -> world.getPlayers().forEach(player -> player.sendMultiBlockChange(original)), 60 * 20L);
     }
 }

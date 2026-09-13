@@ -17,12 +17,12 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.site.Presence;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -44,12 +44,15 @@ public class DeathListener implements Listener {
     private final ItemFactory itemFactory;
     private final DamageLogManager damageLogManager;
     private final ClientManager clientManager;
+    private final Presence presence;
 
     @Inject
-    public DeathListener(ItemFactory itemFactory, DamageLogManager damageLogManager, ClientManager clientManager) {
+    public DeathListener(ItemFactory itemFactory, DamageLogManager damageLogManager, ClientManager clientManager,
+                         Presence presence) {
         this.itemFactory = itemFactory;
         this.damageLogManager = damageLogManager;
         this.clientManager = clientManager;
+        this.presence = presence;
     }
 
     @EventHandler
@@ -64,7 +67,7 @@ public class DeathListener implements Listener {
         }
         deathEvent.callEvent();
 
-        Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
+        presence.around(event.getPlayer()).forEach(onlinePlayer -> {
             CustomDeathMessageEvent customDeathMessageEvent = new CustomDeathMessageEvent(onlinePlayer, deathEvent);
             UtilServer.callEvent(customDeathMessageEvent);
         });

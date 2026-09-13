@@ -34,7 +34,7 @@ import java.util.Optional;
  * Loading is scoped to one world at a time. This matters more than it sounds: the loaders this replaced could only
  * rebuild <em>everything</em>, so a single instanced island appearing meant tearing down and re-spawning content in
  * every other world too - which with live instances is both a stall and a way to destroy state somebody is standing in.
- * A world that appears is built; a world that goes away has exactly its own content removed.
+ * A world that appears is built, and a world that goes away has exactly its own content removed.
  *
  * @see WorldContentListener for what drives it
  */
@@ -80,7 +80,7 @@ public class WorldContentService implements Reloadable {
     }
 
     /**
-     * Registers a source of data-points that are not in a world's Mapper file — a structure pasted at runtime, say.
+     * Registers a source of data-points that are not in a world's Mapper file, such as a structure pasted at runtime.
      * Contributors run before any content is asked about a world, so what they add is indistinguishable from an
      * authored marker.
      */

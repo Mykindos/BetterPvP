@@ -86,7 +86,7 @@ public class ChatFilterListener implements Listener {
         }
 
         @Override
-        public Collection<? extends Player> getAudience() {
+        public Collection<? extends Player> getAudience(Player chatter) {
             // Get all staff members (HELPER and above)
             Collection<Player> audience = clientManager.getOnline().stream()
                     .filter(client -> client.getGamer().getPlayer() != null && client.hasRank(Rank.ADMIN))

@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.StaffChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
+import me.mykindos.betterpvp.core.chat.network.NetworkChannels;
+import me.mykindos.betterpvp.core.chat.network.NetworkChat;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.chat.filter.IFilterService;
@@ -52,13 +54,21 @@ public class ChatListener implements Listener {
     private final ClientManager clientManager;
     private final IFilterService filterService;
     private final IIgnoreService ignoreService;
+    private final NetworkChat networkChat;
+    private final StaffChatChannel staffChannel;
 
     @Inject
-    public ChatListener(Core core, ClientManager clientManager, IFilterService filterService, IIgnoreService ignoreService) {
+    public ChatListener(Core core, ClientManager clientManager, IFilterService filterService,
+                        IIgnoreService ignoreService, NetworkChat networkChat, NetworkChannels networkChannels) {
         this.core = core;
         this.clientManager = clientManager;
         this.filterService = filterService;
         this.ignoreService = ignoreService;
+        this.networkChat = networkChat;
+        this.staffChannel = new StaffChatChannel(clientManager);
+
+        // Staff chat needs no key: every server can pick its own staff out of the players it holds.
+        networkChannels.register(ChatChannel.STAFF, key -> staffChannel.getAudience(null));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -90,7 +100,9 @@ public class ChatListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
 
         filterService.filterMessage(event.getMessage()).thenAccept(filteredMessage -> {
-            for (Player onlinePlayer : event.getChannel().getAudience()) {
+            networkChat.relay(player, event.getChannel(), event.getPrefix(), filteredMessage);
+
+            for (Player onlinePlayer : event.getChannel().getAudience(player)) {
                 // If a per-recipient renderer is provided (e.g. /showitem localizing its hover item into the
                 // recipient's locale), use it for this recipient; otherwise deliver the shared filtered message.
                 final Component recipientMessage = event.getMessageRenderer() != null
@@ -166,7 +178,7 @@ public class ChatListener implements Listener {
         if (event.getTargetChannel() == ChatChannel.SERVER) {
             event.setNewChannel(ServerChatChannel.getInstance());
         } else if (event.getTargetChannel() == ChatChannel.STAFF) {
-            event.setNewChannel(new StaffChatChannel(clientManager));
+            event.setNewChannel(staffChannel);
         }
 
     }

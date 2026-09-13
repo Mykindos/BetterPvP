@@ -35,12 +35,6 @@ public enum GamerProperty {
      */
     MOB_KILLS,
 
-    PREFERRED_SPAWN,
-
-    /**
-     * Where a player was standing right before their most recent voyage via the travel system.
-     * <p>Casting class {@link String}, formatted by {@code UtilWorld#locationToString}</p>
-     */
-    TRAVEL_ORIGIN
+    PREFERRED_SPAWN
 
 }

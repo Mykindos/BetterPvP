@@ -1,0 +1,116 @@
+# Every place a player can be. See the Site Framework reference:
+# https://outline.betterpvp.net/doc/site-framework-T5MqndTHVB
+#
+# world:      adopt <world name> | clone <template folder> | own <folder> [+ from <template folder>]
+# lifecycle:  PERMANENT | POOLED | ON_DEMAND | OWNED
+# admission:  open | party | private  (modules contribute their own, e.g. clan)
+# selection:  fill-first or spread
+# rejoin:     RESUME | REINSTANCE | ANCHOR      rejoin-at: EXACT | SPAWN_POINT
+# dormancy:   ALWAYS_LOADED or UNLOAD_WHEN_EMPTY. An ON_DEMAND site is always reaped once empty.
+# min:        instances kept provisioned ahead of demand, so a party never waits on a world clone.
+# voyage:     how long the crossing takes. A roll every 10s once past min-seconds.
+# arrival:    which of the site's landing markers a party is put down at.
+#
+# A crew always lands together, at one spot chosen once for the whole crew.
+
+# The world name here is the only place it is configured. islands.yml bound content to 'Aldenmark' while voyages.yml
+# sailed to 'world'; whichever your server actually uses, it goes here now.
+aldenmark:
+  display-name: "Aldenmark"
+  icon: GRASS_BLOCK
+  world:
+    adopt: "Aldenmark"
+  lifecycle: PERMANENT
+  min: 1
+  admission: open
+  anchorable: true
+  rejoin: RESUME
+  rejoin-at: EXACT
+  voyage:
+    min-seconds: 60
+    max-seconds: 120
+    chance: 0.25
+  arrival:
+    distribution: random
+
+# One world today, so PERMANENT. Pooling it is this row plus a template folder: lifecycle POOLED, world clone, and
+# min/max/capacity. No code changes either way.
+spawn:
+  display-name: "Spawn"
+  icon: OAK_BOAT
+  world:
+    adopt: "Season-2/Spawn"
+  lifecycle: PERMANENT
+  min: 1
+  capacity: 0
+  admission: open
+  selection: fill-first
+  fallback: aldenmark
+  anchorable: true
+  rejoin: RESUME
+  rejoin-at: SPAWN_POINT
+  voyage:
+    min-seconds: 45
+    max-seconds: 90
+    chance: 0.3
+  arrival:
+    # Spawn has a front door; everyone arrives at the same quay.
+    distribution: first
+
+mining:
+  display-name: "Mining Isle"
+  icon: IRON_PICKAXE
+  world:
+    clone: "templates/islands/mining"
+  lifecycle: ON_DEMAND
+  min: 1
+  max: 10
+  admission: party
+  anchorable: false
+  rejoin: ANCHOR
+  dormancy-grace-seconds: 120
+
+woodcutting:
+  display-name: "Woodcutting Isle"
+  icon: OAK_LOG
+  world:
+    clone: "templates/islands/woodcutting"
+  lifecycle: ON_DEMAND
+  min: 1
+  max: 10
+  admission: party
+  anchorable: false
+  rejoin: ANCHOR
+  dormancy-grace-seconds: 120
+
+fishing:
+  display-name: "Fishing Isle"
+  icon: FISHING_ROD
+  world:
+    clone: "templates/islands/fishing"
+  lifecycle: ON_DEMAND
+  min: 1
+  max: 10
+  admission: party
+  anchorable: false
+  rejoin: ANCHOR
+  dormancy-grace-seconds: 120
+
+# One per clan, made the first time somebody sails home and kept from then on. 'from' is what a new one is copied
+# from; without it a clan would be given raw generated terrain with no dock to land at.
+camp:
+  display-name: "Camp"
+  icon: CAMPFIRE
+  world:
+    own: "camps/"
+    from: "templates/camp"
+  lifecycle: OWNED
+  admission: clan
+  anchorable: true
+  rejoin: RESUME
+  rejoin-at: EXACT
+  dormancy: UNLOAD_WHEN_EMPTY
+  dormancy-grace-seconds: 300
+  arrival:
+    # A camp has one landing, so a crew that sailed home comes ashore together.
+    distribution: first

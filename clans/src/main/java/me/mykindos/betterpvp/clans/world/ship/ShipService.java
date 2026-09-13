@@ -12,7 +12,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.world.content.RegionContributor;
 import me.mykindos.betterpvp.clans.world.content.WorldContentService;
-import me.mykindos.betterpvp.clans.world.voyage.VoyageService;
+import me.mykindos.betterpvp.core.world.site.ArrivalPoints;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
@@ -397,7 +397,7 @@ public class ShipService implements RegionContributor {
         final RegionScope berth = RegionScope.names(BERTH_POINT);
         final RegionScope navigator = RegionScope.names(NAVIGATOR_POINT);
         final RegionScope vessel = RegionScope.names(StructureAnchor.POINT);
-        final RegionScope arrival = RegionScope.names(VoyageService.ARRIVAL_POINT);
+        final RegionScope arrival = RegionScope.names(ArrivalPoints.DEFAULT_MARKER);
 
         final TagRegistry tags = Mapper.get().getTagRegistry();
         tags.register(

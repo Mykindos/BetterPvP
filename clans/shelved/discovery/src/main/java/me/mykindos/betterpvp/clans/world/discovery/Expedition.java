@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.world.discovery;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
 import me.mykindos.betterpvp.clans.world.island.IslandInstance;
 import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
