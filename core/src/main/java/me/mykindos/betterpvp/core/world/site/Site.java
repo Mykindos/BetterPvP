@@ -21,7 +21,7 @@ public class Site {
     @NotNull SitePolicy policy;
 
     /** How long the crossing to it takes. */
-    @NotNull VoyageTiming timing;
+    @NotNull TransitTiming timing;
 
     /** The Mapper marker naming this site's landing spots. */
     @NotNull String arrivalMarker;

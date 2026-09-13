@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.clans.world.sailing;
 
-import me.mykindos.betterpvp.core.world.site.VoyageTiming;
+import me.mykindos.betterpvp.core.world.site.TransitTiming;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,7 @@ public interface Landfall {
     @NotNull Component displayName();
 
     /** The arrival schedule for voyages to this destination. */
-    @NotNull VoyageTiming timing();
+    @NotNull TransitTiming timing();
 
     /**
      * Places the crew at the destination, provisioning it first if it does not exist yet. Called once on arrival, with

@@ -3,12 +3,12 @@ package me.mykindos.betterpvp.clans.world.sailing;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
 import me.mykindos.betterpvp.clans.world.ship.Berth;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.site.VoyageTiming;
+import me.mykindos.betterpvp.core.world.site.TransitTiming;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * The destination resolves where they are going, {@link Ocean} owns the staging world, {@link Sailors} performs the
  * teleports and {@link VoyageCues} renders the feedback. What is left here is the lifecycle of a voyage.
  *
- * @see VoyageTiming for the arrival schedule
+ * @see TransitTiming for the arrival schedule
  */
 @BPvPListener
 @Singleton

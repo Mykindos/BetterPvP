@@ -1,18 +1,16 @@
-package me.mykindos.betterpvp.clans.world.voyage;
+package me.mykindos.betterpvp.clans.world.sailing;
 
-import me.mykindos.betterpvp.core.world.site.VoyageTiming;
+import me.mykindos.betterpvp.core.world.site.TransitTiming;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class VoyageTimingTest {
+class TransitTimingTest {
 
-    private static final VoyageTiming TIMING = new VoyageTiming(30, 90, 0.25);
+    private static final TransitTiming TIMING = new TransitTiming(30, 90, 0.25);
 
     /** Always lands, so only the floor and ceiling decide the outcome. */
     private static final double ALWAYS = 0.0;
@@ -55,7 +53,7 @@ class VoyageTimingTest {
     @Test
     @DisplayName("the sample is compared strictly against the chance")
     void chanceBoundaryIsExclusive() {
-        final VoyageTiming quarter = new VoyageTiming(0, 1000, 0.25);
+        final TransitTiming quarter = new TransitTiming(0, 1000, 0.25);
         assertTrue(quarter.arrives(10, 0.249));
         assertFalse(quarter.arrives(10, 0.25), "a sample equal to the chance must not count as a hit");
         assertFalse(quarter.arrives(10, 0.9));
@@ -64,7 +62,7 @@ class VoyageTimingTest {
     @Test
     @DisplayName("zero chance means every crossing runs to the ceiling")
     void zeroChanceRunsToCeiling() {
-        final VoyageTiming never = new VoyageTiming(10, 40, 0.0);
+        final TransitTiming never = new TransitTiming(10, 40, 0.0);
         assertFalse(never.arrives(20, 0.0));
         assertTrue(never.arrives(40, 0.0));
     }
@@ -72,7 +70,7 @@ class VoyageTimingTest {
     @Test
     @DisplayName("certain odds land on the first roll after the floor")
     void certainChanceLandsAtFloor() {
-        final VoyageTiming certain = new VoyageTiming(10, 400, 1.0);
+        final TransitTiming certain = new TransitTiming(10, 400, 1.0);
         assertFalse(certain.arrives(9, 0.999));
         assertTrue(certain.arrives(10, 0.999));
     }
@@ -93,7 +91,7 @@ class VoyageTimingTest {
     @Test
     @DisplayName("a ceiling below the floor becomes a fixed-length crossing")
     void invertedBoundsCollapseToFixedLength() {
-        final VoyageTiming inverted = new VoyageTiming(60, 10, 0.5);
+        final TransitTiming inverted = new TransitTiming(60, 10, 0.5);
 
         assertEquals(60, inverted.getMinSeconds());
         assertEquals(60, inverted.getMaxSeconds());
@@ -104,17 +102,17 @@ class VoyageTimingTest {
     @Test
     @DisplayName("out-of-range configuration is clamped rather than trusted")
     void configurationIsClamped() {
-        assertEquals(0, new VoyageTiming(-30, 60, 0.5).getMinSeconds());
-        assertEquals(1.0, new VoyageTiming(0, 60, 4.0).getChancePerRoll());
-        assertEquals(0.0, new VoyageTiming(0, 60, -1.0).getChancePerRoll());
+        assertEquals(0, new TransitTiming(-30, 60, 0.5).getMinSeconds());
+        assertEquals(1.0, new TransitTiming(0, 60, 4.0).getChancePerRoll());
+        assertEquals(0.0, new TransitTiming(0, 60, -1.0).getChancePerRoll());
     }
 
     @Test
     @DisplayName("the default crossing has a floor, a ceiling and odds between them")
     void defaultIsSane() {
-        assertTrue(VoyageTiming.DEFAULT.getMinSeconds() > 0);
-        assertTrue(VoyageTiming.DEFAULT.getMaxSeconds() > VoyageTiming.DEFAULT.getMinSeconds());
-        assertTrue(VoyageTiming.DEFAULT.getChancePerRoll() > 0
-                && VoyageTiming.DEFAULT.getChancePerRoll() < 1);
+        assertTrue(TransitTiming.DEFAULT.getMinSeconds() > 0);
+        assertTrue(TransitTiming.DEFAULT.getMaxSeconds() > TransitTiming.DEFAULT.getMinSeconds());
+        assertTrue(TransitTiming.DEFAULT.getChancePerRoll() > 0
+                && TransitTiming.DEFAULT.getChancePerRoll() < 1);
     }
 }

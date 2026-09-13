@@ -122,15 +122,15 @@ public class SiteRegistry implements Reloadable {
                 .build();
     }
 
-    private @NotNull VoyageTiming timing(@Nullable ConfigurationSection voyage) {
+    private @NotNull TransitTiming timing(@Nullable ConfigurationSection voyage) {
         if (voyage == null) {
-            return VoyageTiming.DEFAULT;
+            return TransitTiming.DEFAULT;
         }
 
-        return VoyageTiming.of(
-                voyage.getInt("min-seconds", VoyageTiming.DEFAULT.getMinSeconds()),
-                voyage.getInt("max-seconds", VoyageTiming.DEFAULT.getMaxSeconds()),
-                voyage.getDouble("chance", VoyageTiming.DEFAULT.getChancePerRoll()));
+        return TransitTiming.of(
+                voyage.getInt("min-seconds", TransitTiming.DEFAULT.getMinSeconds()),
+                voyage.getInt("max-seconds", TransitTiming.DEFAULT.getMaxSeconds()),
+                voyage.getDouble("chance", TransitTiming.DEFAULT.getChancePerRoll()));
     }
 
     private @NotNull ConfigurationSection arrivalSection(@NotNull ConfigurationSection section) {

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.travel;
+package me.mykindos.betterpvp.core.world.site;
 
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.server.Realm;

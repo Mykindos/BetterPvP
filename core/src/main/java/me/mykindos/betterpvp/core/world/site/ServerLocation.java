@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.travel;
+package me.mykindos.betterpvp.core.world.site;
 
 import lombok.Value;
 import me.mykindos.betterpvp.core.Core;

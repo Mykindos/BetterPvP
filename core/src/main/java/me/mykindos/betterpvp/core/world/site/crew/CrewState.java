@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.crew;
+package me.mykindos.betterpvp.core.world.site.crew;
 
 /**
  * Whether a crew is still forming or already at sea.

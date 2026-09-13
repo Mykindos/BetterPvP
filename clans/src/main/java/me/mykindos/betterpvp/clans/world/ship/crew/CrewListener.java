@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.crew;
+package me.mykindos.betterpvp.clans.world.ship.crew;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -8,6 +8,9 @@ import me.mykindos.betterpvp.clans.world.ship.ShipService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
+import me.mykindos.betterpvp.core.world.site.crew.JoinOutcome;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -155,7 +158,12 @@ public class CrewListener implements Listener {
     }
 
     private void notifyDisbanded(@NotNull Crew crew, @NotNull String captainName) {
-        for (UUID member : crew.getMembers()) {
+        for (UUID member : crew.roster()) {
+            // The captain is told separately, in their own words, by whoever called this.
+            if (crew.getCaptain().equals(member)) {
+                continue;
+            }
+
             final Player online = Bukkit.getPlayer(member);
             if (online == null) {
                 continue;

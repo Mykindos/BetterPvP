@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.crew;
+package me.mykindos.betterpvp.core.world.site.crew;
 
 import com.google.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
@@ -125,9 +125,10 @@ public class CrewService {
      * Puts a member off the ship. The captain cannot be removed this way — {@link #disband(Crew)} is what ends a crew.
      */
     public boolean removeMember(@NotNull Crew crew, @NotNull UUID member) {
-        if (!crew.getMembers().remove(member)) {
+        if (crew.getCaptain().equals(member) || !crew.has(member)) {
             return false;
         }
+        crew.ashore(member);
         byPlayer.remove(member, crew);
         return true;
     }
@@ -159,7 +160,7 @@ public class CrewService {
         for (UUID member : crew.roster()) {
             byPlayer.remove(member, crew);
         }
-        crew.getMembers().clear();
+        crew.emptied();
         crew.getRequests().clear();
         byCaptain.remove(crew.getCaptain(), crew);
     }
@@ -215,7 +216,7 @@ public class CrewService {
         // with a rival captain is only there to be clicked by mistake.
         withdrawRequests(player);
 
-        crew.getMembers().add(player);
+        crew.aboard(player);
         byPlayer.put(player, crew);
     }
 }

@@ -13,10 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -108,7 +105,7 @@ class SiteRegistryTest {
     void voyageTiming() {
         assertEquals(60, site("aldenmark").getTiming().getMinSeconds());
         assertEquals(120, site("aldenmark").getTiming().getMaxSeconds());
-        assertEquals(VoyageTiming.DEFAULT, site("camp").getTiming());
+        assertEquals(TransitTiming.DEFAULT, site("camp").getTiming());
     }
 
     @Test

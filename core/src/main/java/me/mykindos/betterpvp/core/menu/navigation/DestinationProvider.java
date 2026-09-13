@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.travel;
+package me.mykindos.betterpvp.core.menu.navigation;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

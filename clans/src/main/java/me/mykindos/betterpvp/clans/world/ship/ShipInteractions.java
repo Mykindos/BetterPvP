@@ -2,22 +2,22 @@ package me.mykindos.betterpvp.clans.world.ship;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
-import me.mykindos.betterpvp.clans.world.crew.menu.CrewMenu;
-import me.mykindos.betterpvp.core.world.travel.NavigationMenu;
-import me.mykindos.betterpvp.core.world.travel.Destination;
-import me.mykindos.betterpvp.core.world.travel.TravelService;
 import me.mykindos.betterpvp.clans.world.sailing.ShipDestinations;
+import me.mykindos.betterpvp.clans.world.ship.crew.menu.CrewMenu;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.menu.navigation.Destination;
+import me.mykindos.betterpvp.core.menu.navigation.NavigationMenu;
 import me.mykindos.betterpvp.core.scene.indicator.Indicator;
 import me.mykindos.betterpvp.core.scene.indicator.IndicatorService;
 import me.mykindos.betterpvp.core.scene.indicator.ModelIndicatorStyle;
 import me.mykindos.betterpvp.core.scene.interaction.SceneInteractionRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -60,19 +60,16 @@ public class ShipInteractions implements Listener {
     private final Map<String, Indicator> requestArrows = new HashMap<>();
 
     private final ShipDestinations destinations;
-    private final TravelService travelService;
     private final ClientManager clientManager;
 
     @Inject
     public ShipInteractions(@NotNull CrewService crewService, @NotNull ShipService shipService,
                             @NotNull IndicatorService indicators, @NotNull SceneInteractionRegistry sceneInteractions,
-                            @NotNull ShipDestinations destinations,
-                            @NotNull TravelService travelService, @NotNull ClientManager clientManager) {
+                            @NotNull ShipDestinations destinations, @NotNull ClientManager clientManager) {
         this.crewService = crewService;
         this.shipService = shipService;
         this.indicators = indicators;
         this.destinations = destinations;
-        this.travelService = travelService;
         this.clientManager = clientManager;
 
         sceneInteractions.register(ShipService.CREW_INTERACTION, (player, placement) -> openCrewBook(player));
@@ -99,6 +96,12 @@ public class ShipInteractions implements Listener {
             return;
         }
 
+        final Gamer gamer = clientManager.search().online(player).getGamer();
+        if (gamer.isInCombat()) {
+            UtilMessage.message(player, "clans.prefix.ship", "clans.ship.in-combat");
+            return;
+        }
+
         // The fixed ports and the uncharted islands come back as one list: a crossing to either is the same crossing,
         // and the only thing that marks an island out is that it is made when the crew gets there.
         final List<Destination> courses = new ArrayList<>(destinations.destinationsFor(player));
@@ -108,9 +111,7 @@ public class ShipInteractions implements Listener {
             return;
         }
 
-        // Routed through TravelService so the crossing inherits the travel guards - no leaving mid-fight, no double
-        // departure - but with no hold: the crossing itself is the wait.
-        new NavigationMenu(courses, travelService, true).show(player);
+        new NavigationMenu(courses).show(player);
         new SoundEffect(Sound.BLOCK_WOODEN_TRAPDOOR_OPEN, 1.2f, 0.7f).play(player);
     }
 

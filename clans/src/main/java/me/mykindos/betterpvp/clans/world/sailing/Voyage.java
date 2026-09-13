@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.world.sailing;
 
-import me.mykindos.betterpvp.core.world.site.VoyageTiming;
 import lombok.Getter;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.TransitTiming;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,14 +16,14 @@ public class Voyage {
 
     private final Crew crew;
     private final Landfall destination;
-    private final VoyageTiming timing;
+    private final TransitTiming timing;
 
     /** The staging world the crew occupies, released when the voyage ends. */
     private final String ocean;
 
     private final long startedAt;
 
-    public Voyage(@NotNull Crew crew, @NotNull Landfall destination, @NotNull VoyageTiming timing,
+    public Voyage(@NotNull Crew crew, @NotNull Landfall destination, @NotNull TransitTiming timing,
                   @NotNull String ocean, long startedAt) {
         this.crew = crew;
         this.destination = destination;

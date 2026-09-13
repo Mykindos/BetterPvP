@@ -1,8 +1,6 @@
-package me.mykindos.betterpvp.clans.world.crew.menu.button;
+package me.mykindos.betterpvp.clans.world.ship.crew.menu.button;
 
 import lombok.RequiredArgsConstructor;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
 import me.mykindos.betterpvp.core.framework.profiles.PlayerProfiles;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
@@ -11,6 +9,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

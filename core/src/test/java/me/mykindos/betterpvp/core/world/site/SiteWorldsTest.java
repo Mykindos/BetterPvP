@@ -21,7 +21,7 @@ class SiteWorldsTest {
 
     private static Site site(String id, WorldSource source) {
         return new Site(id, Component.text(id), Material.GRASS_BLOCK, source, SitePolicy.builder().build(),
-                VoyageTiming.DEFAULT, ArrivalPoints.DEFAULT_MARKER, ArrivalDistribution.random());
+                TransitTiming.DEFAULT, ArrivalPoints.DEFAULT_MARKER, ArrivalDistribution.random());
     }
 
     @Test

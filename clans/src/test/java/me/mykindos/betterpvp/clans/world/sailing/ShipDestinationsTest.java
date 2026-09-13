@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.clans.world.sailing;
 
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.menu.navigation.Destination;
 import me.mykindos.betterpvp.core.world.site.Placement;
 import me.mykindos.betterpvp.core.world.site.Site;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import me.mykindos.betterpvp.core.world.site.SiteOwners;
 import me.mykindos.betterpvp.core.world.site.SiteRegistry;
-import me.mykindos.betterpvp.core.world.travel.Destination;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.World;
@@ -31,9 +31,7 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -195,7 +193,6 @@ class ShipDestinationsTest {
             final ShipDestination course = (ShipDestination) destination;
             assertEquals(course.getSite().key(), course.getSiteKey());
             assertTrue(course.isReady());
-            assertFalse(course.announcesArrival(), "a course is set here, not walked");
         }
     }
 

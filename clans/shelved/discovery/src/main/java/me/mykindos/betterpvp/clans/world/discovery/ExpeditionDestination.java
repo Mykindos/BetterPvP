@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.clans.world.discovery;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import me.mykindos.betterpvp.clans.world.travel.Destination;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;

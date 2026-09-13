@@ -1,22 +1,21 @@
 package me.mykindos.betterpvp.clans.world.sailing;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
+import me.mykindos.betterpvp.core.menu.navigation.Destination;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.site.Party;
 import me.mykindos.betterpvp.core.world.site.Placement;
 import me.mykindos.betterpvp.core.world.site.Site;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
-import me.mykindos.betterpvp.core.world.site.VoyageTiming;
-import me.mykindos.betterpvp.core.world.travel.Destination;
-import net.kyori.adventure.key.Key;
+import me.mykindos.betterpvp.core.world.site.TransitTiming;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,11 +53,6 @@ public class ShipDestination implements Destination, Landfall {
     }
 
     @Override
-    public @NotNull Key key() {
-        return Key.key("betterpvp", "site/" + siteKey.getSiteId() + (siteKey.isOwned() ? "/" + siteKey.getOwnerId() : ""));
-    }
-
-    @Override
     public @NotNull Component displayName() {
         return displayName;
     }
@@ -70,7 +64,7 @@ public class ShipDestination implements Destination, Landfall {
     }
 
     @Override
-    public @NotNull VoyageTiming timing() {
+    public @NotNull TransitTiming timing() {
         return site.getTiming();
     }
 
@@ -78,15 +72,8 @@ public class ShipDestination implements Destination, Landfall {
      * Whether a course can be set at all. Whether the place itself is ready is not asked here: a site that has to be
      * made is made when the crew arrives, which is minutes from now.
      */
-    @Override
     public boolean isReady() {
         return placement.isLocal(site);
-    }
-
-    /** A course is set here, not walked; the crew is welcomed when they make landfall. */
-    @Override
-    public boolean announcesArrival() {
-        return false;
     }
 
     /**
@@ -94,14 +81,14 @@ public class ShipDestination implements Destination, Landfall {
      * it is their whole crew that leaves rather than they alone.
      */
     @Override
-    public @NotNull CompletableFuture<Boolean> receive(@NotNull Player traveller) {
+    public void select(@NotNull Player traveller) {
         final Optional<Crew> crew = crewService.captainedBy(traveller.getUniqueId());
         if (crew.isEmpty()) {
             UtilMessage.message(traveller, "clans.prefix.ship", "clans.ship.not-captain");
-            return CompletableFuture.completedFuture(false);
+            return;
         }
 
-        return voyageService.begin(crew.get(), this);
+        voyageService.begin(crew.get(), this);
     }
 
     /**
@@ -117,8 +104,12 @@ public class ShipDestination implements Destination, Landfall {
         return placement.locate(siteKey, partyOf(sailors)).thenCompose(handle -> placement.sendAll(sailors, handle));
     }
 
+    /**
+     * The crew's own party less anybody who left on the way, since only those still at sea are being put ashore.
+     * Order is kept so the party lands in the order it sailed, captain first.
+     */
     private @NotNull Party partyOf(@NotNull List<Player> sailors) {
-        final Set<UUID> members = new HashSet<>();
+        final Set<UUID> members = new LinkedHashSet<>();
         sailors.forEach(sailor -> members.add(sailor.getUniqueId()));
         return Party.of(sailors.getFirst().getUniqueId(), members);
     }

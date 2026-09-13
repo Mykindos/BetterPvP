@@ -1,10 +1,8 @@
-package me.mykindos.betterpvp.clans.world.crew.menu;
+package me.mykindos.betterpvp.clans.world.ship.crew.menu;
 
 import lombok.NonNull;
-import me.mykindos.betterpvp.clans.world.crew.Crew;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
-import me.mykindos.betterpvp.clans.world.crew.menu.button.CrewMemberButton;
-import me.mykindos.betterpvp.clans.world.crew.menu.button.CrewRequestButton;
+import me.mykindos.betterpvp.clans.world.ship.crew.menu.button.CrewMemberButton;
+import me.mykindos.betterpvp.clans.world.ship.crew.menu.button.CrewRequestButton;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.Item;
@@ -13,6 +11,8 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.HorizontalScrollGui;
+import me.mykindos.betterpvp.core.world.site.crew.Crew;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

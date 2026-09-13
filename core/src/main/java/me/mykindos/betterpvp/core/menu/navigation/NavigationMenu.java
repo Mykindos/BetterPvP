@@ -1,8 +1,6 @@
-package me.mykindos.betterpvp.core.world.travel;
+package me.mykindos.betterpvp.core.menu.navigation;
 
 import com.google.common.base.Preconditions;
-import me.mykindos.betterpvp.core.world.travel.Destination;
-import me.mykindos.betterpvp.core.world.travel.TravelService;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import net.kyori.adventure.text.Component;
@@ -24,15 +22,7 @@ public class NavigationMenu extends AbstractGui implements Windowed {
     private final Collection<Destination> destinations;
     private final Set<Integer> occupiedSlots = new HashSet<>();
 
-    public NavigationMenu(List<Destination> destinations, TravelService travelService) {
-        this(destinations, travelService, false);
-    }
-
-    /**
-     * @param immediate skip the departure hold, for a destination whose own journey is already the wait. Standing
-     *                  still for three seconds first only delays it.
-     */
-    public NavigationMenu(List<Destination> destinations, TravelService travelService, boolean immediate) {
+    public NavigationMenu(List<Destination> destinations) {
         super(9, 5);
         Preconditions.checkArgument(!destinations.isEmpty(), "No destinations to navigate to!");
         this.destinations = destinations;
@@ -40,14 +30,14 @@ public class NavigationMenu extends AbstractGui implements Windowed {
         // last destination should be on the center last
         final ArrayList<Destination> buffer = new ArrayList<>(destinations);
         final Destination center = buffer.removeLast();
-        placeButton(slotIndex(4, 4), center, travelService, immediate);
+        placeButton(slotIndex(4, 4), center);
 
         boolean side = ThreadLocalRandom.current().nextBoolean();
         for (Destination destination : buffer) {
             final int scattered = scatterSlot(side);
             final int slot = scattered != UNPLACED ? scattered : nextOpenSlot();
             if (slot != UNPLACED) {
-                placeButton(slot, destination, travelService, immediate);
+                placeButton(slot, destination);
             }
 
             side = !side;
@@ -89,8 +79,8 @@ public class NavigationMenu extends AbstractGui implements Windowed {
         return row * 9 + column;
     }
 
-    private void placeButton(int slot, Destination destination, TravelService travelService, boolean immediate) {
-        setItem(slot, new DestinationButton(destination, travelService, immediate));
+    private void placeButton(int slot, Destination destination) {
+        setItem(slot, new DestinationButton(destination));
         occupiedSlots.add(slot);
     }
 

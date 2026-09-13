@@ -4,8 +4,9 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.world.crew.CrewService;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.menu.navigation.Destination;
+import me.mykindos.betterpvp.core.menu.navigation.DestinationProvider;
 import me.mykindos.betterpvp.core.world.site.Placement;
 import me.mykindos.betterpvp.core.world.site.Site;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
@@ -13,8 +14,7 @@ import me.mykindos.betterpvp.core.world.site.SiteKey;
 import me.mykindos.betterpvp.core.world.site.SiteOwners;
 import me.mykindos.betterpvp.core.world.site.SitePolicy;
 import me.mykindos.betterpvp.core.world.site.SiteRegistry;
-import me.mykindos.betterpvp.core.world.travel.Destination;
-import me.mykindos.betterpvp.core.world.travel.DestinationProvider;
+import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -73,11 +73,11 @@ public class ShipDestinations implements DestinationProvider {
                 continue;
             }
 
-            final Optional<Destination> offer = isPort(site)
+            final Optional<ShipDestination> offer = isPort(site)
                     ? Optional.of(destination(site, site.key(), site.getDisplayName()))
                     : owned(site, player);
 
-            offer.filter(Destination::isReady).ifPresent(destinations::add);
+            offer.filter(ShipDestination::isReady).ifPresent(destinations::add);
         }
 
         destinations.addAll(expeditionCache.get(player.getUniqueId(), id -> expeditions()));
@@ -88,7 +88,7 @@ public class ShipDestinations implements DestinationProvider {
      * A site belonging to the player looking at the helm, offered only to them. Somebody who owns no instance of it
      * is offered nothing, which is how a player with no clan is shown no camp.
      */
-    private @NotNull Optional<Destination> owned(@NotNull Site site, @NotNull Player player) {
+    private @NotNull Optional<ShipDestination> owned(@NotNull Site site, @NotNull Player player) {
         if (site.getPolicy().getLifecycle() != SitePolicy.Lifecycle.OWNED) {
             return Optional.empty();
         }
@@ -117,7 +117,7 @@ public class ShipDestinations implements DestinationProvider {
                 break;
             }
 
-            final Destination offer = destination(site, site.key(), Component.text(PlaceNames.generate()));
+            final ShipDestination offer = destination(site, site.key(), Component.text(PlaceNames.generate()));
             if (offer.isReady() && hasRoom(site)) {
                 offers.add(offer);
             }
@@ -131,8 +131,8 @@ public class ShipDestinations implements DestinationProvider {
         return max <= 0 || instances.forKey(site.key()).size() < max;
     }
 
-    private @NotNull Destination destination(@NotNull Site site, @NotNull SiteKey key,
-                                             @NotNull Component displayName) {
+    private @NotNull ShipDestination destination(@NotNull Site site, @NotNull SiteKey key,
+                                                 @NotNull Component displayName) {
         return new ShipDestination(site, key, displayName, crewService, voyageService, placement);
     }
 

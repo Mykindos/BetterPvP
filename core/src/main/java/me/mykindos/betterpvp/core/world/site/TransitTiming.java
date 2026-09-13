@@ -10,10 +10,10 @@ import org.jetbrains.annotations.NotNull;
  * is what makes it testable without waiting.
  */
 @Value
-public class VoyageTiming {
+public class TransitTiming {
 
     /** What a site that has not said otherwise takes. */
-    public static final VoyageTiming DEFAULT = new VoyageTiming(45, 120, 0.25);
+    public static final TransitTiming DEFAULT = new TransitTiming(45, 120, 0.25);
 
     /** Seconds before the first roll. Nothing can arrive before this. */
     int minSeconds;
@@ -24,7 +24,7 @@ public class VoyageTiming {
     /** Chance each roll lands, once past the floor. */
     double chancePerRoll;
 
-    public VoyageTiming(int minSeconds, int maxSeconds, double chancePerRoll) {
+    public TransitTiming(int minSeconds, int maxSeconds, double chancePerRoll) {
         this.minSeconds = Math.max(0, minSeconds);
         // A ceiling below the floor lets the floor win, giving a fixed-length journey.
         this.maxSeconds = Math.max(this.minSeconds, maxSeconds);
@@ -55,7 +55,7 @@ public class VoyageTiming {
     /**
      * Reads timing from config, falling back to {@link #DEFAULT} for anything unset.
      */
-    public static @NotNull VoyageTiming of(int minSeconds, int maxSeconds, double chancePerRoll) {
-        return new VoyageTiming(minSeconds, maxSeconds, chancePerRoll);
+    public static @NotNull TransitTiming of(int minSeconds, int maxSeconds, double chancePerRoll) {
+        return new TransitTiming(minSeconds, maxSeconds, chancePerRoll);
     }
 }

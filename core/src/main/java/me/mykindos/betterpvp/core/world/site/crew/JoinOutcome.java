@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.crew;
+package me.mykindos.betterpvp.core.world.site.crew;
 
 /**
  * What happened when somebody tried to join a crew.
