@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -40,6 +41,13 @@ import java.util.function.Function;
  * {@link #onInit()} runs every time the entity (re)appears - bind a ModelEngine model, style a display, add behaviours.
  * {@link #onDematerialize()} runs every time the entity goes away - the framework already stops behaviours and removes
  * attached children for {@link SceneEntity}; override only to release entity-bound resources (e.g. a ModelEngine model).
+ * It runs both when the chunk unloads and on {@link #remove()}. Override {@link #remove()} for what must only happen when
+ * the object is gone for good.
+ *
+ * <h3>Telling a despawn from a destruction</h3>
+ * The framework removes a body with {@link Entity#remove()}, whose removal reason reads as a destroy, the same as the
+ * entity being killed. {@link #isDespawning()} is true for exactly as long as the framework itself is taking the body
+ * away, so a listener reacting to entity removal can tell the two apart.
  */
 @Getter
 public abstract class SceneObject {
@@ -62,7 +70,16 @@ public abstract class SceneObject {
     /** How to (re)spawn the backing entity at the anchor. Non-null only for self-spawning chunk-managed objects. */
     @Nullable private Function<Location, Entity> entityFactory;
 
+    /**
+     * Identity that survives restarts, for objects that keep a record of themselves. Null for everything else. Lets the
+     * registry answer whether the object a record describes is already standing.
+     */
+    @Nullable private UUID persistentId;
+
     private LifecycleState state = LifecycleState.DORMANT;
+
+    /** Whether the framework is taking the body away right now. See {@link #isDespawning()}. */
+    private boolean despawning;
 
     /** {@code true} when the live entity was created by {@link #entityFactory} (so dematerialize may remove it). */
     private boolean ownsEntity;
@@ -93,6 +110,16 @@ public abstract class SceneObject {
     }
 
     /**
+     * Gives this object an identity that survives restarts. Must be set before the object is registered.
+     */
+    public final void setPersistentId(@NotNull UUID persistentId) {
+        if (registry != null) {
+            throw new IllegalStateException("SceneObject #" + id + " is already registered");
+        }
+        this.persistentId = persistentId;
+    }
+
+    /**
      * Configures this object for chunk-managed materialization. Call <b>before</b> registering, instead of
      * {@link #init(Entity)}. The object stays {@link LifecycleState#DORMANT} until
      * {@link SceneMaterializationController} materializes it.
@@ -113,7 +140,7 @@ public abstract class SceneObject {
      * {@link #materialize()}/{@link #dematerialize()} drive only the object's decorations.
      */
     protected final void bindEntity(@NotNull Entity entity) {
-        this.entity = entity;
+        setEntity(entity);
     }
 
     /**
@@ -127,7 +154,7 @@ public abstract class SceneObject {
         if (state == LifecycleState.ACTIVE) {
             throw new IllegalStateException("SceneObject #" + id + " is already active");
         }
-        this.entity = entity;
+        setEntity(entity);
         this.ownsEntity = false;
         activate();
     }
@@ -141,7 +168,7 @@ public abstract class SceneObject {
             return;
         }
         if (entity == null && entityFactory != null && anchor != null) {
-            this.entity = entityFactory.apply(anchor);
+            setEntity(entityFactory.apply(anchor));
             this.ownsEntity = true;
         }
         if (entity == null) {
@@ -169,11 +196,16 @@ public abstract class SceneObject {
         if (state != LifecycleState.ACTIVE) {
             return;
         }
-        onDematerialize();
-        if (ownsEntity && entity != null) {
-            entity.remove();
-            entity = null;
-            ownsEntity = false;
+        despawning = true;
+        try {
+            onDematerialize();
+            if (ownsEntity && entity != null) {
+                entity.remove();
+                setEntity(null);
+                ownsEntity = false;
+            }
+        } finally {
+            despawning = false;
         }
         state = LifecycleState.DORMANT;
     }
@@ -225,17 +257,39 @@ public abstract class SceneObject {
     }
 
     /**
+     * Whether the framework is taking this object's body away right now, on a chunk unload or on {@link #remove()}.
+     * A removal event seen while this is true was not caused by gameplay.
+     */
+    public boolean isDespawning() {
+        return despawning;
+    }
+
+    /** Swaps the backing entity, keeping the registry's entity index in step. */
+    private void setEntity(@Nullable Entity next) {
+        final Entity previous = this.entity;
+        this.entity = next;
+        if (registry != null) {
+            registry.rebind(this, previous, next);
+        }
+    }
+
+    /**
      * Permanently removes this object: tears down its entity and behaviours and unregisters it. Unlike
      * {@link #dematerialize()} the object will not come back. Subclasses should call {@code super.remove()} after their
      * own cleanup.
      */
     public void remove() {
-        if (state == LifecycleState.ACTIVE) {
-            onDematerialize();
-        }
-        if (entity != null) {
-            entity.remove();
-            entity = null;
+        despawning = true;
+        try {
+            if (state == LifecycleState.ACTIVE) {
+                onDematerialize();
+            }
+            if (entity != null) {
+                entity.remove();
+                setEntity(null);
+            }
+        } finally {
+            despawning = false;
         }
         ownsEntity = false;
         state = LifecycleState.DORMANT;

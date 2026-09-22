@@ -33,6 +33,13 @@ public final class SceneObjectRegistry {
     private final Map<Integer, SceneObject> objects = new ConcurrentHashMap<>();
 
     /**
+     * Objects by the UUID of their body, and of any extra entity that stands in for them (see {@link #alias}). Read from
+     * packet threads, so concurrent.
+     */
+    private final Map<UUID, SceneObject> byEntity = new ConcurrentHashMap<>();
+    private final Map<UUID, SceneObject> byPersistentId = new ConcurrentHashMap<>();
+
+    /**
      * Set once by {@link SceneMaterializationController} on construction. Null only in the brief window before that
      * singleton is created, or on servers where the scene system is unused.
      */
@@ -65,6 +72,12 @@ public final class SceneObjectRegistry {
     public void register(@NotNull SceneObject object) {
         object.registry = this;
         objects.put(object.getId(), object);
+        if (object.isInitialized()) {
+            byEntity.put(object.getEntity().getUniqueId(), object);
+        }
+        if (object.getPersistentId() != null) {
+            byPersistentId.put(object.getPersistentId(), object);
+        }
         if (materializationController != null && object.isChunkManaged()) {
             materializationController.manage(object);
         }
@@ -76,10 +89,36 @@ public final class SceneObjectRegistry {
      */
     public void unregister(@NotNull SceneObject object) {
         objects.remove(object.getId());
+        byEntity.values().removeIf(indexed -> indexed == object);
+        if (object.getPersistentId() != null) {
+            byPersistentId.remove(object.getPersistentId(), object);
+        }
         object.registry = null;
         if (materializationController != null && object.isChunkManaged()) {
             materializationController.unmanage(object);
         }
+    }
+
+    /** Keeps the entity index in step when a registered object's body changes. */
+    void rebind(@NotNull SceneObject object, @Nullable Entity previous, @Nullable Entity next) {
+        if (previous != null) {
+            byEntity.remove(previous.getUniqueId(), object);
+        }
+        if (next != null) {
+            byEntity.put(next.getUniqueId(), object);
+        }
+    }
+
+    /**
+     * Makes {@code part} resolve to {@code owner}, so interacting with an extra entity (a hitbox, a seat) reaches the
+     * object it belongs to. Removed again by {@link #unalias}, or when the owner is unregistered.
+     */
+    public void alias(@NotNull Entity part, @NotNull SceneObject owner) {
+        byEntity.put(part.getUniqueId(), owner);
+    }
+
+    public void unalias(@NotNull Entity part) {
+        byEntity.remove(part.getUniqueId());
     }
 
     @Nullable
@@ -98,14 +137,16 @@ public final class SceneObjectRegistry {
         return getObject(entity.getUniqueId());
     }
 
+    /** The object whose body, or one of whose aliased parts, has this entity UUID. */
     @Nullable
     public SceneObject getObject(@NotNull UUID uuid) {
-        for (SceneObject obj : objects.values()) {
-            if (obj.isInitialized() && obj.getEntity().getUniqueId().equals(uuid)) {
-                return obj;
-            }
-        }
-        return null;
+        return byEntity.get(uuid);
+    }
+
+    /** The registered object carrying this {@link SceneObject#getPersistentId() persistent id}, if one is standing. */
+    @Nullable
+    public SceneObject getObjectByPersistentId(@NotNull UUID persistentId) {
+        return byPersistentId.get(persistentId);
     }
 
     @Nullable

@@ -11,9 +11,11 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -132,6 +134,25 @@ public class SceneMaterializationController implements Listener {
     @EventHandler
     public void onEntitiesUnload(EntitiesUnloadEvent event) {
         forEachIn(event.getChunk(), SceneObject::dematerialize);
+    }
+
+    /**
+     * Drops a closed world's chunk index. A world that opens again has a new UID, so nothing indexed under the old one
+     * can ever materialize, and instanced worlds open and close often enough for the stale entries to add up. Whatever
+     * is still registered there was not handed back by its owner, which is reported so the leak can be found.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onWorldUnload(WorldUnloadEvent event) {
+        final Map<Long, Set<SceneObject>> byChunk = index.remove(event.getWorld().getUID());
+        if (byChunk == null) {
+            return;
+        }
+
+        final long leftBehind = byChunk.values().stream().flatMap(Set::stream).filter(SceneObject::isRegistered).count();
+        if (leftBehind > 0) {
+            log.warn("{} scene object(s) were still registered when '{}' unloaded", leftBehind,
+                    event.getWorld().getName()).submit();
+        }
     }
 
     /** Visits every still-registered object indexed in {@code chunk}, pruning any that have since been removed. */
