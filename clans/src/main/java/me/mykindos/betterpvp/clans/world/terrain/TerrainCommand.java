@@ -8,7 +8,7 @@ import dev.brauw.mapper.region.PointRegion;
 import dev.brauw.mapper.region.PolygonRegion;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.map.MapZoneStyleRegistry;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;

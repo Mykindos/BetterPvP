@@ -2,12 +2,13 @@ package me.mykindos.betterpvp.clans.world.spawn;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.clans.scene.ClansSceneObjectFactory;
-import me.mykindos.betterpvp.clans.world.WorldContent;
-import me.mykindos.betterpvp.clans.world.content.WorldContentBinding;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
-import me.mykindos.betterpvp.clans.world.content.WorldSites;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSites;
 import me.mykindos.betterpvp.clans.world.model.Dock;
 import me.mykindos.betterpvp.clans.world.model.HumanCannon;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -41,13 +42,13 @@ public class Spawn implements WorldContent {
     private final HumanCannon humanCannon;
 
     @Inject
-    private Spawn(@NotNull WorldContentService contentService, @NotNull WorldSites sites,
+    private Spawn(@NotNull WorldContentService contentService, @NotNull Clans clans, @NotNull WorldSites sites,
                   @NotNull ClientManager clientManager, @NotNull ClansSceneObjectFactory clansSceneFactory,
                   @NotNull CannonService cannonService) {
         this.clientManager = clientManager;
         this.clansSceneFactory = clansSceneFactory;
         this.humanCannon = new HumanCannon(cannonService);
-        contentService.register(new WorldContentBinding(sites.selector(SITE), this::content));
+        contentService.register(clans, new WorldContentBinding(sites.selector(SITE), this::content));
     }
 
     private @NotNull List<WorldContent> content() {

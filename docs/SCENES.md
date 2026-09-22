@@ -12,7 +12,7 @@ Some scene objects are also `SceneEntity` objects. Scene entities can carry beha
 
 When a scene object is spawned, it is usually registered in `SceneObjectRegistry`. The registry lets the rest of the system find the scene object behind a clicked entity or an object id. That is how the interaction listener can turn a player right-click on an NPC's backing entity into a call on the correct NPC object.
 
-Loaders own groups of scene objects. A loader reads an external source, such as Mapper data-points, creates the objects, and tracks them. When the loader reloads, the base loader removes every tracked object first, then loads the current set again. That gives scene content a simple replacement model: reloads rebuild the scene instead of trying to patch old objects in place.
+World content owns groups of scene objects. A `WorldContent` reads an external source, such as Mapper data-points, and creates the objects for one world at a time. The `WorldContentService` tracks what each piece of content put into each world, and removes exactly that when the world unloads or the content is reloaded. That gives scene content a simple replacement model: reloads rebuild the content instead of trying to patch old objects in place, and one world loading never rebuilds another.
 
 ### Behaviors
 
@@ -37,20 +37,32 @@ Each behavior can start, tick, and stop. The scene ticker calls attached behavio
 - `SceneTextDisplay`: a managed text display entity.
 - `SceneItemDisplay`: a managed item display entity.
 
-Factories create command-spawnable object types, especially NPCs and props. Loaders can also construct objects directly when the content is specific to one scene.
+Factories create command-spawnable object types, especially NPCs and props. World content can also construct objects directly when they are specific to one place.
 
-### Loading Strategies
+### World Content
 
-A loader declares when it should load by returning one or more load strategies. Strategies are the triggers; loaders are the content builders.
+Content lives in `core/world/content/`. A module declares a `WorldContentBinding`: which worlds the content belongs to (a `WorldSelector`) and the content itself. It registers the binding with `WorldContentService`, naming the plugin that owns it.
 
-The built-in strategies are:
+```java
+contentService.register(plugin, new WorldContentBinding(WorldSelector.named(BPvPWorld.MAIN_WORLD_NAME),
+        () -> List.of(content)).withRequiresModels(true));
+```
 
-- `OnEnableLoadStrategy`: loads once as soon as the loader is registered during plugin enable. Use this for simple content that does not need world startup or ModelEngine completion.
-- `ServerStartLoadStrategy`: loads once after the server start event. Use this when the world and Mapper data need to be ready, but custom ModelEngine models are not involved.
-- `ModelEngineLoadStrategy`: reloads when ModelEngine finishes registering models. Use this for modeled NPCs and props so they are rebuilt after the initial ModelEngine pipeline and after ModelEngine reloads.
-- `ModuleReloadLoadStrategy`: reloads when the owning module reloads. This is usually paired with another initial-load strategy so module reloads refresh the same scene content.
+The service drives it off the server lifecycle:
 
-Most module scenes today use Mapper data-points plus `ModelEngineLoadStrategy` and `ModuleReloadLoadStrategy`. Mapper provides the positions and orientation. ModelEngine tells the loader when custom models are safe to spawn. Module reload gives operators a way to rebuild the scene without restarting.
+- Nothing is installed until the server has started, because Mapper data is only readable by then.
+- A world that loads gets every binding that matches it. A world that unloads loses exactly its own content.
+- `withRequiresModels(true)` holds content back until ModelEngine has registered its models, and applies it again after every ModelEngine reload. Use this for modeled NPCs and props.
+- Reloading a plugin re-applies only that plugin's bindings. `withOnReload` runs first, for content that caches what it read.
+- Disabling a plugin removes everything it registered.
+
+A `WorldContent` implements whichever of these fit:
+
+- `zones(world, regions)`: capability zones.
+- `sceneObjects(world, regions)`: chunk-managed scene objects, which spawn their body when their chunk loads and come back after it unloads.
+- `install(world, regions, scope)`: anything else. Eagerly spawned objects (`scope.spawn`, `scope.adopt`), things with their own teardown (`scope.onRelease`), or content that adds to the world after it has loaded, since content may keep its scope.
+
+`FactorySpawnPoints` covers the common case of spawning a factory's objects at data-points named `<prefix>:<type>`.
 
 ## Scene Package File Hierarchy
 
@@ -69,7 +81,6 @@ core/src/main/java/me/mykindos/betterpvp/core/scene/
 |-- controller/
 |-- display/
 |-- listener/
-|-- loader/
 |-- npc/
 `-- prop/
 ```
@@ -87,16 +98,15 @@ Major files and folders:
 - `controller/`: background scene controllers. The ticker drives behavior ticks, and cleanup removes registered scene objects when needed.
 - `display/`: managed Bukkit display wrappers such as `SceneTextDisplay` and `SceneItemDisplay`.
 - `listener/`: shared event routing, especially player interaction with registered scene objects.
-- `loader/`: scene loading lifecycle. `SceneObjectLoader` owns tracked objects, `MapperSceneLoader` reads Mapper regions, `SceneLoaderManager` binds loaders, and load strategies define reload timing.
 - `npc/`: NPC base types, NPC factories, human/model-backed NPC support, and player-list visibility handling.
 - `prop/`: prop base types and factories for non-interactive scene content.
 
-Module-specific scene loaders live in the owning modules, for example:
+Module-specific content lives in the owning modules, for example:
 
 ```text
-hub/src/main/java/me/mykindos/betterpvp/hub/feature/npc/HubSceneLoader.java
-clans/src/main/java/me/mykindos/betterpvp/clans/scene/ClansSceneLoader.java
-shops/src/main/java/me/mykindos/betterpvp/shops/npc/ShopsSceneLoader.java
+hub/src/main/java/me/mykindos/betterpvp/hub/feature/npc/HubSceneContent.java
+clans/src/main/java/me/mykindos/betterpvp/clans/scene/ClansSceneContent.java
+shops/src/main/java/me/mykindos/betterpvp/shops/npc/ShopsSceneContent.java
 ```
 
-Those files are responsible for translating module content into scene objects. For example, they choose Mapper data-point names, create the right NPC or display classes, register the relevant factory, and declare the load strategies that fit the module.
+Those files translate module content into scene objects. They choose Mapper data-point names, create the right NPC or display classes, register the relevant factory, and choose which worlds the content belongs to.

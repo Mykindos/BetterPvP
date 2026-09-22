@@ -38,8 +38,8 @@ import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
-import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
 import me.mykindos.betterpvp.core.world.WorldHandler;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRules;
@@ -182,10 +182,9 @@ public class Clans extends BPvPPlugin {
             // letting them reach disk would bake a copy into the map that no longer tracks the structure it came from.
             injector.getInstance(ShipService.class).restoreAll();
 
-            // Unload scene content so each archetype's onDeactivate fires on a graceful shutdown (the previously-unused
-            // SceneLoaderManager.shutdown()). In-flight respawn points are already persisted synchronously as they are
-            // mined, so no final flush is needed here.
-            injector.getInstance(SceneLoaderManager.class).shutdown();
+            // Unload world content so each archetype's onDeactivate fires on a graceful shutdown. In-flight respawn
+            // points are already persisted synchronously as they are mined, so no final flush is needed here.
+            injector.getInstance(WorldContentService.class).release(this);
 
             // Persist the minimap cache synchronously so a restart keeps the generated map instead of re-caching it.
             injector.getInstance(MapHandler.class).saveMapDataNow();

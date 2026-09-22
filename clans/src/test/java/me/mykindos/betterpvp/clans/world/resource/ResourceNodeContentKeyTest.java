@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ResourceNodeLoaderKeyTest {
+class ResourceNodeContentKeyTest {
 
     @Test
     @DisplayName("sanitizeForKey lowercases and replaces every character outside the Adventure Key charset")
     void sanitizeForKeyProducesLegalKeyCharacters() {
-        assertEquals("islands_solo_abc12345", ResourceNodeLoader.sanitizeForKey("islands/solo/ABC12345"));
-        assertEquals("world_one__chunk_4_-2", ResourceNodeLoader.sanitizeForKey("World One: chunk 4,-2"));
+        assertEquals("islands_solo_abc12345", ResourceNodeContent.sanitizeForKey("islands/solo/ABC12345"));
+        assertEquals("world_one__chunk_4_-2", ResourceNodeContent.sanitizeForKey("World One: chunk 4,-2"));
     }
 
     @Test
@@ -34,8 +34,8 @@ class ResourceNodeLoaderKeyTest {
         final World worldTwo = mock(World.class);
         when(worldTwo.getName()).thenReturn("islands/solo/bbbbbbbb");
 
-        final Key keyOne = ResourceNodeLoader.nodeKey(region, worldOne);
-        final Key keyTwo = ResourceNodeLoader.nodeKey(region, worldTwo);
+        final Key keyOne = ResourceNodeContent.nodeKey(region, worldOne);
+        final Key keyTwo = ResourceNodeContent.nodeKey(region, worldTwo);
 
         assertNotEquals(keyOne, keyTwo);
         assertEquals("clans", keyOne.namespace());
@@ -50,6 +50,6 @@ class ResourceNodeLoaderKeyTest {
         final World world = mock(World.class);
         when(world.getName()).thenReturn("Weird World: 1!");
 
-        Key.key(ResourceNodeLoader.nodeKey(region, world).asString());
+        Key.key(ResourceNodeContent.nodeKey(region, world).asString());
     }
 }

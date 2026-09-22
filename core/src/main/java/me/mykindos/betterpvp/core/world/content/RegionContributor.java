@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.content;
+package me.mykindos.betterpvp.core.world.content;
 
 import dev.brauw.mapper.region.Region;
 import org.bukkit.World;

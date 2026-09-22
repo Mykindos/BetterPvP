@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.world.model;
 
 import dev.brauw.mapper.region.PointRegion;
-import me.mykindos.betterpvp.clans.world.SceneSpawn;
-import me.mykindos.betterpvp.clans.world.WorldContent;
+import me.mykindos.betterpvp.core.world.content.SceneSpawn;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonArchetypeRegistry;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonDestination;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;

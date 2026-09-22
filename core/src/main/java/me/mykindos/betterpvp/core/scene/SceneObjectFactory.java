@@ -16,9 +16,7 @@ import java.util.function.Function;
  * a factory is automatically initialized and registered with {@link SceneObjectRegistry}.
  * <p>
  * For data-point / world-load driven spawning, use
- * {@link me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader} instead.
- *
- * @see me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader
+ * {@link me.mykindos.betterpvp.core.world.content.WorldContent} instead.
  */
 @Getter
 public abstract class SceneObjectFactory {

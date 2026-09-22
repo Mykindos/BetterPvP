@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.clans.world.sailing;
 
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
-import me.mykindos.betterpvp.clans.world.SceneSpawn;
-import me.mykindos.betterpvp.clans.world.WorldContent;
+import me.mykindos.betterpvp.core.world.content.SceneSpawn;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.zone.GlobalBounds;

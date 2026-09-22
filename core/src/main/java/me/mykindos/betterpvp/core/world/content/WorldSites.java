@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.world.content;
+package me.mykindos.betterpvp.core.world.content;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
