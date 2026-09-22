@@ -1,37 +1,39 @@
 package me.mykindos.betterpvp.core.world.schematic.command;
 
 import com.google.inject.Inject;
-import dev.brauw.mapper.region.Region;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
-import me.mykindos.betterpvp.core.world.schematic.SchematicAnimator;
+import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
+import me.mykindos.betterpvp.core.world.schematic.SchematicRenderer;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
-import me.mykindos.betterpvp.core.world.schematic.StructureTransform;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
- * {@code /structure paste <name>} — places a structure where you stand, turned to match the way you face.
+ * {@code /structure paste <name>} places a structure where you stand, turned to match the way you face.
  * <p>
  * A builder's check on what a berth will do at runtime: the rotation is worked out exactly as a real paste does, from
  * the difference between the structure's captured facing and the target's. The data-points are reported rather than
- * registered — they belong to whoever pasted the structure, not to the world's Mapper file.
+ * registered, since they belong to whoever pasted the structure, not to the world's Mapper file. {@code /structure undo}
+ * takes it back out.
  */
 @SubCommand(StructureCommand.class)
 public class StructurePasteSubCommand extends Command {
 
     private final SchematicService schematics;
-    private final SchematicAnimator animator;
+    private final SchematicRenderer renderer;
+    private final StructurePasteHistory history;
 
     @Inject
-    public StructurePasteSubCommand(SchematicService schematics, SchematicAnimator animator) {
+    public StructurePasteSubCommand(SchematicService schematics, SchematicRenderer renderer,
+                                    StructurePasteHistory history) {
         this.schematics = schematics;
-        this.animator = animator;
+        this.renderer = renderer;
+        this.history = history;
     }
 
     @Override
@@ -58,14 +60,11 @@ public class StructurePasteSubCommand extends Command {
             return;
         }
 
-        final Schematic schematic = loaded.get();
-        final int turns = StructureTransform.quarterTurnsBetween(schematic.getAnchorYaw(), player.getLocation().getYaw());
-
-        animator.paste(schematic, player.getLocation(), turns);
-        final List<Region> regions = animator.pasteRegions(schematic, player.getLocation(), turns);
+        final SchematicPlacement placement = SchematicPlacement.facing(loaded.get(), player.getLocation());
+        history.record(player.getUniqueId(), player.getWorld(), renderer.paste(placement));
 
         UtilMessage.simpleMessage(player, StructureCommand.PREFIX,
-                "Pasted <green>%s</green> — %d blocks, %d data-point(s), turned %d×90°.",
-                args[0], schematic.blockCount(), regions.size(), turns);
+                "Pasted <green>%s</green>: %d blocks, %d data-point(s), turned %d×90°.",
+                args[0], placement.getBlocks().size(), placement.markers().size(), placement.getQuarterTurns());
     }
 }

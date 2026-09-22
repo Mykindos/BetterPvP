@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class StructureTransformTest {
+class BlockTransformTest {
 
     private static final double EPSILON = 1e-9;
 
     @Test
     @DisplayName("no rotation leaves a point untouched")
     void zeroTurnsIsIdentity() {
-        final double[] rotated = StructureTransform.rotateXZ(3.5, -7.25, 0);
+        final double[] rotated = BlockTransform.rotatePoint(3.5, -7.25, 0);
         assertArrayEquals(new double[]{3.5, -7.25}, rotated, EPSILON);
     }
 
@@ -30,14 +30,14 @@ class StructureTransformTest {
     void fourTurnsIsIdentity(int startingTurns) {
         double[] point = {2.5, 9.5};
         for (int turn = 0; turn < 4; turn++) {
-            point = StructureTransform.rotateXZ(point[0], point[1], 1);
+            point = BlockTransform.rotatePoint(point[0], point[1], 1);
         }
         assertArrayEquals(new double[]{2.5, 9.5}, point, EPSILON);
     }
 
     /**
      * The property the whole transform exists for. A datapoint sits at the centre of the block it marks, and the block
-     * itself is moved by {@link SchematicAnimator#rotateXZ}; if the two disagree the marker drifts one block per turn
+     * itself is moved by {@link BlockTransform#rotateBlock}; if the two disagree the marker drifts one block per turn
      * and a pasted helm ends up beside the helm.
      */
     @ParameterizedTest
@@ -46,8 +46,8 @@ class StructureTransformTest {
     void pointsStayInRegisterWithBlocks(int quarterTurns) {
         for (int blockX = -3; blockX <= 3; blockX++) {
             for (int blockZ = -3; blockZ <= 3; blockZ++) {
-                final int[] rotatedBlock = SchematicAnimator.rotateXZ(blockX, blockZ, quarterTurns);
-                final double[] rotatedCentre = StructureTransform.rotateXZ(blockX + 0.5, blockZ + 0.5, quarterTurns);
+                final int[] rotatedBlock = BlockTransform.rotateBlock(blockX, blockZ, quarterTurns);
+                final double[] rotatedCentre = BlockTransform.rotatePoint(blockX + 0.5, blockZ + 0.5, quarterTurns);
 
                 assertArrayEquals(
                         new double[]{rotatedBlock[0] + 0.5, rotatedBlock[1] + 0.5},
@@ -62,26 +62,26 @@ class StructureTransformTest {
     @DisplayName("negative turn counts wrap instead of throwing")
     void negativeTurnsWrap() {
         assertArrayEquals(
-                StructureTransform.rotateXZ(4.5, 1.5, 3),
-                StructureTransform.rotateXZ(4.5, 1.5, -1),
+                BlockTransform.rotatePoint(4.5, 1.5, 3),
+                BlockTransform.rotatePoint(4.5, 1.5, -1),
                 EPSILON);
     }
 
     @Test
     @DisplayName("yaw drops a quarter turn per rotation and wraps into [0, 360)")
     void yawRotates() {
-        assertEquals(0f, StructureTransform.rotateYaw(0f, 0), 0.001f);
-        assertEquals(270f, StructureTransform.rotateYaw(0f, 1), 0.001f);
-        assertEquals(180f, StructureTransform.rotateYaw(0f, 2), 0.001f);
-        assertEquals(90f, StructureTransform.rotateYaw(0f, 3), 0.001f);
-        assertEquals(0f, StructureTransform.rotateYaw(0f, 4), 0.001f);
+        assertEquals(0f, BlockTransform.rotateYaw(0f, 0), 0.001f);
+        assertEquals(270f, BlockTransform.rotateYaw(0f, 1), 0.001f);
+        assertEquals(180f, BlockTransform.rotateYaw(0f, 2), 0.001f);
+        assertEquals(90f, BlockTransform.rotateYaw(0f, 3), 0.001f);
+        assertEquals(0f, BlockTransform.rotateYaw(0f, 4), 0.001f);
     }
 
     @Test
     @DisplayName("a negative yaw normalises rather than staying negative")
     void yawNormalisesNegativeInput() {
-        assertEquals(270f, StructureTransform.rotateYaw(-90f, 0), 0.001f);
-        assertEquals(180f, StructureTransform.rotateYaw(-90f, 1), 0.001f);
+        assertEquals(270f, BlockTransform.rotateYaw(-90f, 0), 0.001f);
+        assertEquals(180f, BlockTransform.rotateYaw(-90f, 1), 0.001f);
     }
 
     /**
@@ -93,25 +93,25 @@ class StructureTransformTest {
     @DisplayName("quarterTurnsBetween inverts rotateYaw")
     void quarterTurnsBetweenInvertsRotateYaw(int turns) {
         final float captureYaw = 45f;
-        final float placedYaw = StructureTransform.rotateYaw(captureYaw, turns);
-        assertEquals(turns, StructureTransform.quarterTurnsBetween(captureYaw, placedYaw));
+        final float placedYaw = BlockTransform.rotateYaw(captureYaw, turns);
+        assertEquals(turns, BlockTransform.quarterTurnsBetween(captureYaw, placedYaw));
     }
 
     @Test
     @DisplayName("an off-axis marker yaw snaps to the nearest quarter turn rather than being refused")
     void offAxisYawSnaps() {
         // 37 degrees off south is closest to no rotation at all.
-        assertEquals(0, StructureTransform.quarterTurnsBetween(0f, 37f));
+        assertEquals(0, BlockTransform.quarterTurnsBetween(0f, 37f));
         // 100 degrees is closest to a single quarter turn.
-        assertEquals(3, StructureTransform.quarterTurnsBetween(0f, 100f));
+        assertEquals(3, BlockTransform.quarterTurnsBetween(0f, 100f));
     }
 
     @Test
     @DisplayName("turns are counted the short way around regardless of how yaw is expressed")
     void equivalentYawsGiveTheSameTurns() {
         assertEquals(
-                StructureTransform.quarterTurnsBetween(0f, 90f),
-                StructureTransform.quarterTurnsBetween(360f, 450f));
+                BlockTransform.quarterTurnsBetween(0f, 90f),
+                BlockTransform.quarterTurnsBetween(360f, 450f));
     }
 
     /**
@@ -130,12 +130,12 @@ class StructureTransformTest {
         final Schematic schematic = new Schematic(width, height, length, 1, 0, 7, List.of());
         final Location at = new Location(null, 100, 64, -40);
 
-        final BoundingBox bounds = StructureTransform.pastedBounds(schematic, at, quarterTurns);
+        final BoundingBox bounds = SchematicPlacement.of(schematic, at, quarterTurns).selectionBounds();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
-                    final int[] rotated = SchematicAnimator.rotateXZ(x - 1, z - 7, quarterTurns);
+                    final int[] rotated = BlockTransform.rotateBlock(x - 1, z - 7, quarterTurns);
                     assertTrue(bounds.contains(
                                     at.getBlockX() + rotated[0] + 0.5,
                                     at.getBlockY() + y + 0.5,

@@ -38,7 +38,7 @@ public class CapturedRegion {
     /**
      * Captures {@code region} relative to {@code anchor}.
      * <p>
-     * The anchor's <em>block</em> position is the origin, matching {@link SchematicAnimator}'s use of
+     * The anchor's <em>block</em> position is the origin, matching {@link SchematicPlacement}'s use of
      * {@code getBlockX()} — the two must agree or the datapoints drift from the blocks they mark.
      */
     public static @NotNull CapturedRegion capture(@NotNull Region region, @NotNull Location anchor) {
@@ -143,13 +143,13 @@ public class CapturedRegion {
         }
 
         public @NotNull Location toWorld(@NotNull Location at, int quarterTurns) {
-            final double[] rotated = StructureTransform.rotateXZ(x, z, quarterTurns);
+            final double[] rotated = BlockTransform.rotatePoint(x, z, quarterTurns);
             return new Location(
                     at.getWorld(),
                     at.getBlockX() + rotated[0],
                     at.getBlockY() + y,
                     at.getBlockZ() + rotated[1],
-                    StructureTransform.rotateYaw(yaw, quarterTurns),
+                    BlockTransform.rotateYaw(yaw, quarterTurns),
                     pitch);
         }
     }

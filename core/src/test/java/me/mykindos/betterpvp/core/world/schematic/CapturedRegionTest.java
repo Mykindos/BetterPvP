@@ -101,7 +101,7 @@ class CapturedRegionTest {
         final CapturedRegion captured = CapturedRegion.capture(original, anchor);
         final Location placed = ((PointRegion) captured.rebuild(anchor, quarterTurns)).getLocation();
 
-        final int[] expectedBlock = SchematicAnimator.rotateXZ(3, 5, quarterTurns);
+        final int[] expectedBlock = BlockTransform.rotateBlock(3, 5, quarterTurns);
         assertEquals(expectedBlock[0] + 0.5, placed.getX(), EPSILON);
         assertEquals(expectedBlock[1] + 0.5, placed.getZ(), EPSILON);
     }

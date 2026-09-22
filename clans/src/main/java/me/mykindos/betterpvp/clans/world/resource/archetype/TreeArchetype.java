@@ -7,7 +7,6 @@ import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import lombok.Value;
-import me.mykindos.betterpvp.clans.world.resource.BlockBatchStore;
 import me.mykindos.betterpvp.clans.world.resource.ResourceArchetype;
 import me.mykindos.betterpvp.clans.world.resource.ResourceLoot;
 import me.mykindos.betterpvp.clans.world.resource.ResourceNodeDefinition;
@@ -18,8 +17,10 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.world.schematic.BlockBatchStore;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
-import me.mykindos.betterpvp.core.world.schematic.SchematicAnimator;
+import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
+import me.mykindos.betterpvp.core.world.schematic.SchematicRenderer;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
 import org.bukkit.Location;
@@ -31,6 +32,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,8 +53,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Each {@link #onHarvest} hit counts toward {@code tree.hits}; the final hit animates the fell stages (last = stump)
  * and rolls the loot table. Frames are applied non-destructively — each is overlaid with {@link
- * SchematicAnimator#pasteCapturing} ({@code //paste -a}, solid blocks only) and the previous frame is backed out with
- * {@link SchematicAnimator#restore} ({@code //undo}) before the next is shown, so surrounding decoration is never
+ * SchematicRenderer#paste} ({@code //paste -a}, solid blocks only) and the previous frame is backed out with
+ * {@link SchematicRenderer#restore} ({@code //undo}) before the next is shown, so surrounding decoration is never
  * touched and exiting a frame restores exactly what it overwrote. For a respawning tree, the delay elapsed the stump
  * is undone and the standing schematic re-placed. Every fell frame's undo is mirrored to a {@link BlockBatchStore},
  * keyed by (world, region): a fresh activation restores whatever fell frame a previous run left showing — a graceful
@@ -69,7 +71,7 @@ public class TreeArchetype implements ResourceArchetype {
     private final Core core;
     private final ResourceLoot loot;
     private final SchematicService schematicService;
-    private final SchematicAnimator schematicAnimator;
+    private final SchematicRenderer renderer;
     private final BlockBatchStore frameStore;
     private final ClientManager clientManager;
 
@@ -78,12 +80,12 @@ public class TreeArchetype implements ResourceArchetype {
 
     @Inject
     public TreeArchetype(@NotNull Core core, @NotNull ResourceLoot loot, @NotNull SchematicService schematicService,
-                         @NotNull SchematicAnimator schematicAnimator, @NotNull BlockBatchStore frameStore,
+                         @NotNull SchematicRenderer renderer, @NotNull BlockBatchStore frameStore,
                          @NotNull ClientManager clientManager) {
         this.core = core;
         this.loot = loot;
         this.schematicService = schematicService;
-        this.schematicAnimator = schematicAnimator;
+        this.renderer = renderer;
         this.frameStore = frameStore;
         this.clientManager = clientManager;
     }
@@ -132,7 +134,7 @@ public class TreeArchetype implements ResourceArchetype {
             final World anchorWorld = anchor.getWorld();
             placements.remove(new PlacementKey(anchorWorld.getName(), runtime.placement.regionId));
 
-            schematicAnimator.restore(anchorWorld, runtime.currentUndo);
+            renderer.restore(anchorWorld, runtime.currentUndo);
         }
     }
 
@@ -195,7 +197,7 @@ public class TreeArchetype implements ResourceArchetype {
      * store) nothing is persisted for it. On activation ({@code clearLeftover}) a previous run may have left a fell
      * frame pasted (a graceful stop, or a crash mid-animation): its persisted undo — the terrain each fell cell
      * overwrote — is restored first, reverting the debris to bare ground; on respawn the stump is undone from the
-     * in-memory undo instead. Standing is laid down with {@link SchematicAnimator#pasteCapturing} (solid blocks only,
+     * in-memory undo instead. Standing is laid down with {@link SchematicRenderer#paste} (solid blocks only,
      * decoration untouched); its own cells sat in air, so {@link TreePlacement#standingUndo} (config-derived air) is what
      * later fells it — no per-standing capture is kept. No-op without a loadable standing schematic.
      */
@@ -212,8 +214,8 @@ public class TreeArchetype implements ResourceArchetype {
         final List<Schematic.PlacedBlock> leftover = clearLeftover
                 ? frameStore.get(placement.regionId, world.getName()).map(BlockBatchStore.Batch::getBlocks).orElse(List.of())
                 : runtime.currentUndo;
-        schematicAnimator.restore(world, leftover);
-        schematicAnimator.pasteCapturing(world, placement.standing, placement.anchor, placement.quarterTurns);
+        renderer.restore(world, leftover);
+        renderer.paste(SchematicPlacement.of(placement.standing, placement.anchor, placement.quarterTurns));
         runtime.currentUndo = placement.standingUndo;
         frameStore.clear(placement.regionId, world.getName()); // standing is the resting state — cache nothing, matching the ore store
         runtime.felled = false;
@@ -285,8 +287,9 @@ public class TreeArchetype implements ResourceArchetype {
             final BlockData data = block.getBlockData();
             UtilBlock.playBlockEffect(block, data);
         }
-        schematicAnimator.restore(world, runtime.currentUndo);
-        recordFrame(runtime, world, schematicAnimator.pasteCapturing(world, frame, runtime.placement.anchor, runtime.placement.quarterTurns));
+        renderer.restore(world, runtime.currentUndo);
+        recordFrame(runtime, world, renderer.paste(
+                SchematicPlacement.of(frame, runtime.placement.anchor, runtime.placement.quarterTurns)));
     }
 
     /**
@@ -314,7 +317,7 @@ public class TreeArchetype implements ResourceArchetype {
         final Location raw = marker.getLocation();
         final Location anchor = new Location(world, raw.getX(), raw.getY(), raw.getZ());
         // Two corrections fold into this. (1) Minecraft yaw turns clockwise (S→W→N→E as yaw rises) but
-        // SchematicAnimator.rotateXZ turns counter-clockwise, so the yaw step is negated. (2) Spigot stores the
+        // BlockTransform.rotateBlock turns counter-clockwise, so the yaw step is negated. (2) Spigot stores the
         // perspective yaw a quarter-turn off the client facing, so a west-facing marker (the as-authored orientation)
         // must land on zero turns — the +1 phase constant. Net: a marker facing the way the schematic was saved pastes
         // it unrotated, and turning the marker turns the tree the same way.
@@ -336,24 +339,15 @@ public class TreeArchetype implements ResourceArchetype {
         }
 
         final CuboidRegion bounds = computeBounds(definition, marker, standing, stages, anchor, quarterTurns, world);
-        // One walk of standing's solid cells (air skipped, exactly as pasteCapturing places them), rotated to absolute
-        // positions, yields both the felling footprint (which blocks a hit may break) and the config-derived undo that
-        // fells the tree by re-airing those cells — they were air before the tree, so standing caches nothing.
+        // One walk of standing's solid cells, exactly as the paste places them, yields both the felling footprint (which
+        // blocks a hit may break) and the config-derived undo that fells the tree by re-airing those cells. They were
+        // air before the tree, so standing caches nothing.
         final BlockData air = Material.AIR.createBlockData();
-        final int turns = quarterTurns & 3;
         final Set<Long> footprint = new HashSet<>();
         final List<Schematic.PlacedBlock> standingUndo = new ArrayList<>();
-        for (Schematic.PlacedBlock cell : standing.getBlocks()) {
-            if (cell.getData().getMaterial().isAir()) {
-                continue;
-            }
-            final int[] rotated = SchematicAnimator.rotateXZ(cell.getX() - standing.getAnchorX(),
-                    cell.getZ() - standing.getAnchorZ(), turns);
-            final int wx = anchor.getBlockX() + rotated[0];
-            final int wy = anchor.getBlockY() + cell.getY() - standing.getAnchorY();
-            final int wz = anchor.getBlockZ() + rotated[1];
-            footprint.add(pack(wx, wy, wz));
-            standingUndo.add(new Schematic.PlacedBlock(wx, wy, wz, air));
+        for (Schematic.PlacedBlock cell : SchematicPlacement.of(standing, anchor, quarterTurns).getBlocks()) {
+            footprint.add(pack(cell.getX(), cell.getY(), cell.getZ()));
+            standingUndo.add(new Schematic.PlacedBlock(cell.getX(), cell.getY(), cell.getZ(), air));
         }
         return new TreePlacement(marker.getId(), standing, stages, anchor, quarterTurns, hits, stageDelay, bounds,
                 footprint, standingUndo);
@@ -370,23 +364,15 @@ public class TreeArchetype implements ResourceArchetype {
         // The zone must cover every block any animation frame can occupy, not just the standing tree: a fell stage drops
         // the trunk and canopy across the ground, reaching well past the standing footprint. Were the zone bounded by the
         // standing box alone, that debris would lie outside the gate and ResourceNodeRule would never deny breaking it —
-        // so the box is the union of the standing schematic and every fell stage. bounds() returns
-        // [minX, minY, minZ, maxX, maxY, maxZ].
-        int[] box = SchematicAnimator.bounds(standing, anchor, quarterTurns);
+        // so the box is the union of the standing schematic and every fell stage.
+        final BoundingBox box = SchematicPlacement.of(standing, anchor, quarterTurns).blockBounds();
         for (Schematic stage : stages) {
-            box = union(box, SchematicAnimator.bounds(stage, anchor, quarterTurns));
+            box.union(SchematicPlacement.of(stage, anchor, quarterTurns).blockBounds());
         }
-        final Location min = new Location(world, box[0], box[1], box[2]);
-        final Location max = new Location(world, box[3], box[4], box[5]);
+        // The cuboid's corners are the blocks at each end, while the box spans whole blocks and so ends one past them.
+        final Location min = new Location(world, box.getMinX(), box.getMinY(), box.getMinZ());
+        final Location max = new Location(world, box.getMaxX() - 1, box.getMaxY() - 1, box.getMaxZ() - 1);
         return new CuboidRegion("tree_" + marker.getId(), min, max);
-    }
-
-    /** Merges two {@code [minX, minY, minZ, maxX, maxY, maxZ]} boxes into the smallest box containing both. */
-    private static int[] union(@NotNull int[] a, @NotNull int[] b) {
-        return new int[] {
-                Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.min(a[2], b[2]),
-                Math.max(a[3], b[3]), Math.max(a[4], b[4]), Math.max(a[5], b[5])
-        };
     }
 
     /**
