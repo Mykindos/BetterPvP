@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonProp;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonRecord;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonService;
 import me.mykindos.betterpvp.core.item.impl.cannon.model.CannonStore;
+import me.mykindos.betterpvp.core.scene.SceneObject;
+import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
@@ -30,20 +32,34 @@ public class CannonContent implements WorldContent {
 
     private final CannonStore store;
     private final CannonService service;
+    private final SceneObjectRegistry registry;
 
     @Inject
-    private CannonContent(Core core, CannonStore store, CannonService service, WorldContentService contentService) {
+    private CannonContent(Core core, CannonStore store, CannonService service, SceneObjectRegistry registry,
+                          WorldContentService contentService) {
         this.store = store;
         this.service = service;
+        this.registry = registry;
         contentService.register(core, new WorldContentBinding(WorldSelector.any(), () -> List.of(this))
                 .withRequiresModels(true));
     }
 
-    /** The store is only read here. A world going away must never delete the cannons standing in it. */
+    /**
+     * The store is only read here. A world going away must never delete the cannons standing in it.
+     * <p>
+     * A cannon already standing, because it was placed since the world loaded, is taken over rather than restored a
+     * second time, which also makes it go away with its world.
+     */
     @Override
     public void install(@NotNull World world, @NotNull RegionIndex regions, @NotNull WorldContentScope scope) {
         for (CannonRecord record : store.all()) {
             if (!record.getWorld().equals(world.getName())) {
+                continue;
+            }
+
+            final SceneObject standing = registry.getObjectByPersistentId(record.getId());
+            if (standing != null) {
+                scope.adopt(standing);
                 continue;
             }
 

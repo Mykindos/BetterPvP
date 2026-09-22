@@ -14,6 +14,12 @@ When a scene object is spawned, it is usually registered in `SceneObjectRegistry
 
 World content owns groups of scene objects. A `WorldContent` reads an external source, such as Mapper data-points, and creates the objects for one world at a time. The `WorldContentService` tracks what each piece of content put into each world, and removes exactly that when the world unloads or the content is reloaded. That gives scene content a simple replacement model: reloads rebuild the content instead of trying to patch old objects in place, and one world loading never rebuilds another.
 
+### Despawning, identity and clicks
+
+- A chunk unload and a permanent `remove()` both take the body away with `Entity#remove()`, whose removal reason reads the same as the entity being killed. `SceneObject#isDespawning()` is true for exactly as long as the framework itself is removing the body, so a removal listener can tell the two apart.
+- An object that keeps a record of itself can carry a `persistentId`, set before it is registered. `SceneObjectRegistry#getObjectByPersistentId` answers whether the object a record describes is already standing, so content restoring from a store can take it over instead of spawning a duplicate.
+- The registry looks objects up by entity UUID through an index, not a scan. `SceneObjectRegistry#alias` makes an extra entity resolve to its owner, which is how `HitboxVolume` works: a behaviour that covers a whole box with interaction entities, so a click anywhere in, for example, a building reaches the object that owns it.
+
 ### Behaviors
 
 Behaviors are small reusable pieces of logic attached to a scene entity. They let a model or NPC gain extra behavior without putting every feature directly into the object class.

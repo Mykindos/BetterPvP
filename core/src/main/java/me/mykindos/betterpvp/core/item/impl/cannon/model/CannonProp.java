@@ -95,16 +95,6 @@ public class CannonProp extends ModeledProp implements SoundProvider {
      */
     private boolean transientCannon;
 
-    /**
-     * True while the framework is tearing this cannon's body down.
-     * <p>
-     * {@code SceneObject.dematerialize()} despawns the golem with {@link org.bukkit.entity.Entity#remove()}, whose
-     * removal reason is {@code DISCARDED} - which {@code EntityRemovalReason} classes as a destroy, the same bucket as
-     * being killed. Without this flag a routine chunk unload is indistinguishable from the cannon being destroyed, and
-     * would delete its record.
-     */
-    private boolean dematerializing;
-
     public CannonProp(@NotNull SceneObjectFactory factory,
                       @NotNull CannonService service,
                       @NotNull UUID cannonId,
@@ -119,6 +109,7 @@ public class CannonProp extends ModeledProp implements SoundProvider {
         this.archetype = archetype;
         this.properties = properties;
         this.health = health;
+        setPersistentId(cannonId);
     }
 
     /** Marks this cannon as scene-owned. See {@link #transientCannon}. */
@@ -162,7 +153,6 @@ public class CannonProp extends ModeledProp implements SoundProvider {
         }
 
         refreshFromConfig();
-        this.dematerializing = false;
 
         this.cycle = new CannonCycle(this);
         addBehavior(cycle);
@@ -184,8 +174,6 @@ public class CannonProp extends ModeledProp implements SoundProvider {
 
     @Override
     protected void onDematerialize() {
-        // Runs before the body is despawned, so the flag is already set by the time the removal event fires.
-        this.dematerializing = true;
         // Captures whatever changed while the body existed - notably rotation, which aiming mutates every tick and so
         // is deliberately not written through on each change.
         service.persist(this);

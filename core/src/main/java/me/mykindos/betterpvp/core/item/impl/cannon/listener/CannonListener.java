@@ -350,8 +350,8 @@ public class CannonListener implements Listener {
 
     /**
      * Destroys a cannon whose body was removed by something other than the scene framework. A framework
-     * dematerialization despawns the golem with the same {@code DISCARDED} reason as a genuine removal, so the cannon's
-     * own {@link CannonProp#isDematerializing()} flag is what separates a chunk unload from a destruction.
+     * dematerialization despawns the golem with the same {@code DISCARDED} reason as a genuine removal, so
+     * {@link CannonProp#isDespawning()} is what separates a chunk unload from a destruction.
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRemove(final EntityRemoveFromWorldEvent event) {
@@ -359,7 +359,7 @@ public class CannonListener implements Listener {
             return;
         }
         cannonService.of(event.getEntity())
-                .filter(cannon -> !cannon.isDematerializing())
+                .filter(cannon -> !cannon.isDespawning())
                 .ifPresent(this::destroy);
     }
 
