@@ -1,13 +1,12 @@
-package me.mykindos.betterpvp.clans.world.resource;
+package me.mykindos.betterpvp.core.world.schematic;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Value;
-import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.store.RecordCodec;
 import me.mykindos.betterpvp.core.framework.store.RecordStore;
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
@@ -22,13 +21,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Crash-surviving record of a <em>batch of blocks</em> stored under an id — the precise set of (position, block data)
- * pairs needed to put a region of the world back exactly as it was. A schematic-driven archetype (currently {@link
- * me.mykindos.betterpvp.clans.world.resource.archetype.TreeArchetype TreeArchetype}) saves the undo for the single
- * animation frame it has pasted, so a restart can back the frame out cleanly instead of blindly airing the whole
- * footprint — which would erase tall grass, flowers and other decoration sitting in cells the frame overlaps.
+ * Crash-surviving record of a <em>batch of blocks</em> stored under an id: the precise set of (position, block data)
+ * pairs needed to put a region of the world back exactly as it was. Whatever pastes into the world keeps the undo for
+ * what it pasted here, so a restart can back it out cleanly instead of blindly airing the whole footprint, which would
+ * erase tall grass, flowers and other decoration sitting in the cells it overlapped.
  * <p>
- * One file per batch under {@code scenes/cache/block-batches/}, keyed by {@code world:id} (a template world cloned into
+ * One file per batch under {@code cache/block-batches/}, keyed by {@code world:id} (a template world cloned into
  * several runtime worlds carries the same Mapper region ids, so the world qualifies the id); a thin facade over the
  * generic {@link RecordStore} that owns the {@link Batch} shape, the store owns the I/O.
  * <p>
@@ -43,8 +41,8 @@ public class BlockBatchStore {
     private final RecordStore<Batch> store;
 
     @Inject
-    public BlockBatchStore(@NotNull Clans clans) {
-        this.store = new RecordStore<>(new File(clans.getDataFolder(), "scenes/cache/block-batches"),
+    public BlockBatchStore(@NotNull Core core) {
+        this.store = new RecordStore<>(new File(core.getDataFolder(), "cache/block-batches"),
                 new BatchCodec());
     }
 

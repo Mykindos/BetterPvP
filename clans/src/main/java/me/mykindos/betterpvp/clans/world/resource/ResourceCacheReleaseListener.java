@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.world.schematic.BlockBatchStore;
 import me.mykindos.betterpvp.core.world.site.SiteWorldReleasedEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -358,7 +358,7 @@ direction it should fell. Repeat for as many trees as you like — one schematic
 `level:`/`name:` to tune individual trees.
 
 > Note: rotation snaps to 90°. If a placed tree looks mirrored or off by a quarter-turn, that's a handedness tweak in
-> `SchematicAnimator` — report what you see.
+> `BlockTransform` — report what you see.
 
 ---
 

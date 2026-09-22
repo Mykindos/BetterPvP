@@ -16,10 +16,10 @@ import me.mykindos.betterpvp.core.world.site.ArrivalPoints;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
-import me.mykindos.betterpvp.core.world.schematic.SchematicAnimator;
+import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
+import me.mykindos.betterpvp.core.world.schematic.SchematicRenderer;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import me.mykindos.betterpvp.core.world.schematic.StructureAnchor;
-import me.mykindos.betterpvp.core.world.schematic.StructureTransform;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -97,7 +97,7 @@ public class ShipService implements RegionContributor {
     private boolean tagsRegistered;
 
     private final SchematicService schematics;
-    private final SchematicAnimator animator;
+    private final SchematicRenderer renderer;
 
     private final Map<String, List<Berth>> berthsByWorld = new HashMap<>();
 
@@ -128,10 +128,10 @@ public class ShipService implements RegionContributor {
     private final WorldContentService contentService;
 
     @Inject
-    public ShipService(@NotNull SchematicService schematics, @NotNull SchematicAnimator animator,
+    public ShipService(@NotNull SchematicService schematics, @NotNull SchematicRenderer renderer,
                        @NotNull WorldContentService contentService, @NotNull Clans clans) {
         this.schematics = schematics;
-        this.animator = animator;
+        this.renderer = renderer;
         this.contentService = contentService;
         this.clans = clans;
         contentService.registerRegions(this);
@@ -271,7 +271,7 @@ public class ShipService implements RegionContributor {
 
         final List<Schematic.PlacedBlock> reversed = new ArrayList<>(captured);
         Collections.reverse(reversed);
-        animator.restore(world, reversed);
+        renderer.restore(world, reversed);
     }
 
     /**
@@ -328,17 +328,15 @@ public class ShipService implements RegionContributor {
             return Optional.empty();
         }
 
-        final Schematic schematic = loaded.get();
-        final int turns = StructureTransform.quarterTurnsBetween(schematic.getAnchorYaw(), anchor.getYaw());
-        final BoundingBox hull = StructureTransform.pastedBounds(schematic, anchor, turns);
+        final SchematicPlacement placement = SchematicPlacement.facing(loaded.get(), anchor);
+        final BoundingBox hull = placement.selectionBounds();
 
         // Captured as it is written, so the world can be handed back exactly as it was found. A pasted hull is scenery
         // the server puts there each boot, not something that should be saved into the map and outlive the plugin.
         undo.computeIfAbsent(world.getName(), key -> new ArrayList<>())
-                .addAll(animator.pasteCapturing(world, schematic, anchor, turns));
+                .addAll(renderer.paste(placement));
 
-        final List<Region> regions = animator.pasteRegions(schematic, anchor, turns,
-                Set.of(BERTH_TAG + ":" + id.toLowerCase(Locale.ROOT)));
+        final List<Region> regions = placement.markers(Set.of(BERTH_TAG + ":" + id.toLowerCase(Locale.ROOT)));
         placed.addAll(regions);
 
         // Falls back to the berth marker so a structure with no boarding point still puts people somewhere sensible
