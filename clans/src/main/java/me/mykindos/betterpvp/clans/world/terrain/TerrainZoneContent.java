@@ -3,11 +3,12 @@ package me.mykindos.betterpvp.clans.world.terrain;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
-import me.mykindos.betterpvp.clans.world.WorldContent;
-import me.mykindos.betterpvp.clans.world.content.WorldContentBinding;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
-import me.mykindos.betterpvp.clans.world.content.WorldSelector;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSelector;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
@@ -46,9 +47,9 @@ public class TerrainZoneContent implements WorldContent {
     private final ClientManager clientManager;
 
     @Inject
-    public TerrainZoneContent(@NotNull ClientManager clientManager, @NotNull WorldContentService contentService) {
+    public TerrainZoneContent(@NotNull ClientManager clientManager, @NotNull WorldContentService contentService, @NotNull Clans clans) {
         this.clientManager = clientManager;
-        contentService.register(new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
+        contentService.register(clans, new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
     }
 
     @Override

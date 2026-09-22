@@ -16,10 +16,10 @@ import org.joml.Vector3f;
  * in {@link #onInit()} when the backing entity is bound. Text can be updated at any time
  * via {@link #updateText(Component)}.
  * <p>
- * Typical usage inside a {@link me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader}:
+ * Typical usage inside {@link me.mykindos.betterpvp.core.world.content.WorldContent#install}:
  * <pre>
  *   TextDisplay entity = location.getWorld().spawn(location, TextDisplay.class);
- *   spawn(new SceneTextDisplay(text, scale, Display.Billboard.FIXED), entity);
+ *   scope.spawn(new SceneTextDisplay(text, scale, Display.Billboard.FIXED), entity);
  * </pre>
  */
 public class SceneTextDisplay extends SceneObject {

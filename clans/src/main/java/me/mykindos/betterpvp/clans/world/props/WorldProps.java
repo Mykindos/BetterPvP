@@ -13,12 +13,13 @@ import dev.brauw.mapper.tag.PatternTag;
 import dev.brauw.mapper.tag.RegionScope;
 import dev.brauw.mapper.tag.TagRegistry;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.scene.ClansSceneObjectFactory;
-import me.mykindos.betterpvp.clans.world.SceneSpawn;
-import me.mykindos.betterpvp.clans.world.WorldContent;
-import me.mykindos.betterpvp.clans.world.content.WorldContentBinding;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
-import me.mykindos.betterpvp.clans.world.content.WorldSelector;
+import me.mykindos.betterpvp.core.world.content.SceneSpawn;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSelector;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.scene.ScenePlacement;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
@@ -112,12 +113,12 @@ public class WorldProps implements WorldContent {
     public WorldProps(@NotNull ClansSceneObjectFactory objectFactory,
                       @NotNull SceneInteractionRegistry sceneInteractions,
                       @NotNull PropArchetypeRegistry archetypes,
-                      @NotNull WorldContentService contentService) {
+                      @NotNull WorldContentService contentService, @NotNull Clans clans) {
         this.objectFactory = objectFactory;
         this.sceneInteractions = sceneInteractions;
         this.archetypes = archetypes;
 
-        contentService.register(new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
+        contentService.register(clans, new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
     }
 
     @Override

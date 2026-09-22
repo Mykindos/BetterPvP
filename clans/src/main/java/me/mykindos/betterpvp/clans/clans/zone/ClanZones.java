@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * {@link me.mykindos.betterpvp.core.world.zone.Zones} plays in core.
  * <p>
  * Server-owned areas that used to be modelled as admin clans (spawn, shops, Fields) are now Mapper region zones loaded
- * by {@link ClanRegionZoneLoader}. They carry the cross-cutting {@link me.mykindos.betterpvp.core.world.zone.Zones}
+ * by {@link ClanRegionZoneContent}. They carry the cross-cutting {@link me.mykindos.betterpvp.core.world.zone.Zones}
  * capability tags ({@code safe}, {@code no_build}) plus, for resource areas, {@link #FIELDS}.
  */
 public final class ClanZones {

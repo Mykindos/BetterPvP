@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Type-filtered views are available via {@link #getObjects(Class)}.
  * <p>
  * Registration is owned by {@link SceneObjectFactory} and
- * {@link me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader}; unregistration
+ * {@link me.mykindos.betterpvp.core.world.content.WorldContentScope}. Unregistration
  * happens automatically when {@link SceneObject#remove()} is called on a registered object.
  */
 @Singleton

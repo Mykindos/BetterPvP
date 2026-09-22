@@ -13,10 +13,10 @@ import org.joml.Vector3f;
  * Configuration (item, scale, display transform) is supplied at construction time and
  * applied in {@link #onInit()} when the backing entity is bound.
  * <p>
- * Typical usage inside a {@link me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader}:
+ * Typical usage inside {@link me.mykindos.betterpvp.core.world.content.WorldContent#install}:
  * <pre>
  *   ItemDisplay entity = location.getWorld().spawn(location, ItemDisplay.class);
- *   spawn(new SceneItemDisplay(item, 0.5f), entity);
+ *   scope.spawn(new SceneItemDisplay(item, 0.5f), entity);
  * </pre>
  */
 public class SceneItemDisplay extends SceneObject {

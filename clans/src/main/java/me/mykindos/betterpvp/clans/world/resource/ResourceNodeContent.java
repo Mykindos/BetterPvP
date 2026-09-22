@@ -17,24 +17,23 @@ import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
-import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
-import me.mykindos.betterpvp.core.scene.loader.LoadStrategy;
-import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
-import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
-import me.mykindos.betterpvp.core.scene.loader.SceneObjectLoader;
-import me.mykindos.betterpvp.core.scene.loader.ServerStartLoadStrategy;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
+import me.mykindos.betterpvp.core.world.content.SceneSpawn;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentScope;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSelector;
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneGameMode;
-import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -59,9 +58,8 @@ import java.util.Set;
  * Loads resource nodes from {@code scenes/props/*.yml} (one file per node type) into individual {@link World}s. For
  * each definition it matches Mapper regions in a world — by tag (every region carrying the tag) or by name — and per
  * match builds the gate {@link Zone}, spawns the {@link ResourceNodeProp} label, and registers the node with
- * {@link ResourceNodeManager}. Reuses the same server-start / module-reload lifecycle as the other clans scene
- * loaders, plus a world-scoped listener so a world that appears after startup (e.g. a discovery island cloned from a
- * template at runtime) gets its nodes without disturbing any other world.
+ * {@link ResourceNodeManager}. A world that appears after startup (e.g. a discovery island cloned from a template at
+ * runtime) gets its nodes without disturbing any other world.
  * <p>
  * A file may declare a {@code parent} to inherit from another definition as a template, setting only the keys it wants
  * to override. The parent is referenced either by id ({@code parent: copper_mine} or {@code parent: {id: copper_mine}})
@@ -72,20 +70,17 @@ import java.util.Set;
  * <p>
  * <h3>Per-world tracking</h3>
  * Definitions ({@code scenes/props/*.yml}, parsed and template-merged) are world-agnostic and parsed once, then reused
- * to scan every world. Spawned state (zones, {@link ResourceNodeProp}s) is tracked per world name in
- * {@link #stateByWorld}, so {@link #unloadWorld(World)} tears down only that world's nodes. Zone keys are namespaced
- * with the sanitised world name so cloned worlds — which carry identical Mapper region ids — never collide in
- * {@link ZoneManager}.
+ * to scan every world. Spawned state is owned by each world's content scope, so a world going away tears down only
+ * its own nodes. Zone keys are namespaced with the sanitised world name so cloned worlds, which carry identical Mapper
+ * region ids, never collide in the zone manager.
  */
 @CustomLog
 @Singleton
 @PluginAdapter("Mapper")
-public class ResourceNodeLoader extends SceneObjectLoader {
+public class ResourceNodeContent implements WorldContent {
 
     private final Clans clans;
     private final ClientManager clientManager;
-    private final ZoneManager zoneManager;
-    private final SceneObjectRegistry registry;
     private final ResourceNodeFactory factory;
     private final ResourceArchetypeRegistry archetypeRegistry;
     private final ResourceNodeManager manager;
@@ -93,68 +88,49 @@ public class ResourceNodeLoader extends SceneObjectLoader {
 
     private static final String PARENT_KEY = "parent";
 
-    private final Map<String, WorldState> stateByWorld = new HashMap<>();
     private @Nullable List<Pair<ResourceNodeDefinition, ResourceArchetype>> definitions;
     private boolean tagsRegistered;
 
     @Inject
-    public ResourceNodeLoader(Clans clans, ClientManager clientManager, ZoneManager zoneManager,
-                              SceneObjectRegistry registry, ResourceNodeFactory factory,
-                              ResourceArchetypeRegistry archetypeRegistry, ResourceNodeManager manager,
-                              ResourceNodeLabelService labelService, SceneLoaderManager sceneLoaderManager) {
+    public ResourceNodeContent(Clans clans, ClientManager clientManager, ResourceNodeFactory factory,
+                               ResourceArchetypeRegistry archetypeRegistry, ResourceNodeManager manager,
+                               ResourceNodeLabelService labelService, WorldContentService contentService) {
         this.clans = clans;
         this.clientManager = clientManager;
-        this.zoneManager = zoneManager;
-        this.registry = registry;
         this.factory = factory;
         this.archetypeRegistry = archetypeRegistry;
         this.manager = manager;
         this.labelService = labelService;
-        sceneLoaderManager.register(this, clans);
+        // Dropped on a module reload so edited node files are read again. Every world load in between reuses them.
+        contentService.register(clans, new WorldContentBinding(WorldSelector.any(), () -> List.of(this))
+                .withOnReload(() -> definitions = null));
     }
 
+    /** Scans {@code world} for matching regions and spawns a node per match. */
     @Override
-    public List<LoadStrategy> getStrategies() {
-        return List.of(new ServerStartLoadStrategy(), new ModuleReloadLoadStrategy());
-    }
-
-    /**
-     * Spawns nodes for {@code world} only. Reuses the already-parsed definitions (parsing them first if this is the
-     * first call this server lifetime). Safe to call for a world that already has nodes loaded — it is unloaded first,
-     * so re-invoking (e.g. a duplicate {@code WorldLoadEvent}) does not duplicate zones.
-     */
-    public void loadWorld(@NotNull World world) {
-        unloadWorldByName(world.getName());
-        loadWorldInternal(world);
-    }
-
-    /** Unregisters every zone, node and label this loader spawned for {@code world}, leaving all other worlds intact. */
-    public void unloadWorld(@NotNull World world) {
-        unloadWorldByName(world.getName());
-    }
-
-    @Override
-    protected void load() {
+    public void install(@NotNull World world, @NotNull RegionIndex regions, @NotNull WorldContentScope scope) {
         ensureDefinitionsParsed();
         if (definitions == null || definitions.isEmpty()) {
             return;
         }
-        for (World world : Bukkit.getWorlds()) {
-            loadWorldInternal(world);
-        }
-        log.info("Loaded resource nodes across {} world(s)", Bukkit.getWorlds().size()).submit();
-    }
 
-    @Override
-    protected void unload() {
-        new ArrayList<>(stateByWorld.keySet()).forEach(this::unloadWorldByName);
-        // Dropped so a module reload re-reads the node YAML; per-world loads keep reusing the cache.
-        definitions = null;
+        int nodes = 0;
+        for (Pair<ResourceNodeDefinition, ResourceArchetype> node : definitions) {
+            final ResourceNodeDefinition definition = node.getLeft();
+            final ResourceArchetype archetype = node.getRight();
+            for (Region region : match(definition, regions.all(), archetype.regionType())) {
+                region.setWorld(world);
+                spawnNode(definition, archetype, region, world, regions.all(), scope);
+                nodes++;
+            }
+        }
+        if (nodes > 0) {
+            log.info("Loaded {} resource node(s) for world '{}'", nodes, world.getName()).submit();
+        }
     }
 
     /**
-     * Parses every {@code scenes/props/*.yml} definition, caching the result so per-world loads reuse it. The cache is
-     * dropped on {@link #unload()}, so a module reload picks up edited node files.
+     * Parses every {@code scenes/props/*.yml} definition, caching the result so per-world loads reuse it.
      */
     private void ensureDefinitionsParsed() {
         if (definitions != null) {
@@ -254,58 +230,6 @@ public class ResourceNodeLoader extends SceneObjectLoader {
         } catch (Throwable throwable) {
             log.warn("Could not register the resource node validator - check the Mapper plugin version",
                     throwable).submit();
-        }
-    }
-
-    /** Scans {@code world} for matching regions and spawns a node per match, tracked under this world's state. */
-    private void loadWorldInternal(@NotNull World world) {
-        ensureDefinitionsParsed();
-        if (definitions == null || definitions.isEmpty()) {
-            return;
-        }
-        final Collection<Region> regions = regionsFor(world);
-        if (regions.isEmpty()) {
-            return;
-        }
-
-        final WorldState state = stateByWorld.computeIfAbsent(world.getName(), name -> new WorldState());
-        int nodes = 0;
-        for (Pair<ResourceNodeDefinition, ResourceArchetype> node : definitions) {
-            final ResourceNodeDefinition definition = node.getLeft();
-            final ResourceArchetype archetype = node.getRight();
-            for (Region region : match(definition, regions, archetype.regionType())) {
-                region.setWorld(world);
-                spawnNode(definition, archetype, region, world, regions, state);
-                nodes++;
-            }
-        }
-        if (nodes > 0) {
-            log.info("Loaded {} resource node(s) for world '{}'", nodes, world.getName()).submit();
-        } else {
-            stateByWorld.remove(world.getName());
-        }
-    }
-
-    /** Releases every zone/node this loader tracked for the world named {@code worldName}, if any. */
-    private void unloadWorldByName(@NotNull String worldName) {
-        final WorldState state = stateByWorld.remove(worldName);
-        if (state == null) {
-            return;
-        }
-        for (ResourceNodeProp prop : state.props) {
-            manager.unregister(prop);
-            // Unregisters from the SceneObjectRegistry and (for multi-label nodes) ResourceNodeLabelService, and
-            // deactivates the archetype's world state (ore snapshot / tree placement) exactly once.
-            prop.remove();
-        }
-        state.zones.forEach(zoneManager::unregister);
-    }
-
-    private @NotNull Collection<Region> regionsFor(@NotNull World world) {
-        try {
-            return MapperHelper.getRegions(world);
-        } catch (Exception exception) {
-            return List.of(); // world has no Mapper data-points
         }
     }
 
@@ -423,7 +347,7 @@ public class ResourceNodeLoader extends SceneObjectLoader {
 
     private void spawnNode(@NotNull ResourceNodeDefinition definition, @NotNull ResourceArchetype archetype,
                            @NotNull Region region, @NotNull World world, @NotNull Collection<Region> regions,
-                           @NotNull WorldState state) {
+                           @NotNull WorldContentScope scope) {
         final CuboidRegion bounds = archetype.zoneBounds(definition, region);
         bounds.setWorld(world);
         final RegionTags tags = new RegionTags(region.getOptions().getTags());
@@ -445,9 +369,6 @@ public class ResourceNodeLoader extends SceneObjectLoader {
                 .tag("resource_node");
         archetype.zoneTags().forEach(builder::tag);
         final Zone zone = builder.rules(rules).build();
-        zoneManager.register(zone);
-        state.zones.add(zone);
-
         final Component label = Component.text(displayName, NamedTextColor.GREEN)
                 .appendNewline()
                 .append(Component.text("Level " + level, NamedTextColor.GRAY));
@@ -456,7 +377,7 @@ public class ResourceNodeLoader extends SceneObjectLoader {
         final ResourceNodeProp prop = new ResourceNodeProp(factory, definition, archetype, region, level, zone, label, labelLocations, labelService);
 
         // A node whose content is unusable (a tree with no loadable schematic, say) must not take the rest of the world
-        // down with it, so it is rolled back to leave no half-registered zone behind.
+        // down with it, so its zone is only registered once everything else has succeeded.
         try {
             // Capture the archetype's world state once at load (ore snapshot / tree placement) - it works off the region
             // and definition, not the label entity, so it runs before the prop materializes and persists across chunk
@@ -466,17 +387,11 @@ public class ResourceNodeLoader extends SceneObjectLoader {
             // Chunk-managed: the label entities and respawn tick (re)materialize with the node's chunk; the first label is
             // re-spawned by this factory on every materialization. Harvest routing (manager) is keyed by the stable zone, so
             // it is registered once here and works regardless of the labels' materialization state.
-            //
-            // Registered directly (not via SceneObjectLoader#spawn) so this world's props are tracked in `state` rather than
-            // the base class's flat, world-agnostic managed list - unloadWorld() must be able to release one world's props
-            // without touching another's, and a full reload() drives the same teardown through unload() below.
-            prop.configureMaterialization(labelLocations.getFirst(), loc -> loc.getWorld().spawn(loc, TextDisplay.class));
-            registry.register(prop);
-            state.props.add(prop);
             manager.register(prop);
+            scope.onRelease(() -> manager.unregister(prop));
+            scope.add(new SceneSpawn(prop, labelLocations.getFirst(), loc -> loc.getWorld().spawn(loc, TextDisplay.class)));
+            scope.add(zone);
         } catch (Exception exception) {
-            zoneManager.unregister(zone);
-            state.zones.remove(zone);
             log.warn("Skipping resource node '{}' in world '{}'", definition.getId(), world.getName(), exception).submit();
         }
     }
@@ -531,11 +446,5 @@ public class ResourceNodeLoader extends SceneObjectLoader {
     /** Lowercases and replaces every character outside {@code [a-z0-9_.-]} with {@code _}, matching Adventure's Key value charset. */
     static @NotNull String sanitizeForKey(@NotNull String raw) {
         return raw.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_.\\-]", "_");
-    }
-
-    /** Per-world tracked state: this world's registered zones and the nodes spawned inside it. */
-    private static final class WorldState {
-        private final List<Zone> zones = new ArrayList<>();
-        private final List<ResourceNodeProp> props = new ArrayList<>();
     }
 }

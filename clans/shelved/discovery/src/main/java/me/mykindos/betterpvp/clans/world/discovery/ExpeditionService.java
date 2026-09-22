@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.clans.world.discovery;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
 import me.mykindos.betterpvp.core.world.site.crew.Crew;
 import me.mykindos.betterpvp.core.world.site.crew.CrewService;
 import me.mykindos.betterpvp.clans.world.discovery.hazard.HazardService;

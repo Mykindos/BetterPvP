@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * The {@link SceneObjectFactory} backing {@link ResourceNodeProp}s. Resource nodes are loaded from Mapper regions by
- * {@link ResourceNodeLoader}, not spawned by command, so {@link #spawnDefault} is unsupported — the factory exists
+ * {@link ResourceNodeContent}, not spawned by command, so {@link #spawnDefault} is unsupported — the factory exists
  * only to satisfy the prop's two-phase init/registration contract.
  */
 @Singleton

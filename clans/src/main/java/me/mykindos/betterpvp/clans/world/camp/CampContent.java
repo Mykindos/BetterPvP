@@ -2,11 +2,12 @@ package me.mykindos.betterpvp.clans.world.camp;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.scene.ClansSceneObjectFactory;
-import me.mykindos.betterpvp.clans.world.WorldContent;
-import me.mykindos.betterpvp.clans.world.content.WorldContentBinding;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
-import me.mykindos.betterpvp.clans.world.content.WorldSites;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSites;
 import me.mykindos.betterpvp.clans.world.model.Dock;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -29,11 +30,11 @@ public class CampContent {
     private final ClansSceneObjectFactory clansSceneFactory;
 
     @Inject
-    private CampContent(@NotNull WorldContentService contentService, @NotNull WorldSites sites,
+    private CampContent(@NotNull WorldContentService contentService, @NotNull Clans clans, @NotNull WorldSites sites,
                         @NotNull ClientManager clientManager, @NotNull ClansSceneObjectFactory clansSceneFactory) {
         this.clientManager = clientManager;
         this.clansSceneFactory = clansSceneFactory;
-        contentService.register(new WorldContentBinding(sites.selector(Camps.SITE_ID), this::content));
+        contentService.register(clans, new WorldContentBinding(sites.selector(Camps.SITE_ID), this::content));
     }
 
     private @NotNull List<WorldContent> content() {

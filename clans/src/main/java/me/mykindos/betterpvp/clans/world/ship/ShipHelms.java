@@ -9,12 +9,13 @@ import com.ticxo.modelengine.api.model.ModeledEntity;
 import dev.brauw.mapper.region.PointRegion;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.scene.ClansSceneObjectFactory;
-import me.mykindos.betterpvp.clans.world.SceneSpawn;
-import me.mykindos.betterpvp.clans.world.WorldContent;
-import me.mykindos.betterpvp.clans.world.content.WorldContentBinding;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
-import me.mykindos.betterpvp.clans.world.content.WorldSelector;
+import me.mykindos.betterpvp.core.world.content.SceneSpawn;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSelector;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.scene.behavior.SceneBehavior;
@@ -80,14 +81,14 @@ public class ShipHelms implements WorldContent {
     @Inject
     public ShipHelms(@NotNull ClansSceneObjectFactory objectFactory, @NotNull ShipInteractions interactions,
                      @NotNull CrewService crewService, @NotNull Core core,
-                     @NotNull WorldContentService contentService) {
+                     @NotNull WorldContentService contentService, @NotNull Clans clans) {
         this.objectFactory = objectFactory;
         this.interactions = interactions;
         this.crewService = crewService;
         this.core = core;
 
         // Any world: a vessel's structure is moored wherever a dock asks for it, including in cloned island instances.
-        contentService.register(new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
+        contentService.register(clans, new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
     }
 
     /** The live wheel at one mooring, or empty if its chunk is unloaded or the vessel has no helm. */

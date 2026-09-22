@@ -142,7 +142,7 @@ public class CannonService implements Reloadable {
     public @Nullable CannonProp restore(@NotNull CannonRecord record) {
         final Location location = record.toLocation();
         if (location == null) {
-            return null; // world not loaded yet; a later WorldLoadStrategy pass will pick it up
+            return null; // world not loaded yet; CannonContent restores it when the world loads
         }
         final CannonArchetype archetype = archetypes.get(record.getArchetypeId()).orElse(null);
         if (archetype == null) {

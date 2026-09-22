@@ -8,33 +8,30 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.scene.display.SceneTextDisplay;
-import me.mykindos.betterpvp.core.scene.loader.LoadStrategy;
-import me.mykindos.betterpvp.core.scene.loader.MapperSceneLoader;
-import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
-import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
-import me.mykindos.betterpvp.core.scene.loader.ServerStartLoadStrategy;
-import me.mykindos.betterpvp.core.utilities.MapperHelper;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentScope;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSelector;
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.Map.entry;
 import static net.kyori.adventure.text.Component.newline;
 import static net.kyori.adventure.text.Component.text;
 
 /**
- * Loads all clans text-display labels from Mapper data-points on server start.
+ * Spawns the clans text-display labels in the main world from Mapper data-points.
  * <p>
  * Data-points must be named {@code clans:text_<key>} (e.g. {@code clans:text_class_selector}).
  * Multiple data-points sharing the same name are all spawned, so a single label type can
@@ -42,14 +39,11 @@ import static net.kyori.adventure.text.Component.text;
  * <p>
  * To add a new label: add one {@link LabelDef} entry to {@link #LABELS}. The loading loop
  * is fully generic and never needs to change.
- * <p>
- * This loader uses {@link ServerStartLoadStrategy} — it fires once the world and Mapper data
- * are ready, but does not wait for ModelEngine.
  */
 @CustomLog
 @Singleton
 @PluginAdapter("Mapper")
-public class ClansTextDisplayLoader extends MapperSceneLoader {
+public class ClansTextDisplayContent implements WorldContent {
 
     private static final String PREFIX = "clans:text_";
     private static final Map<String, LabelDef> LABELS = Map.ofEntries(
@@ -63,28 +57,14 @@ public class ClansTextDisplayLoader extends MapperSceneLoader {
     );
 
     @Inject
-    public ClansTextDisplayLoader(Clans clans, SceneLoaderManager sceneLoaderManager) {
-        sceneLoaderManager.register(this, clans);
+    public ClansTextDisplayContent(Clans clans, WorldContentService contentService) {
+        contentService.register(clans, new WorldContentBinding(WorldSelector.named(BPvPWorld.MAIN_WORLD_NAME),
+                () -> List.of(this)));
     }
 
     @Override
-    @NotNull
-    protected Collection<Region> getRegions() {
-        final World world = Objects.requireNonNull(Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME));
-        return MapperHelper.getRegions(world);
-    }
-
-    @Override
-    public List<LoadStrategy> getStrategies() {
-        return List.of(new ServerStartLoadStrategy(), new ModuleReloadLoadStrategy());
-    }
-
-    @Override
-    protected void load() {
-        final World world = Objects.requireNonNull(Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME));
-        int spawned = 0;
-
-        for (Region region : getRegions()) {
+    public void install(@NotNull World world, @NotNull RegionIndex regions, @NotNull WorldContentScope scope) {
+        for (Region region : regions.all()) {
             if (!(region instanceof PointRegion p)) continue;
             if (!region.getName().startsWith(PREFIX)) continue;
 
@@ -97,12 +77,9 @@ public class ClansTextDisplayLoader extends MapperSceneLoader {
 
             final Location loc = p.getLocation();
             loc.setWorld(world);
-            spawn(new SceneTextDisplay(def.build(), def.scale(), def.billboard()),
-                    loc.getWorld().spawn(loc, TextDisplay.class));
-            spawned++;
+            scope.spawn(new SceneTextDisplay(def.build(), def.scale(), def.billboard()),
+                    world.spawn(loc, TextDisplay.class));
         }
-
-        log.info("Loaded {} text display(s) for clans", spawned).submit();
     }
 
     /**

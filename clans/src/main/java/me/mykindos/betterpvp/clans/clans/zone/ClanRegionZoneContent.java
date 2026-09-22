@@ -3,35 +3,31 @@ package me.mykindos.betterpvp.clans.clans.zone;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.brauw.mapper.region.CuboidRegion;
-import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
-import me.mykindos.betterpvp.core.scene.loader.LoadStrategy;
-import me.mykindos.betterpvp.core.scene.loader.ModuleReloadLoadStrategy;
-import me.mykindos.betterpvp.core.scene.loader.SceneLoaderManager;
-import me.mykindos.betterpvp.core.scene.loader.ServerStartLoadStrategy;
-import me.mykindos.betterpvp.core.utilities.MapperHelper;
+import me.mykindos.betterpvp.core.world.content.WorldContent;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSelector;
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.core.world.zone.NoBuildRule;
 import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneGameMode;
-import me.mykindos.betterpvp.core.world.zone.ZoneLoader;
-import me.mykindos.betterpvp.core.world.zone.ZoneManager;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
 import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -52,45 +48,39 @@ import java.util.Optional;
  * </ul>
  * An entry may also set {@code gamemode}, which is how an area declares the mode it is played in (a training mine
  * inside a protected spawn is {@code survival}); leave it out and the zone has no opinion.
- * Reuses the same {@link ServerStartLoadStrategy}/{@link ModuleReloadLoadStrategy} lifecycle as the clans scene
- * loaders, so it reloads on server start and on a module reload.
+ * Files are re-read whenever the world they target loads and on a module reload.
  */
 @CustomLog
 @Singleton
 @PluginAdapter("Mapper")
-public class ClanRegionZoneLoader extends ZoneLoader {
+public class ClanRegionZoneContent implements WorldContent {
 
     private final Clans clans;
     private final ClientManager clientManager;
 
     @Inject
-    public ClanRegionZoneLoader(ZoneManager zoneManager, Clans clans, ClientManager clientManager,
-                                SceneLoaderManager sceneLoaderManager) {
-        super(zoneManager);
+    public ClanRegionZoneContent(Clans clans, ClientManager clientManager, WorldContentService contentService) {
         this.clans = clans;
         this.clientManager = clientManager;
-        sceneLoaderManager.register(this, clans);
+        contentService.register(clans, new WorldContentBinding(WorldSelector.any(), () -> List.of(this)));
     }
 
     @Override
-    public List<LoadStrategy> getStrategies() {
-        return List.of(new ServerStartLoadStrategy(), new ModuleReloadLoadStrategy());
-    }
-
-    @Override
-    protected void load() {
+    public @NotNull List<Zone> zones(@NotNull World world, @NotNull RegionIndex regions) {
         final File zonesFolder = new File(clans.getDataFolder(), "zones");
         final File[] files = zonesFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".yml"));
-        if (files == null || files.length == 0) {
-            log.warn("No zone files found in {} - no clan region zones loaded", zonesFolder).submit();
-            return;
+        if (files == null) {
+            return List.of();
         }
 
-        int loaded = 0;
+        final List<Zone> zones = new ArrayList<>();
         for (File file : files) {
-            loaded += loadFile(file);
+            final ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(file);
+            if (config.getString("world", BPvPWorld.MAIN_WORLD_NAME).equals(world.getName())) {
+                loadFile(config, regions, zones);
+            }
         }
-        log.info("Loaded {} clan region zone(s) from {} continent file(s)", loaded, files.length).submit();
+        return zones;
     }
 
     /**
@@ -115,22 +105,11 @@ public class ClanRegionZoneLoader extends ZoneLoader {
     }
 
     /**
-     * Loads every zone defined in a single continent file. Each top-level key is a Mapper region name; the reserved
-     * {@code world} key (optional, defaults to the main world) selects the Bukkit world the regions live in.
-     *
-     * @return the number of zones registered from this file
+     * Loads every zone defined in a single continent file. Each top-level key is a Mapper region name. The reserved
+     * {@code world} key (optional, defaults to the main world) selects the world the regions live in.
      */
-    private int loadFile(@NotNull File file) {
-        final ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(file);
-        final String worldName = config.getString("world", BPvPWorld.MAIN_WORLD_NAME);
-        final World world = Bukkit.getWorld(worldName);
-        if (world == null) {
-            log.warn("Zone file '{}' targets world '{}' which is not loaded - skipping", file.getName(), worldName).submit();
-            return 0;
-        }
-
-        final Collection<Region> regions = MapperHelper.getRegions(world);
-        int loaded = 0;
+    private void loadFile(@NotNull ExtendedYamlConfiguration config, @NotNull RegionIndex regions,
+                          @NotNull List<Zone> zones) {
         for (String name : config.getKeys(false)) {
             if (name.equalsIgnoreCase("world") || !config.isConfigurationSection(name)) {
                 continue;
@@ -140,14 +119,12 @@ public class ClanRegionZoneLoader extends ZoneLoader {
             final int priority = config.getInt(name + ".priority", ClanZones.SERVER_REGION_PRIORITY);
             final String display = config.getString(name + ".display", name);
 
-            final Optional<CuboidRegion> regionOptional = MapperHelper.findRegion(regions, name, CuboidRegion.class);
-            if (regionOptional.isEmpty()) {
-                log.warn("Clan zone '{}' has no matching Mapper region in '{}' - skipping", name, worldName).submit();
+            final Optional<CuboidRegion> region = regions.findOne(name, CuboidRegion.class);
+            if (region.isEmpty()) {
+                log.warn("Clan zone '{}' has no matching Mapper region in '{}' - skipping", name,
+                        regions.getWorld().getName()).submit();
                 continue;
             }
-
-            final Region region = regionOptional.get();
-            region.setWorld(world);
 
             final ZoneRuleContainer rules = new ZoneRuleContainer();
             if (tags.contains(Zones.NO_BUILD)) {
@@ -157,15 +134,13 @@ public class ClanRegionZoneLoader extends ZoneLoader {
             final Zone.ZoneBuilder builder = Zone.builder()
                     .key(ClanZones.regionKey(name))
                     .displayName(Component.text(display))
-                    .bounds(RegionBounds.of(region))
+                    .bounds(RegionBounds.of(region.get()))
                     .priority(priority)
                     .rules(rules);
             tags.forEach(builder::tag);
             gameMode(config.getString(name + ".gamemode"), name).ifPresent(mode -> builder.gameMode(ZoneGameMode.of(mode)));
 
-            register(builder.build());
-            loaded++;
+            zones.add(builder.build());
         }
-        return loaded;
     }
 }

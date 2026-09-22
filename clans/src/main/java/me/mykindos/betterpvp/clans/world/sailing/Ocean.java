@@ -3,9 +3,10 @@ package me.mykindos.betterpvp.clans.world.sailing;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.clans.world.content.WorldContentBinding;
-import me.mykindos.betterpvp.clans.world.content.WorldContentService;
-import me.mykindos.betterpvp.clans.world.content.WorldSelector;
+import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
+import me.mykindos.betterpvp.core.world.content.WorldContentService;
+import me.mykindos.betterpvp.core.world.content.WorldSelector;
 import me.mykindos.betterpvp.clans.world.ship.Berth;
 import me.mykindos.betterpvp.clans.world.ship.ShipService;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -65,7 +66,7 @@ public class Ocean implements Listener {
 
     @Inject
     public Ocean(@NotNull SiteWorlds worlds, @NotNull SiteInstances instances, @NotNull ShipService shipService,
-                 @NotNull WorldContentService contentService, @NotNull ClientManager clientManager,
+                 @NotNull WorldContentService contentService, @NotNull Clans clans, @NotNull ClientManager clientManager,
                  @NotNull VoyageCues cues) {
         this.worlds = worlds;
         this.instances = instances;
@@ -74,7 +75,7 @@ public class Ocean implements Listener {
         this.cues = cues;
 
         // Building is disabled here: the ship belongs to another player and the world is deleted on arrival.
-        contentService.register(new WorldContentBinding(
+        contentService.register(clans, new WorldContentBinding(
                 WorldSelector.prefixed(WORLD_PREFIX), () -> List.of(new OceanContent(clientManager))));
     }
 
