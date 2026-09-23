@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.world.camp.Camp;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.ResourceLedger;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -20,11 +22,13 @@ public class CampResources implements ResourceLedger {
 
     private final CampStore store;
     private final ResourceChests chests;
+    private final CampWideTraits campWide;
 
     @Inject
-    public CampResources(@NotNull CampStore store, @NotNull ResourceChests chests) {
+    public CampResources(@NotNull CampStore store, @NotNull ResourceChests chests, @NotNull CampWideTraits campWide) {
         this.store = store;
         this.chests = chests;
+        this.campWide = campWide;
     }
 
     @Override
@@ -50,8 +54,10 @@ public class CampResources implements ResourceLedger {
         return camp.getResources().values().stream().mapToInt(Integer::intValue).sum();
     }
 
+    /** What the camp's resource chests hold together, more with a Quartermaster. */
     public int capacity(@NotNull Camp camp) {
-        return chests.capacity(camp.getHolding());
+        final double quartermaster = campWide.best(camp.getRoster(), CampTraits.QUARTERMASTER, "capacity", 0.05);
+        return (int) Math.floor(chests.capacity(camp.getHolding()) * (1 + quartermaster));
     }
 
     /** Adds {@code amounts} to the camp's balance, with no checks. */

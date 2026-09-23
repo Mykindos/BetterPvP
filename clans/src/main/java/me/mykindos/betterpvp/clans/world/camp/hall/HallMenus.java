@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWageFund;
 import me.mykindos.betterpvp.clans.world.camp.settler.FarmWorkplace;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.CrewMenus;
+import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.CampProsperity;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.RecruitConfig;
@@ -58,6 +59,7 @@ public class HallMenus {
     private final CampRecruitment recruitment;
     private final RecruitConfig recruitConfig;
     private final FarmWorkplace farm;
+    private final CampProsperity prosperity;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
@@ -66,7 +68,8 @@ public class HallMenus {
                      @NotNull BlueprintSessions blueprints, @NotNull CrewMenus crews, @NotNull SettlerService settlers,
                      @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
-                     @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm) {
+                     @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm,
+                     @NotNull CampProsperity prosperity) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -83,6 +86,7 @@ public class HallMenus {
         this.recruitment = recruitment;
         this.recruitConfig = recruitConfig;
         this.farm = farm;
+        this.prosperity = prosperity;
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */

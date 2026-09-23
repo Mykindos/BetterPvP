@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampProfessions;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.SettlerConfig;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
@@ -123,7 +124,7 @@ class CampRecruitmentTest {
         new CampTraits(traits);
         recruitment = new CampRecruitment(store, settlers, new SettlerGenerator(professions, traits), settlerConfig,
                 config, traits, mock(ConstructionService.class), mock(SiteInstances.class), clanManager, permissions,
-                coins, now::get);
+                coins, new CampWideTraits(settlerConfig), now::get);
     }
 
     @AfterEach

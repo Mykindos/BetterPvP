@@ -26,23 +26,25 @@ public class CampMorale implements MoraleModel {
     private static final double HOUR_MILLIS = 3_600_000.0;
 
     private final SettlerConfig config;
+    private final CampWideTraits campWide;
     private final Set<FoodSource> food;
 
     @Inject
-    public CampMorale(@NotNull SettlerConfig config, @NotNull Set<FoodSource> food) {
+    public CampMorale(@NotNull SettlerConfig config, @NotNull CampWideTraits campWide, @NotNull Set<FoodSource> food) {
         this.config = config;
+        this.campWide = campWide;
         this.food = food;
     }
 
     @Override
     public int morale(@NotNull SiteKey site, @NotNull Settler settler, @NotNull Roster roster, long now) {
-        double morale = food(site, roster) + bard(roster);
+        double morale = food(site, roster) + campWide.best(roster, CampTraits.BARD, "morale", 5);
         if (!roster.inState(SettlerState.STRIKING).isEmpty()) {
             morale += number("unpaid", -25);
         }
 
         double troubles = idle(settler, now) + dismissals(roster, now);
-        if (roster.getSettlers().stream().anyMatch(member -> member.hasTrait(CampTraits.BELOVED))) {
+        if (campWide.any(roster, CampTraits.BELOVED)) {
             troubles = Math.max(config.trait(CampTraits.BELOVED, "floor", -10), troubles);
         }
         morale += troubles;
@@ -80,21 +82,8 @@ public class CampMorale implements MoraleModel {
         if (best <= 0) {
             return 0;
         }
-        final double cook = roster.getSettlers().stream()
-                .filter(member -> member.hasTrait(CampTraits.COOK))
-                .mapToDouble(member -> config.trait(CampTraits.COOK, "food", 0.25) * strength(member))
-                .max()
-                .orElse(0);
+        final double cook = campWide.best(roster, CampTraits.COOK, "food", 0.25);
         return Math.min(number("food-max", 30), best * (1 + cook));
-    }
-
-    /** The best Bard in the camp cheers everyone up. */
-    private double bard(@NotNull Roster roster) {
-        return roster.getSettlers().stream()
-                .filter(member -> member.hasTrait(CampTraits.BARD))
-                .mapToDouble(member -> config.trait(CampTraits.BARD, "morale", 5) * strength(member))
-                .max()
-                .orElse(0);
     }
 
     /** A settler with a profession and nowhere to work grows restless once it has waited long enough. */
@@ -118,10 +107,6 @@ public class CampMorale implements MoraleModel {
             total += number("dismissal", -10) * Math.max(0, 1 - (now - departure.getAt()) / window);
         }
         return Math.max(number("dismissal-floor", -30), total);
-    }
-
-    private double strength(@NotNull Settler settler) {
-        return config.getTable().rarity(settler.getRarity()).getTraitStrength();
     }
 
     private double number(@NotNull String number, double fallback) {

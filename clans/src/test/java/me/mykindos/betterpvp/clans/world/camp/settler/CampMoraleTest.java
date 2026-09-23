@@ -45,7 +45,7 @@ class CampMoraleTest {
                 SettlerRarity.COMMON, new RarityNumbers(1, 1, 1, 0.3),
                 SettlerRarity.LEGENDARY, new RarityNumbers(3, 2, 2.2, 0.05)), List.of(), List.of(), Map.of()));
         final FoodSource granary = site -> food;
-        morale = new CampMorale(config, Set.of(granary));
+        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary));
     }
 
     private Settler settler(String profession, SettlerRarity rarity, String... traits) {

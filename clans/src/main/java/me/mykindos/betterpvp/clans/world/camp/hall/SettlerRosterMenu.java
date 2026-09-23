@@ -95,6 +95,8 @@ public class SettlerRosterMenu extends AbstractGui implements Windowed {
                         Component.text(cap.getAsInt())).color(NamedTextColor.GRAY));
             }
         }
+        view.lore(Translations.component("clans.camp.prosperity.value",
+                Component.text(menus.getProsperity().of(key), NamedTextColor.GOLD)).color(NamedTextColor.GRAY));
         if (roster.size() > 0) {
             final double morale = roster.getSettlers().stream().mapToInt(Settler::getMorale).average().orElse(0);
             view.lore(Translations.component("clans.camp.hall.settlers.morale", Component.text((int) Math.round(morale)))
