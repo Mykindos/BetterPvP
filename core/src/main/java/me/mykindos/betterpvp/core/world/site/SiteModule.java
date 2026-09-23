@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.world.site;
 
 import com.google.inject.AbstractModule;
+import me.mykindos.betterpvp.core.world.site.storage.LocalSiteStorage;
+import me.mykindos.betterpvp.core.world.site.storage.SiteStorage;
 
 /**
  * Wiring for the site framework. This is where the single-server and networked implementations are chosen between,
@@ -13,5 +15,6 @@ public class SiteModule extends AbstractModule {
         bind(Placement.class).toProvider(PlacementProvider.class);
         bind(SiteInstanceStore.class).to(DatabaseSiteInstanceStore.class);
         bind(ResidencyStore.class).to(DatabaseResidencyStore.class);
+        bind(SiteStorage.class).to(LocalSiteStorage.class);
     }
 }

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
-import me.mykindos.betterpvp.core.world.site.storage.SiteStorages;
+import me.mykindos.betterpvp.core.world.site.storage.SiteStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Reads and writes camp records, through whichever store this server is configured with.
+ * Reads and writes camp records, through whatever {@link SiteStorage} is bound.
  * <p>
  * A record is read once and held for as long as the clan is around, because the questions asked of it come from the
  * main thread while a world is being opened and cannot wait on a store that may be another machine away. Writing is
@@ -26,13 +26,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @CustomLog
 public class CampStore {
 
-    private final SiteStorages storages;
+    private final SiteStorage storage;
     private final Map<Long, Camp> records = new ConcurrentHashMap<>();
     private final Set<Long> changed = ConcurrentHashMap.newKeySet();
 
     @Inject
-    public CampStore(@NotNull SiteStorages storages) {
-        this.storages = storages;
+    public CampStore(@NotNull SiteStorage storage) {
+        this.storage = storage;
     }
 
     /**
@@ -45,7 +45,7 @@ public class CampStore {
             return CompletableFuture.completedFuture(known);
         }
 
-        return storages.storage().read(Camps.keyFor(clanId), Camp.class)
+        return storage.read(Camps.keyFor(clanId), Camp.class)
                 .exceptionally(ex -> {
                     // A record that cannot be read is left where it is rather than being replaced with an empty one,
                     // since overwriting it would turn a bad read into a lost camp.
@@ -83,7 +83,7 @@ public class CampStore {
         }
 
         changed.remove(clanId);
-        return storages.storage().write(Camps.keyFor(clanId), camp).exceptionally(ex -> {
+        return storage.write(Camps.keyFor(clanId), camp).exceptionally(ex -> {
             log.error("Could not write the camp record for clan {}", clanId, ex).submit();
             return null;
         });
@@ -93,7 +93,7 @@ public class CampStore {
     public void delete(long clanId) {
         records.remove(clanId);
         changed.remove(clanId);
-        storages.storage().delete(Camps.keyFor(clanId)).exceptionally(ex -> {
+        storage.delete(Camps.keyFor(clanId)).exceptionally(ex -> {
             log.error("Could not delete the camp record for clan {}", clanId, ex).submit();
             return null;
         });
