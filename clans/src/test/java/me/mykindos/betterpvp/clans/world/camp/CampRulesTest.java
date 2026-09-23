@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceChests;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceOverflow;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -34,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -49,6 +54,7 @@ class CampRulesTest {
     private final ResourceChests chests = mock(ResourceChests.class);
     private final CampConfig config = mock(CampConfig.class);
     private final ClanManager clanManager = mock(ClanManager.class);
+    private final CampWideTraits campWide = mock(CampWideTraits.class);
     private CampResources resources;
     private CampPermissions permissions;
     private CampConstruction construction;
@@ -59,10 +65,19 @@ class CampRulesTest {
         when(config.defaultPermissions()).thenReturn(Map.of(
                 ClanMember.MemberRank.LEADER, EnumSet.allOf(ConstructionAction.class),
                 ClanMember.MemberRank.RECRUIT, EnumSet.of(ConstructionAction.CLAIM)));
-        resources = new CampResources(store, chests);
+        resources = new CampResources(store, chests, campWide);
         permissions = new CampPermissions(clanManager, store, config);
         construction = new CampConstruction(store, resources, permissions, config,
                 new ResourceOverflow(store, resources, config), mock(CrewRule.class), mock(ConstructionService.class));
+    }
+
+    @Test
+    void aQuartermasterMakesRoomForMore() {
+        when(chests.capacity(any())).thenReturn(250);
+        assertEquals(250, resources.capacity(camp));
+
+        when(campWide.best(any(), eq(CampTraits.QUARTERMASTER), anyString(), anyDouble())).thenReturn(0.10);
+        assertEquals(275, resources.capacity(camp));
     }
 
     @Test

@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.SettlerConfig;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -73,6 +74,7 @@ public class CampRecruitment implements Listener {
     private final ClanManager clanManager;
     private final CampPermissions permissions;
     private final CampCoins coins;
+    private final CampWideTraits campWide;
     private final LongSupplier clock;
 
     @Inject
@@ -81,16 +83,17 @@ public class CampRecruitment implements Listener {
                            @NotNull RecruitConfig config, @NotNull TraitRegistry traits,
                            @NotNull ConstructionService construction, @NotNull SiteInstances instances,
                            @NotNull ClanManager clanManager, @NotNull CampPermissions permissions,
-                           @NotNull CampCoins coins) {
+                           @NotNull CampCoins coins, @NotNull CampWideTraits campWide) {
         this(store, settlers, generator, settlerConfig, config, traits, construction, instances, clanManager,
-                permissions, coins, System::currentTimeMillis);
+                permissions, coins, campWide, System::currentTimeMillis);
     }
 
     CampRecruitment(@NotNull CampStore store, @NotNull SettlerService settlers, @NotNull SettlerGenerator generator,
                     @NotNull SettlerConfig settlerConfig, @NotNull RecruitConfig config,
                     @NotNull TraitRegistry traits, @NotNull ConstructionService construction,
                     @NotNull SiteInstances instances, @NotNull ClanManager clanManager,
-                    @NotNull CampPermissions permissions, @NotNull CampCoins coins, @NotNull LongSupplier clock) {
+                    @NotNull CampPermissions permissions, @NotNull CampCoins coins,
+                    @NotNull CampWideTraits campWide, @NotNull LongSupplier clock) {
         this.store = store;
         this.settlers = settlers;
         this.generator = generator;
@@ -102,6 +105,7 @@ public class CampRecruitment implements Listener {
         this.clanManager = clanManager;
         this.permissions = permissions;
         this.coins = coins;
+        this.campWide = campWide;
         this.clock = clock;
     }
 
@@ -301,15 +305,10 @@ public class CampRecruitment implements Listener {
         return (long) (config.getArrivalEvery().toMillis() * (1 - best(key, CampTraits.RECRUITER, "sooner", 0.15)));
     }
 
-    /** The strongest effect any settler in the camp has from {@code trait}, as a share. */
+    /** The strongest effect any settler in the camp has from {@code trait}, as a share, never above 90%. */
     private double best(@NotNull SiteKey key, @NotNull String trait, @NotNull String number, double fallback) {
-        return settlers.roster(key).map(roster -> roster.getSettlers().stream()
-                        .filter(settler -> settler.hasTrait(trait))
-                        .mapToDouble(settler -> settlerConfig.trait(trait, number, fallback)
-                                * settlerConfig.getTable().rarity(settler.getRarity()).getTraitStrength())
-                        .max()
-                        .orElse(0))
-                .map(value -> Math.min(0.9, value))
+        return settlers.roster(key)
+                .map(roster -> Math.min(0.9, campWide.best(roster, trait, number, fallback)))
                 .orElse(0.0);
     }
 
