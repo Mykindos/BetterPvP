@@ -23,6 +23,9 @@ import java.util.function.LongSupplier;
 @Singleton
 public class SettlerService {
 
+    /** How long a departure is remembered, for anything that looks back at who left. */
+    private static final long DEPARTURES_KEPT_MILLIS = 7L * 24 * 60 * 60 * 1000;
+
     private final ProfessionRegistry professions;
     private final LongSupplier clock;
     private final Map<String, SettlerSite> sites = new HashMap<>();
@@ -100,8 +103,11 @@ public class SettlerService {
             return SettlerResult.refused("core.settler.not_found");
         }
 
+        final long now = clock.getAsLong();
         roster.getSettlers().remove(settler);
-        settler.changeState(SettlerState.LEAVING, clock.getAsLong());
+        roster.getDepartures().removeIf(departure -> now - departure.getAt() > DEPARTURES_KEPT_MILLIS);
+        roster.getDepartures().add(new SettlerDeparture(settler.getName(), settler.getRarity(), reason, now));
+        settler.changeState(SettlerState.LEAVING, now);
         site.changed(key);
         UtilServer.callEvent(new SettlerLeftEvent(key, settler, reason));
         return SettlerResult.done(settler);

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.AccessLevel;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -46,8 +48,14 @@ public class SettlerCards {
 
     /** Shows {@code player} the card of settler {@code settlerId}, if it still lives at {@code site}. */
     public void open(@NotNull Player player, @NotNull SiteKey site, @NotNull UUID settlerId) {
+        open(player, site, settlerId, null);
+    }
+
+    /** As {@link #open(Player, SiteKey, UUID)}, with Back leading to {@code previous}. */
+    public void open(@NotNull Player player, @NotNull SiteKey site, @NotNull UUID settlerId,
+                     @Nullable Windowed previous) {
         service.roster(site).flatMap(roster -> roster.find(settlerId))
-                .ifPresent(settler -> new SettlerCardMenu(this, player, site, settler).show(player));
+                .ifPresent(settler -> new SettlerCardMenu(this, player, site, settler, previous).show(player));
     }
 
     boolean allows(@NotNull Player player, @NotNull SiteKey site, @NotNull SettlerAction action) {
@@ -55,11 +63,12 @@ public class SettlerCards {
     }
 
     /** Tells the player why an action was refused, or reopens the card to show what it changed. */
-    void after(@NotNull Player player, @NotNull SiteKey site, @NotNull UUID settlerId, @NotNull SettlerResult result) {
+    void after(@NotNull Player player, @NotNull SiteKey site, @NotNull UUID settlerId, @NotNull SettlerResult result,
+               @Nullable Windowed previous) {
         if (!result.isSuccess() && result.getReason() != null) {
             tell(player, result.getReason());
         }
-        open(player, site, settlerId);
+        open(player, site, settlerId, previous);
     }
 
     void tell(@NotNull Player player, @NotNull Component message) {

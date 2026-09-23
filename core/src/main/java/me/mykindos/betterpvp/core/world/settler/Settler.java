@@ -34,6 +34,8 @@ public class Settler {
     private List<String> traits = new ArrayList<>();
     /** From -100 to 100, where 0 is neutral. */
     private int morale;
+    /** When its morale last fell low enough to leave over, or 0 while it is not that low. */
+    private long unhappySince;
     /** The workplace it is assigned to, or null when it has none. */
     private @Nullable String assignment;
     private SettlerState state = SettlerState.IDLE;

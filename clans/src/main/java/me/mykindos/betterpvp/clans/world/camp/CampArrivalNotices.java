@@ -10,6 +10,9 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.settler.SettlerDeparture;
+import me.mykindos.betterpvp.core.world.settler.SettlerService;
+import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.construction.StructureStatus;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,27 +26,33 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Tells a member arriving at their camp what is waiting for them: structures ready to claim and structures that need
- * repairing or are disabled. Nothing is said when nothing is waiting.
+ * Tells a member arriving at their camp what is waiting for them: structures ready to claim, structures that need
+ * repairing, are disabled or wait for a crew, settlers on strike, and settlers who left in the last day. Nothing is
+ * said when nothing is waiting.
  */
 @BPvPListener
 @Singleton
 public class CampArrivalNotices implements Listener {
 
+    private static final long DAY_MILLIS = 24L * 60 * 60 * 1000;
+
     private final Clans clans;
     private final Camps camps;
     private final ConstructionService construction;
     private final StructureCatalogue catalogue;
+    private final SettlerService settlers;
 
     @Inject
     public CampArrivalNotices(@NotNull Clans clans, @NotNull Camps camps, @NotNull ConstructionService construction,
-                              @NotNull StructureCatalogue catalogue) {
+                              @NotNull StructureCatalogue catalogue, @NotNull SettlerService settlers) {
         this.clans = clans;
         this.camps = camps;
         this.construction = construction;
         this.catalogue = catalogue;
+        this.settlers = settlers;
     }
 
     @EventHandler
@@ -88,6 +97,21 @@ public class CampArrivalNotices implements Listener {
                         ? NamedTextColor.GREEN : NamedTextColor.RED;
                 lines.add(Translations.component(key, name.color(NamedTextColor.YELLOW)).color(colour));
             }
+            settlers.roster(worksite.getKey()).ifPresent(roster -> {
+                final int striking = roster.inState(SettlerState.STRIKING).size();
+                if (striking > 0) {
+                    lines.add(Translations.component("clans.camp.notice.striking", Component.text(striking))
+                            .color(NamedTextColor.RED));
+                }
+                for (SettlerDeparture departure : roster.getDepartures()) {
+                    if (now - departure.getAt() <= DAY_MILLIS) {
+                        lines.add(Translations.component("clans.camp.notice.left."
+                                        + departure.getReason().name().toLowerCase(Locale.ROOT),
+                                Component.text(departure.getName(), departure.getRarity().getColor()))
+                                .color(NamedTextColor.GRAY));
+                    }
+                }
+            });
         });
         return lines;
     }

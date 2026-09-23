@@ -62,7 +62,7 @@ class CampSettlersTest {
         when(config.workingCap(CampProfessions.FARMER)).thenReturn(Optional.empty());
         settlers = new CampSettlers(store, config, service, mock(CampPermissions.class), shapes,
                 mock(SettlerCards.class), mock(CampBuilders.class), mock(CampResources.class),
-                mock(CampWageFund.class),
+                mock(CampWageFund.class), mock(CampMorale.class),
                 new CampProfessions(new ProfessionRegistry()),
                 new CampTraits(new TraitRegistry()));
     }

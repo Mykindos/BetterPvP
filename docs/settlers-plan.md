@@ -56,7 +56,7 @@ The data, with nothing in the world yet.
   * Right-click a settler to open its card.
 * Clans
   * `SettlerCardMenu`: name, history, profession, rarity, traits, morale, current assignment, with assign and dismiss buttons behind permissions.
-  * Settler permissions per rank on the camp record, `permissions.settlers` defaults in `camps.yml`, and a Settlers page in `/clan permissions`. Allies get none.
+  * Settler permissions per rank on the camp record, `permissions.settlers` defaults in `camps.yml`, and a Settlers page in the camp permissions menu. Allies get none.
   * Settlers gather at the Great Hall's `settler_home` point and work at a structure's `settler_work` point. Farmers work the middle of the farm.
   * Looks per profession, and per rarity within a profession, in `settlers.yml`.
 * Cards: "Settler base model" (visual half), "Worker NPCs".
@@ -102,12 +102,15 @@ The data, with nothing in the world yet.
 ### S5. Morale, losses and the roster
 
 * Core
-  * `MoraleEngine`: neutral baseline, pushed up by `MoraleSource`s (food, camp-wide traits) and down by penalties (unpaid wages across the camp, idle professionals, recent dismissals). Settlers below neutral for long enough leave.
-  * Higher morale strengthens resident bonuses through one multiplier every workplace reads.
+  * `MoraleModel`, supplied by the site: each settler's morale, the level below which it thinks of leaving, how long before it does, and who never leaves.
+  * `MoraleEngine`: settles every settler's morale each minute on the server holding the site's world. A settler below the leave level for long enough leaves (`UNHAPPY`). `MoraleEngine.multiplier` is the one number resident bonuses read (1 + morale / 200).
   * `FoodSource` interface with nothing behind it yet. The Granary and Mill plug in when they exist.
+  * The roster remembers who left, why and when (`SettlerDeparture`, kept a week), which is what dismissal penalties and notices read.
 * Clans
-  * `SettlerRosterMenu`, a Settlers page in the Steward's Great Hall menu: everyone, with filters by profession and state, the wage fund, caps and Prosperity.
-  * Entry notices for strikes and settlers who left.
+  * `CampMorale` with the PRD numbers in `settlers.yml`: food, Bard and Cook raise morale. Strikes, idle professionals and fading dismissals lower it. Beloved, Content, Moody, Homesick and Loyal shape it.
+  * `SettlerRosterMenu`, the Settlers page in the Steward's Great Hall menu: everyone, filtered by profession and state, with population, working caps and average morale. Clicking a settler opens its card, with Back to the roster.
+  * Entry notices for strikes and settlers who left in the last day. Online members are told when a settler leaves unhappy.
+  * `/clan build` and `/clan permissions` are removed. The Steward is the only way in.
 * Cards: part of "Settler base model".
 
 ### S6. Getting settlers
