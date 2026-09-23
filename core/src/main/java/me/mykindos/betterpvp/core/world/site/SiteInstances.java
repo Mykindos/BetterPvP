@@ -36,15 +36,17 @@ public class SiteInstances implements Listener {
     private final CompletableFuture<Void> recovered = new CompletableFuture<>();
     private final SiteRegistry registry;
     private final SiteWorlds worlds;
-    private final SiteStore store;
+    private final SiteInstanceStore store;
+    private final SiteRecovery recovery;
     private final SiteOwners owners;
 
     @Inject
-    public SiteInstances(@NotNull SiteRegistry registry, @NotNull SiteWorlds worlds, @NotNull SiteStore store,
-                         @NotNull SiteOwners owners) {
+    public SiteInstances(@NotNull SiteRegistry registry, @NotNull SiteWorlds worlds, @NotNull SiteInstanceStore store,
+                         @NotNull SiteRecovery recovery, @NotNull SiteOwners owners) {
         this.registry = registry;
         this.worlds = worlds;
         this.store = store;
+        this.recovery = recovery;
         this.owners = owners;
     }
 
@@ -58,7 +60,7 @@ public class SiteInstances implements Listener {
 
     @EventHandler
     public void onServerStart(@NotNull ServerStartEvent event) {
-        store.recover()
+        recovery.recover()
                 .thenAccept(survivors -> survivors.forEach(instance -> instances.put(instance.getId(), instance)))
                 .whenComplete((unused, ex) -> {
                     if (ex != null) {

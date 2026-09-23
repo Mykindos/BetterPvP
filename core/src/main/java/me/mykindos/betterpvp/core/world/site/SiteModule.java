@@ -11,5 +11,7 @@ public class SiteModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Placement.class).toProvider(PlacementProvider.class);
+        bind(SiteInstanceStore.class).to(DatabaseSiteInstanceStore.class);
+        bind(ResidencyStore.class).to(DatabaseResidencyStore.class);
     }
 }
