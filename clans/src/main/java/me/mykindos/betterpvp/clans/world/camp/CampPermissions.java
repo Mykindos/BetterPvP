@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -28,7 +29,10 @@ public class CampPermissions {
         this.config = config;
     }
 
-    /** Whether {@code player} is a member of the clan that owns camp {@code clanId} and their rank may take {@code action}. */
+    /**
+     * Whether {@code player} is a member of the clan that owns camp {@code clanId} and their rank may take
+     * {@code action}. The leader may always do everything, so a clan can never lock its own leader out.
+     */
     public boolean allows(@NotNull Player player, long clanId, @NotNull ConstructionAction action) {
         return clanManager.getClanById(clanId)
                 .flatMap(clan -> clan.getMemberByUUID(player.getUniqueId()))
@@ -37,6 +41,9 @@ public class CampPermissions {
     }
 
     public @NotNull Set<ConstructionAction> granted(long clanId, @NotNull ClanMember.MemberRank rank) {
+        if (rank == ClanMember.MemberRank.LEADER) {
+            return EnumSet.allOf(ConstructionAction.class);
+        }
         return store.cached(clanId)
                 .map(camp -> camp.getPermissions() == null ? config.defaultPermissions() : camp.getPermissions())
                 .map(permissions -> permissions.getOrDefault(rank, Set.of()))
