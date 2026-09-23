@@ -253,6 +253,18 @@ class ConstructionServiceTest {
                 && change.getTo() == StructureStatus.PAUSED));
     }
 
+    @Test
+    void availabilityCanBeAskedWithoutTheWorld() {
+        final StructureType workshop = catalogue.find("workshop").orElseThrow();
+        assertTrue(service.unavailable(player, CAMP, workshop).isPresent(), "needs a hall first");
+
+        finished("hall");
+        assertTrue(service.unavailable(player, CAMP, workshop).isEmpty());
+
+        site.balance.put("wood", 0);
+        assertTrue(service.unavailable(player, CAMP, workshop).isPresent(), "cannot afford it");
+    }
+
     private ConstructionResult build(String type) {
         return service.build(player, world, catalogue.find(type).orElseThrow(), new Location(world, 0, 64, 0), 0);
     }

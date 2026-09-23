@@ -85,6 +85,25 @@ public class ConstructionService {
         return buildProblem(player, worksite.get(), type, StructurePosition.of(anchor, quarterTurns));
     }
 
+    /**
+     * Why {@code player} could not start building {@code type} on {@code site} wherever it went: permission,
+     * requirements and cost, but not where it would stand. Works whether the site's world is loaded or not.
+     */
+    public @NotNull Optional<Component> unavailable(@NotNull Player player, @NotNull SiteKey site,
+                                                    @NotNull StructureType type) {
+        final ConstructionSite owner = sites.get(site.getSiteId());
+        final Optional<Holding> holding = owner == null ? Optional.empty() : owner.holding(site);
+        if (holding.isEmpty()) {
+            return Optional.of(text("core.construction.no_holding"));
+        }
+        if (!owner.allows(player, site, ConstructionAction.BUILD)) {
+            return Optional.of(text("core.construction.build_not_allowed"));
+        }
+        return requirements(site, owner, holding.get(), type, 0)
+                .or(() -> owner.ledger().canAfford(site, type.version(0).getCost())
+                        ? Optional.empty() : Optional.of(text("core.construction.cannot_afford")));
+    }
+
     public @NotNull ConstructionResult build(@NotNull Player player, @NotNull World world, @NotNull StructureType type,
                                              @NotNull Location anchor, int quarterTurns) {
         final Optional<Worksite> found = worksite(world);
@@ -294,14 +313,19 @@ public class ConstructionService {
     }
 
     private @NotNull Optional<Component> requirements(@NotNull Worksite worksite, @NotNull StructureType type, int version) {
+        return requirements(worksite.key, worksite.site, worksite.holding, type, version);
+    }
+
+    private @NotNull Optional<Component> requirements(@NotNull SiteKey key, @NotNull ConstructionSite site,
+                                                      @NotNull Holding holding, @NotNull StructureType type, int version) {
         for (String required : type.getRequiredStructures()) {
-            if (!worksite.holding.hasBuilt(required)) {
+            if (!holding.hasBuilt(required)) {
                 final Component name = catalogue.find(required).map(StructureType::getDisplayName)
                         .orElse(Component.text(required));
                 return Optional.of(text("core.construction.requires", name));
             }
         }
-        return worksite.site.blocked(worksite.key, worksite.holding, type, version);
+        return site.blocked(key, holding, type, version);
     }
 
     private @NotNull Optional<Component> fit(@NotNull Worksite worksite, @NotNull StructureType type, int version,
