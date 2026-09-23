@@ -8,11 +8,15 @@ import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
+import me.mykindos.betterpvp.core.world.settler.recruit.SettlerCandidate;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +42,21 @@ public class Camp {
 
     /** Coins set aside to pay the camp's settlers. */
     private long wageFund;
+
+    /** Candidates waiting at the Dock, from boats and milestones. */
+    private List<SettlerCandidate> arrivals = new ArrayList<>();
+
+    /** When the next boat comes in, or 0 before the first is due. */
+    private long nextArrivalAt;
+
+    /** Candidates on the Steward's hiring board. */
+    private List<SettlerCandidate> hiringBoard = new ArrayList<>();
+
+    /** When the hiring board was last rolled, or 0 before it ever was. */
+    private long boardRolledAt;
+
+    /** The clan levels whose settlers have been sent. */
+    private Set<Integer> milestones = new HashSet<>();
 
     /** Whether the camp has been given the settlers every camp starts with. */
     private boolean startingSettlers;
