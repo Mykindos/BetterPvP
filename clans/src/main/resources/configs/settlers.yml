@@ -73,6 +73,8 @@ traits:
   seasoned: {bonus: 0.20}
   recruiter: {sooner: 0.15}
   haggler: {discount: 0.10}
+  quartermaster: {capacity: 0.05}
+  chronicler: {prosperity: 0.03}
 
 # What settlers are paid from the camp's wage fund, in coins an hour, by profession and rarity. Professions not listed
 # are not paid. model: 'fixed' pays the fixed rates whatever a settler is doing, 'idle-working' pays the idle rate
@@ -117,6 +119,11 @@ farm:
   extra-drop: 0.10
   max-growth: 1.0
   max-extra-drop: 0.5
+
+# A camp's Prosperity: each settler is worth its rarity's value, and the total is multiplied by 1 + the camp's
+# average morale / 200 and by any Chronicler. The leaderboard ranks camps by it.
+prosperity:
+  values: {common: 10, uncommon: 20, rare: 40, legendary: 80}
 
 # Boats bringing settlers to a camp's Dock, only while the Dock is working. Each boat brings a number of candidates
 # rolled from count-odds, who wait wait-hours at the Dock. Odds are weights. A common candidate joins for free unless
