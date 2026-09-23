@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.world.settler.Trait;
 import me.mykindos.betterpvp.core.world.settler.WorkplaceKind;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -71,33 +70,11 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
     }
 
     private @NotNull SimpleItem identity() {
-        final ItemView.ItemViewBuilder view = ItemView.builder()
-                .material(Material.NAME_TAG)
-                .displayName(Component.text(settler.getName(), settler.getRarity().getColor()))
-                .frameLore(true)
-                .lore(settler.getRarity().displayName());
-        if (settler.getHistory() != null) {
-            final ComponentLike[] args = settler.getHistoryArgs().stream()
-                    .map(Component::text)
-                    .toArray(ComponentLike[]::new);
-            view.lore(Translations.component(settler.getHistory(), args).color(NamedTextColor.GRAY));
-        }
-        return new SimpleItem(view.build());
+        return new SimpleItem(SettlerItems.identity(settler).build());
     }
 
     private @NotNull SimpleItem profession() {
-        final ItemView.ItemViewBuilder view = ItemView.builder()
-                .material(profession == null ? Material.LEATHER_BOOTS : Material.IRON_PICKAXE)
-                .displayName((profession == null
-                        ? Translations.component("clans.settler.card.no_profession")
-                        : Translations.component(profession.getKey())).color(NamedTextColor.YELLOW))
-                .frameLore(true);
-        if (profession != null && settler.getSpecialty() != null) {
-            view.lore(Translations.component(profession.specialtyKey(settler.getSpecialty())).color(NamedTextColor.GRAY));
-        }
-        if (profession == null) {
-            view.lore(Translations.component("clans.settler.card.wanders").color(NamedTextColor.GRAY));
-        }
+        final ItemView.ItemViewBuilder view = SettlerItems.profession(settler, profession);
         final double wage = cards.getPayroll().hourly(site, settler);
         if (wage > 0) {
             view.lore(Translations.component("clans.settler.card.wage",
@@ -135,15 +112,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
     }
 
     private @NotNull SimpleItem trait(@NotNull Trait trait) {
-        final String group = trait.getGroup().name().toLowerCase(Locale.ROOT);
-        return new SimpleItem(ItemView.builder()
-                .material(trait.isTradeOff() ? Material.REDSTONE : Material.GLOWSTONE_DUST)
-                .displayName(Translations.component(trait.nameKey())
-                        .color(trait.isTradeOff() ? NamedTextColor.GOLD : NamedTextColor.AQUA))
-                .frameLore(true)
-                .lore(Translations.component(trait.descriptionKey()).color(NamedTextColor.GRAY))
-                .lore(Translations.component("clans.settler.card.group." + group).color(NamedTextColor.DARK_GRAY))
-                .build());
+        return new SimpleItem(SettlerItems.trait(trait));
     }
 
     /** Farmers are sent to and called back from the farm here. Builders open their crew, or the jobs they could join. */

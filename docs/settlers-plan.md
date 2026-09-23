@@ -115,11 +115,19 @@ The data, with nothing in the world yet.
 
 ### S6. Getting settlers
 
+* Core
+  * `SettlerCandidate`: a settler who could join, their price and until when they wait.
+  * `SettlerOdds`: rarity and profession weights to roll a candidate from.
+  * `SettlerGrants`: how dungeons, bosses and resource islands give a site a settler when they get their hooks, rolled from the site's own `SettlerTable` (`SettlerSite.table`).
 * Clans
-  * `DockArrivals`: every so often (real time, per camp) a boat brings a few candidates to the Dock's `settler_arrival` point. They wait for a while. Common ones join for free if there is room, and rarer or perk-carrying ones show a coin price.
-  * `HiringBoard`: a rotating pool per camp with rarity weights, refreshed on an interval, plus hiring a chosen candidate for coins.
-  * Milestones: clan level milestones in config grant a set settler, through `ClanLevelUpEvent`.
-  * `SettlerGrant` API, which dungeons, bosses and resource islands call when they get their hooks. Staff command until then.
+  * `CampRecruitment`, settled each minute on the server holding the camp's world:
+    * **Dock arrivals:** a boat every 4 hours while the Dock works, bringing 1 to 3 candidates who wait 2 hours. Commons join free unless they carry a camp-wide trait. Boats due while the camp was closed are still there if their wait is not up.
+    * **Hiring board:** 4 candidates, a new set every 12 hours or at once for 2,000 coins.
+    * **Milestones:** each configured clan level sends a settler who waits at the Dock, free, until there is room. Checked against the clan's level, so clans already past a milestone get it too.
+    * Recruiter brings boats sooner and Haggler lowers prices.
+  * `DockArrivals`: waiting candidates stand at the Dock's `settler_arrival` point (the Dock build's, else the island's). Right-clicking one opens its candidate card: who they are, their traits, price and wait, with Take them on and Send them away behind the HIRE permission.
+  * The hiring board is a page in the Steward's menu. Coins come from the player hiring.
+  * Online members are told when a boat or a milestone settler arrives.
 * Cards: "Hiring".
 
 ### S7. Farmers and workplaces

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AccessLevel;
 import lombok.Getter;
+import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -15,11 +16,13 @@ import me.mykindos.betterpvp.core.world.settler.TraitRegistry;
 import me.mykindos.betterpvp.core.world.settler.wage.Payroll;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /** Opens settler cards and carries out what their buttons ask for. */
 @Singleton
@@ -35,15 +38,30 @@ public class SettlerCards {
     private final CrewMenus crews;
     @Getter(AccessLevel.PACKAGE)
     private final Payroll payroll;
+    @Getter(AccessLevel.PACKAGE)
+    private final CampRecruitment recruitment;
 
     @Inject
     public SettlerCards(@NotNull SettlerService service, @NotNull ProfessionRegistry professions,
-                        @NotNull TraitRegistry traits, @NotNull CrewMenus crews, @NotNull Payroll payroll) {
+                        @NotNull TraitRegistry traits, @NotNull CrewMenus crews, @NotNull Payroll payroll,
+                        @NotNull CampRecruitment recruitment) {
         this.service = service;
         this.professions = professions;
         this.traits = traits;
         this.crews = crews;
         this.payroll = payroll;
+        this.recruitment = recruitment;
+    }
+
+    /**
+     * Shows {@code player} candidate {@code candidateId}, if they are still waiting. Back leads to whatever
+     * {@code previous} makes, made again so it shows who is still waiting.
+     */
+    public void openCandidate(@NotNull Player player, @NotNull SiteKey site, @NotNull UUID candidateId,
+                              @Nullable Supplier<Windowed> previous) {
+        recruitment.find(site, candidateId).ifPresentOrElse(
+                candidate -> new CandidateMenu(this, player, site, candidate, previous).show(player),
+                () -> tell(player, Translations.component("clans.settler.recruit.gone").color(NamedTextColor.GRAY)));
     }
 
     /** Shows {@code player} the card of settler {@code settlerId}, if it still lives at {@code site}. */

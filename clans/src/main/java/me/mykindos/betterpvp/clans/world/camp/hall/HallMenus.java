@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWageFund;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.CrewMenus;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
+import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
+import me.mykindos.betterpvp.clans.world.camp.settler.recruit.RecruitConfig;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -32,8 +34,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Opens the Great Hall's menus, all reached from the Steward: the hub, and under it the settlers, the wage fund, the
- * crews, the construction menu and the camp's permissions. Carries out what the wage fund asks for.
+ * Opens the Great Hall's menus, all reached from the Steward: the hub, and under it the settlers, the hiring board,
+ * the wage fund, the crews, the construction menu and the camp's permissions. Carries out what the wage fund asks for.
  */
 @Singleton
 @Getter(AccessLevel.PACKAGE)
@@ -52,6 +54,8 @@ public class HallMenus {
     private final CampWageFund wageFund;
     private final SettlerCards cards;
     private final ProfessionRegistry professions;
+    private final CampRecruitment recruitment;
+    private final RecruitConfig recruitConfig;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
@@ -59,7 +63,8 @@ public class HallMenus {
                      @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
                      @NotNull BlueprintSessions blueprints, @NotNull CrewMenus crews, @NotNull SettlerService settlers,
                      @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
-                     @NotNull ProfessionRegistry professions) {
+                     @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
+                     @NotNull RecruitConfig recruitConfig) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -73,6 +78,8 @@ public class HallMenus {
         this.wageFund = wageFund;
         this.cards = cards;
         this.professions = professions;
+        this.recruitment = recruitment;
+        this.recruitConfig = recruitConfig;
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */

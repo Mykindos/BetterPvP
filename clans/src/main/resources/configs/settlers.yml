@@ -68,6 +68,8 @@ traits:
   beloved: {floor: -10}
   content: {floor: -20}
   moody: {swing: 2}
+  recruiter: {sooner: 0.15}
+  haggler: {discount: 0.10}
 
 # What settlers are paid from the camp's wage fund, in coins an hour, by profession and rarity. Professions not listed
 # are not paid. model: 'fixed' pays the fixed rates whatever a settler is doing, 'idle-working' pays the idle rate
@@ -103,6 +105,36 @@ morale:
   food-max: 30
   leave-below: -40
   leave-after-hours: 48
+
+# Boats bringing settlers to a camp's Dock, only while the Dock is working. Each boat brings a number of candidates
+# rolled from count-odds, who wait wait-hours at the Dock. Odds are weights. A common candidate joins for free unless
+# it has a camp-wide trait, then it asks common-with-camp-wide-trait.
+arrivals:
+  every-hours: 4
+  wait-hours: 2
+  count-odds: {1: 50, 2: 35, 3: 15}
+  rarity-odds: {common: 70, uncommon: 22, rare: 7, legendary: 1}
+  profession-odds: {builder: 40, farmer: 20, none: 40}
+  prices: {common: 0, uncommon: 4500, rare: 15000, legendary: 60000}
+  common-with-camp-wide-trait: 2000
+
+# The hiring board at the Steward: candidates to hire for coins, a new set every refresh-hours or for reroll coins.
+hiring:
+  candidates: 4
+  refresh-hours: 12
+  reroll: 2000
+  rarity-odds: {common: 60, uncommon: 28, rare: 10, legendary: 2}
+  profession-odds: {builder: 50, farmer: 20, none: 30}
+  prices: {common: 5000, uncommon: 15000, rare: 50000, legendary: 200000}
+
+# Settlers a clan is sent when it reaches a clan level, who wait at the Dock until there is room. profession may be
+# 'any' for one rolled from the arrival odds, or 'none'.
+milestones:
+  5: {profession: builder, rarity: uncommon}
+  10: {profession: builder, rarity: rare}
+  25: {profession: farmer, rarity: rare}
+  50: {profession: any, rarity: legendary}
+  100: {profession: builder, rarity: legendary}
 
 # Settlers every new camp starts with, so it has a crew for its first jobs.
 starting-settlers:
