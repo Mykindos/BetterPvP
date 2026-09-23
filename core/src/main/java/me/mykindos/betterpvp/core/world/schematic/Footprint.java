@@ -69,11 +69,11 @@ public final class Footprint {
         return ((long) x << 32) | (z & 0xFFFFFFFFL);
     }
 
-    static int unpackX(long column) {
+    public static int unpackX(long column) {
         return (int) (column >> 32);
     }
 
-    static int unpackZ(long column) {
+    public static int unpackZ(long column) {
         return (int) column;
     }
 }
