@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.Holding;
+import me.mykindos.betterpvp.core.world.settler.Roster;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -30,6 +31,9 @@ public class Camp {
 
     /** The structures the clan has raised or is raising. */
     private Holding holding = new Holding();
+
+    /** The settlers living in the camp. */
+    private Roster roster = new Roster();
 
     /** Resource balance, by resource id. */
     private Map<String, Integer> resources = new LinkedHashMap<>();
