@@ -83,7 +83,7 @@ class SiteInstancesTest {
     private SiteWorlds worlds;
 
     @Mock
-    private SiteStore store;
+    private SiteInstanceStore store;
 
     private SiteRegistry registry;
     private SiteInstances instances;
@@ -98,7 +98,7 @@ class SiteInstancesTest {
 
         registry = new SiteRegistry(mock(Core.class));
         registry.load(YamlConfiguration.loadConfiguration(new StringReader(CATALOGUE)));
-        instances = new SiteInstances(registry, worlds, store, new SiteOwners());
+        instances = new SiteInstances(registry, worlds, store, mock(SiteRecovery.class), new SiteOwners());
         worldCounter = new AtomicInteger();
 
         when(worlds.worldNameFor(any(), any(), any())).thenAnswer(call -> {
