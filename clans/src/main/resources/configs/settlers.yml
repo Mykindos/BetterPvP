@@ -24,6 +24,22 @@ professions:
   farmer:
     by-hall-stage: [2, 2, 2]
 
+# How settlers look. 'default' is used for anything a profession does not set, and for any model or skin that is
+# not installed yet, so settlers show up before their own models exist. A profession ('builder', 'farmer', or 'none'
+# for settlers without one) overrides it, and its 'rarities' section overrides that again for one rarity.
+# model: the ModelEngine model. skin: a blueprint whose bones replace the model's. idle, walk and work: animations,
+# where work plays while the settler stands at its workplace. size: how large it is shown.
+looks:
+  default: {model: scene_market_1, skin: skin_farmer, idle: vendor_stand_2, walk: walk, work: vendor_stand_2, size: 1.0}
+  builder:
+    skin: settler_builder
+    work: work
+  farmer:
+    skin: settler_farmer
+    work: work
+  none:
+    skin: settler_wanderer
+
 # A settler's name is one first name and one byname.
 names:
   first:

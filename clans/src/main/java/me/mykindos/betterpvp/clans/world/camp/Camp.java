@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.settler.Roster;
+import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -47,6 +48,9 @@ public class Camp {
     /** Whether members of allied clans may open containers, or null for the configured default. */
     private @Nullable Boolean allyContainers;
 
+    /** What each rank may do to the camp's settlers, or null for the configured defaults. */
+    private @Nullable Map<ClanMember.MemberRank, Set<SettlerAction>> settlerPermissions;
+
     public int getResource(String resource) {
         return resources.getOrDefault(resource, 0);
     }
@@ -63,6 +67,20 @@ public class Camp {
             });
         }
         return permissions;
+    }
+
+    /** The settler permissions this camp has set, copying them from {@code defaults} the first time any change. */
+    public Map<ClanMember.MemberRank, Set<SettlerAction>> ownSettlerPermissions(
+            Map<ClanMember.MemberRank, Set<SettlerAction>> defaults) {
+        if (settlerPermissions == null) {
+            settlerPermissions = new EnumMap<>(ClanMember.MemberRank.class);
+            defaults.forEach((rank, actions) -> {
+                final Set<SettlerAction> copy = EnumSet.noneOf(SettlerAction.class);
+                copy.addAll(actions);
+                settlerPermissions.put(rank, copy);
+            });
+        }
+        return settlerPermissions;
     }
 
     /** The actions this camp lets allies take, copying them from {@code defaults} the first time they are changed. */

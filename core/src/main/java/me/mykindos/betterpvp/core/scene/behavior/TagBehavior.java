@@ -151,6 +151,11 @@ public class TagBehavior implements SceneBehavior {
         addNameplate(entity, TagAnchor.aboveEntity(entity), new Vector(0, 0, 0), new Vector(0, 0.3, 0), name, role);
     }
 
+    /** Variant of {@link #addNameplate(SceneEntity, String, Component)} with a styled name. */
+    public static void addNameplate(SceneEntity entity, Component name, Component role) {
+        addNameplate(entity, TagAnchor.aboveEntity(entity), new Vector(0, 0, 0), new Vector(0, 0.3, 0), name, role);
+    }
+
     /**
      * Anchor-parameterized variant of {@link #addNameplate(SceneEntity, String, Component)}.
      * Adds a name tag at {@code anchor + nameOffset} and a role tag at {@code anchor + roleOffset},
@@ -165,8 +170,14 @@ public class TagBehavior implements SceneBehavior {
      */
     public static void addNameplate(SceneEntity entity, TagAnchor anchor, Vector nameOffset, Vector roleOffset,
                                     String name, Component role) {
+        addNameplate(entity, anchor, nameOffset, roleOffset, Component.text(name, NamedTextColor.GREEN), role);
+    }
+
+    /** Variant of {@link #addNameplate(SceneEntity, TagAnchor, Vector, Vector, String, Component)} with a styled name. */
+    public static void addNameplate(SceneEntity entity, TagAnchor anchor, Vector nameOffset, Vector roleOffset,
+                                    Component name, Component role) {
         entity.addBehavior(new TagBehavior(entity, anchor, nameOffset, d -> {
-            d.text(Component.text(name, NamedTextColor.GREEN));
+            d.text(name);
             d.setBillboard(Display.Billboard.CENTER);
             d.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
             d.setShadowed(true);

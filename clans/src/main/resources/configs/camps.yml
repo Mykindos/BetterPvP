@@ -97,3 +97,9 @@ permissions:
   RECRUIT: [CLAIM]
   ALLY: []
   ally-containers: false
+  # What each rank may do to the camp's settlers. The leader may always do everything, and allies nothing.
+  settlers:
+    LEADER: [HIRE, ASSIGN, DISMISS, PAY]
+    ADMIN: [HIRE, ASSIGN, DISMISS, PAY]
+    MEMBER: [ASSIGN, PAY]
+    RECRUIT: [PAY]

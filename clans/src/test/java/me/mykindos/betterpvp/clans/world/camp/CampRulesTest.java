@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
+import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -162,6 +163,28 @@ class CampRulesTest {
         assertTrue(permissions.mayOpenContainers(ally, CLAN));
         assertFalse(construction.allows(stranger, SITE, ConstructionAction.CLAIM), "only allies get the Ally row");
         assertFalse(permissions.mayOpenContainers(stranger, CLAN));
+    }
+
+    @Test
+    void settlerActionsFollowTheRankAndLeaveOutsidersOut() {
+        when(config.defaultSettlerPermissions()).thenReturn(Map.of(
+                ClanMember.MemberRank.MEMBER, EnumSet.of(SettlerAction.PAY)));
+        final Player leader = member(ClanMember.MemberRank.LEADER);
+        final Player member = member(ClanMember.MemberRank.MEMBER);
+        final Player outsider = mock(Player.class);
+        when(outsider.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(clanManager.getClanById(CLAN).orElseThrow().getMemberByUUID(outsider.getUniqueId()))
+                .thenReturn(Optional.empty());
+
+        assertTrue(permissions.allows(leader, CLAN, SettlerAction.DISMISS), "the leader may always do everything");
+        assertTrue(permissions.allows(member, CLAN, SettlerAction.PAY));
+        assertFalse(permissions.allows(member, CLAN, SettlerAction.DISMISS));
+        assertFalse(permissions.allows(outsider, CLAN, SettlerAction.PAY));
+
+        permissions.set(CLAN, ClanMember.MemberRank.MEMBER, SettlerAction.DISMISS, true);
+        assertTrue(permissions.allows(member, CLAN, SettlerAction.DISMISS));
+        assertTrue(camp.getSettlerPermissions().get(ClanMember.MemberRank.MEMBER).contains(SettlerAction.PAY),
+                "changing one keeps the defaults it was copied from");
     }
 
     private Player member(ClanMember.MemberRank rank) {

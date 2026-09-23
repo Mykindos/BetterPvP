@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.clans.world.camp;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import dev.brauw.mapper.region.PointRegion;
-import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -12,7 +10,6 @@ import me.mykindos.betterpvp.clans.clans.fatigue.RespawnHoldService;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
-import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.site.Party;
@@ -124,18 +121,7 @@ public class CampRespawn implements Listener {
                 .filter(structure -> structure.getType().equals(CampStructures.BARRACKS))
                 .filter(structure -> structure.getCondition() != StructureCondition.NOT_PLACED)
                 .findFirst()
-                .map(structure -> point(world, structure)
+                .map(structure -> shapes.point(world, structure, MARKER)
                         .orElseGet(() -> structure.getPosition().toLocation(world).add(0.5, 1, 0.5)));
-    }
-
-    private @NotNull Optional<Location> point(@NotNull World world, @NotNull PlacedStructure structure) {
-        return shapes.placementOf(world, structure).flatMap(placed -> {
-            for (Region marker : placed.markers()) {
-                if (MARKER.equalsIgnoreCase(marker.getName()) && marker instanceof PointRegion point) {
-                    return Optional.of(point.getLocation().clone());
-                }
-            }
-            return Optional.empty();
-        });
     }
 }
