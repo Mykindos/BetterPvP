@@ -19,6 +19,8 @@ public class Roster {
     private long payrollAt;
     /** The part of a coin owed but not yet charged, carried to the next settlement. */
     private double payrollCarry;
+    /** Settlers who left lately, newest last. */
+    private List<SettlerDeparture> departures = new ArrayList<>();
 
     public @NotNull Optional<Settler> find(@NotNull UUID id) {
         return settlers.stream().filter(settler -> settler.getId().equals(id)).findFirst();
@@ -38,6 +40,13 @@ public class Roster {
 
     public @NotNull List<Settler> inState(@NotNull SettlerState state) {
         return settlers.stream().filter(settler -> settler.getState() == state).toList();
+    }
+
+    /** Settlers who left for {@code reason} since {@code since}. */
+    public @NotNull List<SettlerDeparture> departedSince(long since, @NotNull SettlerLeaveReason reason) {
+        return departures.stream()
+                .filter(departure -> departure.getAt() >= since && departure.getReason() == reason)
+                .toList();
     }
 
     /** How many settlers of {@code profession} are assigned anywhere. */

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWageFund;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.CrewMenus;
+import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
+import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.wage.Payroll;
@@ -30,8 +32,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Opens the Great Hall's menus, all reached from the Steward: the hub, and under it the wage fund, the crews, the
- * construction menu and the camp's permissions. Carries out what the wage fund asks for.
+ * Opens the Great Hall's menus, all reached from the Steward: the hub, and under it the settlers, the wage fund, the
+ * crews, the construction menu and the camp's permissions. Carries out what the wage fund asks for.
  */
 @Singleton
 @Getter(AccessLevel.PACKAGE)
@@ -48,13 +50,16 @@ public class HallMenus {
     private final SettlerService settlers;
     private final Payroll payroll;
     private final CampWageFund wageFund;
+    private final SettlerCards cards;
+    private final ProfessionRegistry professions;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
                      @NotNull CampPermissions permissions, @NotNull CampStructures structures,
                      @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
                      @NotNull BlueprintSessions blueprints, @NotNull CrewMenus crews, @NotNull SettlerService settlers,
-                     @NotNull Payroll payroll, @NotNull CampWageFund wageFund) {
+                     @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
+                     @NotNull ProfessionRegistry professions) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -66,6 +71,8 @@ public class HallMenus {
         this.settlers = settlers;
         this.payroll = payroll;
         this.wageFund = wageFund;
+        this.cards = cards;
+        this.professions = professions;
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */

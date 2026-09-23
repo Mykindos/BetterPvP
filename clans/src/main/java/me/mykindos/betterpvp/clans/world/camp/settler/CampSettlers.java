@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
 import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
+import me.mykindos.betterpvp.core.world.settler.morale.MoraleModel;
 import me.mykindos.betterpvp.core.world.settler.wage.CoinAccount;
 import me.mykindos.betterpvp.core.world.settler.wage.WageModel;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -63,12 +64,14 @@ public class CampSettlers implements SettlerSite {
     private final CampBuilders builders;
     private final CampResources resources;
     private final CampWageFund wageFund;
+    private final CampMorale morale;
 
     @Inject
     public CampSettlers(@NotNull CampStore store, @NotNull SettlerConfig config, @NotNull SettlerService service,
                         @NotNull CampPermissions permissions, @NotNull StructureShapes shapes,
                         @NotNull SettlerCards cards, @NotNull CampBuilders builders,
                         @NotNull CampResources resources, @NotNull CampWageFund wageFund,
+                        @NotNull CampMorale morale,
                         @NotNull CampProfessions professions,
                         @NotNull CampTraits traits) {
         this.store = store;
@@ -79,6 +82,7 @@ public class CampSettlers implements SettlerSite {
         this.builders = builders;
         this.resources = resources;
         this.wageFund = wageFund;
+        this.morale = morale;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -203,6 +207,11 @@ public class CampSettlers implements SettlerSite {
     @Override
     public @NotNull Duration strikeLimit(@NotNull SiteKey site) {
         return config.getStrikeLimit();
+    }
+
+    @Override
+    public @NotNull Optional<MoraleModel> moraleModel(@NotNull SiteKey site) {
+        return Optional.of(morale);
     }
 
     private @NotNull Location standOn(@NotNull World world, @NotNull PlacedStructure structure, @NotNull String point) {

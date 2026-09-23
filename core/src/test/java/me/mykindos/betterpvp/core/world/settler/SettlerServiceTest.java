@@ -150,6 +150,8 @@ class SettlerServiceTest {
         assertFalse(service.dismiss(CAMP, builder.getId()).isSuccess());
         final SettlerLeftEvent left = (SettlerLeftEvent) events.getLast();
         assertEquals(SettlerLeaveReason.DISMISSED, left.getReason());
+        assertEquals(1, site.roster.getDepartures().size(), "the roster remembers who left");
+        assertEquals(SettlerLeaveReason.DISMISSED, site.roster.getDepartures().getFirst().getReason());
     }
 
     @Test
