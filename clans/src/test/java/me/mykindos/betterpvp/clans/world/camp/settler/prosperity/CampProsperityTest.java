@@ -41,7 +41,7 @@ class CampProsperityTest {
                 SettlerRarity.COMMON, new RarityNumbers(1, 1, 1, 0.3),
                 SettlerRarity.LEGENDARY, new RarityNumbers(3, 2, 2.2, 0.05)), List.of(), List.of(), Map.of()));
         prosperity = new CampProsperity(config, new CampWideTraits(config), mock(SettlerService.class),
-                mock(SiteInstances.class), mock(ProsperityStores.class));
+                mock(SiteInstances.class), mock(ProsperityStore.class));
     }
 
     private Settler settler(SettlerRarity rarity, int morale, String... traits) {
