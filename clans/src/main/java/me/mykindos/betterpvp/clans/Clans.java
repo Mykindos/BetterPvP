@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementLoader;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.tips.ClansTipLoader;
+import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.ship.ShipService;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -52,8 +54,10 @@ import org.reflections.scanners.Scanners;
 
 import java.lang.reflect.Field;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
+@CustomLog
 public class Clans extends BPvPPlugin {
 
     private final String PACKAGE = getClass().getPackageName();
@@ -185,6 +189,13 @@ public class Clans extends BPvPPlugin {
             // Unload world content so each archetype's onDeactivate fires on a graceful shutdown. In-flight respawn
             // points are already persisted synchronously as they are mined, so no final flush is needed here.
             injector.getInstance(WorldContentService.class).release(this);
+
+            // Waited on, since the server stops right after and a camp's last changes would be lost with an async write.
+            try {
+                injector.getInstance(CampStore.class).flush().get(10, TimeUnit.SECONDS);
+            } catch (Exception exception) {
+                log.error("Could not write camp records on shutdown", exception).submit();
+            }
 
             // Persist the minimap cache synchronously so a restart keeps the generated map instead of re-caching it.
             injector.getInstance(MapHandler.class).saveMapDataNow();

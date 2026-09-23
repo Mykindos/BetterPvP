@@ -156,7 +156,9 @@ class CampsTest {
     @Test
     @DisplayName("a camp built to a skin is built from that skin's template")
     void aSkinNamesTheTemplate() {
-        when(store.cached(OWNER)).thenReturn(Optional.of(new Camp("shore", List.of())));
+        final Camp shore = new Camp();
+        shore.setSkin("shore");
+        when(store.cached(OWNER)).thenReturn(Optional.of(shore));
 
         assertEquals(Optional.of("templates/camps/shore"), camps.templateFor(Camps.keyFor(OWNER)));
     }

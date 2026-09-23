@@ -1,0 +1,44 @@
+# Camp numbers. Everything here is a placeholder until the balance cards settle it.
+
+resources:
+  # How much one resource chest holds. A camp's capacity is this times the resource chests its structures have,
+  # counted across Wood, Stone and Iron together.
+  chest-capacity: 250
+  # What a resource is dropped as when a camp holds more than its chests can take, such as after demolishing a
+  # structure that had resource chests.
+  overflow-item:
+    wood: "minecraft:oak_log"
+    stone: "minecraft:cobblestone"
+    iron: "minecraft:iron_ingot"
+
+# What each item is worth when deposited, by item key. Vanilla items are "minecraft:<material>", custom items use
+# their own key. Items not listed here stay in the player's inventory.
+deposit:
+  wood:
+    "minecraft:oak_log": 1
+    "minecraft:spruce_log": 1
+    "minecraft:birch_log": 1
+    "minecraft:jungle_log": 1
+    "minecraft:acacia_log": 1
+    "minecraft:dark_oak_log": 1
+    "minecraft:mangrove_log": 1
+    "minecraft:cherry_log": 1
+  stone:
+    "minecraft:cobblestone": 1
+    "minecraft:stone": 1
+    "minecraft:deepslate": 1
+    "minecraft:cobbled_deepslate": 1
+  iron:
+    "minecraft:raw_iron": 1
+    "minecraft:iron_ingot": 1
+
+construction:
+  # How many of a structure's top layers wait for the claim, then animate in.
+  claim-layers: 3
+
+# What each rank may do in its camp, until a clan changes it. RECRUIT, MEMBER, ADMIN, LEADER.
+permissions:
+  LEADER: [BUILD, CANCEL, MOVE, UPGRADE, CLAIM, DEMOLISH, REPAIR]
+  ADMIN: [BUILD, CANCEL, MOVE, UPGRADE, CLAIM, DEMOLISH, REPAIR]
+  MEMBER: [BUILD, CLAIM, REPAIR]
+  RECRUIT: [CLAIM]

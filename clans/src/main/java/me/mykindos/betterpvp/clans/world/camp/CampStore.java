@@ -7,8 +7,11 @@ import me.mykindos.betterpvp.core.world.site.SiteKey;
 import me.mykindos.betterpvp.core.world.site.storage.SiteStorages;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +28,7 @@ public class CampStore {
 
     private final SiteStorages storages;
     private final Map<Long, Camp> records = new ConcurrentHashMap<>();
+    private final Set<Long> changed = ConcurrentHashMap.newKeySet();
 
     @Inject
     public CampStore(@NotNull SiteStorages storages) {
@@ -56,14 +60,30 @@ public class CampStore {
         return Optional.ofNullable(records.get(clanId));
     }
 
+    /** Notes that a clan's camp changed, so the next {@link #flush()} writes it down. */
+    public void changed(long clanId) {
+        changed.add(clanId);
+    }
+
+    /** Writes every camp that changed since the last flush. */
+    public @NotNull CompletableFuture<Void> flush() {
+        final List<CompletableFuture<Void>> writes = new ArrayList<>();
+        for (Long clanId : List.copyOf(changed)) {
+            changed.remove(clanId);
+            writes.add(save(clanId));
+        }
+        return CompletableFuture.allOf(writes.toArray(CompletableFuture[]::new));
+    }
+
     /** Writes what is held for a clan. Does nothing for one whose record was never read. */
-    public void save(long clanId) {
+    public @NotNull CompletableFuture<Void> save(long clanId) {
         final Camp camp = records.get(clanId);
         if (camp == null) {
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
-        storages.storage().write(Camps.keyFor(clanId), camp).exceptionally(ex -> {
+        changed.remove(clanId);
+        return storages.storage().write(Camps.keyFor(clanId), camp).exceptionally(ex -> {
             log.error("Could not write the camp record for clan {}", clanId, ex).submit();
             return null;
         });
@@ -72,6 +92,7 @@ public class CampStore {
     /** Throws a camp away for good, for a clan that no longer exists. */
     public void delete(long clanId) {
         records.remove(clanId);
+        changed.remove(clanId);
         storages.storage().delete(Camps.keyFor(clanId)).exceptionally(ex -> {
             log.error("Could not delete the camp record for clan {}", clanId, ex).submit();
             return null;
