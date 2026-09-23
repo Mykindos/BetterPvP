@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.scene.ClansSceneObjectFactory;
+import me.mykindos.betterpvp.core.world.construction.BuildZones;
+import me.mykindos.betterpvp.core.world.construction.view.StructureViews;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
 import me.mykindos.betterpvp.core.world.content.WorldContentService;
@@ -19,8 +21,8 @@ import java.util.List;
  * What stands in a camp. Bound to the site rather than to a world name, so every clan's copy gets the same treatment
  * however many of them are open at once.
  * <p>
- * A dock and nothing else. A camp is somewhere a clan builds, so it is deliberately not put under the building rules
- * that a landmark is, and what a clan raises there is its own business.
+ * A dock, the build zones the skin marks out, and whatever structures the clan has raised. A camp is somewhere a clan
+ * builds, so it is deliberately not put under the building rules that a landmark is.
  */
 @Singleton
 @PluginAdapter("Mapper")
@@ -28,16 +30,20 @@ public class CampContent {
 
     private final ClientManager clientManager;
     private final ClansSceneObjectFactory clansSceneFactory;
+    private final WorldContent structures;
+    private final WorldContent buildZones = new BuildZones();
 
     @Inject
     private CampContent(@NotNull WorldContentService contentService, @NotNull Clans clans, @NotNull WorldSites sites,
-                        @NotNull ClientManager clientManager, @NotNull ClansSceneObjectFactory clansSceneFactory) {
+                        @NotNull ClientManager clientManager, @NotNull ClansSceneObjectFactory clansSceneFactory,
+                        @NotNull StructureViews views, @NotNull CampConstruction construction) {
         this.clientManager = clientManager;
         this.clansSceneFactory = clansSceneFactory;
+        this.structures = views.content();
         contentService.register(clans, new WorldContentBinding(sites.selector(Camps.SITE_ID), this::content));
     }
 
     private @NotNull List<WorldContent> content() {
-        return List.of(new Dock(clientManager, clansSceneFactory));
+        return List.of(new Dock(clientManager, clansSceneFactory), buildZones, structures);
     }
 }
