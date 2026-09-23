@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** One structure a holding owns: what it is, where it stands, what shape it is in and what is being done to it. */
@@ -20,6 +22,8 @@ public class PlacedStructure {
     private StructurePosition position;
     private StructureCondition condition;
     private @Nullable Job job;
+    /** What its containers hold, by {@link StructureStorage} slot. Null when they are all empty. */
+    private @Nullable Map<String, List<String>> storage;
 
     public PlacedStructure(@NotNull UUID id, @NotNull String type, @NotNull StructurePosition position,
                            @NotNull StructureCondition condition) {

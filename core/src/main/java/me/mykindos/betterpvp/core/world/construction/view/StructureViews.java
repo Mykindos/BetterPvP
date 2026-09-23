@@ -27,11 +27,16 @@ import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,6 +135,38 @@ public class StructureViews implements Listener {
                 view.clear();
             }
         });
+    }
+
+    /** Writes down a structure container when whoever had it open closes it. */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onClose(@NotNull InventoryCloseEvent event) {
+        final InventoryHolder holder = event.getInventory().getHolder(false);
+        if (holder instanceof DoubleChest chest) {
+            saveAt(chest.getLeftSide(false));
+            saveAt(chest.getRightSide(false));
+        } else {
+            saveAt(holder);
+        }
+    }
+
+    private void saveAt(@Nullable InventoryHolder holder) {
+        if (!(holder instanceof BlockState state)) {
+            return;
+        }
+        final Loaded loaded = worlds.get(state.getWorld().getName());
+        if (loaded == null) {
+            return;
+        }
+        for (StructureView view : loaded.views.values()) {
+            if (view.saveAt(state.getX(), state.getY(), state.getZ())) {
+                return;
+            }
+        }
+    }
+
+    /** Marks the record of whatever holding {@code world} belongs to as needing a save. */
+    void changed(@NotNull World world) {
+        service.worksite(world).ifPresent(worksite -> worksite.getSite().changed(worksite.getKey()));
     }
 
     void claim(@NotNull Player player, @NotNull World world, @NotNull UUID structure) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -79,6 +80,7 @@ class PlacedStructureTest {
                 ResourceCost.of(Map.of("wood", 40, "stone", 10)), 0, 5);
         job.hold("siege", 7);
         hall.setJob(job);
+        hall.setStorage(Map.of("1,0,0", Arrays.asList("c3RvbmU=", null)));
         holding.getStructures().add(hall);
 
         final ObjectMapper mapper = new ObjectMapper();
