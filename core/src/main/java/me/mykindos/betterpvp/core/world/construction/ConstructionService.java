@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -78,7 +80,7 @@ public class ConstructionService {
                                                 @NotNull Location anchor, int quarterTurns) {
         final Optional<Worksite> worksite = worksite(world);
         if (worksite.isEmpty()) {
-            return Optional.of(text("You can't build here."));
+            return Optional.of(text("core.construction.cannot_build_here"));
         }
         return buildProblem(player, worksite.get(), type, StructurePosition.of(anchor, quarterTurns));
     }
@@ -87,7 +89,7 @@ public class ConstructionService {
                                              @NotNull Location anchor, int quarterTurns) {
         final Optional<Worksite> found = worksite(world);
         if (found.isEmpty()) {
-            return ConstructionResult.refused("You can't build here.");
+            return ConstructionResult.refused("core.construction.cannot_build_here");
         }
         final Worksite worksite = found.get();
         final StructurePosition position = StructurePosition.of(anchor, quarterTurns);
@@ -117,7 +119,7 @@ public class ConstructionService {
         return act(player, world, id, ConstructionAction.CANCEL, (worksite, structure, type) -> {
             final Job job = structure.getJob();
             if (job == null) {
-                return ConstructionResult.refused("There is nothing to cancel.");
+                return ConstructionResult.refused("core.construction.nothing_to_cancel");
             }
 
             worksite.site.ledger().refund(worksite.key, job.getSpent());
@@ -134,7 +136,7 @@ public class ConstructionService {
         return act(player, world, id, ConstructionAction.CLAIM, (worksite, structure, type) -> {
             final Job job = structure.getJob();
             if (job == null || job.isHeld() || !job.isDone(clock.getAsLong())) {
-                return ConstructionResult.refused("It isn't finished yet.");
+                return ConstructionResult.refused("core.construction.not_finished");
             }
 
             switch (job.getKind()) {
@@ -154,10 +156,10 @@ public class ConstructionService {
                                             @NotNull Location anchor, int quarterTurns) {
         return act(player, world, id, ConstructionAction.MOVE, (worksite, structure, type) -> {
             if (!type.getFlags().isMovable()) {
-                return ConstructionResult.refused("It can't be moved.");
+                return ConstructionResult.refused("core.construction.not_movable");
             }
             if (structure.getJob() != null) {
-                return ConstructionResult.refused("Finish or cancel what it's doing first.");
+                return ConstructionResult.refused("core.construction.busy");
             }
 
             final StructurePosition target = StructurePosition.of(anchor, quarterTurns);
@@ -190,10 +192,10 @@ public class ConstructionService {
         return act(player, world, id, ConstructionAction.UPGRADE, (worksite, structure, type) -> {
             final int next = structure.getVersion() + 1;
             if (!type.hasVersion(next)) {
-                return ConstructionResult.refused("It can't be upgraded any further.");
+                return ConstructionResult.refused("core.construction.max_version");
             }
             if (structure.getJob() != null || structure.getCondition() != StructureCondition.ACTIVE) {
-                return ConstructionResult.refused("It has to be standing and idle to be upgraded.");
+                return ConstructionResult.refused("core.construction.upgrade_needs_idle");
             }
 
             final Optional<Component> problem = requirements(worksite, type, next)
@@ -216,10 +218,10 @@ public class ConstructionService {
         return act(player, world, id, ConstructionAction.REPAIR, (worksite, structure, type) -> {
             final StructureCondition condition = structure.getCondition();
             if (condition != StructureCondition.DISABLED && condition != StructureCondition.NEEDS_REPAIR) {
-                return ConstructionResult.refused("It doesn't need repairing.");
+                return ConstructionResult.refused("core.construction.no_repair_needed");
             }
             if (structure.getJob() != null) {
-                return ConstructionResult.refused("It is already being worked on.");
+                return ConstructionResult.refused("core.construction.already_working");
             }
             final Optional<ConstructionResult> unpaid = pay(worksite, type.getRepairCost());
             if (unpaid.isPresent()) {
@@ -243,14 +245,14 @@ public class ConstructionService {
     public @NotNull ConstructionResult demolish(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
         return act(player, world, id, ConstructionAction.DEMOLISH, (worksite, structure, type) -> {
             if (!type.getFlags().isDemolishable()) {
-                return ConstructionResult.refused("It can't be demolished.");
+                return ConstructionResult.refused("core.construction.not_demolishable");
             }
             if (structure.getCondition() == StructureCondition.UNDER_CONSTRUCTION
                     || structure.getCondition() == StructureCondition.NOT_PLACED) {
-                return ConstructionResult.refused("Only a standing structure can be demolished.");
+                return ConstructionResult.refused("core.construction.demolish_needs_standing");
             }
             if (structure.getJob() != null) {
-                return ConstructionResult.refused("Cancel what it's doing first.");
+                return ConstructionResult.refused("core.construction.busy");
             }
 
             final Location centre = shapes.placementOf(world, structure)
@@ -283,12 +285,12 @@ public class ConstructionService {
     private @NotNull Optional<Component> buildProblem(@NotNull Player player, @NotNull Worksite worksite,
                                                       @NotNull StructureType type, @NotNull StructurePosition position) {
         if (!worksite.site.allows(player, worksite.key, ConstructionAction.BUILD)) {
-            return Optional.of(text("You aren't allowed to build here."));
+            return Optional.of(text("core.construction.build_not_allowed"));
         }
         return requirements(worksite, type, 0)
                 .or(() -> fit(worksite, type, 0, position, null))
                 .or(() -> worksite.site.ledger().canAfford(worksite.key, type.version(0).getCost())
-                        ? Optional.empty() : Optional.of(text("You don't have enough resources.")));
+                        ? Optional.empty() : Optional.of(text("core.construction.cannot_afford")));
     }
 
     private @NotNull Optional<Component> requirements(@NotNull Worksite worksite, @NotNull StructureType type, int version) {
@@ -296,7 +298,7 @@ public class ConstructionService {
             if (!worksite.holding.hasBuilt(required)) {
                 final Component name = catalogue.find(required).map(StructureType::getDisplayName)
                         .orElse(Component.text(required));
-                return Optional.of(text("It needs a ").append(name).append(text(" first.")));
+                return Optional.of(text("core.construction.requires", name));
             }
         }
         return worksite.site.blocked(worksite.key, worksite.holding, type, version);
@@ -306,14 +308,14 @@ public class ConstructionService {
                                              @NotNull StructurePosition position, @Nullable UUID ignoring) {
         final Optional<SchematicPlacement> placement = shapes.placementOf(worksite.world, type.getId(), version, position);
         if (placement.isEmpty()) {
-            return Optional.of(text("That structure has no build to place."));
+            return Optional.of(text("core.construction.no_build"));
         }
         return fitCheck.problem(worksite.world, worksite.holding, type, placement.get(), ignoring);
     }
 
     private @NotNull Optional<ConstructionResult> pay(@NotNull Worksite worksite, @NotNull ResourceCost cost) {
         if (!worksite.site.ledger().canAfford(worksite.key, cost)) {
-            return Optional.of(ConstructionResult.refused("You don't have enough resources."));
+            return Optional.of(ConstructionResult.refused("core.construction.cannot_afford"));
         }
         worksite.site.ledger().spend(worksite.key, cost);
         return Optional.empty();
@@ -323,19 +325,19 @@ public class ConstructionService {
                                             @NotNull ConstructionAction action, @NotNull Action body) {
         final Optional<Worksite> found = worksite(world);
         if (found.isEmpty()) {
-            return ConstructionResult.refused("There is nothing to build on here.");
+            return ConstructionResult.refused("core.construction.no_holding");
         }
         final Worksite worksite = found.get();
         final Optional<PlacedStructure> structure = worksite.holding.find(id);
         if (structure.isEmpty()) {
-            return ConstructionResult.refused("That structure no longer exists.");
+            return ConstructionResult.refused("core.construction.missing_structure");
         }
         final Optional<StructureType> type = catalogue.find(structure.get().getType());
         if (type.isEmpty()) {
-            return ConstructionResult.refused("That structure is no longer known.");
+            return ConstructionResult.refused("core.construction.unknown_type");
         }
         if (!worksite.site.allows(player, worksite.key, action)) {
-            return ConstructionResult.refused("You aren't allowed to do that here.");
+            return ConstructionResult.refused("core.construction.action_not_allowed");
         }
         return body.run(worksite, structure.get(), type.get());
     }
@@ -398,8 +400,8 @@ public class ConstructionService {
         }
     }
 
-    private static @NotNull Component text(@NotNull String text) {
-        return Component.text(text, NamedTextColor.RED);
+    private static @NotNull Component text(@NotNull String key, @NotNull ComponentLike... args) {
+        return Translations.component(key, args).color(NamedTextColor.RED);
     }
 
     @FunctionalInterface
