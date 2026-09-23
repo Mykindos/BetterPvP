@@ -48,6 +48,7 @@ public class SettlerConfig implements Reloadable {
     private final Map<String, Trade> trades = new HashMap<>();
     private final Map<String, Map<String, Double>> traitNumbers = new HashMap<>();
     private final Map<String, Double> moraleNumbers = new HashMap<>();
+    private final Map<String, Double> farmNumbers = new HashMap<>();
     /** Limits on one job's crew. */
     @Getter
     private CrewLimits crewLimits = CrewLimits.NONE;
@@ -150,6 +151,12 @@ public class SettlerConfig implements Reloadable {
         }
         crewLimits = new CrewLimits(config.getInt("crews.max-size", 5), config.getDouble("crews.max-speed", 4),
                 Map.copyOf(perRarity), config.getDouble("crews.compatible-bonus", 0.1));
+
+        farmNumbers.clear();
+        final ConfigurationSection farmSection = config.getConfigurationSection("farm");
+        if (farmSection != null) {
+            farmSection.getKeys(false).forEach(key -> farmNumbers.put(key, farmSection.getDouble(key)));
+        }
 
         moraleNumbers.clear();
         final ConfigurationSection moraleSection = config.getConfigurationSection("morale");
@@ -284,6 +291,11 @@ public class SettlerConfig implements Reloadable {
     /** One of {@code trait}'s numbers at common strength, or {@code fallback} if settlers.yml does not set it. */
     public double trait(@NotNull String trait, @NotNull String number, double fallback) {
         return traitNumbers.getOrDefault(trait, Map.of()).getOrDefault(number, fallback);
+    }
+
+    /** One of the farm numbers, or {@code fallback} if settlers.yml does not set it. */
+    public double farm(@NotNull String number, double fallback) {
+        return farmNumbers.getOrDefault(number, fallback);
     }
 
     /** One of the morale numbers, or {@code fallback} if settlers.yml does not set it. */

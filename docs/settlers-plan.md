@@ -130,14 +130,14 @@ The data, with nothing in the world yet.
   * Online members are told when a boat or a milestone settler arrives.
 * Cards: "Hiring".
 
-### S7. Farmers and workplaces
+### S7. Farmers and the farm
 
 * Core
-  * `Workplace`: something with resident slots and a bonus. A structure is one kind of workplace. The camp farm is another, keyed by the farm zone.
-  * `WorkplaceBonus`: reads the residents' stats, traits and the morale multiplier.
+  * `WorkplaceBonus`: the settlers at work at a workplace, and what they add together. Each brings its own share, scaled by its morale multiplier, and the total stops at the workplace's cap. A workplace's slots are its profession's working cap, so a workplace needs no class of its own until structures take residents.
 * Clans
-  * `FarmWorkplace`: Farmers give the farm better crop yields and faster growth, as numbers from config.
-  * Structure menus show resident slots.
+  * `FarmWorkplace`: each Farmer at work adds 10% growth and a 10% chance of an extra harvest drop, times its profession stats. Green Thumb and Bountiful add to their bonus, Seasoned and Moody strengthen both, and morale scales it all. The farm stops at +100% growth and 50% extra drops.
+  * `FarmBonusListener`: a crop growing on a camp's farm may grow extra stages at once (every whole share of bonus is a stage, the rest a chance), and a fully grown crop harvested there may drop one more.
+  * A Farm page in the Steward's menu: the farm's bonuses, the Farmers working it against its slots, and the free Farmers to send to it.
 * Cards: "Upgradable farm" gets its first bonus source.
 
 ### S8. Camp-wide traits and Prosperity
