@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import dev.brauw.mapper.region.CuboidRegion;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.locale.Translations;
@@ -40,12 +41,15 @@ public class CampGrounds implements WorldContent {
     public static final String FARM = "farm";
 
     private final Camps camps;
+    private final CampPermissions permissions;
     private final ClanManager clanManager;
     private final ClientManager clientManager;
 
     @Inject
-    public CampGrounds(@NotNull Camps camps, @NotNull ClanManager clanManager, @NotNull ClientManager clientManager) {
+    public CampGrounds(@NotNull Camps camps, @NotNull CampPermissions permissions, @NotNull ClanManager clanManager,
+                       @NotNull ClientManager clientManager) {
         this.camps = camps;
+        this.permissions = permissions;
         this.clanManager = clanManager;
         this.clientManager = clientManager;
     }
@@ -62,7 +66,7 @@ public class CampGrounds implements WorldContent {
                 .bounds(GlobalBounds.world(world))
                 .priority(1)
                 .gameMode(ZoneGameMode.of(GameMode.ADVENTURE))
-                .rules(new ZoneRuleContainer().add(new CampGroundsRule(camps, clientManager, false)))
+                .rules(new ZoneRuleContainer().add(new CampGroundsRule(camps, permissions, clientManager, false)))
                 .build());
 
         final List<ZoneBounds> farms = regions.find(FARM, CuboidRegion.class).stream()
@@ -77,7 +81,7 @@ public class CampGrounds implements WorldContent {
                     .bounds(CompositeBounds.of(farms))
                     .priority(2)
                     .gameMode(player -> camps.isMember(player, world) ? GameMode.SURVIVAL : null)
-                    .rules(new ZoneRuleContainer().add(new CampGroundsRule(camps, clientManager, true)))
+                    .rules(new ZoneRuleContainer().add(new CampGroundsRule(camps, permissions, clientManager, true)))
                     .build());
         }
 

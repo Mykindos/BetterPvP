@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.clans.world.camp.CampConstruction;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
-import me.mykindos.betterpvp.core.world.construction.StructureVersion;
+import me.mykindos.betterpvp.core.world.construction.StructureStage;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 
@@ -61,7 +61,7 @@ class CampStructuresTest {
     @Test
     void numbersComeFromTheConfig() {
         final CampConfig.StructureNumbers numbers = new CampConfig.StructureNumbers(
-                List.of(new StructureVersion("camps/storehouse_1", ResourceCost.of(Map.of("wood", 120)),
+                List.of(new StructureStage("camps/storehouse_1", ResourceCost.of(Map.of("wood", 120)),
                         Duration.ofMinutes(15))),
                 ResourceCost.NONE, Duration.ZERO, ResourceCost.of(Map.of("wood", 40)), Duration.ofMinutes(3),
                 0.25, Material.CHEST);
@@ -70,7 +70,7 @@ class CampStructuresTest {
         new CampStructures(config, catalogue);
 
         final StructureType storehouse = find(CampStructures.STOREHOUSE);
-        assertEquals(120, storehouse.version(0).getCost().get("wood"));
+        assertEquals(120, storehouse.stage(0).getCost().get("wood"));
         assertEquals(Duration.ofMinutes(3), storehouse.getRepairTime());
         assertEquals(0.25, storehouse.getFlags().getDemolishRefund(), 1e-9);
         assertTrue(storehouse.getFlags().isDemolishable(), "config never changes what the code says it allows");

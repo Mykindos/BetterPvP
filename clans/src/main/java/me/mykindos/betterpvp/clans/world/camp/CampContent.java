@@ -53,6 +53,6 @@ public class CampContent {
     }
 
     private @NotNull List<WorldContent> content() {
-        return List.of(grounds, new Dock(clientManager, clansSceneFactory), buildZones, startingCamp, structures);
+        return List.of(grounds, new Dock(clientManager, clansSceneFactory, false), buildZones, startingCamp, structures);
     }
 }

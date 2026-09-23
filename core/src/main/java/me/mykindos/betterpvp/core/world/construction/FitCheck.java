@@ -23,7 +23,7 @@ import java.util.UUID;
 /**
  * Whether a structure can stand somewhere: every column it covers inside a build zone carrying the tag it needs, and no
  * column shared with another structure at the same height. The same check serves a ghost following the player, a
- * placement, a move and an upgrade, for any position and rotation.
+ * placement, a move and an advance, for any position and rotation.
  */
 @Singleton
 public class FitCheck {
@@ -97,7 +97,7 @@ public class FitCheck {
 
     /**
      * Everything the holding's other structures take up: where each stands, plus where a move is taking it and the
-     * bigger version an upgrade is growing it into, since that ground is spoken for.
+     * bigger stage it is advancing into, since that ground is spoken for.
      */
     private @NotNull List<Footprint> occupied(@NotNull World world, @NotNull Holding holding, @Nullable UUID ignoring) {
         final List<Footprint> occupied = new ArrayList<>();
@@ -105,16 +105,16 @@ public class FitCheck {
             if (structure.getId().equals(ignoring) || structure.getCondition() == StructureCondition.NOT_PLACED) {
                 continue;
             }
-            shapes.footprintOf(world, structure.getType(), structure.getVersion(), structure.getPosition())
+            shapes.footprintOf(world, structure.getType(), structure.getStage(), structure.getPosition())
                     .ifPresent(occupied::add);
 
             final Job job = structure.getJob();
             if (job != null && job.getKind() == JobKind.MOVE && job.getTarget() != null) {
-                shapes.footprintOf(world, structure.getType(), structure.getVersion(), job.getTarget())
+                shapes.footprintOf(world, structure.getType(), structure.getStage(), job.getTarget())
                         .ifPresent(occupied::add);
             }
-            if (job != null && job.getKind() == JobKind.UPGRADE) {
-                shapes.footprintOf(world, structure.getType(), job.getTargetVersion(), structure.getPosition())
+            if (job != null && job.getKind() == JobKind.ADVANCE) {
+                shapes.footprintOf(world, structure.getType(), job.getTargetStage(), structure.getPosition())
                         .ifPresent(occupied::add);
             }
         }

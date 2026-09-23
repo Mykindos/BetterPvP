@@ -181,17 +181,17 @@ class ConstructionServiceTest {
     }
 
     @Test
-    void anUpgradeRaisesTheVersionOnceClaimed() {
+    void advancingRaisesTheStageOnceClaimed() {
         final PlacedStructure hall = finished("hall");
 
-        assertTrue(service.upgrade(player, world, hall.getId()).isSuccess());
-        assertEquals(0, hall.getVersion(), "not until it is claimed");
-        assertEquals(StructureStatus.UPGRADING, hall.status(now.get()));
+        assertTrue(service.advance(player, world, hall.getId()).isSuccess());
+        assertEquals(0, hall.getStage(), "not until it is claimed");
+        assertEquals(StructureStatus.ADVANCING, hall.status(now.get()));
 
         now.addAndGet(5 * MINUTE);
         service.claim(player, world, hall.getId());
-        assertEquals(1, hall.getVersion());
-        assertFalse(service.upgrade(player, world, hall.getId()).isSuccess(), "there is no version after that");
+        assertEquals(1, hall.getStage());
+        assertFalse(service.advance(player, world, hall.getId()).isSuccess(), "there is no stage after that");
     }
 
     @Test
@@ -209,7 +209,7 @@ class ConstructionServiceTest {
     @Test
     void aStructureWithAJobRunningCannotBeDemolished() {
         final PlacedStructure hall = finished("hall");
-        service.upgrade(player, world, hall.getId());
+        service.advance(player, world, hall.getId());
 
         assertFalse(service.demolish(player, world, hall.getId()).isSuccess());
     }
@@ -380,10 +380,10 @@ class ConstructionServiceTest {
         }
 
         @Override
-        public @NotNull List<StructureVersion> getVersions() {
+        public @NotNull List<StructureStage> getStages() {
             return List.of(
-                    new StructureVersion(id, ResourceCost.of(Map.of("wood", 10)), Duration.ofMinutes(10)),
-                    new StructureVersion(id + "_2", ResourceCost.of(Map.of("wood", 20)), Duration.ofMinutes(5)));
+                    new StructureStage(id, ResourceCost.of(Map.of("wood", 10)), Duration.ofMinutes(10)),
+                    new StructureStage(id + "_2", ResourceCost.of(Map.of("wood", 20)), Duration.ofMinutes(5)));
         }
 
         @Override

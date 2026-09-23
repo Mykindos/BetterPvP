@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.construction;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,19 +39,20 @@ public class Job {
     private ResourceCost spent = ResourceCost.NONE;
     /** Whoever is working on it. */
     private List<UUID> staff = new ArrayList<>();
-    /** The version the structure will be at once this job is claimed. */
-    private int targetVersion;
+    /** The stage the structure will be at once this job is claimed. */
+    @JsonAlias("targetVersion")
+    private int targetStage;
     /** Where a move is taking the structure. Null for anything but a move. */
     private @Nullable StructurePosition target;
 
     public static @NotNull Job start(@NotNull JobKind kind, @NotNull Duration duration, @NotNull ResourceCost spent,
-                                     int targetVersion, long now) {
+                                     int targetStage, long now) {
         final Job job = new Job();
         job.kind = kind;
         job.durationMillis = Math.max(0, duration.toMillis());
         job.checkpointAt = now;
         job.spent = spent;
-        job.targetVersion = targetVersion;
+        job.targetStage = targetStage;
         return job;
     }
 

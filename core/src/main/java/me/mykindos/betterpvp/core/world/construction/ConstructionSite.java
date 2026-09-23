@@ -27,11 +27,11 @@ public interface ConstructionSite {
     boolean allows(@NotNull Player player, @NotNull SiteKey site, @NotNull ConstructionAction action);
 
     /**
-     * Why {@code type} cannot be taken to {@code version} here, beyond the structures it requires, or empty if nothing
+     * Why {@code type} cannot be taken to {@code stage} here, beyond the structures it requires, or empty if nothing
      * stands in the way. This is where a site's own gates go, such as a tier needing a particular hall.
      */
     default @NotNull Optional<Component> blocked(@NotNull SiteKey site, @NotNull Holding holding,
-                                                 @NotNull StructureType type, int version) {
+                                                 @NotNull StructureType type, int stage) {
         return Optional.empty();
     }
 

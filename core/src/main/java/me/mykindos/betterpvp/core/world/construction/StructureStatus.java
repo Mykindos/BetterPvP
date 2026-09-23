@@ -10,8 +10,8 @@ public enum StructureStatus {
     /** Its job is done and it waits for someone to claim it. */
     READY_TO_CLAIM,
     ACTIVE,
-    /** Still standing but not usable until the upgrade is claimed. */
-    UPGRADING,
+    /** Still standing but not usable until the next stage is claimed. */
+    ADVANCING,
     /** Its job is held and waiting. */
     PAUSED,
     DISABLED,

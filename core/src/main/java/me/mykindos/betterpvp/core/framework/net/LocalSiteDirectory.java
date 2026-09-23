@@ -25,7 +25,7 @@ public class LocalSiteDirectory implements SiteDirectory {
 
     private final Map<UUID, RemoteInstance> instances = new ConcurrentHashMap<>();
     private final Map<UUID, Integer> reserved = new ConcurrentHashMap<>();
-    private final Map<UUID, RemoteInstance> expected = new ConcurrentHashMap<>();
+    private final Map<UUID, Arrival> expected = new ConcurrentHashMap<>();
 
     @Override
     public void publish(@NotNull Collection<RemoteInstance> published) {
@@ -76,12 +76,12 @@ public class LocalSiteDirectory implements SiteDirectory {
     }
 
     @Override
-    public void expect(@NotNull UUID player, @NotNull RemoteInstance instance) {
-        expected.put(player, instance);
+    public void expect(@NotNull UUID player, @NotNull Arrival arrival) {
+        expected.put(player, arrival);
     }
 
     @Override
-    public @NotNull CompletableFuture<Optional<RemoteInstance>> claimArrival(@NotNull UUID player) {
+    public @NotNull CompletableFuture<Optional<Arrival>> claimArrival(@NotNull UUID player) {
         return CompletableFuture.completedFuture(Optional.ofNullable(expected.remove(player)));
     }
 

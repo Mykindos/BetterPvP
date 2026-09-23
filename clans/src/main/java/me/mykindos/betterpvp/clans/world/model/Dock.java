@@ -37,10 +37,17 @@ public class Dock implements WorldContent {
 
     private final ClientManager clientManager;
     private final SceneObjectFactory objectFactory;
+    private final boolean safe;
 
     public Dock(ClientManager clientManager, SceneObjectFactory objectFactory) {
+        this(clientManager, objectFactory, true);
+    }
+
+    /** @param safe whether combat is suppressed on the dock, as it is everywhere but a camp */
+    public Dock(ClientManager clientManager, SceneObjectFactory objectFactory, boolean safe) {
         this.clientManager = clientManager;
         this.objectFactory = objectFactory;
+        this.safe = safe;
     }
 
     @Override
@@ -56,15 +63,17 @@ public class Dock implements WorldContent {
                 .map(dock -> (ZoneBounds) RegionBounds.of(dock))
                 .toList();
         if (!docks.isEmpty()) {
-            zones.add(Zone.builder()
+            final Zone.ZoneBuilder dock = Zone.builder()
                     .key(ClanZones.regionKey("dock"))
                     .displayName(Component.text("Dock"))
                     .tag("dock")
-                    .tag(Zones.SAFE)
                     .bounds(CompositeBounds.of(docks))
                     .priority(ClanZones.SERVER_REGION_PRIORITY + 5)
-                    .rules(rules)
-                    .build());
+                    .rules(rules);
+            if (safe) {
+                dock.tag(Zones.SAFE);
+            }
+            zones.add(dock.build());
         }
 
         return zones;

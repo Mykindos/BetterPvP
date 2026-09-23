@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.framework.net.Arrival;
 import me.mykindos.betterpvp.core.framework.net.PlayerTransfer;
 import me.mykindos.betterpvp.core.framework.net.RemoteInstance;
 import me.mykindos.betterpvp.core.framework.net.SiteDirectory;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -88,26 +90,21 @@ public class NetworkPlacement implements Placement, Listener {
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> send(@NotNull Player traveller, @NotNull SiteHandle handle) {
-        return sendAll(List.of(traveller), handle);
-    }
-
-    @Override
     public @NotNull CompletableFuture<Boolean> sendAll(@NotNull Collection<Player> travellers,
-                                                        @NotNull SiteHandle handle) {
+                                                        @NotNull SiteHandle handle, @Nullable String landing) {
         if (travellers.isEmpty()) {
             return CompletableFuture.completedFuture(false);
         }
 
         if (handle.getServer().equals(currentServer())) {
-            return local.sendAll(travellers, handle);
+            return local.sendAll(travellers, handle, landing);
         }
 
         final RemoteInstance destination = new RemoteInstance(handle.getInstanceId(), handle.getKey().getSiteId(),
                 handle.getKey().getOwnerId(), handle.getServer(), handle.getWorld(), true, 0);
 
         // Recorded before the transfer, because the server they land on has no other way to know why they came.
-        travellers.forEach(traveller -> directory.expect(traveller.getUniqueId(), destination));
+        travellers.forEach(traveller -> directory.expect(traveller.getUniqueId(), new Arrival(destination, landing)));
         return transfers.transferAll(travellers, handle.getServer());
     }
 
@@ -122,11 +119,12 @@ public class NetworkPlacement implements Placement, Listener {
     public void onJoin(@NotNull ClientJoinEvent event) {
         final Player player = event.getPlayer();
 
-        directory.claimArrival(player.getUniqueId()).thenAccept(arrival -> arrival.ifPresent(instance ->
-                UtilServer.runTask(core, () -> land(player, instance))));
+        directory.claimArrival(player.getUniqueId()).thenAccept(arrival -> arrival.ifPresent(expected ->
+                UtilServer.runTask(core, () -> land(player, expected))));
     }
 
-    private void land(@NotNull Player player, @NotNull RemoteInstance instance) {
+    private void land(@NotNull Player player, @NotNull Arrival arrival) {
+        final RemoteInstance instance = arrival.getInstance();
         final Optional<Site> site = registry.get(instance.getSiteId());
         if (site.isEmpty()) {
             log.warn("{} arrived for site '{}', which this server does not have", player.getName(), instance.getSiteId()).submit();
@@ -138,7 +136,7 @@ public class NetworkPlacement implements Placement, Listener {
                 : SiteKey.of(instance.getSiteId(), instance.getOwnerId());
 
         instances.locate(key, Party.solo(player.getUniqueId()))
-                .thenCompose(located -> local.send(player, handleFor(key, located)))
+                .thenCompose(located -> local.send(player, handleFor(key, located), arrival.getLanding()))
                 // The seat held for this player while they travelled is theirs now, counted as an occupant by the
                 // server they are standing on, so holding it in the directory as well would count them twice.
                 .whenComplete((placed, error) -> directory.release(instance.getId(), 1))
