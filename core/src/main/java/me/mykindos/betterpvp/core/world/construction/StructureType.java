@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +31,33 @@ public interface StructureType {
     @NotNull List<StructureVersion> getVersions();
 
     @NotNull StructureFlags getFlags();
+
+    /** What moving it costs. Free unless the type says otherwise. */
+    default @NotNull ResourceCost getMoveCost() {
+        return ResourceCost.NONE;
+    }
+
+    /** How long moving it takes. Instant unless the type says otherwise. */
+    default @NotNull Duration getMoveTime() {
+        return Duration.ZERO;
+    }
+
+    default @NotNull ResourceCost getRepairCost() {
+        return ResourceCost.NONE;
+    }
+
+    default @NotNull Duration getRepairTime() {
+        return Duration.ZERO;
+    }
+
+    /** What taking it from nothing to {@code version} has cost, which a partial refund is a share of. */
+    default @NotNull ResourceCost costUpTo(int version) {
+        ResourceCost total = ResourceCost.NONE;
+        for (int i = 0; i <= Math.min(version, getVersions().size() - 1); i++) {
+            total = total.plus(getVersions().get(i).getCost());
+        }
+        return total;
+    }
 
     default @NotNull StructureVersion version(int index) {
         return getVersions().get(Math.clamp(index, 0, getVersions().size() - 1));
