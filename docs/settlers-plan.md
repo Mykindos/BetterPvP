@@ -29,17 +29,18 @@ What we are building is in the [Settlers PRD](https://outline.betterpvp.net/doc/
 The data, with nothing in the world yet.
 
 * Core
-  * `Settler`: id, name, history, `SettlerRarity`, profession id (nullable), traits, morale, assignment, state (working, idle, striking, leaving), timestamps.
-  * `Profession` and `ProfessionRegistry`: id, what it works at (`WorkplaceKind`: construction job, or a named workplace such as the farm), and the model to show.
-  * `Trait`, `TraitRoll` (trait plus strength) and `TraitRegistry`. Rarity decides how many traits and how strong.
+  * `Settler`: id, name, history line (a translation key and what it fills in), `SettlerRarity`, profession id (nullable), specialty (a Builder's trade), trait ids, morale, assignment, state (working, idle, striking, leaving), timestamps.
+  * `Profession` and `ProfessionRegistry`: id, what it works at (`WorkplaceKind`: construction job, or a named workplace such as the farm), the model to show, and its specialties.
+  * `Trait` and `TraitRegistry`: group, whether it is a trade-off, the least rarity that rolls it and the professions that can. Strength comes from the settler's rarity when a trait is read, so rebalancing reaches settlers who already exist.
   * `Roster`: the settlers one site owns, with lookups by profession, assignment and state.
-  * `SettlerSite`: what an owner supplies, like `ConstructionSite` does. Roster, population caps, `changed()`, permissions.
+  * `SettlerSite`: what an owner supplies, like `ConstructionSite` does. Roster, `changed()`, the population cap and a working cap per profession. The population cap limits who lives there, the working cap limits how many of a profession work at once, and the rest wander.
   * `SettlerService`: grant, dismiss, assign and unassign, cap checks, events (`SettlerJoinedEvent`, `SettlerLeftEvent`, `SettlerAssignedEvent`).
-  * `SettlerGenerator`: rolls a settler from a template (profession, rarity, source) with a name and history line from config lists.
+  * `SettlerGenerator`: rolls a settler from a template (rarity, profession, source) and a `SettlerTable` (rarity numbers, name lists, history lines by source).
 * Clans
   * `Camp` gains the roster. `CampSettlers` implements `SettlerSite`. Population cap from the Great Hall stage, per-role caps from config, Workshop bonus to the Builder cap.
   * Builder and Farmer registered as professions.
   * `/settler grant|list|dismiss` for staff, so the rest can be tested before any source exists.
+  * Settler permissions (hire, assign, dismiss, pay) wait for S2, where the card is the first place players act on a settler.
 * Tests for caps, rolls and roster persistence round trips.
 * Cards: "Settler base model" (data half).
 

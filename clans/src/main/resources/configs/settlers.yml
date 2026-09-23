@@ -1,0 +1,87 @@
+# Settler numbers. Every value is a starting point for balance testing. What exists (professions, traits) is code, how
+# much of it is here.
+
+# What each rarity means for a settler. traits: how many it rolls. trait-strength: what its trait effects are multiplied
+# by. stats: what its profession stats are multiplied by. trade-off-chance: the chance, from 0 to 1, that each trait it
+# rolls is a trade-off.
+rarities:
+  common: {traits: 1, trait-strength: 1.0, stats: 1.0, trade-off-chance: 0.30}
+  uncommon: {traits: 1, trait-strength: 1.25, stats: 1.25, trade-off-chance: 0.25}
+  rare: {traits: 2, trait-strength: 1.5, stats: 1.6, trade-off-chance: 0.15}
+  legendary: {traits: 3, trait-strength: 2.0, stats: 2.2, trade-off-chance: 0.05}
+
+population:
+  # How many settlers a camp can have, by Great Hall stage. A camp without a finished Great Hall can have none.
+  by-hall-stage: [6, 12, 20]
+
+# How many settlers of each profession can work at once. by-hall-stage follows the Great Hall like population does.
+# per-stage-of adds that many for every stage of a finished structure, so a Workshop at its second stage adds 2.
+professions:
+  builder:
+    by-hall-stage: [2, 3, 4]
+    per-stage-of:
+      workshop: 1
+  farmer:
+    by-hall-stage: [2, 2, 2]
+
+# A settler's name is one first name and one byname.
+names:
+  first:
+    - Aldric
+    - Mirel
+    - Oswin
+    - Tamsin
+    - Hal
+    - Brienne
+    - Corin
+    - Wenna
+    - Edric
+    - Isolde
+    - Garrick
+    - Maud
+    - Rowan
+    - Elsbet
+    - Tobin
+    - Hild
+    - Anselm
+    - Petra
+    - Ulric
+    - Linnet
+  bynames:
+    - Tanner
+    - of the Fens
+    - Greyhand
+    - Reed
+    - Two-Coats
+    - Ashford
+    - Salt
+    - Low
+    - Marsh
+    - Thatcher
+    - the Younger
+    - Blackwell
+    - of the Downs
+    - Stonebridge
+    - Half-Penny
+    - Crane
+    - Wick
+    - of the Hollow
+    - Fairweather
+    - Longstride
+
+# History lines by where a settler came from, as translation keys. {0} in a line is filled in by the source, such as
+# the dungeon a prisoner was freed from.
+histories:
+  dock:
+    - clans.settler.history.dock.1
+    - clans.settler.history.dock.2
+  hiring:
+    - clans.settler.history.hiring.1
+  dungeon:
+    - clans.settler.history.dungeon.1
+  boss:
+    - clans.settler.history.boss.1
+  island:
+    - clans.settler.history.island.1
+  milestone:
+    - clans.settler.history.milestone.1
