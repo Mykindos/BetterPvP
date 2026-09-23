@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeftEvent;
 import me.mykindos.betterpvp.core.world.settler.wage.SettlerStrikeEvent;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -20,15 +19,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-/** Tells a camp's online members when its settlers strike over wages, go back to work, or leave unpaid. */
+/** Tells a camp's online members when its settlers strike over wages, go back to work, or leave unpaid or unhappy. */
 @BPvPListener
 @Singleton
-public class WageNotices implements Listener {
+public class SettlerNotices implements Listener {
 
     private final ClanManager clanManager;
 
     @Inject
-    public WageNotices(@NotNull ClanManager clanManager) {
+    public SettlerNotices(@NotNull ClanManager clanManager) {
         this.clanManager = clanManager;
     }
 
@@ -42,8 +41,13 @@ public class WageNotices implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLeft(@NotNull SettlerLeftEvent event) {
-        if (event.getReason() == SettlerLeaveReason.UNPAID) {
-            tell(event.getSite(), Translations.component("clans.camp.hall.wages.left_unpaid",
+        final String key = switch (event.getReason()) {
+            case UNPAID -> "clans.camp.hall.wages.left_unpaid";
+            case UNHAPPY -> "clans.camp.hall.settlers.left_unhappy";
+            case DISMISSED -> null;
+        };
+        if (key != null) {
+            tell(event.getSite(), Translations.component(key,
                     Component.text(event.getSettler().getName(), event.getSettler().getRarity().getColor()))
                     .color(NamedTextColor.RED));
         }

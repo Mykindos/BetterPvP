@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -39,10 +40,12 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
     private final SiteKey site;
     private final Settler settler;
     private final @Nullable Profession profession;
+    private final @Nullable Windowed previous;
 
     SettlerCardMenu(@NotNull SettlerCards cards, @NotNull Player viewer, @NotNull SiteKey site,
-                    @NotNull Settler settler) {
+                    @NotNull Settler settler, @Nullable Windowed previous) {
         super(9, 4);
+        this.previous = previous;
         this.cards = cards;
         this.viewer = viewer;
         this.site = site;
@@ -63,6 +66,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         }
         assignButton();
         dismissButton();
+        setItem(31, new BackButton(previous));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 
@@ -106,11 +110,14 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
     private @NotNull SimpleItem morale() {
         final int morale = settler.getMorale();
         final NamedTextColor color = morale > 0 ? NamedTextColor.GREEN : morale < 0 ? NamedTextColor.RED : NamedTextColor.GRAY;
-        return new SimpleItem(ItemView.builder()
+        final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.CAKE)
                 .displayName(Translations.component("clans.settler.card.morale",
-                        Component.text(morale, color)).color(NamedTextColor.YELLOW))
-                .build());
+                        Component.text(morale, color)).color(NamedTextColor.YELLOW));
+        if (settler.getUnhappySince() > 0) {
+            view.frameLore(true).lore(Translations.component("clans.settler.card.unhappy").color(NamedTextColor.RED));
+        }
+        return new SimpleItem(view.build());
     }
 
     private @NotNull SimpleItem work() {
@@ -177,7 +184,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
             }
             cards.after(click.getPlayer(), site, settler.getId(), working
                     ? cards.getService().unassign(site, settler.getId())
-                    : cards.getService().assign(site, settler.getId(), profession.getWorkplace()));
+                    : cards.getService().assign(site, settler.getId(), profession.getWorkplace()), previous);
         }));
     }
 

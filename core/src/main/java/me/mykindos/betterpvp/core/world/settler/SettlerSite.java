@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
+import me.mykindos.betterpvp.core.world.settler.morale.MoraleModel;
 import me.mykindos.betterpvp.core.world.settler.wage.CoinAccount;
 import me.mykindos.betterpvp.core.world.settler.wage.WageModel;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -20,8 +21,8 @@ import java.util.OptionalInt;
 
 /**
  * Everything settlers need from the module that owns a kind of site: where its rosters are kept, how many settlers
- * each can hold, how they look, where in its world they gather and work, what its Builders bring to a job and how
- * its settlers are paid. Registered per site id with the {@link SettlerService}, so core never learns what the owner
+ * each can hold, how they look, where in its world they gather and work, what its Builders bring to a job, how its
+ * settlers are paid and how they feel. Registered per site id with the {@link SettlerService}, so core never learns what the owner
  * of a site is.
  */
 public interface SettlerSite {
@@ -95,5 +96,10 @@ public interface SettlerSite {
     /** How long a settler strikes for before it leaves for good. */
     default @NotNull Duration strikeLimit(@NotNull SiteKey site) {
         return Duration.ofHours(72);
+    }
+
+    /** How the site's settlers feel, or empty if their morale never changes. */
+    default @NotNull Optional<MoraleModel> moraleModel(@NotNull SiteKey site) {
+        return Optional.empty();
     }
 }

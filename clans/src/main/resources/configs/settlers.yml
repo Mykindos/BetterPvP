@@ -62,7 +62,12 @@ traits:
   greedy: {speed: 0.15, wage: 0.25}
   brawny: {workforce: 2, speed: -0.10}
   prodigy: {stats: 0.25}
-  homesick: {stats: 0.10}
+  homesick: {stats: 0.10, morale: -10}
+  bard: {morale: 5}
+  cook: {food: 0.25}
+  beloved: {floor: -10}
+  content: {floor: -20}
+  moody: {swing: 2}
 
 # What settlers are paid from the camp's wage fund, in coins an hour, by profession and rarity. Professions not listed
 # are not paid. model: 'fixed' pays the fixed rates whatever a settler is doing, 'idle-working' pays the idle rate
@@ -78,6 +83,26 @@ wages:
       builder: {common: 150, uncommon: 300, rare: 600, legendary: 1250}
     working:
       builder: {common: 450, uncommon: 900, rare: 1800, legendary: 3750}
+
+# How settlers feel. Morale runs from -100 to 100 and sits at 0 when nothing is happening.
+# unpaid: every settler's morale while anyone is on strike over wages.
+# idle-after-hours, idle-per-hour, idle-floor: a settler with a profession and nowhere to work loses idle-per-hour for
+# every hour past idle-after-hours, down to idle-floor.
+# dismissal, dismissal-hours, dismissal-floor: each dismissal costs everyone dismissal, fading to nothing over
+# dismissal-hours. Together they cost no more than dismissal-floor.
+# food-max: the most food can add.
+# leave-below, leave-after-hours: a settler whose morale stays below leave-below that long leaves.
+morale:
+  unpaid: -25
+  idle-after-hours: 24
+  idle-per-hour: -1
+  idle-floor: -30
+  dismissal: -10
+  dismissal-hours: 48
+  dismissal-floor: -30
+  food-max: 30
+  leave-below: -40
+  leave-after-hours: 48
 
 # Settlers every new camp starts with, so it has a crew for its first jobs.
 starting-settlers:
