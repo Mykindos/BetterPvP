@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureStatus;
+import me.mykindos.betterpvp.core.world.construction.StructureStorage;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.content.SceneSpawn;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
@@ -25,7 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * One structure as it appears in the world, kept in step with its status.
@@ -48,6 +51,10 @@ final class StructureView {
     private @Nullable ClaimFlash flash;
     private @Nullable StructureStatus lastStatus;
     private boolean animating;
+    private @Nullable PlacedStructure structure;
+    private List<StructureStorage.Slot> slots = List.of();
+    private final Set<String> stocked = new HashSet<>();
+    private boolean settled;
 
     StructureView(@NotNull StructureViews views, @NotNull World world, @NotNull WorldContentScope scope) {
         this.views = views;
@@ -56,6 +63,7 @@ final class StructureView {
     }
 
     void sync(@NotNull PlacedStructure structure, @NotNull StructureType type, int claimLayers, long now) {
+        this.structure = structure;
         final StructureStatus status = structure.status(now);
         if (status == StructureStatus.NOT_PLACED) {
             clear();
@@ -79,7 +87,7 @@ final class StructureView {
             animating = true;
         }
         if (!animating) {
-            build.showUpTo(target(structure, status, reserved, now));
+            show(target(structure, status, reserved, now));
         }
 
         if (status == StructureStatus.READY_TO_CLAIM && isBuilding(structure)) {
@@ -103,7 +111,7 @@ final class StructureView {
         if (!animating || build == null) {
             return;
         }
-        build.showUpTo(build.getShown() + 1);
+        show(build.getShown() + 1);
         if (build.isComplete()) {
             animating = false;
         }
@@ -115,16 +123,17 @@ final class StructureView {
         }
     }
 
-    /** Takes the structure out of the world entirely, blocks included. */
+    /** Takes the structure out of the world entirely, blocks included. Its containers are written down first. */
     void clear() {
         if (build != null) {
-            build.revert();
+            show(0);
         }
         release();
     }
 
     /** Lets go of everything shown for it except its blocks, which stay standing in the world. */
     void release() {
+        save(slots);
         if (flash != null) {
             flash.remove();
         }
@@ -138,6 +147,75 @@ final class StructureView {
         placement = null;
         shape = null;
         animating = false;
+        slots = List.of();
+        stocked.clear();
+        settled = false;
+    }
+
+    /** Writes down the container at a world position, if it is one of this structure's and is standing. */
+    boolean saveAt(int x, int y, int z) {
+        for (StructureStorage.Slot slot : slots) {
+            if (slot.getX() == x && slot.getY() == y && slot.getZ() == z) {
+                save(List.of(slot));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Raises or lowers the build. Containers about to come down are written down and emptied first, and containers
+     * that went up are filled from the record.
+     */
+    private void show(int layers) {
+        if (build == null) {
+            return;
+        }
+        final List<StructureStorage.Slot> lowered = new ArrayList<>();
+        for (StructureStorage.Slot slot : slots) {
+            if (slot.getLayer() >= layers && stocked.contains(slot.getKey())) {
+                StructureStorage.close(world, slot);
+                lowered.add(slot);
+            }
+        }
+        save(lowered);
+        lowered.forEach(slot -> {
+            StructureStorage.empty(world, slot);
+            stocked.remove(slot.getKey());
+        });
+
+        build.showUpTo(layers);
+
+        if (structure == null) {
+            return;
+        }
+        for (StructureStorage.Slot slot : slots) {
+            if (slot.getLayer() < build.getShown() && stocked.add(slot.getKey())) {
+                StructureStorage.restore(world, structure, slot);
+            }
+        }
+        if (build.isComplete() && !settled) {
+            settled = true;
+            final Location centre = placement.blockBounds().getCenter().toLocation(world);
+            if (StructureStorage.settle(world, structure, slots, centre)) {
+                views.changed(world);
+            }
+        }
+    }
+
+    private void save(@NotNull List<StructureStorage.Slot> which) {
+        if (structure == null) {
+            return;
+        }
+        boolean saved = false;
+        for (StructureStorage.Slot slot : which) {
+            if (stocked.contains(slot.getKey())) {
+                saved |= StructureStorage.capture(world, structure, slot);
+            }
+        }
+        if (saved) {
+            views.changed(world);
+        }
     }
 
     /** @param claimLayers when the new shape was just claimed, how many layers to leave for its animation, else -1 */
@@ -147,9 +225,10 @@ final class StructureView {
             placement = found;
             plan = LayerPlan.of(found.getSchematic());
             build = views.getRenderer().open(found, plan, structure.getId());
+            slots = StructureStorage.slots(found, plan);
             shape = newShape;
             if (claimLayers >= 0) {
-                build.showUpTo(plan.reservedFrom(claimLayers));
+                show(plan.reservedFrom(claimLayers));
             }
 
             final BoundingBox bounds = found.blockBounds();
