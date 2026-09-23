@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
-import me.mykindos.betterpvp.core.world.construction.StructureVersion;
+import me.mykindos.betterpvp.core.world.construction.StructureStage;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +46,10 @@ public class CampConfig implements Reloadable {
     private final Map<ResourceKind, Material> overflowItems = new EnumMap<>(ResourceKind.class);
     private final Map<ClanMember.MemberRank, Set<ConstructionAction>> permissions =
             new EnumMap<>(ClanMember.MemberRank.class);
+    private final Set<ConstructionAction> allyActions = EnumSet.noneOf(ConstructionAction.class);
+    /** Whether allies may open a camp's containers until a clan changes it. */
+    @Getter
+    private boolean allyContainers;
     private final Map<String, StructureNumbers> structures = new HashMap<>();
 
     @Inject
@@ -85,16 +89,23 @@ public class CampConfig implements Reloadable {
 
         permissions.clear();
         for (ClanMember.MemberRank rank : ClanMember.MemberRank.values()) {
-            final Set<ConstructionAction> actions = EnumSet.noneOf(ConstructionAction.class);
-            for (String action : config.getStringList("permissions." + rank.name())) {
-                try {
-                    actions.add(ConstructionAction.valueOf(action.toUpperCase(Locale.ROOT)));
-                } catch (IllegalArgumentException exception) {
-                    log.warn("Unknown camp permission '{}' for {}", action, rank).submit();
-                }
-            }
-            permissions.put(rank, actions);
+            permissions.put(rank, actions(config.getStringList("permissions." + rank.name()), rank.name()));
         }
+        allyActions.clear();
+        allyActions.addAll(actions(config.getStringList("permissions.ALLY"), "ALLY"));
+        allyContainers = config.getBoolean("permissions.ally-containers", false);
+    }
+
+    private @NotNull Set<ConstructionAction> actions(@NotNull List<String> names, @NotNull String who) {
+        final Set<ConstructionAction> actions = EnumSet.noneOf(ConstructionAction.class);
+        for (String action : names) {
+            try {
+                actions.add(ConstructionAction.valueOf(action.toUpperCase(Locale.ROOT)));
+            } catch (IllegalArgumentException exception) {
+                log.warn("Unknown camp permission '{}' for {}", action, who).submit();
+            }
+        }
+        return actions;
     }
 
     /** The numbers for structure {@code id}, or nothing if {@code camps.yml} does not list it. */
@@ -103,20 +114,20 @@ public class CampConfig implements Reloadable {
     }
 
     private @NotNull StructureNumbers readStructure(@NotNull String id, @NotNull ConfigurationSection section) {
-        final List<StructureVersion> versions = new ArrayList<>();
-        for (Map<?, ?> version : section.getMapList("versions")) {
-            final Object schematic = version.get("schematic");
-            final Object seconds = version.get("build-seconds");
-            versions.add(new StructureVersion(schematic == null ? id : schematic.toString(),
-                    cost(version.get("cost")), Duration.ofSeconds(seconds instanceof Number number ? number.longValue() : 0)));
+        final List<StructureStage> stages = new ArrayList<>();
+        for (Map<?, ?> stage : section.getMapList("stages")) {
+            final Object schematic = stage.get("schematic");
+            final Object seconds = stage.get("build-seconds");
+            stages.add(new StructureStage(schematic == null ? id : schematic.toString(),
+                    cost(stage.get("cost")), Duration.ofSeconds(seconds instanceof Number number ? number.longValue() : 0)));
         }
-        if (versions.isEmpty()) {
-            log.warn("Camp structure '{}' has no versions in camps.yml", id).submit();
-            versions.add(new StructureVersion(id, ResourceCost.NONE, Duration.ZERO));
+        if (stages.isEmpty()) {
+            log.warn("Camp structure '{}' has no stages in camps.yml", id).submit();
+            stages.add(new StructureStage(id, ResourceCost.NONE, Duration.ZERO));
         }
 
         final Material icon = Material.matchMaterial(section.getString("icon", "BRICKS"));
-        return new StructureNumbers(List.copyOf(versions),
+        return new StructureNumbers(List.copyOf(stages),
                 cost(section.get("move.cost")), Duration.ofSeconds(section.getLong("move.seconds", 0)),
                 cost(section.get("repair.cost")), Duration.ofSeconds(section.getLong("repair.seconds", 0)),
                 section.getDouble("demolish-refund", 0), icon == null ? Material.BRICKS : icon);
@@ -150,10 +161,15 @@ public class CampConfig implements Reloadable {
         return Collections.unmodifiableMap(permissions);
     }
 
+    /** What allies may do until a clan changes it. */
+    public @NotNull Set<ConstructionAction> defaultAllyActions() {
+        return Collections.unmodifiableSet(allyActions);
+    }
+
     /** One structure's numbers. */
     @Value
     public static class StructureNumbers {
-        List<StructureVersion> versions;
+        List<StructureStage> stages;
         ResourceCost moveCost;
         Duration moveTime;
         ResourceCost repairCost;

@@ -37,11 +37,12 @@ construction:
   claim-layers: 3
 
 # The numbers for each structure. What a structure is (its tier, what it needs, whether it can move or be demolished)
-# is code. Each version names the structure build it uses, what it costs and how long it takes. Times are in seconds.
+# is code. Each stage names the structure build it uses, what it costs and how long it takes. Stages run in order,
+# the first being what building it produces. Times are in seconds.
 structures:
   great_hall:
     icon: BELL
-    versions:
+    stages:
       - schematic: camps/great_hall_1
         cost: {}
         build-seconds: 0
@@ -55,7 +56,7 @@ structures:
     repair: {cost: {wood: 50, stone: 50}, seconds: 300}
   barracks:
     icon: RED_BED
-    versions:
+    stages:
       - schematic: camps/barracks_1
         cost: {wood: 100, stone: 50}
         build-seconds: 600
@@ -63,14 +64,14 @@ structures:
     repair: {cost: {wood: 30}, seconds: 180}
   dock:
     icon: OAK_BOAT
-    versions:
+    stages:
       - schematic: camps/dock_1
         cost: {}
         build-seconds: 0
     repair: {cost: {wood: 60}, seconds: 300}
   workshop:
     icon: CRAFTING_TABLE
-    versions:
+    stages:
       - schematic: camps/workshop_1
         cost: {wood: 150, stone: 100}
         build-seconds: 1200
@@ -79,7 +80,7 @@ structures:
     demolish-refund: 0.0
   storehouse:
     icon: CHEST
-    versions:
+    stages:
       - schematic: camps/storehouse_1
         cost: {wood: 120, stone: 60}
         build-seconds: 900
@@ -87,9 +88,12 @@ structures:
     repair: {cost: {wood: 40}, seconds: 180}
     demolish-refund: 0.0
 
-# What each rank may do in its camp, until a clan changes it. RECRUIT, MEMBER, ADMIN, LEADER.
+# What each rank may do in its camp, until a clan changes it. RECRUIT, MEMBER, ADMIN, LEADER, and ALLY for members of
+# allied clans. ally-containers is whether allies may open the camp's containers.
 permissions:
-  LEADER: [BUILD, CANCEL, MOVE, UPGRADE, CLAIM, DEMOLISH, REPAIR]
-  ADMIN: [BUILD, CANCEL, MOVE, UPGRADE, CLAIM, DEMOLISH, REPAIR]
+  LEADER: [BUILD, CANCEL, MOVE, ADVANCE, CLAIM, DEMOLISH, REPAIR]
+  ADMIN: [BUILD, CANCEL, MOVE, ADVANCE, CLAIM, DEMOLISH, REPAIR]
   MEMBER: [BUILD, CLAIM, REPAIR]
   RECRUIT: [CLAIM]
+  ALLY: []
+  ally-containers: false

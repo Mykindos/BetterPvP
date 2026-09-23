@@ -64,7 +64,7 @@ class LocalPlacementTest {
 
         registry = new SiteRegistry(mock(Core.class));
         registry.load(loadConfiguration(new StringReader(CATALOGUE)));
-        placement = new LocalPlacement(registry, instances);
+        placement = new LocalPlacement(registry, instances, new SiteLandings());
     }
 
     @AfterEach

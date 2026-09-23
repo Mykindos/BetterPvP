@@ -158,7 +158,7 @@ public class BlueprintSessions implements Listener {
             return Optional.of(existing);
         }
 
-        final Optional<Schematic> schematic = schematics.load(type.version(0).getSchematic());
+        final Optional<Schematic> schematic = schematics.load(type.stage(0).getSchematic());
         if (schematic.isEmpty()) {
             return Optional.empty();
         }

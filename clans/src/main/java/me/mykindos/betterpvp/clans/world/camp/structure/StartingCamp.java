@@ -67,7 +67,7 @@ public class StartingCamp implements WorldContent {
 
     /** Where the marker puts the structure, turned from the way its build was saved to the way the marker faces. */
     private @NotNull StructurePosition position(@NotNull StructureType type, @NotNull PerspectiveRegion marker) {
-        final float savedYaw = schematics.load(type.version(0).getSchematic())
+        final float savedYaw = schematics.load(type.stage(0).getSchematic())
                 .map(schematic -> schematic.getAnchorYaw())
                 .orElse(0f);
         return StructurePosition.of(marker.getLocation(),

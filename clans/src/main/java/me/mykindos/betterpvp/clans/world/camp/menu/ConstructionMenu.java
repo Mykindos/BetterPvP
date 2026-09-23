@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
-import me.mykindos.betterpvp.core.world.construction.StructureVersion;
+import me.mykindos.betterpvp.core.world.construction.StructureStage;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
@@ -66,7 +66,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
 
     private @NotNull ItemView view(@NotNull CampStructure structure) {
         final Optional<Component> unavailable = construction.unavailable(viewer, camp, structure);
-        final StructureVersion first = structure.version(0);
+        final StructureStage first = structure.stage(0);
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(structure.getIcon())
                 .displayName(structure.getDisplayName().color(unavailable.isEmpty() ? NamedTextColor.GREEN : NamedTextColor.RED)

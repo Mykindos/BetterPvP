@@ -129,8 +129,8 @@ class FitCheckTest {
             }
 
             @Override
-            public @NotNull List<StructureVersion> getVersions() {
-                return List.of(new StructureVersion("test", ResourceCost.NONE, Duration.ZERO));
+            public @NotNull List<StructureStage> getStages() {
+                return List.of(new StructureStage("test", ResourceCost.NONE, Duration.ZERO));
             }
 
             @Override

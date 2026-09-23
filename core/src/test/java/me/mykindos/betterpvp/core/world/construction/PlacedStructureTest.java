@@ -40,12 +40,12 @@ class PlacedStructureTest {
     }
 
     @Test
-    void anUpgradeLeavesItStandingButNotUsable() {
-        final PlacedStructure upgraded = structure(StructureCondition.ACTIVE);
-        upgraded.setJob(job(JobKind.UPGRADE));
+    void advancingLeavesItStandingButNotUsable() {
+        final PlacedStructure advancing = structure(StructureCondition.ACTIVE);
+        advancing.setJob(job(JobKind.ADVANCE));
 
-        assertEquals(StructureStatus.UPGRADING, upgraded.status(MINUTE));
-        assertFalse(upgraded.status(MINUTE).isUsable());
+        assertEquals(StructureStatus.ADVANCING, advancing.status(MINUTE));
+        assertFalse(advancing.status(MINUTE).isUsable());
     }
 
     @Test
@@ -89,6 +89,18 @@ class PlacedStructureTest {
         assertEquals(holding, read);
         assertTrue(read.find(hall.getId()).orElseThrow().getJob().isHeld());
         assertEquals(40, read.getStructures().getFirst().getJob().getSpent().get("wood"));
+    }
+
+    @Test
+    void aRecordWrittenBeforeStagesStillReads() throws Exception {
+        final String old = "{\"id\":\"" + UUID.randomUUID() + "\",\"type\":\"hall\",\"version\":2,"
+                + "\"condition\":\"ACTIVE\",\"job\":{\"kind\":\"UPGRADE\",\"targetVersion\":3}}";
+
+        final PlacedStructure read = new ObjectMapper().readValue(old, PlacedStructure.class);
+
+        assertEquals(2, read.getStage());
+        assertEquals(JobKind.ADVANCE, read.getJob().getKind());
+        assertEquals(3, read.getJob().getTargetStage());
     }
 
     @Test

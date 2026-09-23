@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.site;
 
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.net.Arrival;
 import me.mykindos.betterpvp.core.framework.net.LocalSiteDirectory;
 import me.mykindos.betterpvp.core.framework.net.PlayerTransfer;
 import me.mykindos.betterpvp.core.framework.net.RemoteInstance;
@@ -208,12 +209,13 @@ class NetworkPlacementTest {
     void arrivalIsRecordedBeforeTheTransfer() {
         final UUID player = UUID.randomUUID();
         final RemoteInstance remote = advertised("hub", THERE, 0);
-        directory.expect(player, remote);
+        directory.expect(player, new Arrival(remote, "barracks"));
 
-        final Optional<RemoteInstance> arrival = directory.claimArrival(player).join();
+        final Optional<Arrival> arrival = directory.claimArrival(player).join();
 
         assertTrue(arrival.isPresent());
-        assertEquals(remote.getId(), arrival.get().getId());
+        assertEquals(remote.getId(), arrival.get().getInstance().getId());
+        assertEquals("barracks", arrival.get().getLanding(), "where they land travels with them");
         assertTrue(directory.claimArrival(player).join().isEmpty(), "reading an arrival should consume it");
     }
 
