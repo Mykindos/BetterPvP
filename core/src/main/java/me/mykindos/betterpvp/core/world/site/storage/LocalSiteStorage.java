@@ -26,9 +26,6 @@ import java.util.concurrent.CompletableFuture;
 @CustomLog
 public class LocalSiteStorage implements SiteStorage {
 
-    /** What this store is named in config. */
-    public static final String NAME = "local";
-
     private static final String EXTENSION = ".json";
     private static final String PENDING_EXTENSION = ".writing";
 
