@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
+import me.mykindos.betterpvp.core.world.settler.SettlerTable;
 import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
 import me.mykindos.betterpvp.core.world.settler.morale.MoraleModel;
@@ -207,6 +208,11 @@ public class CampSettlers implements SettlerSite {
     @Override
     public @NotNull Duration strikeLimit(@NotNull SiteKey site) {
         return config.getStrikeLimit();
+    }
+
+    @Override
+    public @NotNull Optional<SettlerTable> table(@NotNull SiteKey site) {
+        return Optional.of(config.getTable());
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
+import me.mykindos.betterpvp.clans.world.camp.settler.recruit.SettlerBoatEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -19,7 +20,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-/** Tells a camp's online members when its settlers strike over wages, go back to work, or leave unpaid or unhappy. */
+/**
+ * Tells a camp's online members when settlers arrive at the Dock, strike over wages, go back to work, or leave unpaid
+ * or unhappy.
+ */
 @BPvPListener
 @Singleton
 public class SettlerNotices implements Listener {
@@ -37,6 +41,13 @@ public class SettlerNotices implements Listener {
                         ? "clans.camp.hall.wages.strike_started" : "clans.camp.hall.wages.strike_ended",
                 Component.text(event.getSettlers().size()))
                 .color(event.isStriking() ? NamedTextColor.RED : NamedTextColor.GREEN));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onBoat(@NotNull SettlerBoatEvent event) {
+        tell(event.getSite(), Translations.component(event.isMilestone()
+                ? "clans.settler.recruit.milestone_arrived" : "clans.settler.recruit.boat_arrived")
+                .color(NamedTextColor.GREEN));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

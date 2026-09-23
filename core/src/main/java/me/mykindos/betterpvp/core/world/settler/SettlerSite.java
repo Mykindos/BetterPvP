@@ -98,6 +98,11 @@ public interface SettlerSite {
         return Duration.ofHours(72);
     }
 
+    /** What new settlers for the site are rolled from, or empty if none can be rolled for it. */
+    default @NotNull Optional<SettlerTable> table(@NotNull SiteKey site) {
+        return Optional.empty();
+    }
+
     /** How the site's settlers feel, or empty if their morale never changes. */
     default @NotNull Optional<MoraleModel> moraleModel(@NotNull SiteKey site) {
         return Optional.empty();
