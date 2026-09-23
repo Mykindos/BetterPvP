@@ -148,7 +148,7 @@ The data, with nothing in the world yet.
     * Chronicler raises Prosperity.
     * Lookout warns online members when someone from outside the clan lands at the camp, once per visitor every five minutes.
   * `CampProsperity`: every settler is worth its rarity's value (10, 20, 40, 80), times 1 + the camp's average morale / 200, times any Chronicler. Worked out when asked, and written every ten minutes by the server holding the camp's world. Shown on the Steward's Settlers page.
-  * `ProsperityStore` interface. `DatabaseProsperityStore` (`camp_prosperity`, dropped with the clan) is what ships. `ProsperityStores` is the registry another network registers its own store with, chosen by `clans.camp.prosperity.store`, like `SiteStorages`.
+  * `ProsperityStore` interface, bound to `DatabaseProsperityStore` (`camp_prosperity`, dropped with the clan) in `ClansInjectorModule`, like `SiteInstanceStore` and `ResidencyStore`.
   * `ProsperityLeaderboard` ranks camps from the store, so camps not loaded anywhere still rank.
 * Cards: "Settler base model" gets its last part.
 

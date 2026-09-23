@@ -6,10 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Where each camp's Prosperity is kept so it can be ranked with the camp not loaded. The database is what ships, and
- * another network's storage is plugged in through {@link ProsperityStores}.
- */
+/** Where each camp's Prosperity is kept, so it can be ranked with the camp not loaded. */
 public interface ProsperityStore {
 
     /** Records {@code clanId}'s Prosperity, replacing what was there. */
@@ -23,7 +20,4 @@ public interface ProsperityStore {
 
     /** {@code clanId}'s last recorded Prosperity, if it has one. May block, like {@link #top}. */
     @NotNull OptionalInt find(long clanId);
-
-    default void close() {
-    }
 }

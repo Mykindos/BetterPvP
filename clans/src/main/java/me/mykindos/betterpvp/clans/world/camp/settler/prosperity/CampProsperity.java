@@ -37,17 +37,17 @@ public class CampProsperity implements Listener {
     private final CampWideTraits campWide;
     private final SettlerService settlers;
     private final SiteInstances instances;
-    private final ProsperityStores stores;
+    private final ProsperityStore store;
 
     @Inject
     public CampProsperity(@NotNull SettlerConfig config, @NotNull CampWideTraits campWide,
                           @NotNull SettlerService settlers, @NotNull SiteInstances instances,
-                          @NotNull ProsperityStores stores) {
+                          @NotNull ProsperityStore store) {
         this.config = config;
         this.campWide = campWide;
         this.settlers = settlers;
         this.instances = instances;
-        this.stores = stores;
+        this.store = store;
     }
 
     /** {@code key}'s Prosperity now, or 0 if its record is not loaded. */
@@ -74,13 +74,13 @@ public class CampProsperity implements Listener {
         for (SiteInstance instance : new ArrayList<>(instances.all())) {
             final SiteKey key = instance.getKey();
             if (key.getSiteId().equals(Camps.SITE_ID) && Bukkit.getWorld(instance.getWorldName()) != null) {
-                settlers.roster(key).ifPresent(roster -> stores.store().save(key.getOwnerId(), of(roster)));
+                settlers.roster(key).ifPresent(roster -> store.save(key.getOwnerId(), of(roster)));
             }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDisband(@NotNull ClanDisbandEvent event) {
-        stores.store().delete(event.getClan().getId());
+        store.delete(event.getClan().getId());
     }
 }
