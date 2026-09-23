@@ -12,10 +12,12 @@ import me.mykindos.betterpvp.core.world.settler.RarityNumbers;
 import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerTable;
+import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /** The numbers settlers run on, read from {@code settlers.yml}. */
 @Singleton
@@ -37,6 +40,15 @@ public class SettlerConfig implements Reloadable {
     private List<Integer> population = List.of();
     private final Map<String, WorkingCap> workingCaps = new HashMap<>();
     private final Map<String, Map<String, Object>> looks = new HashMap<>();
+    private final Map<SettlerRarity, BuilderNumbers> builders = new EnumMap<>(SettlerRarity.class);
+    private final Map<String, Trade> trades = new HashMap<>();
+    private final Map<String, Map<String, Double>> traitNumbers = new HashMap<>();
+    /** Limits on one job's crew. */
+    @Getter
+    private CrewLimits crewLimits = CrewLimits.NONE;
+    /** What every new camp starts with. */
+    @Getter
+    private List<Starter> startingSettlers = List.of();
 
     @Inject
     public SettlerConfig(@NotNull Clans clans) {
@@ -93,6 +105,68 @@ public class SettlerConfig implements Reloadable {
             }
         }
 
+        builders.clear();
+        for (SettlerRarity rarity : SettlerRarity.values()) {
+            final ConfigurationSection section = config.getConfigurationSection(
+                    "builders." + rarity.name().toLowerCase(Locale.ROOT));
+            if (section != null) {
+                builders.put(rarity, new BuilderNumbers(section.getInt("workforce", 1), section.getDouble("speed", 1),
+                        section.getDouble("efficiency", 0.5)));
+            }
+        }
+
+        trades.clear();
+        final ConfigurationSection tradeSection = config.getConfigurationSection("trades");
+        if (tradeSection != null) {
+            for (String trade : tradeSection.getKeys(false)) {
+                final ConfigurationSection section = tradeSection.getConfigurationSection(trade);
+                if (section != null) {
+                    trades.put(trade, new Trade(section.getString("resource"), section.getDouble("specialty", 0),
+                            section.getInt("workforce", 0), Set.copyOf(section.getStringList("compatible"))));
+                }
+            }
+        }
+
+        final Map<SettlerRarity, Integer> perRarity = new EnumMap<>(SettlerRarity.class);
+        final ConfigurationSection rarityLimits = config.getConfigurationSection("crews.per-rarity");
+        if (rarityLimits != null) {
+            for (SettlerRarity rarity : SettlerRarity.values()) {
+                final String name = rarity.name().toLowerCase(Locale.ROOT);
+                if (rarityLimits.contains(name)) {
+                    perRarity.put(rarity, rarityLimits.getInt(name));
+                }
+            }
+        }
+        crewLimits = new CrewLimits(config.getInt("crews.max-size", 5), config.getDouble("crews.max-speed", 4),
+                Map.copyOf(perRarity), config.getDouble("crews.compatible-bonus", 0.1));
+
+        traitNumbers.clear();
+        final ConfigurationSection traitSection = config.getConfigurationSection("traits");
+        if (traitSection != null) {
+            for (String trait : traitSection.getKeys(false)) {
+                final ConfigurationSection section = traitSection.getConfigurationSection(trait);
+                if (section == null) {
+                    continue;
+                }
+                final Map<String, Double> numbers = new HashMap<>();
+                section.getKeys(false).forEach(key -> numbers.put(key, section.getDouble(key)));
+                traitNumbers.put(trait, numbers);
+            }
+        }
+
+        final List<Starter> starters = new ArrayList<>();
+        for (Map<?, ?> starter : config.getMapList("starting-settlers")) {
+            final Object profession = starter.get("profession");
+            final Object rarity = starter.get("rarity");
+            try {
+                starters.add(new Starter(profession == null || "none".equals(profession) ? null : profession.toString(),
+                        SettlerRarity.valueOf(String.valueOf(rarity == null ? "common" : rarity).toUpperCase(Locale.ROOT))));
+            } catch (IllegalArgumentException exception) {
+                log.warn("Unknown rarity '{}' in settlers.yml starting-settlers", rarity).submit();
+            }
+        }
+        startingSettlers = List.copyOf(starters);
+
         workingCaps.clear();
         final ConfigurationSection professions = config.getConfigurationSection("professions");
         if (professions != null) {
@@ -145,6 +219,20 @@ public class SettlerConfig implements Reloadable {
                 size instanceof Number number ? number.doubleValue() : 1.0);
     }
 
+    /** What a Builder of {@code rarity} brings before its trade and traits. */
+    public @NotNull BuilderNumbers builder(@NotNull SettlerRarity rarity) {
+        return builders.getOrDefault(rarity, new BuilderNumbers(1, 1, 0.5));
+    }
+
+    public @NotNull Optional<Trade> trade(@Nullable String trade) {
+        return trade == null ? Optional.empty() : Optional.ofNullable(trades.get(trade));
+    }
+
+    /** One of {@code trait}'s numbers at common strength, or {@code fallback} if settlers.yml does not set it. */
+    public double trait(@NotNull String trait, @NotNull String number, double fallback) {
+        return traitNumbers.getOrDefault(trait, Map.of()).getOrDefault(number, fallback);
+    }
+
     /** How many settlers a camp can have with its Great Hall at {@code hallStage}, or -1 for no Great Hall. */
     public int population(int hallStage) {
         return byStage(population, hallStage);
@@ -161,6 +249,32 @@ public class SettlerConfig implements Reloadable {
             return 0;
         }
         return values.get(Math.min(stage, values.size() - 1));
+    }
+
+    /** What a Builder of one rarity brings before its trade and traits. */
+    @Value
+    public static class BuilderNumbers {
+        int workforce;
+        double speed;
+        double efficiency;
+    }
+
+    /** One Builder trade. */
+    @Value
+    public static class Trade {
+        /** The resource it specialises in, or null for none. */
+        @Nullable String resource;
+        /** Extra speed, as a share, on jobs whose cost is mostly that resource. */
+        double specialty;
+        int workforce;
+        Set<String> compatible;
+    }
+
+    /** One settler every new camp starts with. */
+    @Value
+    public static class Starter {
+        @Nullable String profession;
+        SettlerRarity rarity;
     }
 
     /** One profession's working cap. */

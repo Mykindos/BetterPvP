@@ -1,19 +1,24 @@
 package me.mykindos.betterpvp.core.world.settler;
 
+import me.mykindos.betterpvp.core.world.construction.Job;
+import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
+import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
+import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
 /**
  * Everything settlers need from the module that owns a kind of site: where its rosters are kept, how many settlers
- * each can hold, how they look and where in its world they gather and work. Registered per site id with the
- * {@link SettlerService}, so core never learns what the owner of a site is.
+ * each can hold, how they look, where in its world they gather and work, and what its Builders bring to a job.
+ * Registered per site id with the {@link SettlerService}, so core never learns what the owner of a site is.
  */
 public interface SettlerSite {
 
@@ -47,5 +52,24 @@ public interface SettlerSite {
 
     /** What happens when {@code player} right-clicks a settler. */
     default void interact(@NotNull Player player, @NotNull SiteKey site, @NotNull Settler settler) {
+    }
+
+    /**
+     * What {@code settler} brings to {@code job} while working beside {@code crew}, which includes it, or empty if it
+     * cannot build.
+     */
+    default @NotNull Optional<BuilderStats> builderStats(@NotNull SiteKey site, @NotNull Settler settler,
+                                                         @NotNull PlacedStructure structure, @NotNull Job job,
+                                                         @NotNull List<Settler> crew) {
+        return Optional.empty();
+    }
+
+    default @NotNull CrewLimits crewLimits(@NotNull SiteKey site) {
+        return CrewLimits.NONE;
+    }
+
+    /** Called once when a job its crew worked on finishes, before the crew is let go. */
+    default void crewFinished(@NotNull SiteKey site, @NotNull PlacedStructure structure, @NotNull Job job,
+                              @NotNull List<Settler> crew) {
     }
 }

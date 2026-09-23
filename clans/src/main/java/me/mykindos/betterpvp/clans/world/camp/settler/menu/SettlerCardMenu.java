@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * One settler: who it is, where it came from, what it does and how it feels, with buttons to put it to work or send
@@ -131,7 +132,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                 .build());
     }
 
-    /** Farmers are sent to and called back from the farm here. Builders join crews from the construction menu. */
+    /** Farmers are sent to and called back from the farm here. Builders open their crew, or the jobs they could join. */
     private void assignButton() {
         if (profession == null) {
             return;
@@ -139,8 +140,16 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         if (profession.getWorkplaceKind() == WorkplaceKind.CONSTRUCTION) {
             setItem(29, new SimpleItem(ItemView.builder()
                     .material(Material.BRICKS)
-                    .displayName(Translations.component("clans.settler.card.crews").color(NamedTextColor.GRAY))
-                    .build()));
+                    .displayName(Translations.component("clans.settler.card.crews").color(NamedTextColor.GREEN))
+                    .action(ClickActions.ALL, Translations.component("clans.settler.crew.open"))
+                    .build(), click -> {
+                        final UUID job = structureId(settler.getAssignment());
+                        if (job == null) {
+                            cards.getCrews().openJobs(click.getPlayer());
+                        } else {
+                            cards.getCrews().openCrew(click.getPlayer(), job);
+                        }
+                    }));
             return;
         }
 
@@ -190,6 +199,17 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                         Component.text(settler.getName(), settler.getRarity().getColor())).color(NamedTextColor.GRAY));
             }
         }));
+    }
+
+    private static @Nullable UUID structureId(@Nullable String assignment) {
+        if (assignment == null) {
+            return null;
+        }
+        try {
+            return UUID.fromString(assignment);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     @Override

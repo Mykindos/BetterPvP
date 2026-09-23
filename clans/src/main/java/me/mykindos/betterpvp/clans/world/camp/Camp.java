@@ -36,6 +36,9 @@ public class Camp {
     /** The settlers living in the camp. */
     private Roster roster = new Roster();
 
+    /** Whether the camp has been given the settlers every camp starts with. */
+    private boolean startingSettlers;
+
     /** Resource balance, by resource id. */
     private Map<String, Integer> resources = new LinkedHashMap<>();
 
