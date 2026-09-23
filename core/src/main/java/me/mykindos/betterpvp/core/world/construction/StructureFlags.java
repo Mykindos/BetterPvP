@@ -5,7 +5,7 @@ import lombok.Value;
 
 /** What a structure type allows and how it starts out. */
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class StructureFlags {
 
     @Builder.Default
