@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentSerializationRegistry;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import net.kyori.adventure.text.Component;
@@ -38,7 +39,7 @@ public class StructureBlueprintItem extends BaseItem {
         final Component structure = item.getComponent(StructureBlueprintComponent.class)
                 .flatMap(component -> catalogue.find(component.getStructure()))
                 .map(StructureType::getDisplayName)
-                .orElse(Component.text("Structure"));
-        return Component.text("Blueprint: ", TextColor.color(60, 125, 222)).append(structure);
+                .orElse(Translations.component("core.item.structure_blueprint.unknown"));
+        return Translations.component("core.item.structure_blueprint.name", structure).color(TextColor.color(60, 125, 222));
     }
 }
