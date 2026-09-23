@@ -11,11 +11,13 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.world.site.Admission;
+import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstanceDormantEvent;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import me.mykindos.betterpvp.core.world.site.SiteOwners;
 import me.mykindos.betterpvp.core.world.site.SiteOwnership;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -69,6 +71,23 @@ public class Camps implements Listener, SiteOwnership {
 
     public static @NotNull SiteKey keyFor(@NotNull Clan clan) {
         return keyFor(clan.getId());
+    }
+
+    /** The clan whose camp {@code world} is, if it is a camp. */
+    public @NotNull OptionalLong clanOf(@NotNull World world) {
+        return instances.byWorld(world.getName())
+                .map(SiteInstance::getKey)
+                .filter(key -> key.getSiteId().equals(SITE_ID))
+                .map(key -> OptionalLong.of(key.getOwnerId()))
+                .orElseGet(OptionalLong::empty);
+    }
+
+    /** Whether {@code player} belongs to the clan whose camp {@code world} is. */
+    public boolean isMember(@NotNull Player player, @NotNull World world) {
+        final OptionalLong clan = clanOf(world);
+        return clan.isPresent() && clanManager.getClanByPlayer(player)
+                .map(own -> own.getId() == clan.getAsLong())
+                .orElse(false);
     }
 
     @Override
