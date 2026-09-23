@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
 import me.mykindos.betterpvp.core.world.content.WorldContentService;
 import me.mykindos.betterpvp.core.world.content.WorldSites;
+import me.mykindos.betterpvp.clans.world.camp.protection.CampGrounds;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.StartingCamp;
 import me.mykindos.betterpvp.clans.world.model.Dock;
@@ -35,20 +36,23 @@ public class CampContent {
     private final WorldContent structures;
     private final WorldContent buildZones = new BuildZones();
     private final StartingCamp startingCamp;
+    private final CampGrounds grounds;
 
     @Inject
     private CampContent(@NotNull WorldContentService contentService, @NotNull Clans clans, @NotNull WorldSites sites,
                         @NotNull ClientManager clientManager, @NotNull ClansSceneObjectFactory clansSceneFactory,
                         @NotNull StructureViews views, @NotNull CampConstruction construction,
-                        @NotNull CampStructures campStructures, @NotNull StartingCamp startingCamp) {
+                        @NotNull CampStructures campStructures, @NotNull StartingCamp startingCamp,
+                        @NotNull CampGrounds grounds) {
         this.clientManager = clientManager;
         this.clansSceneFactory = clansSceneFactory;
         this.structures = views.content();
         this.startingCamp = startingCamp;
+        this.grounds = grounds;
         contentService.register(clans, new WorldContentBinding(sites.selector(Camps.SITE_ID), this::content));
     }
 
     private @NotNull List<WorldContent> content() {
-        return List.of(new Dock(clientManager, clansSceneFactory), buildZones, startingCamp, structures);
+        return List.of(grounds, new Dock(clientManager, clansSceneFactory), buildZones, startingCamp, structures);
     }
 }
