@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.construction;
 
 import dev.brauw.mapper.region.CuboidRegion;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
@@ -8,7 +9,6 @@ import me.mykindos.betterpvp.core.world.zone.RegionBounds;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneRuleContainer;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ public final class BuildZones implements WorldContent {
             final Zone.ZoneBuilder builder = Zone.builder()
                     .key(Key.key("core", "build_zone_" + sanitise(world.getName()) + "_"
                             + region.getId().toString().toLowerCase(Locale.ROOT)))
-                    .displayName(Component.text("Build zone"))
+                    .displayName(Translations.component("core.construction.build_zone"))
                     .bounds(RegionBounds.of(region))
                     .priority(0)
                     .rules(new ZoneRuleContainer())

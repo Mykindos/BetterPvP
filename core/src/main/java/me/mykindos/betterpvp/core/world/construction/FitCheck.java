@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.world.construction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.zone.Zone;
@@ -48,18 +49,24 @@ public class FitCheck {
                                                 @Nullable UUID ignoring) {
         final Footprint footprint = placement.getFootprint();
         if (!insideBuildZones(world, footprint, type.getRequiredZoneTag())) {
-            return Optional.of(type.getRequiredZoneTag() == null
-                    ? Component.text("It has to go entirely inside a build zone.", NamedTextColor.RED)
-                    : Component.text("It has to go entirely inside a " + type.getRequiredZoneTag().replace('_', ' ')
-                    + " build zone.", NamedTextColor.RED));
+            final String tag = type.getRequiredZoneTag();
+            return Optional.of((tag == null
+                    ? Translations.component("core.construction.outside_build_zone")
+                    : Translations.component("core.construction.outside_tagged_build_zone", zoneTag(tag)))
+                    .color(NamedTextColor.RED));
         }
 
         for (Footprint other : occupied(world, holding, ignoring)) {
             if (footprint.intersects(other)) {
-                return Optional.of(Component.text("It would overlap another structure.", NamedTextColor.RED));
+                return Optional.of(Translations.component("core.construction.overlaps").color(NamedTextColor.RED));
             }
         }
         return Optional.empty();
+    }
+
+    /** A zone tag's name for players, falling back to the tag itself for one without a translation. */
+    private static @NotNull Component zoneTag(@NotNull String tag) {
+        return Component.translatable("core.construction.zone_tag." + tag, tag.replace('_', ' '));
     }
 
     private boolean insideBuildZones(@NotNull World world, @NotNull Footprint footprint, @Nullable String requiredTag) {

@@ -3,7 +3,9 @@ package me.mykindos.betterpvp.core.world.construction;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
+import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +27,8 @@ public class ConstructionResult {
         return new ConstructionResult(false, reason, null);
     }
 
-    public static @NotNull ConstructionResult refused(@NotNull String reason) {
-        return refused(Component.text(reason, NamedTextColor.RED));
+    /** Refused with the message under translation key {@code key}. */
+    public static @NotNull ConstructionResult refused(@NotNull String key, @NotNull ComponentLike... args) {
+        return refused(Translations.component(key, args).color(NamedTextColor.RED));
     }
 }
