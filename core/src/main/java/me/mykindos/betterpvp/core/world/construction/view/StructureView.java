@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.world.construction.view;
 
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -21,6 +23,7 @@ import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -183,14 +186,16 @@ final class StructureView {
     private static @NotNull Component label(@NotNull StructureType type, @NotNull PlacedStructure structure,
                                             @NotNull StructureStatus status, long now) {
         final Component state = switch (status) {
-            case UNDER_CONSTRUCTION -> timed(isBuilding(structure) ? "Building" : "Moving", structure, now);
-            case UPGRADING -> timed("Upgrading", structure, now);
-            case READY_TO_CLAIM -> Component.text("Ready - click to claim", NamedTextColor.GREEN);
-            case PAUSED -> Component.text("Paused", NamedTextColor.RED);
-            case DISABLED -> structure.getJob() == null ? Component.text("Disabled", NamedTextColor.RED)
-                    : timed("Repairing", structure, now);
-            case NEEDS_REPAIR -> structure.getJob() == null ? Component.text("Needs repair", NamedTextColor.RED)
-                    : timed("Repairing", structure, now);
+            case UNDER_CONSTRUCTION -> timed(isBuilding(structure) ? "building" : "moving", structure, now);
+            case UPGRADING -> timed("upgrading", structure, now);
+            case READY_TO_CLAIM -> Translations.component("core.construction.label.ready").color(NamedTextColor.GREEN);
+            case PAUSED -> Translations.component("core.construction.label.paused").color(NamedTextColor.RED);
+            case DISABLED -> structure.getJob() == null
+                    ? Translations.component("core.construction.label.disabled").color(NamedTextColor.RED)
+                    : timed("repairing", structure, now);
+            case NEEDS_REPAIR -> structure.getJob() == null
+                    ? Translations.component("core.construction.label.needs_repair").color(NamedTextColor.RED)
+                    : timed("repairing", structure, now);
             case ACTIVE, NOT_PLACED -> null;
         };
         if (state == null) {
@@ -199,18 +204,10 @@ final class StructureView {
         return type.getDisplayName().decorate(TextDecoration.BOLD).appendNewline().append(state);
     }
 
+    /** A label line saying what is being done and how long is left, under {@code core.construction.label.<doing>}. */
     private static @NotNull Component timed(@NotNull String doing, @NotNull PlacedStructure structure, long now) {
-        return Component.text(doing + " · ", NamedTextColor.YELLOW)
-                .append(Component.text(duration(structure.getJob().remainingMillis(now)), NamedTextColor.WHITE));
-    }
-
-    private static @NotNull String duration(long millis) {
-        final long seconds = (millis + 999) / 1000;
-        final long hours = seconds / 3600;
-        final long minutes = (seconds % 3600) / 60;
-        if (hours > 0) {
-            return hours + "h " + minutes + "m";
-        }
-        return minutes > 0 ? minutes + "m " + (seconds % 60) + "s" : seconds + "s";
+        final Duration left = Duration.ofMillis(structure.getJob().remainingMillis(now));
+        return Translations.component("core.construction.label." + doing,
+                Component.text(UtilTime.humanReadableFormat(left), NamedTextColor.WHITE)).color(NamedTextColor.YELLOW);
     }
 }

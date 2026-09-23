@@ -4,10 +4,13 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -37,17 +40,20 @@ public class StructureBlueprintSubCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        final Component prefix = Translations.component("core.prefix.construction");
         if (args.length < 1) {
-            UtilMessage.simpleMessage(player, StructureCommand.PREFIX, "Usage: /structure blueprint <type>");
+            UtilMessage.message(player, prefix, Translations.component("core.construction.command.blueprint.usage"));
             return;
         }
 
         final Optional<StructureType> type = catalogue.find(args[0]);
         if (type.isEmpty()) {
-            UtilMessage.simpleMessage(player, StructureCommand.PREFIX, "<red>No structure type called '%s'.", args[0]);
+            UtilMessage.message(player, prefix, Translations.component("core.construction.command.blueprint.unknown",
+                    Component.text(args[0])).color(NamedTextColor.RED));
             return;
         }
         player.getInventory().addItem(blueprints.blueprintFor(type.get()));
-        UtilMessage.simpleMessage(player, StructureCommand.PREFIX, "Here is a blueprint for <green>%s</green>.", args[0]);
+        UtilMessage.message(player, prefix, Translations.component("core.construction.command.blueprint.given",
+                type.get().getDisplayName().color(NamedTextColor.GREEN)));
     }
 }
