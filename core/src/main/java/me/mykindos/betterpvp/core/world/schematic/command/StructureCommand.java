@@ -34,6 +34,6 @@ public class StructureCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilMessage.simpleMessage(player, PREFIX, "Usage: /structure <save|paste|layers|undo|ghost>");
+        UtilMessage.simpleMessage(player, PREFIX, "Usage: /structure <save|paste|layers|undo|ghost|blueprint>");
     }
 }

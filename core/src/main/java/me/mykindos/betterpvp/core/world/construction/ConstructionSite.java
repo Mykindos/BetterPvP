@@ -35,6 +35,11 @@ public interface ConstructionSite {
         return Optional.empty();
     }
 
+    /** How many of a structure's top layers are held back until it is claimed, then animate in. */
+    default int claimLayers() {
+        return 3;
+    }
+
     default @NotNull List<JobRule> jobRules() {
         return List.of();
     }
