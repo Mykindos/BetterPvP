@@ -6,7 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -133,7 +135,7 @@ public class StructureViews implements Listener {
     void claim(@NotNull Player player, @NotNull World world, @NotNull UUID structure) {
         final ConstructionResult result = service.claim(player, world, structure);
         if (!result.isSuccess() && result.getReason() != null) {
-            player.sendMessage(result.getReason());
+            UtilMessage.message(player, Translations.component("core.prefix.construction"), result.getReason());
         }
     }
 

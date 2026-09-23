@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
@@ -126,7 +128,7 @@ public class BlueprintSessions implements Listener {
         final Session session = sessions.get(player.getUniqueId());
         final Location anchor = anchor(player);
         if (session == null || anchor == null) {
-            player.sendActionBar(Component.text("Look at the ground where it should go.", NamedTextColor.RED));
+            player.sendActionBar(Translations.component("core.construction.blueprint.look_at_ground").color(NamedTextColor.RED));
             return;
         }
 
@@ -134,15 +136,15 @@ public class BlueprintSessions implements Listener {
                 session.quarterTurns);
         if (!result.isSuccess()) {
             if (result.getReason() != null) {
-                player.sendMessage(result.getReason());
+                UtilMessage.message(player, Translations.component("core.prefix.construction"), result.getReason());
             }
             return;
         }
 
         player.getInventory().getItemInMainHand().subtract();
         end(player);
-        player.sendMessage(Component.text("Construction started: ", NamedTextColor.GREEN)
-                .append(held.get().getDisplayName()));
+        UtilMessage.message(player, Translations.component("core.prefix.construction"),
+                Translations.component("core.construction.blueprint.started", held.get().getDisplayName()));
     }
 
     @EventHandler
@@ -178,7 +180,8 @@ public class BlueprintSessions implements Listener {
                 session.quarterTurns);
         session.preview.setValid(problem.isEmpty());
         session.preview.show(anchor, session.quarterTurns);
-        player.sendActionBar(problem.orElse(Component.text("Right-click to build · sneak to turn", NamedTextColor.GREEN)));
+        player.sendActionBar(problem.orElse(Translations.component("core.construction.blueprint.hint")
+                .color(NamedTextColor.GREEN)));
     }
 
     private void end(@NotNull Player player) {
