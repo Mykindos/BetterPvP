@@ -283,6 +283,7 @@ public class ConstructionService {
             for (StructureContents contents : worksite.site.contents()) {
                 contents.drop(worksite.key, structure, centre);
             }
+            StructureStorage.drop(structure, centre);
             return ConstructionResult.done(structure);
         });
     }
