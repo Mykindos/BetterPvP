@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
@@ -16,6 +17,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
@@ -23,8 +25,9 @@ import java.util.Locale;
 /** Every job running in a camp, with how its crew stands. Clicking one opens its crew. */
 public class CrewJobsMenu extends AbstractGui implements Windowed {
 
-    CrewJobsMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull ConstructionService.Worksite worksite) {
-        super(9, 3);
+    CrewJobsMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull ConstructionService.Worksite worksite,
+                 @Nullable Windowed previous) {
+        super(9, 4);
         final long now = menus.getConstruction().now();
         final List<PlacedStructure> running = worksite.getHolding().getStructures().stream()
                 .filter(structure -> structure.getJob() != null && !structure.getJob().isDone(now))
@@ -40,8 +43,9 @@ public class CrewJobsMenu extends AbstractGui implements Windowed {
             final PlacedStructure structure = running.get(i);
             setItem(i, new SimpleItem(CrewMenu.summary(menus, worksite, structure, icon(menus, structure))
                     .action(ClickActions.ALL, Translations.component("clans.settler.crew.open"))
-                    .build(), click -> menus.openCrew(click.getPlayer(), structure.getId())));
+                    .build(), click -> menus.openCrew(click.getPlayer(), structure.getId(), previous)));
         }
+        setItem(31, new BackButton(previous));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 

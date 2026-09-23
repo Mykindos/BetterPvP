@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentBinding;
 import me.mykindos.betterpvp.core.world.content.WorldContentService;
 import me.mykindos.betterpvp.core.world.content.WorldSites;
+import me.mykindos.betterpvp.clans.world.camp.hall.Steward;
 import me.mykindos.betterpvp.clans.world.camp.protection.CampGrounds;
 import me.mykindos.betterpvp.clans.world.camp.settler.StarterCrew;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
@@ -38,6 +39,7 @@ public class CampContent {
     private final WorldContent structures;
     private final WorldContent settlers;
     private final StarterCrew starterCrew;
+    private final WorldContent steward;
     private final WorldContent buildZones = new BuildZones();
     private final StartingCamp startingCamp;
     private final CampGrounds grounds;
@@ -48,12 +50,13 @@ public class CampContent {
                         @NotNull StructureViews views, @NotNull CampConstruction construction,
                         @NotNull CampStructures campStructures, @NotNull StartingCamp startingCamp,
                         @NotNull CampGrounds grounds, @NotNull SettlerPresence settlerPresence,
-                        @NotNull StarterCrew starterCrew) {
+                        @NotNull StarterCrew starterCrew, @NotNull Steward steward) {
         this.clientManager = clientManager;
         this.clansSceneFactory = clansSceneFactory;
         this.structures = views.content();
         this.settlers = settlerPresence.content();
         this.starterCrew = starterCrew;
+        this.steward = steward.content();
         this.startingCamp = startingCamp;
         this.grounds = grounds;
         contentService.register(clans, new WorldContentBinding(sites.selector(Camps.SITE_ID), this::content));
@@ -61,6 +64,6 @@ public class CampContent {
 
     private @NotNull List<WorldContent> content() {
         return List.of(grounds, new Dock(clientManager, clansSceneFactory, false), buildZones, startingCamp, starterCrew,
-                structures, settlers);
+                structures, settlers, steward);
     }
 }

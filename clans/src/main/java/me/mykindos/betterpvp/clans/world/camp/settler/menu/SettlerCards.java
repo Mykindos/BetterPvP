@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.TraitRegistry;
+import me.mykindos.betterpvp.core.world.settler.wage.Payroll;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -30,14 +31,17 @@ public class SettlerCards {
     private final TraitRegistry traits;
     @Getter(AccessLevel.PACKAGE)
     private final CrewMenus crews;
+    @Getter(AccessLevel.PACKAGE)
+    private final Payroll payroll;
 
     @Inject
     public SettlerCards(@NotNull SettlerService service, @NotNull ProfessionRegistry professions,
-                        @NotNull TraitRegistry traits, @NotNull CrewMenus crews) {
+                        @NotNull TraitRegistry traits, @NotNull CrewMenus crews, @NotNull Payroll payroll) {
         this.service = service;
         this.professions = professions;
         this.traits = traits;
         this.crews = crews;
+        this.payroll = payroll;
     }
 
     /** Shows {@code player} the card of settler {@code settlerId}, if it still lives at {@code site}. */

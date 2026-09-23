@@ -13,10 +13,14 @@ import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerTable;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
+import me.mykindos.betterpvp.core.world.settler.wage.FixedWageModel;
+import me.mykindos.betterpvp.core.world.settler.wage.IdleWorkingWageModel;
+import me.mykindos.betterpvp.core.world.settler.wage.WageModel;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -49,6 +53,12 @@ public class SettlerConfig implements Reloadable {
     /** What every new camp starts with. */
     @Getter
     private List<Starter> startingSettlers = List.of();
+    /** How settlers are paid. */
+    @Getter
+    private WageModel wageModel = new FixedWageModel(Map.of());
+    /** How long a settler strikes before it leaves. */
+    @Getter
+    private Duration strikeLimit = Duration.ofHours(72);
 
     @Inject
     public SettlerConfig(@NotNull Clans clans) {
@@ -167,6 +177,18 @@ public class SettlerConfig implements Reloadable {
         }
         startingSettlers = List.copyOf(starters);
 
+        strikeLimit = Duration.ofMinutes((long) (config.getDouble("wages.strike-hours", 72) * 60));
+        final String model = config.getString("wages.model", "fixed");
+        if ("idle-working".equalsIgnoreCase(model)) {
+            wageModel = new IdleWorkingWageModel(rates(config.getConfigurationSection("wages.idle-working.idle")),
+                    rates(config.getConfigurationSection("wages.idle-working.working")));
+        } else {
+            if (!"fixed".equalsIgnoreCase(model)) {
+                log.warn("Unknown wage model '{}' in settlers.yml, paying fixed wages", model).submit();
+            }
+            wageModel = new FixedWageModel(rates(config.getConfigurationSection("wages.fixed")));
+        }
+
         workingCaps.clear();
         final ConfigurationSection professions = config.getConfigurationSection("professions");
         if (professions != null) {
@@ -180,6 +202,25 @@ public class SettlerConfig implements Reloadable {
                         List.copyOf(professions.getIntegerList(profession + ".by-hall-stage")), perStage));
             }
         }
+    }
+
+    /** Coins an hour by profession and rarity, from a {@code profession: {rarity: coins}} section. */
+    private static @NotNull Map<String, Map<SettlerRarity, Double>> rates(@Nullable ConfigurationSection section) {
+        final Map<String, Map<SettlerRarity, Double>> rates = new HashMap<>();
+        if (section == null) {
+            return rates;
+        }
+        for (String profession : section.getKeys(false)) {
+            final Map<SettlerRarity, Double> byRarity = new EnumMap<>(SettlerRarity.class);
+            for (SettlerRarity rarity : SettlerRarity.values()) {
+                final String path = profession + "." + rarity.name().toLowerCase(Locale.ROOT);
+                if (section.contains(path)) {
+                    byRarity.put(rarity, section.getDouble(path));
+                }
+            }
+            rates.put(profession, byRarity);
+        }
+        return rates;
     }
 
     private static @NotNull Map<String, Object> values(@NotNull ConfigurationSection section) {
@@ -204,6 +245,11 @@ public class SettlerConfig implements Reloadable {
     public @NotNull SettlerLook look(@Nullable String profession, @NotNull SettlerRarity rarity) {
         final String id = profession == null ? "none" : profession;
         return look(List.of("default", id, id + "." + rarity.name().toLowerCase(Locale.ROOT)));
+    }
+
+    /** A look named in settlers.yml, such as the Steward's, over the default. */
+    public @NotNull SettlerLook look(@NotNull String id) {
+        return look(List.of("default", id));
     }
 
     private @NotNull SettlerLook look(@NotNull List<String> layers) {

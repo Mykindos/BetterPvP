@@ -7,6 +7,7 @@ What we are building is in the [Settlers PRD](https://outline.betterpvp.net/doc/
 * **Core, `world/settler/`:** the framework. A settler, its profession, traits, morale, the roster it lives in, the NPC that shows it, and how it staffs a construction job. Core never learns what a clan is. Owners are a `SiteKey`, like construction.
 * **Clans, `world/camp/settler/`:** the vocabulary and the numbers. Builder and Farmer, wages in coins, Dock arrivals, the hiring board, the Great Hall roster menu, Prosperity.
 * **Numbers live in `configs/settlers.yml`.** Code says what exists and what it does, config says how much.
+* **Players manage everything in the world, not with commands.** The Steward in the Great Hall opens one menu with the rest nested under it. Commands are for staff only.
 * **Every store sits behind an interface**, as with `SiteStorage` and `Placement`. The roster rides on the camp record, which already goes through `SiteStorage`. Prosperity gets its own `ProsperityStore`.
 
 ## How it connects to what exists
@@ -80,16 +81,22 @@ The data, with nothing in the world yet.
 * Tests for threshold, speed, compatibility, caps, trait effects and releasing crews.
 * Cards: "Job staffing rules", "Worker traits", "Worker cap".
 
-### S4. Wages
+### S4. Wages and the Steward
 
 * Core
   * `WageModel` interface, chosen by config.
-    * `FixedWageModel`: a rate per Builder type over real time.
-    * `IdleWorkingWageModel`: an idle rate, and a higher one while on a job.
-  * `Payroll`: charges wages from a `CoinAccount` interface in real time, computed from timestamps like jobs, so it is right even while the camp world is closed.
-  * Unpaid Builders go on strike at once (a `StrikeRule` holds their jobs) and leave after 3 days still unpaid.
+    * `FixedWageModel`: a rate per profession and rarity over real time.
+    * `IdleWorkingWageModel`: an idle rate, and a higher one while working.
+  * `CoinAccount` interface: where a site's wages come from.
+  * `Payroll`: settles wages from the last settlement's timestamp, so a camp closed for a day is charged for the day when its world opens. Only the server holding a camp's world settles it, so two servers never charge one fund. Part coins carry over.
+  * When the fund runs out, every paid settler strikes from the moment it ran out. Strikers are not paid, bring nothing to a crew, and go back to what they were doing once the fund can pay a minute for everyone. A striker still unpaid after the strike limit leaves (`SettlerLeaveReason.UNPAID`).
+  * `SettlerSite` gains `wageModel`, `wageFund`, `wageMultiplier` and `strikeLimit`.
 * Clans
-  * The wage fund lives on the camp record. `CampWageFund` implements `CoinAccount`. Members pay coins in at the Great Hall roster.
+  * The wage fund lives on the camp record. `CampWageFund` implements `CoinAccount`. Greedy asks for 25% more.
+  * **The Steward:** one NPC on the Great Hall's `steward` point, which moves with the hall. Right-clicking it opens the Great Hall menu, the hub for everything a clan manages there: Wages, Crews, Construction and Permissions, each a nested menu with Back.
+  * The wage fund menu shows the fund, the hourly cost, how long it lasts and who is striking. Members whose rank may PAY put in 1,000, 10,000 or 100,000 coins.
+  * Online members are told when settlers strike, return or leave unpaid. A settler's card shows its wage.
+  * `/clan crews` is gone. The crews menu is reached from the Steward.
 * Cards: "Wages and strikes".
 
 ### S5. Morale, losses and the roster
@@ -99,7 +106,7 @@ The data, with nothing in the world yet.
   * Higher morale strengthens resident bonuses through one multiplier every workplace reads.
   * `FoodSource` interface with nothing behind it yet. The Granary and Mill plug in when they exist.
 * Clans
-  * `SettlerRosterMenu` at the Great Hall and `/clan settlers`: everyone, with filters by profession and state, the wage fund, caps and Prosperity.
+  * `SettlerRosterMenu`, a Settlers page in the Steward's Great Hall menu: everyone, with filters by profession and state, the wage fund, caps and Prosperity.
   * Entry notices for strikes and settlers who left.
 * Cards: part of "Settler base model".
 
