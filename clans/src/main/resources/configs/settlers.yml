@@ -24,6 +24,51 @@ professions:
   farmer:
     by-hall-stage: [2, 2, 2]
 
+# What a Builder brings to a job, by rarity. workforce counts toward a job's threshold. speed is how many times faster
+# than its listed time it would run a job alone. efficiency is the share of its speed it adds when it is not the
+# fastest on the crew.
+builders:
+  common: {workforce: 2, speed: 1.0, efficiency: 0.50}
+  uncommon: {workforce: 3, speed: 1.25, efficiency: 0.60}
+  rare: {workforce: 4, speed: 1.6, efficiency: 0.75}
+  legendary: {workforce: 6, speed: 2.2, efficiency: 0.90}
+
+# Builder trades. resource and specialty: extra speed, as a share, on jobs whose cost is mostly that resource.
+# workforce: extra Workforce. compatible: trades it works best beside, counting fully on the crew with a bonus.
+trades:
+  mason: {resource: stone, specialty: 0.5, compatible: [carpenter, smith]}
+  carpenter: {resource: wood, specialty: 0.5, compatible: [mason, laborer]}
+  smith: {resource: iron, specialty: 0.5, compatible: [mason]}
+  laborer: {workforce: 1, compatible: [carpenter]}
+
+# Limits on one job's crew.
+crews:
+  max-size: 5
+  max-speed: 4.0
+  compatible-bonus: 0.10
+  per-rarity: {rare: 2, legendary: 1}
+
+# How strong each trait is at common rarity. Rarer settlers multiply the good part by their trait-strength, and never
+# the cost of a trade-off. Shares are fractions, so 0.15 is 15%.
+traits:
+  steady_hands: {workforce: 1}
+  tireless: {speed: 0.15, min-hours: 2}
+  frugal: {refund: 0.05}
+  foreman: {crew-speed: 0.10}
+  quick_study: {speed-per-five-jobs: 0.05, max-speed: 0.25}
+  patcher: {speed: 0.20, refund: 0.20}
+  architects_eye: {speed: 0.15}
+  loner: {alone: 0.40, in-crew: -0.20}
+  greedy: {speed: 0.15}
+  brawny: {workforce: 2, speed: -0.10}
+  prodigy: {stats: 0.25}
+  homesick: {stats: 0.10}
+
+# Settlers every new camp starts with, so it has a crew for its first jobs.
+starting-settlers:
+  - {profession: builder, rarity: common}
+  - {profession: builder, rarity: common}
+
 # How settlers look. 'default' is used for anything a profession does not set, and for any model or skin that is
 # not installed yet, so settlers show up before their own models exist. A profession ('builder', 'farmer', or 'none'
 # for settlers without one) overrides it, and its 'rarities' section overrides that again for one rarity.
@@ -88,6 +133,8 @@ names:
 # History lines by where a settler came from, as translation keys. {0} in a line is filled in by the source, such as
 # the dungeon a prisoner was freed from.
 histories:
+  starting:
+    - clans.settler.history.starting.1
   dock:
     - clans.settler.history.dock.1
     - clans.settler.history.dock.2

@@ -134,8 +134,10 @@ public class CampConfig implements Reloadable {
         for (Map<?, ?> stage : section.getMapList("stages")) {
             final Object schematic = stage.get("schematic");
             final Object seconds = stage.get("build-seconds");
+            final Object workforce = stage.get("workforce");
             stages.add(new StructureStage(schematic == null ? id : schematic.toString(),
-                    cost(stage.get("cost")), Duration.ofSeconds(seconds instanceof Number number ? number.longValue() : 0)));
+                    cost(stage.get("cost")), Duration.ofSeconds(seconds instanceof Number number ? number.longValue() : 0),
+                    workforce instanceof Number number ? number.intValue() : 0));
         }
         if (stages.isEmpty()) {
             log.warn("Camp structure '{}' has no stages in camps.yml", id).submit();

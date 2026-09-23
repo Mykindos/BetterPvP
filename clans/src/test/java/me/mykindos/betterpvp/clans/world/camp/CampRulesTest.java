@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
+import me.mykindos.betterpvp.core.world.settler.crew.CrewRule;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -61,7 +62,7 @@ class CampRulesTest {
         resources = new CampResources(store, chests);
         permissions = new CampPermissions(clanManager, store, config);
         construction = new CampConstruction(store, resources, permissions, config,
-                new ResourceOverflow(store, resources, config), mock(ConstructionService.class));
+                new ResourceOverflow(store, resources, config), mock(CrewRule.class), mock(ConstructionService.class));
     }
 
     @Test

@@ -28,13 +28,16 @@ public class SettlerCards {
     private final ProfessionRegistry professions;
     @Getter(AccessLevel.PACKAGE)
     private final TraitRegistry traits;
+    @Getter(AccessLevel.PACKAGE)
+    private final CrewMenus crews;
 
     @Inject
     public SettlerCards(@NotNull SettlerService service, @NotNull ProfessionRegistry professions,
-                        @NotNull TraitRegistry traits) {
+                        @NotNull TraitRegistry traits, @NotNull CrewMenus crews) {
         this.service = service;
         this.professions = professions;
         this.traits = traits;
+        this.crews = crews;
     }
 
     /** Shows {@code player} the card of settler {@code settlerId}, if it still lives at {@code site}. */

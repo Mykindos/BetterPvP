@@ -75,6 +75,7 @@ public class CampArrivalNotices implements Listener {
                     case READY_TO_CLAIM -> "clans.camp.notice.ready";
                     case NEEDS_REPAIR -> "clans.camp.notice.needs_repair";
                     case DISABLED -> "clans.camp.notice.disabled";
+                    case PAUSED -> "clans.camp.notice.needs_crew";
                     default -> null;
                 };
                 if (key == null) {

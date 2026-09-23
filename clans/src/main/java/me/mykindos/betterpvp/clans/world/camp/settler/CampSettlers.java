@@ -10,8 +10,10 @@ import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.protection.CampGrounds;
+import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.core.world.construction.Holding;
+import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
@@ -22,12 +24,15 @@ import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
+import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
+import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -36,7 +41,8 @@ import java.util.UUID;
 /**
  * Everything settlers need from a camp: the roster is kept on the camp record, the Great Hall's stage decides how many
  * settlers it can have and how many of each profession can work, and structures such as the Workshop add to that.
- * Settlers gather at the Great Hall, Farmers work the farm, and Builders work at the structure they are assigned to.
+ * Settlers gather at the Great Hall, Farmers work the farm, and Builders work at the structure they are assigned to,
+ * bringing what {@link CampBuilders} says they do.
  */
 @Singleton
 public class CampSettlers implements SettlerSite {
@@ -51,17 +57,22 @@ public class CampSettlers implements SettlerSite {
     private final CampPermissions permissions;
     private final StructureShapes shapes;
     private final SettlerCards cards;
+    private final CampBuilders builders;
+    private final CampResources resources;
 
     @Inject
     public CampSettlers(@NotNull CampStore store, @NotNull SettlerConfig config, @NotNull SettlerService service,
                         @NotNull CampPermissions permissions, @NotNull StructureShapes shapes,
-                        @NotNull SettlerCards cards, @NotNull CampProfessions professions,
+                        @NotNull SettlerCards cards, @NotNull CampBuilders builders,
+                        @NotNull CampResources resources, @NotNull CampProfessions professions,
                         @NotNull CampTraits traits) {
         this.store = store;
         this.config = config;
         this.permissions = permissions;
         this.shapes = shapes;
         this.cards = cards;
+        this.builders = builders;
+        this.resources = resources;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -140,6 +151,31 @@ public class CampSettlers implements SettlerSite {
     @Override
     public void interact(@NotNull Player player, @NotNull SiteKey site, @NotNull Settler settler) {
         cards.open(player, site, settler.getId());
+    }
+
+    @Override
+    public @NotNull Optional<BuilderStats> builderStats(@NotNull SiteKey site, @NotNull Settler settler,
+                                                        @NotNull PlacedStructure structure, @NotNull Job job,
+                                                        @NotNull List<Settler> crew) {
+        if (!settler.hasProfession(CampProfessions.BUILDER)) {
+            return Optional.empty();
+        }
+        return Optional.of(builders.stats(settler, job, crew));
+    }
+
+    @Override
+    public @NotNull CrewLimits crewLimits(@NotNull SiteKey site) {
+        return config.getCrewLimits();
+    }
+
+    /** Frugal and Patcher crews hand back part of what the job cost. */
+    @Override
+    public void crewFinished(@NotNull SiteKey site, @NotNull PlacedStructure structure, @NotNull Job job,
+                             @NotNull List<Settler> crew) {
+        final double refund = builders.refund(job, crew);
+        if (refund > 0) {
+            resources.refund(site, job.getSpent().share(refund));
+        }
     }
 
     private @NotNull Location standOn(@NotNull World world, @NotNull PlacedStructure structure, @NotNull String point) {

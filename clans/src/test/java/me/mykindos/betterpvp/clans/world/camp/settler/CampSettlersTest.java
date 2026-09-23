@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.world.camp.CampConstruction;
 import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
+import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -60,7 +61,8 @@ class CampSettlersTest {
                 new SettlerConfig.WorkingCap(List.of(2, 3, 4), Map.of(CampStructures.WORKSHOP, 1))));
         when(config.workingCap(CampProfessions.FARMER)).thenReturn(Optional.empty());
         settlers = new CampSettlers(store, config, service, mock(CampPermissions.class), shapes,
-                mock(SettlerCards.class), new CampProfessions(new ProfessionRegistry()),
+                mock(SettlerCards.class), mock(CampBuilders.class), mock(CampResources.class),
+                new CampProfessions(new ProfessionRegistry()),
                 new CampTraits(new TraitRegistry()));
     }
 

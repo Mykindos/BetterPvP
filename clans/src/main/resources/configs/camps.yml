@@ -38,7 +38,8 @@ construction:
 
 # The numbers for each structure. What a structure is (its tier, what it needs, whether it can move or be demolished)
 # is code. Each stage names the structure build it uses, what it costs and how long it takes. Stages run in order,
-# the first being what building it produces. Times are in seconds.
+# the first being what building it produces. Times are in seconds. workforce is how much Workforce a crew of Builders
+# needs for the job that takes the structure to that stage. Repairs and moves need half the stage it stands at.
 structures:
   great_hall:
     icon: BELL
@@ -46,12 +47,15 @@ structures:
       - schematic: camps/great_hall_1
         cost: {}
         build-seconds: 0
+        workforce: 2
       - schematic: camps/great_hall_2
         cost: {wood: 400, stone: 300, iron: 50}
         build-seconds: 3600
+        workforce: 5
       - schematic: camps/great_hall_3
         cost: {wood: 900, stone: 800, iron: 200}
         build-seconds: 10800
+        workforce: 8
     move: {cost: {}, seconds: 0}
     repair: {cost: {wood: 50, stone: 50}, seconds: 300}
   barracks:
@@ -60,6 +64,7 @@ structures:
       - schematic: camps/barracks_1
         cost: {wood: 100, stone: 50}
         build-seconds: 600
+        workforce: 2
     move: {cost: {}, seconds: 0}
     repair: {cost: {wood: 30}, seconds: 180}
   dock:
@@ -68,6 +73,7 @@ structures:
       - schematic: camps/dock_1
         cost: {}
         build-seconds: 0
+        workforce: 2
     repair: {cost: {wood: 60}, seconds: 300}
   workshop:
     icon: CRAFTING_TABLE
@@ -75,6 +81,7 @@ structures:
       - schematic: camps/workshop_1
         cost: {wood: 150, stone: 100}
         build-seconds: 1200
+        workforce: 2
     move: {cost: {}, seconds: 0}
     repair: {cost: {wood: 40}, seconds: 180}
     demolish-refund: 0.0
@@ -84,6 +91,7 @@ structures:
       - schematic: camps/storehouse_1
         cost: {wood: 120, stone: 60}
         build-seconds: 900
+        workforce: 2
     move: {cost: {}, seconds: 0}
     repair: {cost: {wood: 40}, seconds: 180}
     demolish-refund: 0.0

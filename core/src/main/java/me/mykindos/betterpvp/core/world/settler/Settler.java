@@ -37,6 +37,8 @@ public class Settler {
     /** The workplace it is assigned to, or null when it has none. */
     private @Nullable String assignment;
     private SettlerState state = SettlerState.IDLE;
+    /** How many jobs it has seen through to the end. */
+    private int jobsFinished;
     private long joinedAt;
     /** When {@link #state} last changed. */
     private long stateSince;
