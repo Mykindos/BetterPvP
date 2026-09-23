@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,11 +27,14 @@ public class LocalPlacement implements Placement {
 
     private final SiteRegistry registry;
     private final SiteInstances instances;
+    private final SiteLandings landings;
 
     @Inject
-    public LocalPlacement(@NotNull SiteRegistry registry, @NotNull SiteInstances instances) {
+    public LocalPlacement(@NotNull SiteRegistry registry, @NotNull SiteInstances instances,
+                          @NotNull SiteLandings landings) {
         this.registry = registry;
         this.instances = instances;
+        this.landings = landings;
     }
 
     @Override
@@ -63,12 +67,8 @@ public class LocalPlacement implements Placement {
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> send(@NotNull Player traveller, @NotNull SiteHandle handle) {
-        return sendAll(List.of(traveller), handle);
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Boolean> sendAll(@NotNull Collection<Player> travellers, @NotNull SiteHandle handle) {
+    public @NotNull CompletableFuture<Boolean> sendAll(@NotNull Collection<Player> travellers, @NotNull SiteHandle handle,
+                                                       @Nullable String landing) {
         if (travellers.isEmpty()) {
             return CompletableFuture.completedFuture(false);
         }
@@ -86,16 +86,22 @@ public class LocalPlacement implements Placement {
             return CompletableFuture.completedFuture(false);
         }
 
-        final Location landing = landingIn(world, handle);
+        final Location spot = landingIn(world, handle, landing);
         final List<CompletableFuture<Boolean>> arrivals = travellers.stream()
-                .map(traveller -> traveller.teleportAsync(landing))
+                .map(traveller -> traveller.teleportAsync(spot))
                 .toList();
 
         return CompletableFuture.allOf(arrivals.toArray(CompletableFuture[]::new)).thenApply(ignored -> true);
     }
 
-    /** The spot a party is put down at, read off the site's own arrival markers. */
-    private @NotNull Location landingIn(@NotNull World world, @NotNull SiteHandle handle) {
+    /** The spot a party is put down at: the named landing if it resolves, else the site's own arrival markers. */
+    private @NotNull Location landingIn(@NotNull World world, @NotNull SiteHandle handle, @Nullable String landing) {
+        if (landing != null) {
+            final Optional<Location> named = landings.resolve(handle.getKey().getSiteId(), landing, world);
+            if (named.isPresent()) {
+                return named.get();
+            }
+        }
         return registry.get(handle.getKey().getSiteId())
                 .map(site -> ArrivalPoints.choose(world, site.getArrivalMarker(), site.getArrival()))
                 .orElseGet(world::getSpawnLocation);

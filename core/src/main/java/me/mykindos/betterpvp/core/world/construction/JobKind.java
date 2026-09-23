@@ -1,8 +1,11 @@
 package me.mykindos.betterpvp.core.world.construction;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public enum JobKind {
     BUILD,
-    UPGRADE,
+    @JsonAlias("UPGRADE")
+    ADVANCE,
     MOVE,
     REPAIR
 }

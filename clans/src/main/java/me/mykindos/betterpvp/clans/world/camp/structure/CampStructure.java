@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureFlags;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
-import me.mykindos.betterpvp.core.world.construction.StructureVersion;
+import me.mykindos.betterpvp.core.world.construction.StructureStage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
@@ -72,8 +72,8 @@ public final class CampStructure implements StructureType {
     }
 
     @Override
-    public @NotNull List<StructureVersion> getVersions() {
-        return numbers().getVersions();
+    public @NotNull List<StructureStage> getStages() {
+        return numbers().getStages();
     }
 
     @Override
@@ -103,7 +103,7 @@ public final class CampStructure implements StructureType {
 
     private @NotNull CampConfig.StructureNumbers numbers() {
         return config.structure(id).orElseGet(() -> new CampConfig.StructureNumbers(
-                List.of(new StructureVersion("camps/" + id, ResourceCost.NONE, Duration.ZERO)),
+                List.of(new StructureStage("camps/" + id, ResourceCost.NONE, Duration.ZERO)),
                 ResourceCost.NONE, Duration.ZERO, ResourceCost.NONE, Duration.ZERO, 0, Material.BRICKS));
     }
 }

@@ -35,7 +35,7 @@ import java.util.Set;
  * <p>
  * A build rises with its job's progress, leaving its top layers for the claim. A structure waiting to be claimed shows
  * those layers as a blinking glow and can be clicked anywhere. Once claimed, they go down one at a time. Anything that
- * changes its shape, an upgrade or a move being claimed, takes the old build down and puts the new one up.
+ * changes its shape, a new stage or a move being claimed, takes the old build down and puts the new one up.
  */
 final class StructureView {
 
@@ -73,7 +73,7 @@ final class StructureView {
 
         final boolean claimed = lastStatus == StructureStatus.READY_TO_CLAIM
                 && status != StructureStatus.READY_TO_CLAIM && status != StructureStatus.PAUSED;
-        final String currentShape = structure.getType() + ":" + structure.getVersion() + ":" + structure.getPosition();
+        final String currentShape = structure.getType() + ":" + structure.getStage() + ":" + structure.getPosition();
         if (!currentShape.equals(shape)) {
             rebuild(structure, currentShape, claimed ? claimLayers : -1);
         }
@@ -266,7 +266,7 @@ final class StructureView {
                                             @NotNull StructureStatus status, long now) {
         final Component state = switch (status) {
             case UNDER_CONSTRUCTION -> timed(isBuilding(structure) ? "building" : "moving", structure, now);
-            case UPGRADING -> timed("upgrading", structure, now);
+            case ADVANCING -> timed("advancing", structure, now);
             case READY_TO_CLAIM -> Translations.component("core.construction.label.ready").color(NamedTextColor.GREEN);
             case PAUSED -> Translations.component("core.construction.label.paused").color(NamedTextColor.RED);
             case DISABLED -> structure.getJob() == null

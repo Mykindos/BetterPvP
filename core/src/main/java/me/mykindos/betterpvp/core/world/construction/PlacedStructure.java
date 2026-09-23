@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.construction;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +18,9 @@ public class PlacedStructure {
     private UUID id;
     /** A {@link StructureType} id. */
     private String type;
-    /** The version it stands at now. An upgrade under way moves it on only once claimed. */
-    private int version;
+    /** The stage it stands at now. Advancing moves it on only once claimed. */
+    @JsonAlias("version")
+    private int stage;
     private StructurePosition position;
     private StructureCondition condition;
     private @Nullable Job job;
@@ -46,7 +48,7 @@ public class PlacedStructure {
             }
             return switch (job.getKind()) {
                 case BUILD, MOVE -> StructureStatus.UNDER_CONSTRUCTION;
-                case UPGRADE -> StructureStatus.UPGRADING;
+                case ADVANCE -> StructureStatus.ADVANCING;
                 case REPAIR -> fromCondition();
             };
         }

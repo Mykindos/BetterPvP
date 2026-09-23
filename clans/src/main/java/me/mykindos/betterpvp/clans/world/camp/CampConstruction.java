@@ -29,7 +29,7 @@ import java.util.Optional;
 @Singleton
 public class CampConstruction implements ConstructionSite {
 
-    /** The structure whose version decides which tiers can be built. */
+    /** The structure whose stage decides which tiers can be built. */
     public static final String GREAT_HALL = "great_hall";
 
     private final CampStore store;
@@ -70,18 +70,18 @@ public class CampConstruction implements ConstructionSite {
         return permissions.allows(player, site.getOwnerId(), action);
     }
 
-    /** Tier N needs a Great Hall at its Nth version. Versions count from zero, tiers from one. */
+    /** Tier N needs a Great Hall at its Nth stage. Stages count from zero, tiers from one. */
     @Override
     public @NotNull Optional<Component> blocked(@NotNull SiteKey site, @NotNull Holding holding,
-                                                @NotNull StructureType type, int version) {
+                                                @NotNull StructureType type, int stage) {
         if (type.getTier() <= 1 || type.getId().equals(GREAT_HALL)) {
             return Optional.empty();
         }
-        final int hallVersion = holding.ofType(GREAT_HALL).stream()
-                .mapToInt(PlacedStructure::getVersion)
+        final int hallStage = holding.ofType(GREAT_HALL).stream()
+                .mapToInt(PlacedStructure::getStage)
                 .max()
                 .orElse(-1);
-        if (hallVersion + 1 >= type.getTier()) {
+        if (hallStage + 1 >= type.getTier()) {
             return Optional.empty();
         }
         return Optional.of(Translations.component("clans.camp.construction.needs_hall",

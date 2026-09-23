@@ -27,8 +27,8 @@ public interface StructureType {
     /** A tag the build zone it goes in must carry, or null if any build zone will do. */
     @Nullable String getRequiredZoneTag();
 
-    /** The version chain, first to last. Version 0 is what building it produces. Never empty. */
-    @NotNull List<StructureVersion> getVersions();
+    /** The stage chain, first to last. Stage 0 is what building it produces. Never empty. */
+    @NotNull List<StructureStage> getStages();
 
     @NotNull StructureFlags getFlags();
 
@@ -50,20 +50,20 @@ public interface StructureType {
         return Duration.ZERO;
     }
 
-    /** What taking it from nothing to {@code version} has cost, which a partial refund is a share of. */
-    default @NotNull ResourceCost costUpTo(int version) {
+    /** What taking it from nothing to {@code stage} has cost, which a partial refund is a share of. */
+    default @NotNull ResourceCost costUpTo(int stage) {
         ResourceCost total = ResourceCost.NONE;
-        for (int i = 0; i <= Math.min(version, getVersions().size() - 1); i++) {
-            total = total.plus(getVersions().get(i).getCost());
+        for (int i = 0; i <= Math.min(stage, getStages().size() - 1); i++) {
+            total = total.plus(getStages().get(i).getCost());
         }
         return total;
     }
 
-    default @NotNull StructureVersion version(int index) {
-        return getVersions().get(Math.clamp(index, 0, getVersions().size() - 1));
+    default @NotNull StructureStage stage(int index) {
+        return getStages().get(Math.clamp(index, 0, getStages().size() - 1));
     }
 
-    default boolean hasVersion(int index) {
-        return index >= 0 && index < getVersions().size();
+    default boolean hasStage(int index) {
+        return index >= 0 && index < getStages().size();
     }
 }

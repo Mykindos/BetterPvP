@@ -37,6 +37,12 @@ public class Camp {
     /** What each rank may do, or null for the configured defaults. */
     private @Nullable Map<ClanMember.MemberRank, Set<ConstructionAction>> permissions;
 
+    /** What members of allied clans may do, or null for the configured defaults. */
+    private @Nullable Set<ConstructionAction> allyActions;
+
+    /** Whether members of allied clans may open containers, or null for the configured default. */
+    private @Nullable Boolean allyContainers;
+
     public int getResource(String resource) {
         return resources.getOrDefault(resource, 0);
     }
@@ -53,5 +59,14 @@ public class Camp {
             });
         }
         return permissions;
+    }
+
+    /** The actions this camp lets allies take, copying them from {@code defaults} the first time they are changed. */
+    public Set<ConstructionAction> ownAllyActions(Set<ConstructionAction> defaults) {
+        if (allyActions == null) {
+            allyActions = EnumSet.noneOf(ConstructionAction.class);
+            allyActions.addAll(defaults);
+        }
+        return allyActions;
     }
 }

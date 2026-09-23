@@ -189,15 +189,20 @@ public class RedisSiteDirectory implements SiteDirectory {
     }
 
     @Override
-    public void expect(@NotNull UUID player, @NotNull RemoteInstance instance) {
+    public void expect(@NotNull UUID player, @NotNull Arrival arrival) {
+        final RemoteInstance instance = arrival.getInstance();
         UtilServer.runTaskAsync(core, () -> {
             try (Jedis jedis = pool.getResource()) {
-                jedis.hset(ARRIVAL + player, Map.of(
+                final Map<String, String> fields = new HashMap<>(Map.of(
                         "instance", instance.getId().toString(),
                         "site", instance.getSiteId(),
                         "owner", String.valueOf(instance.getOwnerId()),
                         "server", instance.getServer(),
                         "world", instance.getWorld()));
+                if (arrival.getLanding() != null) {
+                    fields.put("landing", arrival.getLanding());
+                }
+                jedis.hset(ARRIVAL + player, fields);
                 jedis.expire(ARRIVAL + player, ARRIVAL_TTL_SECONDS);
             } catch (Exception exception) {
                 log.error("Failed to record that {} is on their way to {}", player, instance.getId(), exception).submit();
@@ -206,7 +211,7 @@ public class RedisSiteDirectory implements SiteDirectory {
     }
 
     @Override
-    public @NotNull CompletableFuture<Optional<RemoteInstance>> claimArrival(@NotNull UUID player) {
+    public @NotNull CompletableFuture<Optional<Arrival>> claimArrival(@NotNull UUID player) {
         return async(jedis -> {
             final String key = ARRIVAL + player;
             final Map<String, String> fields = jedis.hgetAll(key);
@@ -215,9 +220,9 @@ public class RedisSiteDirectory implements SiteDirectory {
             }
 
             jedis.del(key);
-            return Optional.of(new RemoteInstance(UUID.fromString(fields.get("instance")), fields.get("site"),
-                    Long.parseLong(fields.getOrDefault("owner", "0")), fields.get("server"), fields.get("world"),
-                    true, 0));
+            return Optional.of(new Arrival(new RemoteInstance(UUID.fromString(fields.get("instance")),
+                    fields.get("site"), Long.parseLong(fields.getOrDefault("owner", "0")), fields.get("server"),
+                    fields.get("world"), true, 0), fields.get("landing")));
         }, Optional.empty());
     }
 

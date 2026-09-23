@@ -23,11 +23,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Where a camp's resource chests are and how much they hold. A resource chest is a Mapper point named
- * {@code resource_chest} captured in a structure's build, sitting on the chest block, so each version of a structure
+ * {@code resource_chest} captured in a structure's build, sitting on the chest block, so each stage of a structure
  * decides how many it has.
  * <p>
  * A structure's chests count once it has been built for the first time and while it stands, including while it is
- * being upgraded or moved, since its storage stays usable then.
+ * advancing or being moved, since its storage stays usable then.
  */
 @Singleton
 public class ResourceChests {
@@ -71,9 +71,9 @@ public class ResourceChests {
     }
 
     private int count(@NotNull PlacedStructure structure) {
-        final String key = structure.getType() + ":" + structure.getVersion();
+        final String key = structure.getType() + ":" + structure.getStage();
         return counts.computeIfAbsent(key, unused -> catalogue.find(structure.getType())
-                .flatMap(type -> schematics.load(type.version(structure.getVersion()).getSchematic()))
+                .flatMap(type -> schematics.load(type.stage(structure.getStage()).getSchematic()))
                 .map(schematic -> (int) schematic.getRegions().stream()
                         .filter(region -> MARKER.equalsIgnoreCase(region.getName()))
                         .count())
@@ -81,7 +81,7 @@ public class ResourceChests {
     }
 
     private @NotNull Set<Long> positions(@NotNull World world, @NotNull PlacedStructure structure) {
-        final String key = world.getName() + ":" + structure.getId() + ":" + structure.getVersion() + ":"
+        final String key = world.getName() + ":" + structure.getId() + ":" + structure.getStage() + ":"
                 + structure.getPosition();
         return positions.computeIfAbsent(key, unused -> {
             final Set<Long> found = new HashSet<>();

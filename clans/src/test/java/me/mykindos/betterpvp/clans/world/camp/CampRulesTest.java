@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceChests;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceOverflow;
+import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -84,9 +87,9 @@ class CampRulesTest {
         final PlacedStructure hall = new PlacedStructure(UUID.randomUUID(), CampConstruction.GREAT_HALL,
                 new StructurePosition(), StructureCondition.ACTIVE);
         camp.getHolding().getStructures().add(hall);
-        assertTrue(construction.blocked(SITE, camp.getHolding(), forge, 0).isPresent(), "a first-version hall is tier 1");
+        assertTrue(construction.blocked(SITE, camp.getHolding(), forge, 0).isPresent(), "a first-stage hall is tier 1");
 
-        hall.setVersion(1);
+        hall.setStage(1);
         assertTrue(construction.blocked(SITE, camp.getHolding(), forge, 0).isEmpty());
         assertTrue(construction.blocked(SITE, camp.getHolding(), type("storehouse", 1), 0).isEmpty(),
                 "tier 1 never waits");
@@ -130,6 +133,35 @@ class CampRulesTest {
         when(clanManager.getClanById(CLAN)).thenReturn(Optional.of(clan));
 
         assertFalse(construction.allows(stranger, SITE, ConstructionAction.CLAIM));
+    }
+
+    @Test
+    void alliesDoWhatTheAllyRowAllows() {
+        final UUID allyId = UUID.randomUUID();
+        final Player ally = mock(Player.class);
+        when(ally.getUniqueId()).thenReturn(allyId);
+        final ClanMember allyMember = mock(ClanMember.class);
+        when(allyMember.getUuid()).thenReturn(allyId);
+        final IClan allied = mock(IClan.class);
+        when(allied.getMembers()).thenReturn(List.of(allyMember));
+        final Clan owner = mock(Clan.class);
+        when(owner.getMemberByUUID(any(UUID.class))).thenReturn(Optional.empty());
+        when(owner.getAlliances()).thenReturn(List.of(new ClanAlliance(allied, false)));
+        when(clanManager.getClanById(CLAN)).thenReturn(Optional.of(owner));
+        when(config.defaultAllyActions()).thenReturn(Set.of());
+        final Player stranger = mock(Player.class);
+        when(stranger.getUniqueId()).thenReturn(UUID.randomUUID());
+
+        assertFalse(construction.allows(ally, SITE, ConstructionAction.CLAIM));
+        assertFalse(permissions.mayOpenContainers(ally, CLAN));
+
+        permissions.setAlly(CLAN, ConstructionAction.CLAIM, true);
+        permissions.setAllyContainers(CLAN, true);
+
+        assertTrue(construction.allows(ally, SITE, ConstructionAction.CLAIM));
+        assertTrue(permissions.mayOpenContainers(ally, CLAN));
+        assertFalse(construction.allows(stranger, SITE, ConstructionAction.CLAIM), "only allies get the Ally row");
+        assertFalse(permissions.mayOpenContainers(stranger, CLAN));
     }
 
     private Player member(ClanMember.MemberRank rank) {

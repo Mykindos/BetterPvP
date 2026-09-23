@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.LongSupplier;
 
 /**
- * Every construction action a player can take, checked and paid for: build, cancel, claim, move, upgrade, repair and
+ * Every construction action a player can take, checked and paid for: build, cancel, claim, move, advance, repair and
  * demolish. Each action works out which site the world belongs to, asks that site's {@link ConstructionSite} for its
  * holding, costs and permissions, and fires events for whatever shows the result in the world.
  * <p>
@@ -100,7 +100,7 @@ public class ConstructionService {
             return Optional.of(text("core.construction.build_not_allowed"));
         }
         return requirements(site, owner, holding.get(), type, 0)
-                .or(() -> owner.ledger().canAfford(site, type.version(0).getCost())
+                .or(() -> owner.ledger().canAfford(site, type.stage(0).getCost())
                         ? Optional.empty() : Optional.of(text("core.construction.cannot_afford")));
     }
 
@@ -117,7 +117,7 @@ public class ConstructionService {
             return ConstructionResult.refused(problem.get());
         }
 
-        final StructureVersion first = type.version(0);
+        final StructureStage first = type.stage(0);
         worksite.site.ledger().spend(worksite.key, first.getCost());
         final PlacedStructure structure = new PlacedStructure(UUID.randomUUID(), type.getId(), position,
                 StructureCondition.UNDER_CONSTRUCTION);
@@ -161,7 +161,7 @@ public class ConstructionService {
             switch (job.getKind()) {
                 case BUILD -> structure.setCondition(type.getFlags().isStartsBroken()
                         ? StructureCondition.NEEDS_REPAIR : StructureCondition.ACTIVE);
-                case UPGRADE -> structure.setVersion(job.getTargetVersion());
+                case ADVANCE -> structure.setStage(job.getTargetStage());
                 case MOVE -> structure.setPosition(job.getTarget());
                 case REPAIR -> structure.setCondition(StructureCondition.ACTIVE);
             }
@@ -182,7 +182,7 @@ public class ConstructionService {
             }
 
             final StructurePosition target = StructurePosition.of(anchor, quarterTurns);
-            final Optional<Component> misfit = fit(worksite, type, structure.getVersion(), target, structure.getId());
+            final Optional<Component> misfit = fit(worksite, type, structure.getStage(), target, structure.getId());
             if (misfit.isPresent()) {
                 return ConstructionResult.refused(misfit.get());
             }
@@ -200,21 +200,21 @@ public class ConstructionService {
                 return changed(worksite, structure);
             }
 
-            final Job job = Job.start(JobKind.MOVE, time, type.getMoveCost(), structure.getVersion(), clock.getAsLong());
+            final Job job = Job.start(JobKind.MOVE, time, type.getMoveCost(), structure.getStage(), clock.getAsLong());
             job.setTarget(target);
             structure.setJob(job);
             return changed(worksite, structure);
         });
     }
 
-    public @NotNull ConstructionResult upgrade(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
-        return act(player, world, id, ConstructionAction.UPGRADE, (worksite, structure, type) -> {
-            final int next = structure.getVersion() + 1;
-            if (!type.hasVersion(next)) {
-                return ConstructionResult.refused("core.construction.max_version");
+    public @NotNull ConstructionResult advance(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
+        return act(player, world, id, ConstructionAction.ADVANCE, (worksite, structure, type) -> {
+            final int next = structure.getStage() + 1;
+            if (!type.hasStage(next)) {
+                return ConstructionResult.refused("core.construction.max_stage");
             }
             if (structure.getJob() != null || structure.getCondition() != StructureCondition.ACTIVE) {
-                return ConstructionResult.refused("core.construction.upgrade_needs_idle");
+                return ConstructionResult.refused("core.construction.advance_needs_idle");
             }
 
             final Optional<Component> problem = requirements(worksite, type, next)
@@ -222,13 +222,13 @@ public class ConstructionService {
             if (problem.isPresent()) {
                 return ConstructionResult.refused(problem.get());
             }
-            final StructureVersion version = type.version(next);
-            final Optional<ConstructionResult> unpaid = pay(worksite, version.getCost());
+            final StructureStage stage = type.stage(next);
+            final Optional<ConstructionResult> unpaid = pay(worksite, stage.getCost());
             if (unpaid.isPresent()) {
                 return unpaid.get();
             }
 
-            structure.setJob(Job.start(JobKind.UPGRADE, version.getBuildTime(), version.getCost(), next, clock.getAsLong()));
+            structure.setJob(Job.start(JobKind.ADVANCE, stage.getBuildTime(), stage.getCost(), next, clock.getAsLong()));
             return changed(worksite, structure);
         });
     }
@@ -251,7 +251,7 @@ public class ConstructionService {
                 structure.setCondition(StructureCondition.ACTIVE);
             } else {
                 structure.setJob(Job.start(JobKind.REPAIR, type.getRepairTime(), type.getRepairCost(),
-                        structure.getVersion(), clock.getAsLong()));
+                        structure.getStage(), clock.getAsLong()));
             }
             return changed(worksite, structure);
         });
@@ -278,7 +278,7 @@ public class ConstructionService {
                     .map(placement -> placement.blockBounds().getCenter().toLocation(world))
                     .orElseGet(() -> structure.getPosition().toLocation(world));
             worksite.site.ledger().refund(worksite.key,
-                    type.costUpTo(structure.getVersion()).share(type.getFlags().getDemolishRefund()));
+                    type.costUpTo(structure.getStage()).share(type.getFlags().getDemolishRefund()));
             remove(worksite, structure, true);
             for (StructureContents contents : worksite.site.contents()) {
                 contents.drop(worksite.key, structure, centre);
@@ -309,16 +309,16 @@ public class ConstructionService {
         }
         return requirements(worksite, type, 0)
                 .or(() -> fit(worksite, type, 0, position, null))
-                .or(() -> worksite.site.ledger().canAfford(worksite.key, type.version(0).getCost())
+                .or(() -> worksite.site.ledger().canAfford(worksite.key, type.stage(0).getCost())
                         ? Optional.empty() : Optional.of(text("core.construction.cannot_afford")));
     }
 
-    private @NotNull Optional<Component> requirements(@NotNull Worksite worksite, @NotNull StructureType type, int version) {
-        return requirements(worksite.key, worksite.site, worksite.holding, type, version);
+    private @NotNull Optional<Component> requirements(@NotNull Worksite worksite, @NotNull StructureType type, int stage) {
+        return requirements(worksite.key, worksite.site, worksite.holding, type, stage);
     }
 
     private @NotNull Optional<Component> requirements(@NotNull SiteKey key, @NotNull ConstructionSite site,
-                                                      @NotNull Holding holding, @NotNull StructureType type, int version) {
+                                                      @NotNull Holding holding, @NotNull StructureType type, int stage) {
         for (String required : type.getRequiredStructures()) {
             if (!holding.hasBuilt(required)) {
                 final Component name = catalogue.find(required).map(StructureType::getDisplayName)
@@ -326,12 +326,12 @@ public class ConstructionService {
                 return Optional.of(text("core.construction.requires", name));
             }
         }
-        return site.blocked(key, holding, type, version);
+        return site.blocked(key, holding, type, stage);
     }
 
-    private @NotNull Optional<Component> fit(@NotNull Worksite worksite, @NotNull StructureType type, int version,
+    private @NotNull Optional<Component> fit(@NotNull Worksite worksite, @NotNull StructureType type, int stage,
                                              @NotNull StructurePosition position, @Nullable UUID ignoring) {
-        final Optional<SchematicPlacement> placement = shapes.placementOf(worksite.world, type.getId(), version, position);
+        final Optional<SchematicPlacement> placement = shapes.placementOf(worksite.world, type.getId(), stage, position);
         if (placement.isEmpty()) {
             return Optional.of(text("core.construction.no_build"));
         }

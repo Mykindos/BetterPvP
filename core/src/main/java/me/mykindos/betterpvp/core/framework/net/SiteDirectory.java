@@ -55,10 +55,10 @@ public interface SiteDirectory {
     @NotNull CompletableFuture<List<String>> serversByLoad();
 
     /** Records that a player is on their way to an instance, so the server they land on knows what to do with them. */
-    void expect(@NotNull UUID player, @NotNull RemoteInstance instance);
+    void expect(@NotNull UUID player, @NotNull Arrival arrival);
 
     /** Takes the arrival a player was expected for, if there is one. Reading it consumes it. */
-    @NotNull CompletableFuture<Optional<RemoteInstance>> claimArrival(@NotNull UUID player);
+    @NotNull CompletableFuture<Optional<Arrival>> claimArrival(@NotNull UUID player);
 
     /** Whether the directory can be reached right now. */
     boolean isAvailable();
