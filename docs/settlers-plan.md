@@ -64,15 +64,20 @@ The data, with nothing in the world yet.
 
 * Core
   * `StructureStage.workforce`, read from `camps.yml` per stage.
-  * `BuilderStats`: Workforce, Speed, falloff, compatible types, perks. Comes from the Builder's type and rarity in `settlers.yml`.
+  * `BuilderStats`: Workforce, Speed, efficiency, trade and compatible trades. The site works it out per job, so trades and traits can depend on the job and the crew.
+  * `CrewSpeed`: the fastest Builder counts fully, the rest at their efficiency, a compatible trade already on the crew counts fully with a bonus, then the cap.
   * `CrewRule implements JobRule`
-    * `holds`: the crew's summed Workforce is below the stage threshold.
-    * `rate`: crew Speed with per-type diminishing returns, no falloff between compatible pairs, then the speed cap.
-  * Crew limits: max crew size, per-rarity limit per job. Builders join a running job but can't leave it until it ends.
+    * `holds`: the crew's summed Workforce is below the stage threshold. Repairs and moves need half the stage the structure stands at.
+    * `rate`: `CrewSpeed` of the crew. Builders on strike bring nothing.
+  * `CrewService`: joins a Builder to a running job, checking crew size and per-rarity limits and the working cap. Builders stay until the job ends, then are let go and counted as having finished a job. A job's crew is `Job.staff`, and a Builder's assignment is the structure's id.
+  * Job rules only govern running jobs, so a finished job can always be claimed.
   * Builders walk to their job and work there. Idle Builders wander.
 * Clans
-  * Crew section in the construction flow: after placing a blueprint, and on any job, a menu shows the threshold, what the crew brings and what is missing, with the free Builders to add.
-* Tests for threshold, falloff, compatibility, caps and pausing when a crew shrinks.
+  * `CampBuilders`: stats from `settlers.yml` by rarity, trades (specialty resource, extra Workforce, compatible trades) and every Builder trait, at the settler's trait strength. Frugal and Patcher hand back part of the cost when the job ends.
+  * `/clan crews`: every running job with its Workforce, speed and time left, and a crew menu per job listing the crew and the free Builders to add. A Builder's card opens its crew.
+  * Members in the camp are told when a job starts waiting for a crew, and arrival notices list jobs waiting for one.
+  * Every new camp starts with the settlers in `starting-settlers` (two common Builders), so it can staff its first jobs.
+* Tests for threshold, speed, compatibility, caps, trait effects and releasing crews.
 * Cards: "Job staffing rules", "Worker traits", "Worker cap".
 
 ### S4. Wages

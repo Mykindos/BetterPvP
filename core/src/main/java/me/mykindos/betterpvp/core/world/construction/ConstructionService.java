@@ -389,14 +389,18 @@ public class ConstructionService {
         return ConstructionResult.done(structure);
     }
 
-    /** @return whether anything about the job changed */
+    /**
+     * Rules govern running jobs only, so a finished one waits to be claimed whatever changes around it.
+     *
+     * @return whether anything about the job changed
+     */
     private boolean applyRules(@NotNull Worksite worksite, @NotNull PlacedStructure structure) {
         final Job job = structure.getJob();
-        if (job == null) {
+        final long now = clock.getAsLong();
+        if (job == null || job.isDone(now)) {
             return false;
         }
 
-        final long now = clock.getAsLong();
         boolean changed = false;
         double rate = 1.0;
         for (JobRule rule : worksite.site.jobRules()) {

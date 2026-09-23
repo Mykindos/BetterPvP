@@ -9,10 +9,12 @@ import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSite;
 import me.mykindos.betterpvp.core.world.construction.Holding;
+import me.mykindos.betterpvp.core.world.construction.JobRule;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.ResourceLedger;
 import me.mykindos.betterpvp.core.world.construction.StructureContents;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
+import me.mykindos.betterpvp.core.world.settler.crew.CrewRule;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,16 +39,19 @@ public class CampConstruction implements ConstructionSite {
     private final CampPermissions permissions;
     private final CampConfig config;
     private final ResourceOverflow overflow;
+    private final CrewRule crews;
 
     @Inject
     public CampConstruction(@NotNull CampStore store, @NotNull CampResources resources,
                             @NotNull CampPermissions permissions, @NotNull CampConfig config,
-                            @NotNull ResourceOverflow overflow, @NotNull ConstructionService service) {
+                            @NotNull ResourceOverflow overflow, @NotNull CrewRule crews,
+                            @NotNull ConstructionService service) {
         this.store = store;
         this.resources = resources;
         this.permissions = permissions;
         this.config = config;
         this.overflow = overflow;
+        this.crews = crews;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -91,6 +96,12 @@ public class CampConstruction implements ConstructionSite {
     @Override
     public int claimLayers() {
         return config.getClaimLayers();
+    }
+
+    /** Every job is worked by a crew of Builders. */
+    @Override
+    public @NotNull List<JobRule> jobRules() {
+        return List.of(crews);
     }
 
     @Override

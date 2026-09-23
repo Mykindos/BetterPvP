@@ -254,6 +254,29 @@ class ConstructionServiceTest {
     }
 
     @Test
+    void aFinishedJobIsNeverHeldAgain() {
+        final boolean[] siege = {false};
+        site.rules.add(new JobRule() {
+            @Override
+            public @NotNull String id() {
+                return "siege";
+            }
+
+            @Override
+            public boolean holds(@NotNull SiteKey key, @NotNull PlacedStructure structure, @NotNull Job job) {
+                return siege[0];
+            }
+        });
+        final PlacedStructure hall = build("hall").getStructure();
+        final ConstructionService.Worksite worksite = service.worksite(world).orElseThrow();
+
+        now.addAndGet(60 * MINUTE);
+        siege[0] = true;
+        service.refresh(worksite);
+        assertEquals(StructureStatus.READY_TO_CLAIM, hall.status(now.get()), "its crew leaving must not stop the claim");
+    }
+
+    @Test
     void availabilityCanBeAskedWithoutTheWorld() {
         final StructureType workshop = catalogue.find("workshop").orElseThrow();
         assertTrue(service.unavailable(player, CAMP, workshop).isPresent(), "needs a hall first");
