@@ -42,6 +42,11 @@ public class SettlerService {
         sites.put(siteId, site);
     }
 
+    /** What the owner of {@code key}'s site supplies, if settlers can live there. */
+    public @NotNull Optional<SettlerSite> site(@NotNull SiteKey key) {
+        return Optional.ofNullable(sites.get(key.getSiteId()));
+    }
+
     public @NotNull Optional<Roster> roster(@NotNull SiteKey key) {
         return Optional.ofNullable(sites.get(key.getSiteId())).flatMap(site -> site.roster(key));
     }

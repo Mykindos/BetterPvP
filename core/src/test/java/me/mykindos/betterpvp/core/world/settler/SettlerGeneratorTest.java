@@ -31,8 +31,8 @@ class SettlerGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        professions.register(Profession.construction("builder", "builder", "model", List.of("mason", "smith")));
-        professions.register(Profession.workplace("farmer", "farmer", "farm", "model"));
+        professions.register(Profession.construction("builder", "builder", List.of("mason", "smith")));
+        professions.register(Profession.workplace("farmer", "farmer", "farm"));
         traits.register(trait("steady").profession("builder").build());
         traits.register(trait("greedy").profession("builder").tradeOff(true).build());
         traits.register(trait("green_thumb").profession("farmer").build());

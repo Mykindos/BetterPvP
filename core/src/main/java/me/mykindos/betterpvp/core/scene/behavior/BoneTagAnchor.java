@@ -81,4 +81,11 @@ public class BoneTagAnchor implements TagAnchor {
         TagBehavior.addNameplate(entity, new BoneTagAnchor(model, boneId),
                 new Vector(0, 0.75, 0), new Vector(0, 1.05, 0), name, role);
     }
+
+    /** Variant of {@link #addNameplate(SceneEntity, ActiveModel, String, String, Component)} with a styled name. */
+    public static void addNameplate(SceneEntity entity, ActiveModel model, String boneId,
+                                    Component name, Component role) {
+        TagBehavior.addNameplate(entity, new BoneTagAnchor(model, boneId),
+                new Vector(0, 0.75, 0), new Vector(0, 1.05, 0), name, role);
+    }
 }

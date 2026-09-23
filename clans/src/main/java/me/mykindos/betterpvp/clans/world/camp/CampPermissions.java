@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
+import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,6 +47,39 @@ public class CampPermissions {
             return granted(clanId, member.get().getRank()).contains(action);
         }
         return isAlly(owner.get(), player) && allyActions(clanId).contains(action);
+    }
+
+    /** Whether {@code player} may take {@code action} on camp {@code clanId}'s settlers. Only members can. */
+    public boolean allows(@NotNull Player player, long clanId, @NotNull SettlerAction action) {
+        return clanManager.getClanById(clanId)
+                .flatMap(owner -> owner.getMemberByUUID(player.getUniqueId()))
+                .map(member -> settlerActions(clanId, member.getRank()).contains(action))
+                .orElse(false);
+    }
+
+    public @NotNull Set<SettlerAction> settlerActions(long clanId, @NotNull ClanMember.MemberRank rank) {
+        if (rank == ClanMember.MemberRank.LEADER) {
+            return EnumSet.allOf(SettlerAction.class);
+        }
+        return store.cached(clanId)
+                .map(camp -> camp.getSettlerPermissions() == null
+                        ? config.defaultSettlerPermissions() : camp.getSettlerPermissions())
+                .map(permissions -> permissions.getOrDefault(rank, Set.of()))
+                .orElse(Set.of());
+    }
+
+    /** Grants or takes away settler {@code action} for {@code rank}. */
+    public void set(long clanId, @NotNull ClanMember.MemberRank rank, @NotNull SettlerAction action, boolean allowed) {
+        store.cached(clanId).ifPresent(camp -> {
+            final Set<SettlerAction> actions = camp.ownSettlerPermissions(config.defaultSettlerPermissions())
+                    .computeIfAbsent(rank, unused -> EnumSet.noneOf(SettlerAction.class));
+            if (allowed) {
+                actions.add(action);
+            } else {
+                actions.remove(action);
+            }
+            store.changed(clanId);
+        });
     }
 
     /** Whether {@code player} may open containers in camp {@code clanId}: every member, and allies if allowed. */

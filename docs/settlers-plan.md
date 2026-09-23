@@ -47,12 +47,17 @@ The data, with nothing in the world yet.
 ### S2. Settlers in the world
 
 * Core
-  * `SettlerNPC`: a `ModeledNPC` with a nameplate (name, rarity colour). Invulnerable. Falls back to a plain placeholder model when a profession's model is missing, so nothing breaks before art lands.
-  * `SettlerPresence` (`WorldContent`): spawns every settler of the camp whose world opened, and releases them on close.
-  * Behaviours: wander inside the camp's build zones and paths, walk to an assignment, work in place (animation name from config).
+  * `SettlerNPC`: a `ModeledNPC` with a nameplate (name in its rarity colour, profession above). Invulnerable. Legendary settlers give off a faint particle.
+  * `SettlerLook`: model, skin and idle, walk and work animations. The site supplies it, so camps can fall back to a placeholder model while a profession's own is not installed.
+  * `SettlerPresence` (`WorldContent`): spawns every settler of the camp whose world opened, follows joins, departures and assignments, and releases them on close.
+  * `SettlerRoutine`: wander around home, walk to an assignment, play the work animation there. Only moves while a player is near.
+  * `SettlerSite` gains `allows` (`SettlerAction`: hire, assign, dismiss, pay), `look`, `home`, `workplace` and `interact`.
   * Right-click a settler to open its card.
 * Clans
   * `SettlerCardMenu`: name, history, profession, rarity, traits, morale, current assignment, with assign and dismiss buttons behind permissions.
+  * Settler permissions per rank on the camp record, `permissions.settlers` defaults in `camps.yml`, and a Settlers page in `/clan permissions`. Allies get none.
+  * Settlers gather at the Great Hall's `settler_home` point and work at a structure's `settler_work` point. Farmers work the middle of the farm.
+  * Looks per profession, and per rarity within a profession, in `settlers.yml`.
 * Cards: "Settler base model" (visual half), "Worker NPCs".
 
 ### S3. Builders and crews

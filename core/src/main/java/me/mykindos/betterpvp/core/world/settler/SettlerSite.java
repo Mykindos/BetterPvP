@@ -1,15 +1,19 @@
 package me.mykindos.betterpvp.core.world.settler;
 
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.OptionalInt;
 
 /**
- * Everything settlers need from the module that owns a kind of site: where its rosters are kept and how many settlers
- * each can hold. Registered per site id with the {@link SettlerService}, so core never learns what the owner of a site
- * is.
+ * Everything settlers need from the module that owns a kind of site: where its rosters are kept, how many settlers
+ * each can hold, how they look and where in its world they gather and work. Registered per site id with the
+ * {@link SettlerService}, so core never learns what the owner of a site is.
  */
 public interface SettlerSite {
 
@@ -24,4 +28,24 @@ public interface SettlerSite {
 
     /** How many settlers of {@code profession} can work at once, or empty when only the population cap applies. */
     @NotNull OptionalInt workingCap(@NotNull SiteKey site, @NotNull String profession);
+
+    /** Whether {@code player} may take {@code action} on the settlers of {@code site}. */
+    boolean allows(@NotNull Player player, @NotNull SiteKey site, @NotNull SettlerAction action);
+
+    @NotNull SettlerLook look(@NotNull SiteKey site, @NotNull Settler settler);
+
+    /** Where settlers of {@code site} appear and wander around when they have nowhere to be. */
+    default @NotNull Optional<Location> home(@NotNull SiteKey site, @NotNull World world, @NotNull RegionIndex regions) {
+        return Optional.empty();
+    }
+
+    /** Where a settler assigned to {@code workplace} stands to work, or empty if it cannot be found here. */
+    default @NotNull Optional<Location> workplace(@NotNull SiteKey site, @NotNull World world,
+                                                  @NotNull RegionIndex regions, @NotNull String workplace) {
+        return Optional.empty();
+    }
+
+    /** What happens when {@code player} right-clicks a settler. */
+    default void interact(@NotNull Player player, @NotNull SiteKey site, @NotNull Settler settler) {
+    }
 }
