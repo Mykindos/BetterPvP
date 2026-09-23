@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampSettlers;
+import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.DatabaseProsperityStore;
+import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.ProsperityStore;
 import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
 
 public class ClansInjectorModule extends AbstractModule {
@@ -44,6 +46,7 @@ public class ClansInjectorModule extends AbstractModule {
         bind(CampSettlers.class).asEagerSingleton();
         // What feeds a camp's settlers. Empty until the Granary and Mill exist.
         Multibinder.newSetBinder(binder(), FoodSource.class);
+        bind(ProsperityStore.class).to(DatabaseProsperityStore.class);
 
     }
 

@@ -27,14 +27,14 @@ import java.util.concurrent.CompletableFuture;
 public class ProsperityLeaderboard extends Leaderboard<Long, Integer> {
 
     private final ClanManager clanManager;
-    private final ProsperityStores stores;
+    private final ProsperityStore store;
 
     @Inject
     public ProsperityLeaderboard(@NotNull Clans clans, @NotNull ClanManager clanManager,
-                                 @NotNull ProsperityStores stores) {
+                                 @NotNull ProsperityStore store) {
         super(clans);
         this.clanManager = clanManager;
-        this.stores = stores;
+        this.store = store;
         init();
     }
 
@@ -95,17 +95,17 @@ public class ProsperityLeaderboard extends Leaderboard<Long, Integer> {
         if (clan == null) {
             return null;
         }
-        final OptionalInt found = stores.store().find(clan.getId());
+        final OptionalInt found = store.find(clan.getId());
         return found.isPresent() ? LeaderboardEntry.of(clan.getId(), found.getAsInt()) : null;
     }
 
     @Override
     protected Integer fetch(@NotNull SearchOptions options, @NotNull Database database, @NotNull Long entry) {
-        return stores.store().find(entry).orElse(0);
+        return store.find(entry).orElse(0);
     }
 
     @Override
     protected Map<Long, Integer> fetchAll(@NotNull SearchOptions options, @NotNull Database database) {
-        return stores.store().top(10);
+        return store.top(10);
     }
 }

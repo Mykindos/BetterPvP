@@ -20,7 +20,6 @@ import static org.jooq.impl.DSL.table;
 @CustomLog
 public class DatabaseProsperityStore implements ProsperityStore {
 
-    public static final String NAME = "database";
     private static final String TABLE = "camp_prosperity";
 
     private final Database database;
