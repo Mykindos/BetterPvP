@@ -3,18 +3,24 @@ package me.mykindos.betterpvp.clans.world.camp.settler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.mykindos.betterpvp.clans.world.camp.Camp;
 import me.mykindos.betterpvp.clans.world.camp.CampConstruction;
+import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
+import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
+import me.mykindos.betterpvp.core.world.construction.StructureShapes;
+import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.TraitRegistry;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +45,9 @@ class CampSettlersTest {
     private final CampStore store = mock(CampStore.class);
     private final SettlerConfig config = mock(SettlerConfig.class);
     private final SettlerService service = mock(SettlerService.class);
+    private final StructureShapes shapes = mock(StructureShapes.class);
+    private final World world = mock(World.class);
+    private final RegionIndex regions = mock(RegionIndex.class);
     private CampSettlers settlers;
 
     @BeforeEach
@@ -50,15 +59,41 @@ class CampSettlersTest {
         when(config.workingCap(CampProfessions.BUILDER)).thenReturn(Optional.of(
                 new SettlerConfig.WorkingCap(List.of(2, 3, 4), Map.of(CampStructures.WORKSHOP, 1))));
         when(config.workingCap(CampProfessions.FARMER)).thenReturn(Optional.empty());
-        settlers = new CampSettlers(store, config, service,
-                new CampProfessions(new ProfessionRegistry()), new CampTraits(new TraitRegistry()));
+        settlers = new CampSettlers(store, config, service, mock(CampPermissions.class), shapes,
+                mock(SettlerCards.class), new CampProfessions(new ProfessionRegistry()),
+                new CampTraits(new TraitRegistry()));
     }
 
-    private void place(String type, int stage, StructureCondition condition) {
+    private PlacedStructure place(String type, int stage, StructureCondition condition) {
         final PlacedStructure structure = new PlacedStructure(UUID.randomUUID(), type,
                 new StructurePosition(0, 64, 0, 0), condition);
         structure.setStage(stage);
         camp.getHolding().getStructures().add(structure);
+        return structure;
+    }
+
+    @Test
+    void settlersGatherAtTheGreatHallsPointOrOnTopOfIt() {
+        assertTrue(settlers.home(SITE, world, regions).isEmpty());
+
+        final PlacedStructure hall = place(CampConstruction.GREAT_HALL, 0, StructureCondition.ACTIVE);
+        when(shapes.point(world, hall, CampSettlers.HOME_POINT)).thenReturn(Optional.empty());
+        assertEquals(new Location(world, 0.5, 65, 0.5), settlers.home(SITE, world, regions).orElseThrow());
+
+        final Location marked = new Location(world, 4, 66, 4);
+        when(shapes.point(world, hall, CampSettlers.HOME_POINT)).thenReturn(Optional.of(marked));
+        assertEquals(marked, settlers.home(SITE, world, regions).orElseThrow());
+    }
+
+    @Test
+    void aStructureWorkplaceIsItsWorkPoint() {
+        final PlacedStructure workshop = place(CampStructures.WORKSHOP, 0, StructureCondition.ACTIVE);
+        final Location marked = new Location(world, 9, 64, 2);
+        when(shapes.point(world, workshop, CampSettlers.WORK_POINT)).thenReturn(Optional.of(marked));
+
+        assertEquals(marked, settlers.workplace(SITE, world, regions, workshop.getId().toString()).orElseThrow());
+        assertTrue(settlers.workplace(SITE, world, regions, UUID.randomUUID().toString()).isEmpty());
+        assertTrue(settlers.workplace(SITE, world, regions, "nowhere").isEmpty());
     }
 
     @Test

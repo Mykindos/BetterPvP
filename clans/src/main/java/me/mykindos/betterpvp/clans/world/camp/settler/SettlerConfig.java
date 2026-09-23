@@ -9,10 +9,12 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.settler.RarityNumbers;
+import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerTable;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ public class SettlerConfig implements Reloadable {
     private SettlerTable table;
     private List<Integer> population = List.of();
     private final Map<String, WorkingCap> workingCaps = new HashMap<>();
+    private final Map<String, Map<String, Object>> looks = new HashMap<>();
 
     @Inject
     public SettlerConfig(@NotNull Clans clans) {
@@ -69,6 +72,27 @@ public class SettlerConfig implements Reloadable {
                 List.copyOf(config.getStringList("names.bynames")), histories);
         population = List.copyOf(config.getIntegerList("population.by-hall-stage"));
 
+        looks.clear();
+        final ConfigurationSection lookSection = config.getConfigurationSection("looks");
+        if (lookSection != null) {
+            for (String profession : lookSection.getKeys(false)) {
+                final ConfigurationSection look = lookSection.getConfigurationSection(profession);
+                if (look == null) {
+                    continue;
+                }
+                looks.put(profession, values(look));
+                final ConfigurationSection rarityLooks = look.getConfigurationSection("rarities");
+                if (rarityLooks != null) {
+                    for (String rarity : rarityLooks.getKeys(false)) {
+                        final ConfigurationSection byRarity = rarityLooks.getConfigurationSection(rarity);
+                        if (byRarity != null) {
+                            looks.put(profession + "." + rarity.toLowerCase(Locale.ROOT), values(byRarity));
+                        }
+                    }
+                }
+            }
+        }
+
         workingCaps.clear();
         final ConfigurationSection professions = config.getConfigurationSection("professions");
         if (professions != null) {
@@ -82,6 +106,43 @@ public class SettlerConfig implements Reloadable {
                         List.copyOf(professions.getIntegerList(profession + ".by-hall-stage")), perStage));
             }
         }
+    }
+
+    private static @NotNull Map<String, Object> values(@NotNull ConfigurationSection section) {
+        final Map<String, Object> values = new HashMap<>();
+        for (String key : section.getKeys(false)) {
+            if (!section.isConfigurationSection(key)) {
+                values.put(key, section.get(key));
+            }
+        }
+        return values;
+    }
+
+    /** The default look. */
+    public @NotNull SettlerLook defaultLook() {
+        return look(List.of("default"));
+    }
+
+    /**
+     * The look for a settler of {@code profession} (null for none) and {@code rarity}: the default, overridden by the
+     * profession's, overridden by that profession's for the rarity.
+     */
+    public @NotNull SettlerLook look(@Nullable String profession, @NotNull SettlerRarity rarity) {
+        final String id = profession == null ? "none" : profession;
+        return look(List.of("default", id, id + "." + rarity.name().toLowerCase(Locale.ROOT)));
+    }
+
+    private @NotNull SettlerLook look(@NotNull List<String> layers) {
+        final Map<String, Object> merged = new HashMap<>();
+        layers.forEach(layer -> merged.putAll(looks.getOrDefault(layer, Map.of())));
+        final Object size = merged.get("size");
+        final Object skin = merged.get("skin");
+        return new SettlerLook(String.valueOf(merged.getOrDefault("model", "scene_market_1")),
+                skin == null ? null : skin.toString(),
+                String.valueOf(merged.getOrDefault("idle", "idle")),
+                String.valueOf(merged.getOrDefault("walk", "walk")),
+                String.valueOf(merged.getOrDefault("work", "idle")),
+                size instanceof Number number ? number.doubleValue() : 1.0);
     }
 
     /** How many settlers a camp can have with its Great Hall at {@code hallStage}, or -1 for no Great Hall. */

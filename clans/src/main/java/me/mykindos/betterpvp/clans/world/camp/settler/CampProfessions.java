@@ -23,9 +23,9 @@ public class CampProfessions {
 
     @Inject
     public CampProfessions(@NotNull ProfessionRegistry registry) {
-        registry.register(Profession.construction(BUILDER, key(BUILDER), "settler_builder",
+        registry.register(Profession.construction(BUILDER, key(BUILDER),
                 List.of(MASON, CARPENTER, SMITH, LABORER)));
-        registry.register(Profession.workplace(FARMER, key(FARMER), CampGrounds.FARM, "settler_farmer"));
+        registry.register(Profession.workplace(FARMER, key(FARMER), CampGrounds.FARM));
     }
 
     private static @NotNull String key(@NotNull String profession) {

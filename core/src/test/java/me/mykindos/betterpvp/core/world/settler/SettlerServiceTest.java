@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.world.settler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.junit.jupiter.api.AfterEach;
@@ -47,8 +48,8 @@ class SettlerServiceTest {
         bukkit = Mockito.mockStatic(Bukkit.class);
         bukkit.when(Bukkit::getPluginManager).thenReturn(plugins);
 
-        professions.register(Profession.construction("builder", "builder", "model", List.of()));
-        professions.register(Profession.workplace("farmer", "farmer", "farm", "model"));
+        professions.register(Profession.construction("builder", "builder", List.of()));
+        professions.register(Profession.workplace("farmer", "farmer", "farm"));
         service = new SettlerService(professions, now::get);
         service.register("camp", site);
     }
@@ -195,6 +196,16 @@ class SettlerServiceTest {
         public OptionalInt workingCap(SiteKey site, String profession) {
             final Integer cap = caps.get(profession);
             return cap == null ? OptionalInt.empty() : OptionalInt.of(cap);
+        }
+
+        @Override
+        public boolean allows(Player player, SiteKey site, SettlerAction action) {
+            return true;
+        }
+
+        @Override
+        public SettlerLook look(SiteKey site, Settler settler) {
+            return new SettlerLook("model", null, "idle", "walk", "work", 1);
         }
     }
 }

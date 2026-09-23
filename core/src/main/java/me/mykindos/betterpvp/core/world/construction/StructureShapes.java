@@ -2,9 +2,12 @@ package me.mykindos.betterpvp.core.world.construction;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import dev.brauw.mapper.region.PointRegion;
+import dev.brauw.mapper.region.Region;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +42,19 @@ public class StructureShapes {
         return catalogue.find(type)
                 .flatMap(found -> schematics.load(found.stage(stage).getSchematic()))
                 .map(schematic -> SchematicPlacement.of(schematic, position.toLocation(world), position.getQuarterTurns()));
+    }
+
+    /** The first point named {@code name} in the build a structure shows now, if its build has one. */
+    public @NotNull Optional<Location> point(@NotNull World world, @NotNull PlacedStructure structure,
+                                             @NotNull String name) {
+        return placementOf(world, structure).flatMap(placed -> {
+            for (Region marker : placed.markers()) {
+                if (name.equalsIgnoreCase(marker.getName()) && marker instanceof PointRegion point) {
+                    return Optional.of(point.getLocation().clone());
+                }
+            }
+            return Optional.empty();
+        });
     }
 
     public @NotNull Optional<Footprint> footprintOf(@NotNull World world, @NotNull String type, int stage,

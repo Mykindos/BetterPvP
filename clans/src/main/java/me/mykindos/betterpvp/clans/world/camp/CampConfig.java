@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureStage;
+import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +48,8 @@ public class CampConfig implements Reloadable {
     private final Map<ClanMember.MemberRank, Set<ConstructionAction>> permissions =
             new EnumMap<>(ClanMember.MemberRank.class);
     private final Set<ConstructionAction> allyActions = EnumSet.noneOf(ConstructionAction.class);
+    private final Map<ClanMember.MemberRank, Set<SettlerAction>> settlerPermissions =
+            new EnumMap<>(ClanMember.MemberRank.class);
     /** Whether allies may open a camp's containers until a clan changes it. */
     @Getter
     private boolean allyContainers;
@@ -94,6 +97,19 @@ public class CampConfig implements Reloadable {
         allyActions.clear();
         allyActions.addAll(actions(config.getStringList("permissions.ALLY"), "ALLY"));
         allyContainers = config.getBoolean("permissions.ally-containers", false);
+
+        settlerPermissions.clear();
+        for (ClanMember.MemberRank rank : ClanMember.MemberRank.values()) {
+            final Set<SettlerAction> actions = EnumSet.noneOf(SettlerAction.class);
+            for (String action : config.getStringList("permissions.settlers." + rank.name())) {
+                try {
+                    actions.add(SettlerAction.valueOf(action.toUpperCase(Locale.ROOT)));
+                } catch (IllegalArgumentException exception) {
+                    log.warn("Unknown settler permission '{}' for {}", action, rank).submit();
+                }
+            }
+            settlerPermissions.put(rank, actions);
+        }
     }
 
     private @NotNull Set<ConstructionAction> actions(@NotNull List<String> names, @NotNull String who) {
@@ -159,6 +175,10 @@ public class CampConfig implements Reloadable {
 
     public @NotNull Map<ClanMember.MemberRank, Set<ConstructionAction>> defaultPermissions() {
         return Collections.unmodifiableMap(permissions);
+    }
+
+    public @NotNull Map<ClanMember.MemberRank, Set<SettlerAction>> defaultSettlerPermissions() {
+        return Collections.unmodifiableMap(settlerPermissions);
     }
 
     /** What allies may do until a clan changes it. */
