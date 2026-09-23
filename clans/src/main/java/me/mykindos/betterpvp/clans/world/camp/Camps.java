@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.world.site.Admission;
 import me.mykindos.betterpvp.core.world.site.SiteInstanceDormantEvent;
@@ -103,6 +104,12 @@ public class Camps implements Listener, SiteOwnership {
             log.warn("Could not release the camp world for disbanded clan {}", key.getOwnerId(), ex).submit();
             return null;
         }));
+    }
+
+    /** Writes down every camp that changed since the last pass, so a crash loses seconds of work rather than a session. */
+    @UpdateEvent(delay = 5000)
+    public void saveChanged() {
+        store.flush();
     }
 
     /** Writes a camp down once its world closes, which is the last moment anything in it can have changed. */
