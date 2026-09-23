@@ -26,12 +26,15 @@ import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
 import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewLimits;
+import me.mykindos.betterpvp.core.world.settler.wage.CoinAccount;
+import me.mykindos.betterpvp.core.world.settler.wage.WageModel;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,12 +62,14 @@ public class CampSettlers implements SettlerSite {
     private final SettlerCards cards;
     private final CampBuilders builders;
     private final CampResources resources;
+    private final CampWageFund wageFund;
 
     @Inject
     public CampSettlers(@NotNull CampStore store, @NotNull SettlerConfig config, @NotNull SettlerService service,
                         @NotNull CampPermissions permissions, @NotNull StructureShapes shapes,
                         @NotNull SettlerCards cards, @NotNull CampBuilders builders,
-                        @NotNull CampResources resources, @NotNull CampProfessions professions,
+                        @NotNull CampResources resources, @NotNull CampWageFund wageFund,
+                        @NotNull CampProfessions professions,
                         @NotNull CampTraits traits) {
         this.store = store;
         this.config = config;
@@ -73,6 +78,7 @@ public class CampSettlers implements SettlerSite {
         this.cards = cards;
         this.builders = builders;
         this.resources = resources;
+        this.wageFund = wageFund;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -176,6 +182,27 @@ public class CampSettlers implements SettlerSite {
         if (refund > 0) {
             resources.refund(site, job.getSpent().share(refund));
         }
+    }
+
+    @Override
+    public @NotNull Optional<WageModel> wageModel(@NotNull SiteKey site) {
+        return Optional.of(config.getWageModel());
+    }
+
+    @Override
+    public @NotNull Optional<CoinAccount> wageFund(@NotNull SiteKey site) {
+        return Optional.of(wageFund);
+    }
+
+    /** Greedy settlers ask for more. It is a trade-off's cost, so rarity does not change it. */
+    @Override
+    public double wageMultiplier(@NotNull SiteKey site, @NotNull Settler settler) {
+        return settler.hasTrait(CampTraits.GREEDY) ? 1 + config.trait(CampTraits.GREEDY, "wage", 0.25) : 1;
+    }
+
+    @Override
+    public @NotNull Duration strikeLimit(@NotNull SiteKey site) {
+        return config.getStrikeLimit();
     }
 
     private @NotNull Location standOn(@NotNull World world, @NotNull PlacedStructure structure, @NotNull String point) {

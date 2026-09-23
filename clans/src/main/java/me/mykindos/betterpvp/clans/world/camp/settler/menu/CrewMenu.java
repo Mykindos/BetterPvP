@@ -24,6 +24,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -47,8 +48,9 @@ public class CrewMenu extends AbstractGui implements Windowed {
     private final Job job;
     private final SettlerSite site;
 
+    /** @param previous where the job list this menu goes back to leads back to */
     CrewMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull ConstructionService.Worksite worksite,
-             @NotNull PlacedStructure structure) {
+             @NotNull PlacedStructure structure, @Nullable Windowed previous) {
         super(9, 6);
         this.menus = menus;
         this.viewer = viewer;
@@ -88,7 +90,7 @@ public class CrewMenu extends AbstractGui implements Windowed {
             }
             setItem(FIRST_FREE_SLOT + i, new SimpleItem(view.build(), click -> {
                 if (allowed) {
-                    menus.join(click.getPlayer(), structure.getId(), candidate.getId());
+                    menus.join(click.getPlayer(), structure.getId(), candidate.getId(), previous);
                 }
             }));
         }
@@ -97,7 +99,7 @@ public class CrewMenu extends AbstractGui implements Windowed {
                 .material(Material.ARROW)
                 .displayName(Translations.component("clans.settler.crew.back").color(NamedTextColor.YELLOW))
                 .action(ClickActions.ALL, Translations.component("clans.settler.crew.back"))
-                .build(), click -> menus.openJobs(click.getPlayer())));
+                .build(), click -> menus.openJobs(click.getPlayer(), previous)));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 

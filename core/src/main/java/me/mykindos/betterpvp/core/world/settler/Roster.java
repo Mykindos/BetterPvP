@@ -15,6 +15,10 @@ import java.util.UUID;
 public class Roster {
 
     private List<Settler> settlers = new ArrayList<>();
+    /** When wages were last settled, or 0 before they ever were. */
+    private long payrollAt;
+    /** The part of a coin owed but not yet charged, carried to the next settlement. */
+    private double payrollCarry;
 
     public @NotNull Optional<Settler> find(@NotNull UUID id) {
         return settlers.stream().filter(settler -> settler.getId().equals(id)).findFirst();

@@ -54,6 +54,6 @@ public class CampBuildSubCommand extends ClanSubCommand {
     public void execute(Player player, Client client, String... args) {
         final Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
         new ConstructionMenu(player, Camps.keyFor(clan), List.copyOf(structures.all()), construction, catalogue,
-                blueprints).show(player);
+                blueprints, null).show(player);
     }
 }

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -24,6 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,11 +44,13 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
     private final ConstructionService construction;
     private final StructureCatalogue catalogue;
     private final BlueprintSessions blueprints;
+    private final @Nullable Windowed previous;
 
     public ConstructionMenu(@NotNull Player viewer, @NotNull SiteKey camp, @NotNull List<CampStructure> structures,
                             @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
-                            @NotNull BlueprintSessions blueprints) {
+                            @NotNull BlueprintSessions blueprints, @Nullable Windowed previous) {
         super(9, 6);
+        this.previous = previous;
         this.viewer = viewer;
         this.camp = camp;
         this.structures = structures.stream().sorted(Comparator.comparingInt(CampStructure::getTier)).toList();
@@ -57,10 +61,11 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
     }
 
     private void populate() {
-        for (int slot = 0; slot < structures.size() && slot < 54; slot++) {
+        for (int slot = 0; slot < structures.size() && slot < 45; slot++) {
             final CampStructure structure = structures.get(slot);
             setItem(slot, new SimpleItem(view(structure), click -> choose(click.getPlayer(), structure)));
         }
+        setItem(49, new BackButton(previous));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 

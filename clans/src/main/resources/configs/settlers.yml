@@ -59,10 +59,25 @@ traits:
   patcher: {speed: 0.20, refund: 0.20}
   architects_eye: {speed: 0.15}
   loner: {alone: 0.40, in-crew: -0.20}
-  greedy: {speed: 0.15}
+  greedy: {speed: 0.15, wage: 0.25}
   brawny: {workforce: 2, speed: -0.10}
   prodigy: {stats: 0.25}
   homesick: {stats: 0.10}
+
+# What settlers are paid from the camp's wage fund, in coins an hour, by profession and rarity. Professions not listed
+# are not paid. model: 'fixed' pays the fixed rates whatever a settler is doing, 'idle-working' pays the idle rate
+# while it waits for work and the working rate while it works. Unpaid settlers strike at once, and leave after
+# strike-hours still unpaid.
+wages:
+  model: fixed
+  strike-hours: 72
+  fixed:
+    builder: {common: 300, uncommon: 600, rare: 1200, legendary: 2500}
+  idle-working:
+    idle:
+      builder: {common: 150, uncommon: 300, rare: 600, legendary: 1250}
+    working:
+      builder: {common: 450, uncommon: 900, rare: 1800, legendary: 3750}
 
 # Settlers every new camp starts with, so it has a crew for its first jobs.
 starting-settlers:
@@ -84,6 +99,9 @@ looks:
     work: work
   none:
     skin: settler_wanderer
+  # The Steward who runs the Great Hall. Not a settler, but looks like one.
+  steward:
+    skin: settler_steward
 
 # A settler's name is one first name and one byname.
 names:
