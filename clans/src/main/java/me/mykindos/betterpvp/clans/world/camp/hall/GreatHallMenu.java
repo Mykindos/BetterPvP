@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Consumer;
 
-/** What the Steward offers: settlers, hiring, wages, crews, construction and permissions, each in its own menu. */
+/** What the Steward offers: settlers, hiring, wages, crews, the farm, construction and permissions, each nested. */
 public class GreatHallMenu extends AbstractGui implements Windowed {
 
     GreatHallMenu(@NotNull HallMenus menus, @NotNull Player viewer, @NotNull SiteKey key) {
@@ -32,8 +32,10 @@ public class GreatHallMenu extends AbstractGui implements Windowed {
                 player -> new HiringBoardMenu(menus, player, key, this).show(player)));
         setItem(12, entry(Material.GOLD_INGOT, "wages",
                 player -> new WageFundMenu(menus, player, key, this).show(player)));
-        setItem(14, entry(Material.IRON_PICKAXE, "crews",
+        setItem(13, entry(Material.IRON_PICKAXE, "crews",
                 player -> menus.getCrews().openJobs(player, this)));
+        setItem(14, entry(Material.WHEAT, "farm",
+                player -> new FarmMenu(menus, player, key, this).show(player)));
         setItem(15, entry(Material.CRAFTING_TABLE, "construction",
                 player -> new ConstructionMenu(player, key, List.copyOf(menus.getStructures().all()),
                         menus.getConstruction(), menus.getCatalogue(), menus.getBlueprints(), this).show(player)));

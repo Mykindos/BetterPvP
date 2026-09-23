@@ -67,7 +67,10 @@ traits:
   cook: {food: 0.25}
   beloved: {floor: -10}
   content: {floor: -20}
-  moody: {swing: 2}
+  moody: {swing: 2, bonus: 0.30}
+  green_thumb: {growth: 0.10}
+  bountiful: {extra-drop: 0.10}
+  seasoned: {bonus: 0.20}
   recruiter: {sooner: 0.15}
   haggler: {discount: 0.10}
 
@@ -105,6 +108,15 @@ morale:
   food-max: 30
   leave-below: -40
   leave-after-hours: 48
+
+# What Farmers at work do for the camp's farm, each at common strength. growth: crops grow that much faster, as a
+# share. extra-drop: the chance a harvested crop drops one more. Both grow with a Farmer's profession stats and
+# morale, and the whole farm stops at max-growth and max-extra-drop.
+farm:
+  growth: 0.10
+  extra-drop: 0.10
+  max-growth: 1.0
+  max-extra-drop: 0.5
 
 # Boats bringing settlers to a camp's Dock, only while the Dock is working. Each boat brings a number of candidates
 # rolled from count-odds, who wait wait-hours at the Dock. Odds are weights. A common candidate joins for free unless

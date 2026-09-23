@@ -7,6 +7,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWageFund;
+import me.mykindos.betterpvp.clans.world.camp.settler.FarmWorkplace;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.CrewMenus;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Opens the Great Hall's menus, all reached from the Steward: the hub, and under it the settlers, the hiring board,
- * the wage fund, the crews, the construction menu and the camp's permissions. Carries out what the wage fund asks for.
+ * the wage fund, the crews, the farm, the construction menu and the camp's permissions. Carries out what the wage fund asks for.
  */
 @Singleton
 @Getter(AccessLevel.PACKAGE)
@@ -56,6 +57,7 @@ public class HallMenus {
     private final ProfessionRegistry professions;
     private final CampRecruitment recruitment;
     private final RecruitConfig recruitConfig;
+    private final FarmWorkplace farm;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
@@ -64,7 +66,7 @@ public class HallMenus {
                      @NotNull BlueprintSessions blueprints, @NotNull CrewMenus crews, @NotNull SettlerService settlers,
                      @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
-                     @NotNull RecruitConfig recruitConfig) {
+                     @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -80,6 +82,7 @@ public class HallMenus {
         this.professions = professions;
         this.recruitment = recruitment;
         this.recruitConfig = recruitConfig;
+        this.farm = farm;
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */

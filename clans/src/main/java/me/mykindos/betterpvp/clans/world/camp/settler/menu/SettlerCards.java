@@ -89,7 +89,7 @@ public class SettlerCards {
         open(player, site, settlerId, previous);
     }
 
-    void tell(@NotNull Player player, @NotNull Component message) {
+    public void tell(@NotNull Player player, @NotNull Component message) {
         UtilMessage.message(player, Translations.component("clans.prefix.settler"), message);
     }
 }
