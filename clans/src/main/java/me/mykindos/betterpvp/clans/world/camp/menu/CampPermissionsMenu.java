@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
@@ -16,6 +17,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
@@ -42,17 +44,20 @@ public class CampPermissionsMenu extends AbstractGui implements Windowed {
     private final CampPermissions permissions;
     private final boolean editable;
     private final Page page;
+    private final @Nullable Windowed previous;
 
     public CampPermissionsMenu(long clanId, @NotNull CampPermissions permissions, boolean editable) {
-        this(clanId, permissions, editable, Page.CONSTRUCTION);
+        this(clanId, permissions, editable, Page.CONSTRUCTION, null);
     }
 
-    public CampPermissionsMenu(long clanId, @NotNull CampPermissions permissions, boolean editable, @NotNull Page page) {
+    public CampPermissionsMenu(long clanId, @NotNull CampPermissions permissions, boolean editable, @NotNull Page page,
+                               @Nullable Windowed previous) {
         super(9, RANKS.size() + 2);
         this.clanId = clanId;
         this.permissions = permissions;
         this.editable = editable;
         this.page = page;
+        this.previous = previous;
         if (page == Page.CONSTRUCTION) {
             populateConstruction();
         } else {
@@ -61,6 +66,7 @@ public class CampPermissionsMenu extends AbstractGui implements Windowed {
         final int tabs = (RANKS.size() + 1) * 9;
         setItem(tabs + 3, tab(Page.CONSTRUCTION, Material.BRICKS));
         setItem(tabs + 5, tab(Page.SETTLERS, Material.PLAYER_HEAD));
+        setItem(tabs, new BackButton(previous));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 
@@ -96,7 +102,7 @@ public class CampPermissionsMenu extends AbstractGui implements Windowed {
         }
         return new SimpleItem(view.build(), click -> {
             if (!open) {
-                new CampPermissionsMenu(clanId, permissions, editable, target).show(click.getPlayer());
+                new CampPermissionsMenu(clanId, permissions, editable, target, previous).show(click.getPlayer());
             }
         });
     }

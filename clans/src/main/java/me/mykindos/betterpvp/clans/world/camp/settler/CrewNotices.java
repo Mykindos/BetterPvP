@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -28,7 +27,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-/** Tells members in the camp when a job starts waiting for a crew, with a link to the crew menu. */
+/** Tells members in the camp when a job starts waiting for a crew, which the Steward in the Great Hall can staff. */
 @BPvPListener
 @Singleton
 public class CrewNotices implements Listener {
@@ -69,11 +68,7 @@ public class CrewNotices implements Listener {
                 .orElseGet(() -> Component.text(structure.getType()));
         final Component message = Translations.component("clans.settler.crew.needed", name.color(NamedTextColor.YELLOW),
                         Component.text(rule.threshold(structure, job), NamedTextColor.YELLOW))
-                .color(NamedTextColor.GRAY)
-                .append(Component.space())
-                .append(Translations.component("clans.settler.crew.open_link")
-                        .color(NamedTextColor.GREEN)
-                        .clickEvent(ClickEvent.runCommand("/clan crews")));
+                .color(NamedTextColor.GRAY);
 
         for (SiteInstance instance : instances.forKey(site)) {
             final World world = Bukkit.getWorld(instance.getWorldName());

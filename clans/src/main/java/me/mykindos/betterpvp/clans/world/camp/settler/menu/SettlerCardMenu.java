@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.settler.Profession;
@@ -93,6 +94,12 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         if (profession == null) {
             view.lore(Translations.component("clans.settler.card.wanders").color(NamedTextColor.GRAY));
         }
+        final double wage = cards.getPayroll().hourly(site, settler);
+        if (wage > 0) {
+            view.lore(Translations.component("clans.settler.card.wage",
+                    Component.text(UtilFormat.formatNumber((int) Math.ceil(wage)), NamedTextColor.GOLD))
+                    .color(NamedTextColor.GRAY));
+        }
         return new SimpleItem(view.build());
     }
 
@@ -145,9 +152,9 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                     .build(), click -> {
                         final UUID job = structureId(settler.getAssignment());
                         if (job == null) {
-                            cards.getCrews().openJobs(click.getPlayer());
+                            cards.getCrews().openJobs(click.getPlayer(), this);
                         } else {
-                            cards.getCrews().openCrew(click.getPlayer(), job);
+                            cards.getCrews().openCrew(click.getPlayer(), job, this);
                         }
                     }));
             return;

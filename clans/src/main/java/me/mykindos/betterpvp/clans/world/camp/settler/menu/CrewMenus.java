@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.AccessLevel;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.locale.Translations;
+import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.world.settler.crew.CrewService;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -43,28 +45,29 @@ public class CrewMenus {
         this.professions = professions;
     }
 
-    /** Every job running in the camp {@code player} stands in. */
-    public void openJobs(@NotNull Player player) {
+    /** Every job running in the camp {@code player} stands in. Back leads to {@code previous}. */
+    public void openJobs(@NotNull Player player, @Nullable Windowed previous) {
         construction.worksite(player.getWorld()).ifPresentOrElse(
-                worksite -> new CrewJobsMenu(this, player, worksite).show(player),
+                worksite -> new CrewJobsMenu(this, player, worksite, previous).show(player),
                 () -> tell(player, "clans.settler.crew.not_in_camp"));
     }
 
     /** The crew of the job on {@code structureId} in the camp {@code player} stands in. */
-    public void openCrew(@NotNull Player player, @NotNull UUID structureId) {
+    public void openCrew(@NotNull Player player, @NotNull UUID structureId, @Nullable Windowed previous) {
         construction.worksite(player.getWorld())
                 .flatMap(worksite -> worksite.getHolding().find(structureId)
                         .filter(structure -> structure.getJob() != null)
-                        .map(structure -> new CrewMenu(this, player, worksite, structure)))
-                .ifPresentOrElse(menu -> menu.show(player), () -> openJobs(player));
+                        .map(structure -> new CrewMenu(this, player, worksite, structure, previous)))
+                .ifPresentOrElse(menu -> menu.show(player), () -> openJobs(player, previous));
     }
 
-    void join(@NotNull Player player, @NotNull UUID structureId, @NotNull UUID settlerId) {
+    void join(@NotNull Player player, @NotNull UUID structureId, @NotNull UUID settlerId,
+              @Nullable Windowed previous) {
         final SettlerResult result = crews.join(player, player.getWorld(), structureId, settlerId);
         if (!result.isSuccess() && result.getReason() != null) {
             UtilMessage.message(player, Translations.component("clans.prefix.settler"), result.getReason());
         }
-        openCrew(player, structureId);
+        openCrew(player, structureId, previous);
     }
 
     private void tell(@NotNull Player player, @NotNull String key) {
