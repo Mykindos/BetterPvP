@@ -1,5 +1,6 @@
 author: Mykindos
 main: me.mykindos.betterpvp.core.Core
+loader: me.mykindos.betterpvp.core.CoreLoader
 name: Core
 load: STARTUP
 version: '1.0'
