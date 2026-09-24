@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.construction;
 
+import it.unimi.dsi.fastutil.longs.LongSet;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -89,6 +91,21 @@ class FitCheckTest {
         assertFalse(fitCheck.problem(world, holding, type(null), at(2), null).isEmpty());
         assertTrue(fitCheck.problem(world, holding, type(null), at(2), other.getId()).isEmpty());
         assertTrue(fitCheck.problem(world, holding, type(null), at(6), null).isEmpty());
+    }
+
+    @Test
+    void clashesAreTheColumnsOutsideTheZonesOrUnderAnotherStructure() {
+        assertTrue(fitCheck.clashes(world, holding, type(null), at(2), null).isEmpty());
+        assertEquals(LongSet.of(Footprint.pack(10, 0)), fitCheck.clashes(world, holding, type(null), at(9), null));
+
+        final PlacedStructure other = new PlacedStructure(UUID.randomUUID(), "hall",
+                new StructurePosition(3, 64, 0, 0), StructureCondition.ACTIVE);
+        holding.getStructures().add(other);
+        final Footprint occupied = at(3).getFootprint();
+        when(shapes.footprintOf(any(), anyString(), anyInt(), any())).thenReturn(Optional.of(occupied));
+
+        assertEquals(LongSet.of(Footprint.pack(3, 0)), fitCheck.clashes(world, holding, type(null), at(2), null));
+        assertTrue(fitCheck.clashes(world, holding, type(null), at(2), other.getId()).isEmpty());
     }
 
     private SchematicPlacement at(int x) {

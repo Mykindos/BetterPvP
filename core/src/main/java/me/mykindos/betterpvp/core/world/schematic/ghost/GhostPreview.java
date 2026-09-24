@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * A see-where-it-goes copy of a structure that only one player can see, drawn from glowing block displays.
@@ -49,6 +50,8 @@ public final class GhostPreview {
     private int quarterTurns = -1;
     @Getter
     private boolean valid = true;
+    /** Colours each piece on its own when set, instead of the whole ghost by {@link #valid}. */
+    private @Nullable Predicate<GhostPiece> fits;
 
     public GhostPreview(@NotNull Plugin plugin, @NotNull Player viewer, @NotNull Schematic schematic,
                         @NotNull GhostMesher mesher) {
@@ -88,11 +91,21 @@ public final class GhostPreview {
 
     /** Glows green if {@code valid}, red if not. */
     public void setValid(boolean valid) {
-        if (this.valid == valid) {
+        if (this.valid == valid && fits == null) {
             return;
         }
         this.valid = valid;
-        displays.forEach(display -> display.setGlowColorOverride(color()));
+        this.fits = null;
+        recolor();
+    }
+
+    /**
+     * Glows each piece green where {@code fits} says it can go and red where not, rather than the whole ghost one
+     * colour. Pieces are in blocks from the anchor, already turned. Lasts until {@link #setValid} is called.
+     */
+    public void tint(@NotNull Predicate<GhostPiece> fits) {
+        this.fits = fits;
+        recolor();
     }
 
     /** Takes the ghost away. It can be shown again afterwards. */
@@ -125,7 +138,7 @@ public final class GhostPreview {
                 spawned.setBrightness(new Display.Brightness(15, 15));
                 spawned.setTeleportDuration(2);
                 spawned.setGlowing(true);
-                spawned.setGlowColorOverride(color());
+                spawned.setGlowColorOverride(color(piece));
             });
             viewer.showEntity(plugin, display);
             displays.add(display);
@@ -138,7 +151,14 @@ public final class GhostPreview {
         shown = List.of();
     }
 
-    private @NotNull Color color() {
-        return valid ? VALID : INVALID;
+    private void recolor() {
+        for (int i = 0; i < displays.size(); i++) {
+            displays.get(i).setGlowColorOverride(color(shown.get(i)));
+        }
+    }
+
+    private @NotNull Color color(@NotNull GhostPiece piece) {
+        final boolean green = fits == null ? valid : fits.test(piece);
+        return green ? VALID : INVALID;
     }
 }
