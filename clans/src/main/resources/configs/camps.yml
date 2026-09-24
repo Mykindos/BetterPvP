@@ -83,6 +83,18 @@ structures:
           cooldown-seconds: 300
           # What they respawn with, by material.
           items: {bread: 4, torch: 8}
+      infirmary_cot:
+        icon: WHITE_BED
+        cost: {wood: 120, stone: 40}
+        seconds: 600
+        workforce: 3
+        piece: camps/upgrades/infirmary_cot
+        settings:
+          # How long one member waits between tended respawns.
+          cooldown-seconds: 3600
+          # How long the Regeneration lasts, and its level.
+          seconds: 8
+          level: 1
   dock:
     icon: OAK_BOAT
     stages:
@@ -91,6 +103,16 @@ structures:
         build-seconds: 0
         workforce: 2
     repair: {cost: {wood: 60}, seconds: 300}
+    upgrades:
+      harbourmaster:
+        icon: SPYGLASS
+        cost: {wood: 100, iron: 20}
+        seconds: 600
+        workforce: 2
+        piece: camps/upgrades/harbourmaster
+        settings:
+          # How long a camp waits between looking at or choosing the next boat.
+          cooldown-hours: 24
   workshop:
     icon: CRAFTING_TABLE
     stages:
