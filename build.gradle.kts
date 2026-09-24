@@ -1,5 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val outputBuckets = mapOf(
     "clans" to setOf(
@@ -35,7 +34,6 @@ val outputBuckets = mapOf(
 plugins {
     java apply true
     `version-catalog` apply true
-    kotlin("jvm") version libs.versions.kotlin apply true
     id("com.gradleup.shadow") version "9.4.1" apply false // Building fat jar
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
     id("org.flywaydb.flyway") version "12.5.0" apply false // Flyway
@@ -88,9 +86,8 @@ subprojects {
     }
 
     // Set java language version
-    plugins.apply("java")
+    plugins.apply("java-library")
     plugins.apply("com.gradleup.shadow")
-    plugins.apply("org.jetbrains.kotlin.jvm")
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
@@ -127,11 +124,6 @@ subprojects {
         options.compilerArgs.add("-Xlint:deprecation")
     }
 
-    tasks.withType<KotlinCompile>().configureEach {
-        compilerOptions {
-            freeCompilerArgs.add("-Xlint:deprecation")
-        }
-    }
 
     // Make tests use JUnit
     tasks {
