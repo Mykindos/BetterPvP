@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.world.camp.menu;
 
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructure;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.BuildQueue;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.QueuedAction;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
@@ -19,6 +21,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,8 +58,46 @@ public class PlacedStructuresMenu extends AbstractGui implements Windowed {
                     .build(), click -> new StructureActionsMenu(menus, click.getPlayer(), camp, structure.getId(),
                     previous, null).show(click.getPlayer())));
         }
+        final BuildQueue queue = menus.getBuildQueue();
+        final Optional<QueuedAction> queued = queue.queued(camp);
+        if (queue.isActive(camp) || queued.isPresent()) {
+            setItem(45, queued(menus, camp, previous, queued.orElse(null)));
+        }
         setItem(49, new BackButton(previous));
         setBackground(Menu.BACKGROUND_ITEM);
+    }
+
+    /** What the camp has queued, which a member who could take that action, or who queued it, can clear. */
+    private static @NotNull SimpleItem queued(@NotNull StructureMenus menus, @NotNull SiteKey camp,
+                                              @Nullable Windowed previous, @Nullable QueuedAction queued) {
+        final BuildQueue queue = menus.getBuildQueue();
+        final ItemView.ItemViewBuilder view = ItemView.builder()
+                .material(Material.PAPER)
+                .displayName(Translations.component("clans.camp.upgrade.build_queue.menu")
+                        .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                .frameLore(true);
+        if (queued == null) {
+            view.lore(Translations.component("clans.camp.upgrade.build_queue.menu.empty").color(NamedTextColor.GRAY));
+            return new SimpleItem(view.build());
+        }
+        view.lore(queue.describe(queued).color(NamedTextColor.WHITE))
+                .lore(Translations.component("clans.camp.upgrade.build_queue.button.description")
+                        .color(NamedTextColor.GRAY))
+                .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.build_queue.menu.clear"));
+        return new SimpleItem(view.build(), click -> {
+            final Player player = click.getPlayer();
+            final boolean mayClear = player.getUniqueId().equals(queued.getQueuedBy())
+                    || menus.getPermissions().allows(player, camp.getOwnerId(), queued.getAction());
+            if (!mayClear) {
+                menus.tell(player, Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
+                return;
+            }
+            if (queue.clear(camp) != null) {
+                menus.tell(player, Translations.component("clans.camp.upgrade.build_queue.cleared",
+                        queue.describe(queued)).color(NamedTextColor.GRAY));
+            }
+            new PlacedStructuresMenu(menus, camp, previous).show(player);
+        });
     }
 
     /** A structure's icon, name, stage and status, with how long its job has left if one is running. */

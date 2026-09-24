@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.world.camp;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.QueuedAction;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.Holding;
@@ -98,6 +99,15 @@ public class Camp {
 
     /** What each rank may do to the camp's settlers, or null for the configured defaults. */
     private @Nullable Map<ClanMember.MemberRank, Set<SettlerAction>> settlerPermissions;
+
+    /** The action waiting to start when the camp's next job is claimed, or null when nothing is queued. */
+    private @Nullable QueuedAction queuedAction;
+
+    /** The last queued action that could not start, kept so members hear about it when they arrive. */
+    private @Nullable QueuedAction droppedAction;
+
+    /** When a job was last rushed, or 0 before one ever was. */
+    private long rushedAt;
 
     public int getResource(String resource) {
         return resources.getOrDefault(resource, 0);

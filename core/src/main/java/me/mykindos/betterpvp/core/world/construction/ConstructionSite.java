@@ -35,6 +35,12 @@ public interface ConstructionSite {
         return Optional.empty();
     }
 
+    /** The share of what {@code structure} cost to reach its stage that demolishing it gives back. */
+    default double demolishRefund(@NotNull SiteKey site, @NotNull PlacedStructure structure,
+                                  @NotNull StructureType type) {
+        return type.getFlags().getDemolishRefund();
+    }
+
     /** How many of a structure's top layers are held back until it is claimed, then animate in. */
     default int claimLayers() {
         return 3;

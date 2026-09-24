@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.world.camp.resource.ResourceChests;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceOverflow;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.SalvageBin;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -68,7 +69,8 @@ class CampRulesTest {
         resources = new CampResources(store, chests, campWide);
         permissions = new CampPermissions(clanManager, store, config);
         construction = new CampConstruction(store, resources, permissions, config,
-                new ResourceOverflow(store, resources, config), mock(CrewRule.class), mock(ConstructionService.class));
+                new ResourceOverflow(store, resources, config), mock(CrewRule.class), mock(SalvageBin.class),
+                mock(ConstructionService.class));
     }
 
     @Test
