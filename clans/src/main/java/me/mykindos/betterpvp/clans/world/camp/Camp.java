@@ -109,6 +109,9 @@ public class Camp {
     /** When a job was last rushed, or 0 before one ever was. */
     private long rushedAt;
 
+    /** Members who respawn at the Barracks' second door. */
+    private Set<UUID> secondDoor = new HashSet<>();
+
     public int getResource(String resource) {
         return resources.getOrDefault(resource, 0);
     }
