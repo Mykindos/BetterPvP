@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceOverflow;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.RankLockbox;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.SalvageBin;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
@@ -42,13 +43,16 @@ public class CampConstruction implements ConstructionSite {
     private final ResourceOverflow overflow;
     private final CrewRule crews;
     private final SalvageBin salvageBin;
+    private final RankLockbox lockbox;
 
     @Inject
     public CampConstruction(@NotNull CampStore store, @NotNull CampResources resources,
                             @NotNull CampPermissions permissions, @NotNull CampConfig config,
                             @NotNull ResourceOverflow overflow, @NotNull CrewRule crews,
-                            @NotNull SalvageBin salvageBin, @NotNull ConstructionService service) {
+                            @NotNull SalvageBin salvageBin, @NotNull ConstructionService service,
+                            @NotNull RankLockbox lockbox) {
         this.store = store;
+        this.lockbox = lockbox;
         this.resources = resources;
         this.permissions = permissions;
         this.config = config;
@@ -115,6 +119,6 @@ public class CampConstruction implements ConstructionSite {
 
     @Override
     public @NotNull List<StructureContents> contents() {
-        return List.of(overflow);
+        return List.of(overflow, lockbox);
     }
 }

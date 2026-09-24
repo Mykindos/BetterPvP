@@ -2,23 +2,22 @@ package me.mykindos.betterpvp.clans.world.camp.resource;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import dev.brauw.mapper.region.PointRegion;
-import dev.brauw.mapper.region.Region;
 import me.mykindos.betterpvp.clans.world.camp.CampConfig;
+import me.mykindos.betterpvp.clans.world.camp.storage.CampChest;
+import me.mykindos.betterpvp.clans.world.camp.storage.ChestPoints;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
-import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,17 +35,16 @@ public class ResourceChests {
 
     private final StructureCatalogue catalogue;
     private final SchematicService schematics;
-    private final StructureShapes shapes;
+    private final ChestPoints points;
     private final CampConfig config;
     private final Map<String, Integer> counts = new ConcurrentHashMap<>();
-    private final Map<String, Set<Long>> positions = new ConcurrentHashMap<>();
 
     @Inject
     public ResourceChests(@NotNull StructureCatalogue catalogue, @NotNull SchematicService schematics,
-                          @NotNull StructureShapes shapes, @NotNull CampConfig config) {
+                          @NotNull ChestPoints points, @NotNull CampConfig config) {
         this.catalogue = catalogue;
         this.schematics = schematics;
-        this.shapes = shapes;
+        this.points = points;
         this.config = config;
     }
 
@@ -61,12 +59,22 @@ public class ResourceChests {
         return chests * config.getChestCapacity();
     }
 
+    /** Every resource chest that counts in {@code holding}, structure by structure. */
+    public @NotNull List<CampChest> chests(@NotNull Holding holding, @NotNull World world) {
+        final List<CampChest> chests = new ArrayList<>();
+        for (PlacedStructure structure : holding.getStructures()) {
+            if (counts(structure)) {
+                chests.addAll(points.find(world, structure, MARKER));
+            }
+        }
+        return chests;
+    }
+
     /** The structure whose resource chest {@code block} is, if it is one. */
     public @NotNull Optional<PlacedStructure> at(@NotNull Holding holding, @NotNull World world, @NotNull Block block) {
-        final long clicked = pack(block.getX(), block.getY(), block.getZ());
-        return holding.getStructures().stream()
-                .filter(ResourceChests::counts)
-                .filter(structure -> positions(world, structure).contains(clicked))
+        return chests(holding, world).stream()
+                .filter(chest -> chest.isAt(block))
+                .map(CampChest::getStructure)
                 .findFirst();
     }
 
@@ -80,29 +88,9 @@ public class ResourceChests {
                 .orElse(0));
     }
 
-    private @NotNull Set<Long> positions(@NotNull World world, @NotNull PlacedStructure structure) {
-        final String key = world.getName() + ":" + structure.getId() + ":" + structure.getStage() + ":"
-                + structure.getPosition();
-        return positions.computeIfAbsent(key, unused -> {
-            final Set<Long> found = new HashSet<>();
-            shapes.placementOf(world, structure).ifPresent(placement -> {
-                for (Region marker : placement.markers()) {
-                    if (MARKER.equalsIgnoreCase(marker.getName()) && marker instanceof PointRegion point) {
-                        found.add(pack(point.getLocation().getBlockX(), point.getLocation().getBlockY(),
-                                point.getLocation().getBlockZ()));
-                    }
-                }
-            });
-            return found;
-        });
-    }
-
-    private static boolean counts(@NotNull PlacedStructure structure) {
+    /** Whether a structure's chests count: once it has been built for the first time, and while it stands. */
+    public static boolean counts(@NotNull PlacedStructure structure) {
         return structure.getCondition() != StructureCondition.UNDER_CONSTRUCTION
                 && structure.getCondition() != StructureCondition.NOT_PLACED;
-    }
-
-    private static long pack(int x, int y, int z) {
-        return ((long) (x & 0x3FFFFFF) << 38) | ((long) (z & 0x3FFFFFF) << 12) | (y & 0xFFF);
     }
 }
