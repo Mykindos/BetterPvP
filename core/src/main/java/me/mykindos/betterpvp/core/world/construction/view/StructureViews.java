@@ -9,10 +9,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructurePieceUseEvent;
 import me.mykindos.betterpvp.core.world.construction.StructurePlacedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
@@ -27,13 +29,17 @@ import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -135,6 +142,37 @@ public class StructureViews implements Listener {
                 view.clear();
             }
         });
+    }
+
+    /** Right-clicking an upgrade's piece lets whatever the upgrade does take the click. */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onUse(@NotNull PlayerInteractEvent event) {
+        final Block block = event.getClickedBlock();
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND || block == null) {
+            return;
+        }
+        final Loaded loaded = worlds.get(block.getWorld().getName());
+        if (loaded == null) {
+            return;
+        }
+        for (Map.Entry<UUID, StructureView> entry : loaded.views.entrySet()) {
+            final Optional<String> upgrade = entry.getValue().pieceAt(block.getX(), block.getY(), block.getZ());
+            if (upgrade.isEmpty()) {
+                continue;
+            }
+            service.worksite(block.getWorld()).ifPresent(worksite -> worksite.getHolding().find(entry.getKey())
+                    .ifPresent(structure -> catalogue.find(structure.getType())
+                            .flatMap(type -> type.upgrade(upgrade.get()))
+                            .ifPresent(found -> {
+                                final StructurePieceUseEvent use = new StructurePieceUseEvent(event.getPlayer(),
+                                        worksite.getKey(), structure, found);
+                                UtilServer.callEvent(use);
+                                if (use.isHandled()) {
+                                    event.setCancelled(true);
+                                }
+                            })));
+            return;
+        }
     }
 
     /** Writes down a structure container when whoever had it open closes it. */

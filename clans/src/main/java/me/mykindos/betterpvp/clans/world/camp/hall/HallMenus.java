@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.CampProsperity;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.RecruitConfig;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
+import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -63,6 +64,7 @@ public class HallMenus {
     private final FarmWorkplace farm;
     private final CampProsperity prosperity;
     private final CampStore store;
+    private final CampUpgrades upgrades;
     private final StructureMenus structureMenus;
 
     @Inject
@@ -73,7 +75,7 @@ public class HallMenus {
                      @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
                      @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm,
-                     @NotNull CampProsperity prosperity, @NotNull CampStore store,
+                     @NotNull CampProsperity prosperity, @NotNull CampStore store, @NotNull CampUpgrades upgrades,
                      @NotNull StructureMenus structureMenus) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
@@ -93,6 +95,7 @@ public class HallMenus {
         this.farm = farm;
         this.prosperity = prosperity;
         this.store = store;
+        this.upgrades = upgrades;
         this.structureMenus = structureMenus;
     }
 
