@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -29,22 +30,28 @@ public class CampStructures {
     private final List<CampStructure> structures;
 
     @Inject
-    public CampStructures(@NotNull CampConfig config, @NotNull StructureCatalogue catalogue) {
+    public CampStructures(@NotNull CampConfig config, @NotNull StructureCatalogue catalogue,
+                          @NotNull CampUpgrades upgrades) {
         final StructureFlags permanent = StructureFlags.builder().demolishable(false).build();
         final StructureFlags ordinary = StructureFlags.builder().build();
         final Set<String> afterHall = Set.of(CampConstruction.GREAT_HALL);
 
         this.structures = List.of(
-                new CampStructure(CampConstruction.GREAT_HALL, 1, Set.of(), null, permanent, config),
-                new CampStructure(BARRACKS, 1, afterHall, null, permanent, config),
+                new CampStructure(CampConstruction.GREAT_HALL, 1, Set.of(), null, permanent, config, upgrades),
+                new CampStructure(BARRACKS, 1, afterHall, null, permanent, config, upgrades),
                 new CampStructure(DOCK, 1, afterHall, null,
-                        StructureFlags.builder().demolishable(false).movable(false).startsBroken(true).build(), config),
-                new CampStructure(WORKSHOP, 1, afterHall, null, ordinary, config),
-                new CampStructure(STOREHOUSE, 1, afterHall, null, ordinary, config));
+                        StructureFlags.builder().demolishable(false).movable(false).startsBroken(true).build(), config,
+                        upgrades),
+                new CampStructure(WORKSHOP, 1, afterHall, null, ordinary, config, upgrades),
+                new CampStructure(STOREHOUSE, 1, afterHall, null, ordinary, config, upgrades));
         structures.forEach(catalogue::register);
     }
 
     public @NotNull Collection<CampStructure> all() {
         return structures;
+    }
+
+    public @NotNull Optional<CampStructure> find(@NotNull String id) {
+        return structures.stream().filter(structure -> structure.getId().equals(id)).findFirst();
     }
 }

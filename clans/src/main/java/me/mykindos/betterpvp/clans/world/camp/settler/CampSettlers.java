@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.protection.CampGrounds;
 import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.ToolRack;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -66,6 +67,7 @@ public class CampSettlers implements SettlerSite {
     private final CampResources resources;
     private final CampWageFund wageFund;
     private final CampMorale morale;
+    private final ToolRack toolRack;
 
     @Inject
     public CampSettlers(@NotNull CampStore store, @NotNull SettlerConfig config, @NotNull SettlerService service,
@@ -74,7 +76,7 @@ public class CampSettlers implements SettlerSite {
                         @NotNull CampResources resources, @NotNull CampWageFund wageFund,
                         @NotNull CampMorale morale,
                         @NotNull CampProfessions professions,
-                        @NotNull CampTraits traits) {
+                        @NotNull CampTraits traits, @NotNull ToolRack toolRack) {
         this.store = store;
         this.config = config;
         this.permissions = permissions;
@@ -84,6 +86,7 @@ public class CampSettlers implements SettlerSite {
         this.resources = resources;
         this.wageFund = wageFund;
         this.morale = morale;
+        this.toolRack = toolRack;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -171,7 +174,7 @@ public class CampSettlers implements SettlerSite {
         if (!settler.hasProfession(CampProfessions.BUILDER)) {
             return Optional.empty();
         }
-        return Optional.of(builders.stats(settler, job, crew));
+        return Optional.of(toolRack.apply(site, builders.stats(settler, job, crew)));
     }
 
     @Override

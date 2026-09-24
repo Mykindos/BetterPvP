@@ -57,6 +57,20 @@ public class StructureShapes {
         });
     }
 
+    /**
+     * Where an upgrade's piece lands on a structure as it stands now: on the upgrade's point in the structure's build,
+     * turned the way the structure is. Empty if the upgrade has no piece or the build has no point for it.
+     */
+    public @NotNull Optional<SchematicPlacement> pieceOf(@NotNull World world, @NotNull PlacedStructure structure,
+                                                         @NotNull StructureUpgrade upgrade) {
+        final String piece = upgrade.getPiece();
+        if (piece == null) {
+            return Optional.empty();
+        }
+        return point(world, structure, upgrade.point()).flatMap(at -> schematics.load(piece)
+                .map(schematic -> SchematicPlacement.of(schematic, at, structure.getPosition().getQuarterTurns())));
+    }
+
     public @NotNull Optional<Footprint> footprintOf(@NotNull World world, @NotNull String type, int stage,
                                                     @NotNull StructurePosition position) {
         final String key = type + ":" + stage + ":" + position.getX() + ":" + position.getY() + ":" + position.getZ()

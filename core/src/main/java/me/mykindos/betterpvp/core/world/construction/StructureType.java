@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -40,6 +41,15 @@ public interface StructureType {
     /** How long moving it takes. Instant unless the type says otherwise. */
     default @NotNull Duration getMoveTime() {
         return Duration.ZERO;
+    }
+
+    /** Every upgrade it offers, across all its stages. */
+    default @NotNull List<StructureUpgrade> getUpgrades() {
+        return List.of();
+    }
+
+    default @NotNull Optional<StructureUpgrade> upgrade(@NotNull String id) {
+        return getUpgrades().stream().filter(upgrade -> upgrade.getId().equals(id)).findFirst();
     }
 
     default @NotNull ResourceCost getRepairCost() {

@@ -7,5 +7,6 @@ public enum JobKind {
     @JsonAlias("UPGRADE")
     ADVANCE,
     MOVE,
-    REPAIR
+    REPAIR,
+    FIT_UPGRADE
 }

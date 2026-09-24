@@ -44,6 +44,8 @@ public class Job {
     private int targetStage;
     /** Where a move is taking the structure. Null for anything but a move. */
     private @Nullable StructurePosition target;
+    /** The upgrade being fitted. Null for anything but an upgrade. */
+    private @Nullable String upgrade;
 
     public static @NotNull Job start(@NotNull JobKind kind, @NotNull Duration duration, @NotNull ResourceCost spent,
                                      int targetStage, long now) {
