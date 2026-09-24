@@ -28,7 +28,6 @@ At a high level, Champions owns:
 Read these first:
 
 - [CONTEXT.md](../CONTEXT.md)
-- [core/CONTEXT.md](../core/CONTEXT.md)
 
 This module builds on shared concepts from `core`:
 

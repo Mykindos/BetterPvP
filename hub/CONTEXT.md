@@ -13,9 +13,7 @@ It owns the shared hub-world experience that players land in before routing into
 Read these first:
 
 - [CONTEXT.md](../CONTEXT.md)
-- [core/CONTEXT.md](../core/CONTEXT.md)
 - [champions/CONTEXT.md](../champions/CONTEXT.md)
-- [orchestration/CONTEXT.md](../orchestration/CONTEXT.md)
 - [private/store/CONTEXT.md](../private/store/CONTEXT.md)
 
 `core` owns shared concepts such as `Client`, `Gamer`, ranks, action bars, sidebars, boss bars, combat infrastructure, item/menu frameworks, scene primitives, and generic world abstractions.

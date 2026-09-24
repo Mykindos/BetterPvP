@@ -13,7 +13,6 @@ This is not a generic account-wide achievement layer. In the current code shape,
 Read these first:
 
 - [CONTEXT.md](../CONTEXT.md)
-- [core/CONTEXT.md](../core/CONTEXT.md)
 
 `core` still owns the shared player model and the generic infrastructure Progression builds on:
 

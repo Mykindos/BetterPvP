@@ -18,7 +18,6 @@ It is not the owner of shared player identity, shared balance storage, or the ca
 Read these first:
 
 - [../CONTEXT.md](../CONTEXT.md)
-- [../core/CONTEXT.md](../core/CONTEXT.md)
 
 `core` owns the shared concepts that Shops builds on:
 

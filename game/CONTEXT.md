@@ -30,7 +30,6 @@ At a high level, `game` owns:
 Read these first:
 
 - [../CONTEXT.md](../CONTEXT.md)
-- [../core/CONTEXT.md](../core/CONTEXT.md)
 - [../champions/CONTEXT.md](../champions/CONTEXT.md)
 
 `core` still owns the shared concepts that `game` builds on:

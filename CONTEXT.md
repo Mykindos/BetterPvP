@@ -23,42 +23,17 @@ This document is not a full code map. It is the shared domain model and architec
 
 ## Module Map
 
-The repo is split across major project submodules. This root file is the map; each large module should keep its own local context file for deeper rules and flows.
+This root file holds the shared language. Modules with their own domain model and lifecycles keep a local `CONTEXT.md`.
+Code layout and conventions live in `CLAUDE.md` files, not here.
 
-### Foundational Module
+- [champions/CONTEXT.md](champions/CONTEXT.md) - roles, builds, skills and the combat lifecycle
+- [clans/CONTEXT.md](clans/CONTEXT.md) - clan state, territory, resources and conflict flows
+- [game/CONTEXT.md](game/CONTEXT.md) - lobby, match and rotation lifecycle
+- [hub/CONTEXT.md](hub/CONTEXT.md) - hub arrival, routing and queue flows
+- [progression/CONTEXT.md](progression/CONTEXT.md) - professions, experience and skill trees
+- [shops/CONTEXT.md](shops/CONTEXT.md) - shop catalog, dynamic pricing and auctions
 
-- [core/CONTEXT.md](core/CONTEXT.md) - shared player model, persistence, gameplay infrastructure, and cross-cutting systems
-
-### Major Gameplay Modules
-
-- [champions/CONTEXT.md](champions/CONTEXT.md) - champion-driven combat/gameplay systems
-- [clans/CONTEXT.md](clans/CONTEXT.md) - clan/social/group state and flows
-- [game/CONTEXT.md](game/CONTEXT.md) - game-mode or game-loop orchestration
-- [hub/CONTEXT.md](hub/CONTEXT.md) - hub/lobby-specific player experience and flows
-- [lunar/CONTEXT.md](lunar/CONTEXT.md) - Lunar Client-facing integrations and behavior
-- [progression/CONTEXT.md](progression/CONTEXT.md) - progression systems, milestones, and long-term advancement
-- [shops/CONTEXT.md](shops/CONTEXT.md) - shop, purchasing, and catalog behavior
-
-### Platform And Infrastructure Modules
-
-- [orchestration/CONTEXT.md](orchestration/CONTEXT.md) - orchestration-side coordination logic and contracts
-- [orchestration-service/CONTEXT.md](orchestration-service/CONTEXT.md) - orchestration service runtime, responsibilities, and integration rules
-- [proxy/CONTEXT.md](proxy/CONTEXT.md) - proxy-side player/session/network behavior
-
-### Private Modules
-
-- [private/compatability/CONTEXT.md](private/compatability/CONTEXT.md) - compatibility glue for private integrations or version-specific behavior
-- [private/events/CONTEXT.md](private/events/CONTEXT.md) - private event-driven gameplay/content flows
-- [private/dungeons/CONTEXT.md](private/dungeons/CONTEXT.md) - dungeon-specific content and progression
-- [private/store/CONTEXT.md](private/store/CONTEXT.md) - private store integrations and store-owned domain rules
-- [private/store-proxy/CONTEXT.md](private/store-proxy/CONTEXT.md) - proxy-side store integration and cross-process store coordination
-
-### Suggested Ownership Rule
-
-- Put shared language in the root file.
-- Put foundational shared mechanics in `core/CONTEXT.md`.
-- Put module-local flows, invariants, and integration rules in each module's own `CONTEXT.md`.
-- Avoid redefining `Client`, `Gamer`, `Realm`, and other shared concepts in every module unless the module constrains them in a module-specific way.
+Shared mechanics owned by `core` (player state, persistence, runtime infrastructure) are described in this file.
 
 ## Ubiquitous Language
 

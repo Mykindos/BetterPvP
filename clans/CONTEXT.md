@@ -23,7 +23,6 @@ Social grouping is part of the module, but it primarily exists in support of ter
 Read these first:
 
 - [CONTEXT.md](../CONTEXT.md)
-- [core/CONTEXT.md](../core/CONTEXT.md)
 
 This module builds on shared concepts from `core`:
 

@@ -33,3 +33,10 @@ build/
 
 # Runtime logs from test servers
 logs/
+
+# Claude Code: shared config in .claude/ is committed, runtime state is not
+.claude/settings.local.json
+.claude/worktrees/
+.claude/scheduled_tasks.*
+.claude/.compile-stamp
+CLAUDE.local.md
