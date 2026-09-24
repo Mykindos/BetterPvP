@@ -12,16 +12,19 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 /**
  * What a settler does with its day: walks to its workplace and works there while it has one, and otherwise wanders
- * around its home, stopping for a while at each spot. It only moves while a player is close enough to see it.
+ * around its home, stopping for a while at each spot. It only moves while a player is close enough to see it. While
+ * standing it looks at the nearest player close by, and a player who talks to it holds its attention for a moment.
  * <p>
  * Where it works is asked for each time it decides where to go, so a new assignment only needs {@link #replan()}.
  */
@@ -39,6 +42,9 @@ public class SettlerRoutine implements SceneBehavior {
     private static final double WANDER_RADIUS = 12;
     private static final long MIN_REST_MILLIS = 5_000;
     private static final long MAX_REST_MILLIS = 15_000;
+    private static final double LOOK_RADIUS = 5;
+    private static final int LOOK_TICKS = 5;
+    private static final long TALK_MILLIS = 4_000;
 
     private enum Phase { MOVING, RESTING, WORKING }
 
@@ -58,6 +64,8 @@ public class SettlerRoutine implements SceneBehavior {
     private int proximityCounter;
     private boolean watched = true;
     private boolean enabledAi;
+    private @Nullable Player lookTarget;
+    private int lookCounter;
 
     public SettlerRoutine(@NotNull SettlerNPC npc, @NotNull SettlerLook look, @NotNull Location home,
                           @NotNull Supplier<Optional<Location>> workplace) {
@@ -104,6 +112,7 @@ public class SettlerRoutine implements SceneBehavior {
         if (mob == null) {
             return;
         }
+        lookTarget = null;
         final Optional<Location> work = workplace.get();
         toWork = work.isPresent();
         target = work.orElseGet(() -> wanderPoint().orElse(null));
@@ -117,6 +126,22 @@ public class SettlerRoutine implements SceneBehavior {
         stuckTicks = 0;
         lastPosition = mob.getLocation();
         path(mob);
+    }
+
+    /** Stops where it is and faces {@code player} for a moment, then goes back to its day. */
+    public void talkTo(@NotNull Player player) {
+        final Mob mob = mob();
+        if (mob == null) {
+            return;
+        }
+        mob.getPathfinder().stopPathfinding();
+        target = null;
+        animate(false);
+        phase = Phase.RESTING;
+        restUntil = System.currentTimeMillis() + TALK_MILLIS;
+        lookTarget = player;
+        lookCounter = LOOK_TICKS;
+        mob.lookAt(player.getEyeLocation());
     }
 
     /**
@@ -162,11 +187,29 @@ public class SettlerRoutine implements SceneBehavior {
             case RESTING -> {
                 if (System.currentTimeMillis() >= restUntil) {
                     replan();
+                } else {
+                    look(mob);
                 }
             }
             case MOVING -> move(mob);
-            case WORKING -> {
+            case WORKING -> look(mob);
+        }
+    }
+
+    /** Faces the nearest player close by, keeping to one player until they walk away. */
+    private void look(@NotNull Mob mob) {
+        if (lookCounter-- <= 0) {
+            lookCounter = LOOK_TICKS;
+            if (lookTarget == null || !lookTarget.isValid() || !lookTarget.getWorld().equals(mob.getWorld())
+                    || lookTarget.getLocation().distanceSquared(mob.getLocation()) > LOOK_RADIUS * LOOK_RADIUS) {
+                final Location at = mob.getLocation();
+                lookTarget = mob.getWorld().getNearbyPlayers(at, LOOK_RADIUS).stream()
+                        .min(Comparator.comparingDouble(player -> player.getLocation().distanceSquared(at)))
+                        .orElse(null);
             }
+        }
+        if (lookTarget != null) {
+            mob.lookAt(lookTarget.getEyeLocation());
         }
     }
 
@@ -268,7 +311,8 @@ public class SettlerRoutine implements SceneBehavior {
         }
     }
 
+    /** The body, once it is bound. Its decorators start this routine before the settler counts as materialized. */
     private @Nullable Mob mob() {
-        return npc.isMaterialized() && npc.getEntity() instanceof Mob mob ? mob : null;
+        return npc.isInitialized() && npc.getEntity() instanceof Mob mob && !mob.isDead() ? mob : null;
     }
 }

@@ -169,8 +169,10 @@ public class SettlerPresence implements Listener {
         final Location home = site.home(loaded.key, world, loaded.regions).orElseGet(world::getSpawnLocation);
         final SettlerNPC npc = new SettlerNPC(factory, settler.getId());
         npc.addDecorator(object -> dress(npc, world, loaded, site, home));
-        npc.setInteractionHandler(player -> current(loaded.key, npc.getSettlerId())
-                .ifPresent(found -> site.interact(player, loaded.key, found)));
+        npc.setInteractionHandler(player -> current(loaded.key, npc.getSettlerId()).ifPresent(found -> {
+            npc.talkTo(player);
+            site.interact(player, loaded.key, found);
+        }));
         loaded.scope.add(new SceneSpawn(npc, home, factory::backingEntity));
         return npc;
     }

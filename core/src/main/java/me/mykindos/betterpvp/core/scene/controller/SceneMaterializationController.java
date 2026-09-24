@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.scene.controller;
 
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -50,10 +51,12 @@ public class SceneMaterializationController implements Listener {
     /** worldUID -> packed-chunk-key -> objects anchored in that chunk. */
     private final Map<UUID, Map<Long, Set<SceneObject>>> index = new HashMap<>();
     private final Core core;
+    private final SceneObjectRegistry registry;
 
     @Inject
     public SceneMaterializationController(Core core, SceneObjectRegistry registry) {
         this.core = core;
+        this.registry = registry;
         registry.setMaterializationController(this);
     }
 
@@ -85,14 +88,22 @@ public class SceneMaterializationController implements Listener {
     }
 
     /**
-     * Materializes {@code object} next tick, if it is still registered, still dormant, and its chunk still holds
-     * entities. Failures are logged against the object rather than thrown: one prop that cannot build its body must not
-     * take down whatever else was loading alongside it.
+     * Materializes {@code object} next tick, if it is still registered, has no live body, and its chunk is fully
+     * loaded. A chunk below full load still reports its entities as loaded, but a body spawned there is listed again by
+     * the chunk's next {@link EntitiesLoadEvent}, so only a fully loaded chunk keeps the load and unload events paired.
+     * Failures are logged against the object rather than thrown: one prop that cannot build its body must not take
+     * down whatever else was loading alongside it.
      */
     private void materializeSoon(@NotNull SceneObject object, @NotNull Chunk chunk) {
         UtilServer.runTaskLater(core, () -> {
-            if (!object.isRegistered() || object.isMaterialized() || !chunk.isEntitiesLoaded()) {
+            if (!object.isRegistered() || !chunk.isLoaded()) {
                 return;
+            }
+            if (object.isMaterialized()) {
+                if (!hasLostBody(object)) {
+                    return;
+                }
+                object.dematerialize();
             }
             try {
                 object.materialize();
@@ -134,6 +145,30 @@ public class SceneMaterializationController implements Listener {
     @EventHandler
     public void onEntitiesUnload(EntitiesUnloadEvent event) {
         forEachIn(event.getChunk(), SceneObject::dematerialize);
+    }
+
+    /**
+     * Spawns a body again when something other than the framework took it away while its object still counts as
+     * materialized, such as another plugin removing it.
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityRemove(EntityRemoveFromWorldEvent event) {
+        final SceneObject object = registry.getObject(event.getEntity());
+        if (object == null || object.isDespawning() || object.getAnchor() == null || !object.isInitialized()
+                || object.getEntity() != event.getEntity()) {
+            return;
+        }
+        final World world = object.getAnchor().getWorld();
+        final int cx = object.getAnchor().getBlockX() >> 4;
+        final int cz = object.getAnchor().getBlockZ() >> 4;
+        if (world != null && world.isChunkLoaded(cx, cz)) {
+            materializeSoon(object, world.getChunkAt(cx, cz));
+        }
+    }
+
+    /** Whether the body the framework spawned for {@code object} has since been removed without it. */
+    private static boolean hasLostBody(@NotNull SceneObject object) {
+        return object.getEntityFactory() != null && object.isInitialized() && object.getEntity().isDead();
     }
 
     /**

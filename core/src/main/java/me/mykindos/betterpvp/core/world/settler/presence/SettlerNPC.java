@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,13 @@ public class SettlerNPC extends ModeledNPC {
     public void replan() {
         if (routine != null && isMaterialized()) {
             routine.replan();
+        }
+    }
+
+    /** Stops to face {@code player}, who is talking to it. */
+    public void talkTo(@NotNull Player player) {
+        if (routine != null && isMaterialized()) {
+            routine.talkTo(player);
         }
     }
 
