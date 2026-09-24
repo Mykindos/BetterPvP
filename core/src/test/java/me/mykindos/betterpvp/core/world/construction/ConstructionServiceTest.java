@@ -225,6 +225,21 @@ class ConstructionServiceTest {
     }
 
     @Test
+    void aMoveCanBeCheckedBeforeItIsMade() {
+        final PlacedStructure hall = finished("hall");
+        final Location target = new Location(world, 30, 64, 5);
+
+        assertTrue(service.moveProblem(player, world, hall.getId(), target, 0).isEmpty());
+
+        service.advance(player, world, hall.getId());
+        assertTrue(service.moveProblem(player, world, hall.getId(), target, 0).isPresent(),
+                "a structure with a job running cannot move");
+
+        site.allowed = false;
+        assertTrue(service.moveProblem(player, world, hall.getId(), target, 0).isPresent());
+    }
+
+    @Test
     void aJobRuleHoldsWorkAndLetsItGoAgain() {
         final boolean[] siege = {false};
         site.rules.add(new JobRule() {

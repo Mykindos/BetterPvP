@@ -179,22 +179,12 @@ public class ConstructionService {
     public @NotNull ConstructionResult move(@NotNull Player player, @NotNull World world, @NotNull UUID id,
                                             @NotNull Location anchor, int quarterTurns) {
         return act(player, world, id, ConstructionAction.MOVE, (worksite, structure, type) -> {
-            if (!type.getFlags().isMovable()) {
-                return ConstructionResult.refused("core.construction.not_movable");
-            }
-            if (structure.getJob() != null) {
-                return ConstructionResult.refused("core.construction.busy");
-            }
-
             final StructurePosition target = StructurePosition.of(anchor, quarterTurns);
-            final Optional<Component> misfit = fit(worksite, type, structure.getStage(), target, structure.getId());
-            if (misfit.isPresent()) {
-                return ConstructionResult.refused(misfit.get());
+            final Optional<Component> problem = moveProblem(worksite, structure, type, target);
+            if (problem.isPresent()) {
+                return ConstructionResult.refused(problem.get());
             }
-            final Optional<ConstructionResult> unpaid = pay(worksite, type.getMoveCost());
-            if (unpaid.isPresent()) {
-                return unpaid.get();
-            }
+            worksite.site.ledger().spend(worksite.key, type.getMoveCost());
 
             final Duration time = type.getMoveTime();
             if (time.isZero() || structure.getCondition() == StructureCondition.NOT_PLACED) {
@@ -210,6 +200,16 @@ public class ConstructionService {
             structure.setJob(job);
             return changed(worksite, structure);
         });
+    }
+
+    /** Why {@code player} could not move structure {@code id} to {@code anchor}, or empty if they could. */
+    public @NotNull Optional<Component> moveProblem(@NotNull Player player, @NotNull World world, @NotNull UUID id,
+                                                    @NotNull Location anchor, int quarterTurns) {
+        final ConstructionResult checked = act(player, world, id, ConstructionAction.MOVE, (worksite, structure, type) ->
+                moveProblem(worksite, structure, type, StructurePosition.of(anchor, quarterTurns))
+                        .map(ConstructionResult::refused)
+                        .orElseGet(() -> ConstructionResult.done(structure)));
+        return checked.isSuccess() ? Optional.empty() : Optional.ofNullable(checked.getReason());
     }
 
     public @NotNull ConstructionResult advance(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
@@ -399,6 +399,19 @@ public class ConstructionService {
                         @NotNull StructureUpgrade upgrade) {
         structure.getUpgrades().put(upgrade.getStage(), upgrade.getId());
         UtilServer.callEvent(new StructureUpgradedEvent(worksite.key, structure, upgrade));
+    }
+
+    private @NotNull Optional<Component> moveProblem(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
+                                                     @NotNull StructureType type, @NotNull StructurePosition target) {
+        if (!type.getFlags().isMovable()) {
+            return Optional.of(text("core.construction.not_movable"));
+        }
+        if (structure.getJob() != null) {
+            return Optional.of(text("core.construction.busy"));
+        }
+        return fit(worksite, type, structure.getStage(), target, structure.getId())
+                .or(() -> worksite.site.ledger().canAfford(worksite.key, type.getMoveCost())
+                        ? Optional.empty() : Optional.of(text("core.construction.cannot_afford")));
     }
 
     private @NotNull Optional<Component> requirements(@NotNull Worksite worksite, @NotNull StructureType type, int stage) {

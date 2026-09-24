@@ -82,7 +82,7 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
         }
         return new SimpleItem(ItemView.builder()
                 .material(structure.getStage() < stage ? Material.GRAY_DYE : type.getIcon())
-                .displayName(HallMenus.stageName(type, stage).color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                .displayName(type.stageName(stage).color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .frameLore(true)
                 .lore(state)
                 .build());

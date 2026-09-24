@@ -56,6 +56,11 @@ public final class CampStructure implements StructureType {
         return Translations.component("clans.camp.structure." + id + ".description");
     }
 
+    /** What it is called at {@code stage}, 0 being the first. Players see these, never a stage number. */
+    public @NotNull Component stageName(int stage) {
+        return Translations.component("clans.camp.structure." + id + ".stage." + (stage + 1));
+    }
+
     public @NotNull Material getIcon() {
         return numbers().getIcon();
     }
