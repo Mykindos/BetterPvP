@@ -49,6 +49,15 @@ public class Camp {
     /** When the next boat comes in, or 0 before the first is due. */
     private long nextArrivalAt;
 
+    /** Candidates rolled ahead for the next boat, who come on it instead of new ones. Empty when none are. */
+    private List<SettlerCandidate> nextBoat = new ArrayList<>();
+
+    /** The profession everyone on the next boat has, or null for the arrival odds. */
+    private @Nullable String nextBoatProfession;
+
+    /** When the Harbourmaster was last used, or 0 before it ever was. */
+    private long harbourmasterUsedAt;
+
     /** Candidates on the Steward's hiring board. */
     private List<SettlerCandidate> hiringBoard = new ArrayList<>();
 

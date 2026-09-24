@@ -80,6 +80,11 @@ public class HiringBoardMenu extends AbstractGui implements Windowed {
                     }
                     new HiringBoardMenu(menus, click.getPlayer(), key, previous).show(click.getPlayer());
                 }));
+        if (menus.getHarbourmaster().has(key)) {
+            setItem(18, HarbourmasterMenu.button(menus, key,
+                    player -> new HarbourmasterMenu(menus, key, new HiringBoardMenu(menus, player, key, previous))
+                            .show(player)));
+        }
         setItem(22, new BackButton(previous));
         setBackground(Menu.BACKGROUND_ITEM);
     }

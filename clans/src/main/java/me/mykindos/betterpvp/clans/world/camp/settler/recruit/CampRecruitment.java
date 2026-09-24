@@ -155,7 +155,7 @@ public class CampRecruitment implements Listener {
             while (now >= camp.getNextArrivalAt() && boats++ < MAX_BOATS) {
                 final long leaves = camp.getNextArrivalAt() + config.getArrivalWait().toMillis();
                 if (now < leaves) {
-                    camp.getArrivals().addAll(boat(random, leaves));
+                    camp.getArrivals().addAll(land(camp, random, leaves));
                     UtilServer.callEvent(new SettlerBoatEvent(key, false));
                 }
                 camp.setNextArrivalAt(camp.getNextArrivalAt() + interval);
@@ -274,16 +274,33 @@ public class CampRecruitment implements Listener {
         store.changed(key.getOwnerId());
     }
 
-    private @NotNull List<SettlerCandidate> boat(@NotNull Random random, long leaves) {
+    /** The boat landing now: the one rolled ahead for the camp if there is one, else a new one. */
+    private @NotNull List<SettlerCandidate> land(@NotNull Camp camp, @NotNull Random random, long leaves) {
+        final List<SettlerCandidate> boat = camp.getNextBoat().isEmpty()
+                ? boat(camp.getNextBoatProfession(), random)
+                : new ArrayList<>(camp.getNextBoat());
+        camp.setNextBoat(new ArrayList<>());
+        camp.setNextBoatProfession(null);
+        boat.forEach(candidate -> candidate.setExpiresAt(leaves));
+        return boat;
+    }
+
+    /**
+     * Rolls a boat's candidates without landing it, each waiting with no time limit until it lands.
+     *
+     * @param profession the profession every candidate has, or null to roll each from the arrival odds
+     */
+    public @NotNull List<SettlerCandidate> boat(@Nullable String profession, @NotNull Random random) {
         final Integer count = SettlerOdds.pick(config.getArrivalCounts(), random);
         final List<SettlerCandidate> boat = new ArrayList<>();
         for (int i = 0; i < (count == null ? 1 : count); i++) {
             final SettlerRarity rarity = config.getArrivalOdds().rarity(random);
-            final Settler settler = roll(rarity, config.getArrivalOdds().profession(random), "dock", random);
+            final Settler settler = roll(rarity, profession != null ? profession
+                    : config.getArrivalOdds().profession(random), "dock", random);
             final long price = rarity == SettlerRarity.COMMON
                     ? (campWide(settler) ? config.getCampWideTraitPrice() : 0)
                     : config.getArrivalPrices().getOrDefault(rarity, 0L);
-            boat.add(new SettlerCandidate(settler, price, leaves));
+            boat.add(new SettlerCandidate(settler, price, 0));
         }
         return boat;
     }
