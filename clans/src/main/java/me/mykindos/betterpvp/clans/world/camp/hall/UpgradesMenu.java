@@ -74,7 +74,7 @@ public class UpgradesMenu extends AbstractGui implements Windowed {
                 .material(type.getIcon())
                 .displayName(type.getDisplayName().color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .frameLore(true)
-                .lore(HallMenus.stageName(type, structure.getStage()).color(NamedTextColor.GRAY))
+                .lore(type.stageName(structure.getStage()).color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.camp.upgrade.menu.chosen_count",
                         Component.text(structure.getUpgrades().size())).color(NamedTextColor.GRAY));
         if (waiting > 0) {

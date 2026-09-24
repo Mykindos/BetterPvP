@@ -7,6 +7,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
+import me.mykindos.betterpvp.clans.world.camp.menu.StructureMenus;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWageFund;
 import me.mykindos.betterpvp.clans.world.camp.settler.FarmWorkplace;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.CrewMenus;
@@ -14,7 +15,6 @@ import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.CampProsperity;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.RecruitConfig;
-import me.mykindos.betterpvp.clans.world.camp.structure.CampStructure;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -63,6 +63,7 @@ public class HallMenus {
     private final FarmWorkplace farm;
     private final CampProsperity prosperity;
     private final CampStore store;
+    private final StructureMenus structureMenus;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
@@ -72,7 +73,8 @@ public class HallMenus {
                      @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
                      @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm,
-                     @NotNull CampProsperity prosperity, @NotNull CampStore store) {
+                     @NotNull CampProsperity prosperity, @NotNull CampStore store,
+                     @NotNull StructureMenus structureMenus) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -91,11 +93,7 @@ public class HallMenus {
         this.farm = farm;
         this.prosperity = prosperity;
         this.store = store;
-    }
-
-    /** What a structure is called at {@code stage}, 0 being the first. Players see these, never a stage number. */
-    static @NotNull Component stageName(@NotNull CampStructure type, int stage) {
-        return Translations.component("clans.camp.structure." + type.getId() + ".stage." + (stage + 1));
+        this.structureMenus = structureMenus;
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */
