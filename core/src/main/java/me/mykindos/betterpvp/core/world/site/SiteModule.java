@@ -16,5 +16,6 @@ public class SiteModule extends AbstractModule {
         bind(SiteInstanceStore.class).to(DatabaseSiteInstanceStore.class);
         bind(ResidencyStore.class).to(DatabaseResidencyStore.class);
         bind(SiteStorage.class).to(LocalSiteStorage.class);
+        bind(PlayerWhereabouts.class).to(LocalPlayerWhereabouts.class);
     }
 }
