@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.world.camp.hall;
 
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceKind;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructure;
+import me.mykindos.betterpvp.clans.world.camp.structure.UpgradePage;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
@@ -120,8 +121,11 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
         }
 
         view.lore(Component.empty());
+        final Optional<UpgradePage> page = menus.getUpgrades().page(upgrade.getId());
         if (chosen) {
             view.lore(Translations.component("clans.camp.upgrade.menu.chosen").color(NamedTextColor.GREEN));
+            page.ifPresent(found -> view.action(ClickActions.ALL,
+                    Translations.component("clans.camp.upgrade.menu.open")));
         } else if (fitting) {
             view.lore(Translations.component("clans.camp.upgrade.menu.fitting",
                     time(Duration.ofMillis(job.remainingMillis(menus.getConstruction().now()))))
@@ -133,7 +137,9 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
         }
 
         return new SimpleItem(view.build(), click -> {
-            if (!chosen && !fitting && unavailable.isEmpty()) {
+            if (chosen) {
+                page.ifPresent(found -> found.open(click.getPlayer(), key, structure, this));
+            } else if (!fitting && unavailable.isEmpty()) {
                 fit(click.getPlayer(), upgrade);
             }
         });

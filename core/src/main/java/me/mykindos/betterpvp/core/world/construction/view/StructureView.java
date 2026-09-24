@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -195,6 +196,16 @@ final class StructureView {
         stocked.clear();
         pieces.clear();
         settled = false;
+    }
+
+    /** The upgrade whose piece stands on a world position, if one of this structure's does. */
+    @NotNull Optional<String> pieceAt(int x, int y, int z) {
+        for (Map.Entry<String, RenderedBuild> piece : pieces.entrySet()) {
+            if (piece.getValue().getPlacement().blockBounds().contains(x + 0.5, y + 0.5, z + 0.5)) {
+                return Optional.of(piece.getKey());
+            }
+        }
+        return Optional.empty();
     }
 
     /** Writes down the container at a world position, if it is one of this structure's and is standing. */
