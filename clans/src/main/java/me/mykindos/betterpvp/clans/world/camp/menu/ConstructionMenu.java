@@ -23,6 +23,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,8 @@ import java.util.Optional;
 
 /**
  * Every structure a camp can build: what it needs, what it costs and how long it takes, and why it cannot be built yet
- * if it cannot. Clicking one that can be built hands over its blueprint.
+ * if it cannot. Clicking one that can be built hands over its blueprint. The structures the camp already has are one
+ * click away.
  */
 public class ConstructionMenu extends AbstractGui implements Windowed {
 
@@ -44,11 +46,13 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
     private final ConstructionService construction;
     private final StructureCatalogue catalogue;
     private final BlueprintSessions blueprints;
+    private final StructureMenus structureMenus;
     private final @Nullable Windowed previous;
 
     public ConstructionMenu(@NotNull Player viewer, @NotNull SiteKey camp, @NotNull List<CampStructure> structures,
                             @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
-                            @NotNull BlueprintSessions blueprints, @Nullable Windowed previous) {
+                            @NotNull BlueprintSessions blueprints, @NotNull StructureMenus structureMenus,
+                            @Nullable Windowed previous) {
         super(9, 6);
         this.previous = previous;
         this.viewer = viewer;
@@ -57,6 +61,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
         this.construction = construction;
         this.catalogue = catalogue;
         this.blueprints = blueprints;
+        this.structureMenus = structureMenus;
         populate();
     }
 
@@ -66,6 +71,14 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
             setItem(slot, new SimpleItem(view(structure), click -> choose(click.getPlayer(), structure)));
         }
         setItem(49, new BackButton(previous));
+        setItem(50, new SimpleItem(ItemView.builder()
+                .material(Material.SPYGLASS)
+                .displayName(Translations.component("clans.camp.menu.structures.title").color(NamedTextColor.YELLOW)
+                        .decorate(TextDecoration.BOLD))
+                .frameLore(true)
+                .lore(Translations.component("clans.camp.menu.structures.open_description").color(NamedTextColor.GRAY))
+                .action(ClickActions.ALL, Translations.component("clans.camp.hall.open"))
+                .build(), click -> structureMenus.openList(click.getPlayer(), camp, this)));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 
@@ -118,7 +131,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
         player.closeInventory();
     }
 
-    private static @NotNull Component cost(@NotNull ResourceCost cost) {
+    static @NotNull Component cost(@NotNull ResourceCost cost) {
         if (cost.isFree()) {
             return Translations.component("clans.camp.menu.build.free");
         }

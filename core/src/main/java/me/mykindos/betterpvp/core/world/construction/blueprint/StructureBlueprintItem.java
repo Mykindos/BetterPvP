@@ -17,8 +17,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 /**
- * A plan for one structure. Holding it shows where the structure would go, and using it builds it there.
+ * A plan for one structure. Holding it shows where the structure would go, and using it builds it there, or moves it
+ * there when the plan is bound to a structure that already stands.
  *
  * @see BlueprintSessions for how it is held and used
  */
@@ -36,10 +39,13 @@ public class StructureBlueprintItem extends BaseItem {
     }
 
     private static @NotNull Component name(@NotNull StructureCatalogue catalogue, @NotNull ItemInstance item) {
-        final Component structure = item.getComponent(StructureBlueprintComponent.class)
-                .flatMap(component -> catalogue.find(component.getStructure()))
+        final Optional<StructureBlueprintComponent> component = item.getComponent(StructureBlueprintComponent.class);
+        final Component structure = component
+                .flatMap(found -> catalogue.find(found.getStructure()))
                 .map(StructureType::getDisplayName)
                 .orElse(Translations.component("core.item.structure_blueprint.unknown"));
-        return Translations.component("core.item.structure_blueprint.name", structure).color(TextColor.color(60, 125, 222));
+        final boolean moving = component.map(found -> found.getMoving() != null).orElse(false);
+        return Translations.component(moving ? "core.item.structure_blueprint.move_name"
+                : "core.item.structure_blueprint.name", structure).color(TextColor.color(60, 125, 222));
     }
 }
