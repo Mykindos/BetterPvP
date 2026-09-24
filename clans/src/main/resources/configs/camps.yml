@@ -91,6 +91,14 @@ structures:
         cost: {wood: 100, stone: 50}
         build-seconds: 600
         workforce: 2
+      - schematic: camps/barracks_2
+        cost: {wood: 200, stone: 100, iron: 30}
+        build-seconds: 1200
+        workforce: 4
+      - schematic: camps/barracks_3
+        cost: {wood: 400, stone: 225, iron: 90}
+        build-seconds: 2700
+        workforce: 6
     move: {cost: {}, seconds: 0}
     repair: {cost: {wood: 30}, seconds: 180}
     upgrades:
@@ -117,6 +125,24 @@ structures:
           # How long the Regeneration lasts, and its level.
           seconds: 8
           level: 1
+      casualty_board:
+        icon: SKELETON_SKULL
+        cost: {wood: 60, stone: 20}
+        seconds: 300
+        workforce: 2
+        piece: camps/upgrades/casualty_board
+      muster_roll:
+        icon: WRITABLE_BOOK
+        cost: {wood: 120, stone: 40, iron: 10}
+        seconds: 600
+        workforce: 3
+        piece: camps/upgrades/muster_roll
+      second_door:
+        icon: SPRUCE_DOOR
+        cost: {wood: 150, stone: 60}
+        seconds: 900
+        workforce: 3
+        piece: camps/upgrades/second_door
   dock:
     icon: OAK_BOAT
     stages:

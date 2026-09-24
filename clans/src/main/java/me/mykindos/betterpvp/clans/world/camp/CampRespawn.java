@@ -35,7 +35,7 @@ import java.util.Optional;
  * Every clan member respawns at their own camp's Barracks, wherever they died, working or not. A camp loaded on this
  * server takes them straight there. Otherwise they come back at the normal spawn and are sent on to their camp,
  * landing at the Barracks, which is also where they stay if the camp cannot be reached. Players without a clan
- * respawn as they otherwise would.
+ * respawn as they otherwise would. A {@link CampRespawnEvent} lets another spot or landing stand in for the Barracks.
  */
 @CustomLog
 @BPvPListener
@@ -78,20 +78,22 @@ public class CampRespawn implements Listener {
         }
 
         final SiteKey key = Camps.keyFor(clan.get());
-        final Optional<Location> here = instances.forKey(key).stream()
+        final Optional<World> world = instances.forKey(key).stream()
                 .map(instance -> Bukkit.getWorld(instance.getWorldName()))
                 .filter(Objects::nonNull)
-                .findFirst()
-                .flatMap(this::barracks);
-        if (here.isPresent()) {
-            event.setRespawnLocation(here.get());
+                .findFirst();
+        final CampRespawnEvent respawn = new CampRespawnEvent(player, key, world.orElse(null),
+                world.flatMap(this::barracks).orElse(null), LANDING);
+        respawn.callEvent();
+        if (respawn.getSpot() != null) {
+            event.setRespawnLocation(respawn.getSpot());
             return;
         }
-        travel(player, key);
+        travel(player, key, respawn.getLanding());
     }
 
-    /** Sends a respawned member to their camp's Barracks, once any respawn hold has let them go. */
-    private void travel(@NotNull Player player, @NotNull SiteKey key) {
+    /** Sends a respawned member to {@code landing} in their camp, once any respawn hold has let them go. */
+    private void travel(@NotNull Player player, @NotNull SiteKey key, @NotNull String landing) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -104,7 +106,7 @@ public class CampRespawn implements Listener {
                 }
                 cancel();
                 placement.locate(key, Party.solo(player.getUniqueId()))
-                        .thenCompose(handle -> placement.send(player, handle, LANDING))
+                        .thenCompose(handle -> placement.send(player, handle, landing))
                         .exceptionally(error -> {
                             log.warn("Could not send {} to their camp's Barracks after respawning", player.getName(),
                                     error).submit();
