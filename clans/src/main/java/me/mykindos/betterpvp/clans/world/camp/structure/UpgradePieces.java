@@ -9,7 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-/** A member right-clicking a fitted upgrade's piece opens that upgrade's page. */
+/**
+ * A member right-clicking a fitted upgrade's piece opens that upgrade's page, unless the upgrade already handled the
+ * click itself.
+ */
 @BPvPListener
 @Singleton
 public class UpgradePieces implements Listener {
@@ -25,7 +28,7 @@ public class UpgradePieces implements Listener {
 
     @EventHandler
     public void onUse(@NotNull StructurePieceUseEvent event) {
-        if (!event.getSite().getSiteId().equals(Camps.SITE_ID)
+        if (event.isHandled() || !event.getSite().getSiteId().equals(Camps.SITE_ID)
                 || !event.getStructure().hasUpgrade(event.getUpgrade().getId())
                 || !camps.isMember(event.getPlayer(), event.getPlayer().getWorld())) {
             return;
