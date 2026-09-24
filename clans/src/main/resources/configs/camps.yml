@@ -109,6 +109,46 @@ structures:
         seconds: 3600
         workforce: 6
         piece: camps/upgrades/deputy_steward
+      feast_table:
+        icon: CAKE
+        cost: {wood: 100, stone: 40}
+        seconds: 600
+        workforce: 2
+        piece: camps/upgrades/feast_table
+        settings:
+          # Food points one feast takes, how long it lasts and the morale it gives every settler meanwhile.
+          cost: 320
+          hours: 24
+          morale: 15
+          # What each item is worth toward a feast, by item key.
+          food:
+            "minecraft:bread": 5
+            "minecraft:baked_potato": 5
+            "minecraft:cooked_cod": 5
+            "minecraft:cooked_salmon": 6
+            "minecraft:cooked_chicken": 6
+            "minecraft:cooked_mutton": 6
+            "minecraft:cooked_porkchop": 8
+            "minecraft:cooked_beef": 8
+            "minecraft:pumpkin_pie": 8
+      prosperity_breakdown:
+        icon: EMERALD
+        cost: {wood: 250, stone: 150}
+        seconds: 1800
+        workforce: 3
+        piece: camps/upgrades/prosperity_breakdown
+      great_bell:
+        icon: BELL
+        cost: {wood: 300, stone: 200, iron: 80}
+        seconds: 2700
+        workforce: 5
+        piece: camps/upgrades/great_bell
+        settings:
+          # How long a camp waits between rings.
+          cooldown-hours: 24
+          # The morale every settler gets from a ring, and for how many minutes.
+          morale: 10
+          minutes: 120
   barracks:
     icon: RED_BED
     stages:
