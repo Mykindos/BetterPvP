@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -154,6 +155,32 @@ class CampRecruitmentTest {
         now.addAndGet(2 * HOUR);
         recruitment.settle(SITE, false);
         assertTrue(camp.getArrivals().isEmpty(), "they give up waiting");
+    }
+
+    @Test
+    void aBoatRolledAheadLandsAsItWasSeen() {
+        recruitment.settle(SITE, true);
+        final List<SettlerCandidate> seen = recruitment.boat(null, new Random(1));
+        camp.setNextBoat(new ArrayList<>(seen));
+        now.addAndGet(4 * HOUR);
+        recruitment.settle(SITE, true);
+
+        assertEquals(seen, camp.getArrivals());
+        assertEquals(now.get() + 2 * HOUR, camp.getArrivals().getFirst().getExpiresAt());
+        assertTrue(camp.getNextBoat().isEmpty());
+    }
+
+    @Test
+    void aChosenProfessionIsGivenToEveryoneOnTheNextBoatOnly() {
+        recruitment.settle(SITE, true);
+        camp.setNextBoatProfession(CampProfessions.FARMER);
+        now.addAndGet(4 * HOUR);
+        recruitment.settle(SITE, true);
+
+        assertEquals(2, camp.getArrivals().size());
+        assertTrue(camp.getArrivals().stream()
+                .allMatch(candidate -> CampProfessions.FARMER.equals(candidate.getSettler().getProfession())));
+        assertNull(camp.getNextBoatProfession());
     }
 
     @Test

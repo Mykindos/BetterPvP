@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.RecruitConfig;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.Harbourmaster;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -66,6 +67,7 @@ public class HallMenus {
     private final CampStore store;
     private final CampUpgrades upgrades;
     private final StructureMenus structureMenus;
+    private final Harbourmaster harbourmaster;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
@@ -76,7 +78,7 @@ public class HallMenus {
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
                      @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm,
                      @NotNull CampProsperity prosperity, @NotNull CampStore store, @NotNull CampUpgrades upgrades,
-                     @NotNull StructureMenus structureMenus) {
+                     @NotNull StructureMenus structureMenus, @NotNull Harbourmaster harbourmaster) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -97,6 +99,7 @@ public class HallMenus {
         this.store = store;
         this.upgrades = upgrades;
         this.structureMenus = structureMenus;
+        this.harbourmaster = harbourmaster;
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */
