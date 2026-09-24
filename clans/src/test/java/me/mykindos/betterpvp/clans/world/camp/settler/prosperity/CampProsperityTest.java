@@ -85,6 +85,38 @@ class CampProsperityTest {
     }
 
     @Test
+    void theFactorsAddUpToTheTotal() {
+        settler(SettlerRarity.LEGENDARY, 60, CampTraits.CHRONICLER);
+        settler(SettlerRarity.COMMON, -20);
+        settler(SettlerRarity.COMMON, 10);
+        final ProsperityFactors factors = prosperity.factors(roster);
+
+        assertEquals(prosperity.of(roster), factors.getTotal());
+        assertEquals(factors.getTotal(), Math.round(factors.getFactors().stream()
+                .mapToDouble(ProsperityFactors.Factor::getAmount).sum()));
+        assertEquals(List.of(ProsperityFactors.Kind.SETTLERS, ProsperityFactors.Kind.SETTLERS,
+                        ProsperityFactors.Kind.MORALE, ProsperityFactors.Kind.CHRONICLER),
+                factors.getFactors().stream().map(ProsperityFactors.Factor::getKind).toList());
+    }
+
+    @Test
+    void lowMoraleIsANegativeFactor() {
+        settler(SettlerRarity.LEGENDARY, -100);
+        settler(SettlerRarity.LEGENDARY, -100);
+        final List<ProsperityFactors.Factor> factors = prosperity.factors(roster).getFactors();
+
+        assertEquals(new ProsperityFactors.Factor(ProsperityFactors.Kind.SETTLERS, SettlerRarity.LEGENDARY, 2, 160),
+                factors.get(0));
+        assertEquals(new ProsperityFactors.Factor(ProsperityFactors.Kind.MORALE, null, -100, -80), factors.get(1));
+        assertEquals(2, factors.size(), "no Chronicler, no Chronicler factor");
+    }
+
+    @Test
+    void anEmptyCampHasNoFactors() {
+        assertEquals(new ProsperityFactors(List.of(), 0), prosperity.factors(roster));
+    }
+
+    @Test
     void aLeavingChroniclerNoLongerHelps() {
         settler(SettlerRarity.LEGENDARY, 0, CampTraits.CHRONICLER).changeState(SettlerState.LEAVING, 0);
         assertEquals(80, prosperity.of(roster));

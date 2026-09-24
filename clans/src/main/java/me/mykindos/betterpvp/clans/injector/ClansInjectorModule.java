@@ -16,7 +16,10 @@ import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.DatabaseProsper
 import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.ProsperityStore;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.CasualtyStore;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.DatabaseCasualtyStore;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.FeastTable;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.GreatBell;
 import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
+import me.mykindos.betterpvp.core.world.settler.morale.MoraleBoost;
 
 public class ClansInjectorModule extends AbstractModule {
 
@@ -46,8 +49,9 @@ public class ClansInjectorModule extends AbstractModule {
 
         // Camps have settlers from the start, so their professions and traits exist before anything rolls one.
         bind(CampSettlers.class).asEagerSingleton();
-        // What feeds a camp's settlers. Empty until the Granary and Mill exist.
-        Multibinder.newSetBinder(binder(), FoodSource.class);
+        // What feeds a camp's settlers, and what else lifts them.
+        Multibinder.newSetBinder(binder(), FoodSource.class).addBinding().to(FeastTable.class);
+        Multibinder.newSetBinder(binder(), MoraleBoost.class).addBinding().to(GreatBell.class);
         bind(ProsperityStore.class).to(DatabaseProsperityStore.class);
         bind(CasualtyStore.class).to(DatabaseCasualtyStore.class);
 

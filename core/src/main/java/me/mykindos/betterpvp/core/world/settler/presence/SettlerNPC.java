@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +28,13 @@ public class SettlerNPC extends ModeledNPC {
     public void replan() {
         if (routine != null && isMaterialized()) {
             routine.replan();
+        }
+    }
+
+    /** Sends it to stand near {@code spot} for a moment before it goes back to its day. */
+    public void gather(@NotNull Location spot) {
+        if (routine != null && isMaterialized()) {
+            routine.gather(spot);
         }
     }
 }

@@ -133,6 +133,14 @@ public class SettlerPresence implements Listener {
         });
     }
 
+    /** Sends every settler of {@code site} standing in {@code world} to gather near {@code spot} for a moment. */
+    public void gather(@NotNull SiteKey site, @NotNull World world, @NotNull Location spot) {
+        final Loaded loaded = worlds.get(world.getName());
+        if (loaded != null && loaded.key.equals(site)) {
+            loaded.bodies.values().forEach(body -> body.gather(spot));
+        }
+    }
+
     private void sync(@NotNull World world, @NotNull Loaded loaded) {
         final SettlerSite site = service.site(loaded.key).orElse(null);
         final Roster roster = service.roster(loaded.key).orElse(null);

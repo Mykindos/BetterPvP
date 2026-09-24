@@ -119,6 +119,28 @@ public class SettlerRoutine implements SceneBehavior {
         path(mob);
     }
 
+    /**
+     * Walks to a spot a little way from {@code spot} and rests there for a moment, then goes back to its day. Several
+     * settlers sent to one spot spread around it.
+     */
+    public void gather(@NotNull Location spot) {
+        final Mob mob = mob();
+        if (mob == null) {
+            return;
+        }
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        final double angle = random.nextDouble(Math.PI * 2);
+        final double distance = random.nextDouble(1, 3);
+        target = spot.clone().add(Math.cos(angle) * distance, 0, Math.sin(angle) * distance);
+        toWork = false;
+        animate(false);
+        phase = Phase.MOVING;
+        paths = 0;
+        stuckTicks = 0;
+        lastPosition = mob.getLocation();
+        path(mob);
+    }
+
     @Override
     public void tick() {
         final Mob mob = mob();

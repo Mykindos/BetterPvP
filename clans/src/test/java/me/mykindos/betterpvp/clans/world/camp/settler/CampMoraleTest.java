@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.settler.SettlerTable;
 import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
+import me.mykindos.betterpvp.core.world.settler.morale.MoraleBoost;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ class CampMoraleTest {
     private final SettlerConfig config = mock(SettlerConfig.class);
     private final Roster roster = new Roster();
     private int food;
+    private int boost;
     private CampMorale morale;
 
     @BeforeEach
@@ -45,7 +47,8 @@ class CampMoraleTest {
                 SettlerRarity.COMMON, new RarityNumbers(1, 1, 1, 0.3),
                 SettlerRarity.LEGENDARY, new RarityNumbers(3, 2, 2.2, 0.05)), List.of(), List.of(), Map.of()));
         final FoodSource granary = site -> food;
-        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary));
+        final MoraleBoost bell = site -> boost;
+        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary), Set.of(bell));
     }
 
     private Settler settler(String profession, SettlerRarity rarity, String... traits) {
@@ -141,5 +144,13 @@ class CampMoraleTest {
         settler(null, SettlerRarity.LEGENDARY, CampTraits.BELOVED);
 
         assertEquals(-10, of(builder));
+    }
+
+    @Test
+    void boostsAddOnTopOfFoodPastItsCap() {
+        final Settler wanderer = settler(null, SettlerRarity.COMMON);
+        food = 30;
+        boost = 10;
+        assertEquals(40, of(wanderer));
     }
 }

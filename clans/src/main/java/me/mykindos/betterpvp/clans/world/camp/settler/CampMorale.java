@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerDeparture;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
+import me.mykindos.betterpvp.core.world.settler.morale.MoraleBoost;
 import me.mykindos.betterpvp.core.world.settler.morale.MoraleModel;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +17,8 @@ import java.time.Duration;
 import java.util.Set;
 
 /**
- * How a camp's settlers feel. Food and a Bard raise everyone. Wages owed to strikers, a profession with nowhere to
- * work and recent dismissals bring them down. Beloved caps what idleness and dismissals can do, Content keeps a
+ * How a camp's settlers feel. Food, a Bard and any boosts raise everyone. Wages owed to strikers, a profession with
+ * nowhere to work and recent dismissals bring them down. Beloved caps what idleness and dismissals can do, Content keeps a
  * settler from falling too far, Moody doubles every swing, Homesick costs a little, and Loyal settlers never leave.
  */
 @Singleton
@@ -28,17 +29,21 @@ public class CampMorale implements MoraleModel {
     private final SettlerConfig config;
     private final CampWideTraits campWide;
     private final Set<FoodSource> food;
+    private final Set<MoraleBoost> boosts;
 
     @Inject
-    public CampMorale(@NotNull SettlerConfig config, @NotNull CampWideTraits campWide, @NotNull Set<FoodSource> food) {
+    public CampMorale(@NotNull SettlerConfig config, @NotNull CampWideTraits campWide, @NotNull Set<FoodSource> food,
+                      @NotNull Set<MoraleBoost> boosts) {
         this.config = config;
         this.campWide = campWide;
         this.food = food;
+        this.boosts = boosts;
     }
 
     @Override
     public int morale(@NotNull SiteKey site, @NotNull Settler settler, @NotNull Roster roster, long now) {
-        double morale = food(site, roster) + campWide.best(roster, CampTraits.BARD, "morale", 5);
+        double morale = food(site, roster) + campWide.best(roster, CampTraits.BARD, "morale", 5)
+                + boosts.stream().mapToInt(boost -> boost.morale(site)).sum();
         if (!roster.inState(SettlerState.STRIKING).isEmpty()) {
             morale += number("unpaid", -25);
         }
