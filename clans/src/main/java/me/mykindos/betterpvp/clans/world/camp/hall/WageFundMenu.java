@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.camp.hall;
 
+import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
@@ -24,7 +25,8 @@ import java.time.Duration;
 
 /**
  * The camp's wage fund: what it holds, what the camp's settlers cost an hour, how long that lasts, and whether anyone
- * is on strike. Members whose rank may pay put coins in here.
+ * is on strike. Members whose rank may pay put coins in here. With {@link WagePolicy} each member can also choose to
+ * cover what the fund cannot.
  */
 public class WageFundMenu extends AbstractGui implements Windowed {
 
@@ -44,6 +46,9 @@ public class WageFundMenu extends AbstractGui implements Windowed {
         setItem(11, payButton(1_000, allowed));
         setItem(13, payButton(10_000, allowed));
         setItem(15, payButton(100_000, allowed));
+        if (menus.getWagePolicy().isActive(key)) {
+            setItem(26, chipInButton(viewer));
+        }
         setItem(22, new BackButton(previous));
         setBackground(Menu.BACKGROUND_ITEM);
     }
@@ -90,6 +95,30 @@ public class WageFundMenu extends AbstractGui implements Windowed {
                 menus.pay(click.getPlayer(), key, amount);
                 new WageFundMenu(menus, click.getPlayer(), key, previous).show(click.getPlayer());
             }
+        });
+    }
+
+    private @NotNull SimpleItem chipInButton(@NotNull Player viewer) {
+        final WagePolicy policy = menus.getWagePolicy();
+        final boolean on = policy.contributes(key, viewer.getUniqueId());
+        final Component state = Translations.component(on ? "clans.camp.upgrade.wage_policy.on"
+                : "clans.camp.upgrade.wage_policy.off").color(on ? NamedTextColor.GREEN : NamedTextColor.RED);
+        final ItemView view = ItemView.builder()
+                .material(on ? Material.LIME_DYE : Material.GRAY_DYE)
+                .displayName(Translations.component("clans.camp.upgrade.wage_policy.toggle", state)
+                        .color(NamedTextColor.YELLOW))
+                .frameLore(true)
+                .lore(Translations.component("clans.camp.upgrade.wage_policy.explain",
+                        Component.text(UtilFormat.formatNumber((int) policy.dailyCap()), NamedTextColor.GOLD))
+                        .color(NamedTextColor.GRAY))
+                .lore(Translations.component("clans.camp.upgrade.wage_policy.today",
+                        Component.text(UtilFormat.formatNumber((int) policy.paidToday(key, viewer.getUniqueId())),
+                                NamedTextColor.GOLD)).color(NamedTextColor.GRAY))
+                .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.wage_policy.toggle", state))
+                .build();
+        return new SimpleItem(view, click -> {
+            policy.toggle(click.getPlayer(), key);
+            new WageFundMenu(menus, click.getPlayer(), key, previous).show(click.getPlayer());
         });
     }
 

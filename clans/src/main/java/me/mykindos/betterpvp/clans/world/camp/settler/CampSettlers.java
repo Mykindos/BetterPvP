@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.clans.world.camp.protection.CampGrounds;
 import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.ToolRack;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -68,6 +69,7 @@ public class CampSettlers implements SettlerSite {
     private final CampWageFund wageFund;
     private final CampMorale morale;
     private final ToolRack toolRack;
+    private final WagePolicy wagePolicy;
 
     @Inject
     public CampSettlers(@NotNull CampStore store, @NotNull SettlerConfig config, @NotNull SettlerService service,
@@ -76,7 +78,8 @@ public class CampSettlers implements SettlerSite {
                         @NotNull CampResources resources, @NotNull CampWageFund wageFund,
                         @NotNull CampMorale morale,
                         @NotNull CampProfessions professions,
-                        @NotNull CampTraits traits, @NotNull ToolRack toolRack) {
+                        @NotNull CampTraits traits, @NotNull ToolRack toolRack,
+                        @NotNull WagePolicy wagePolicy) {
         this.store = store;
         this.config = config;
         this.permissions = permissions;
@@ -87,6 +90,7 @@ public class CampSettlers implements SettlerSite {
         this.wageFund = wageFund;
         this.morale = morale;
         this.toolRack = toolRack;
+        this.wagePolicy = wagePolicy;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -199,7 +203,7 @@ public class CampSettlers implements SettlerSite {
 
     @Override
     public @NotNull Optional<CoinAccount> wageFund(@NotNull SiteKey site) {
-        return Optional.of(wageFund);
+        return Optional.of(wagePolicy.backing(wageFund));
     }
 
     /** Greedy settlers ask for more. It is a trade-off's cost, so rarity does not change it. */

@@ -74,12 +74,28 @@ public class CrewService implements Listener {
                 .isPresent();
     }
 
-    /** Puts {@code settlerId} on the crew of the job running on {@code structureId}, if the crew has room for it. */
+    /**
+     * Puts {@code settlerId} on the crew of the job running on {@code structureId}, if {@code player} may and the crew
+     * has room for it.
+     */
     public @NotNull SettlerResult join(@NotNull Player player, @NotNull World world, @NotNull UUID structureId,
                                        @NotNull UUID settlerId) {
         final ConstructionService.Worksite worksite = construction.worksite(world).orElse(null);
         final SettlerSite site = worksite == null ? null : settlers.site(worksite.getKey()).orElse(null);
         if (worksite == null || site == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        if (!site.allows(player, worksite.getKey(), SettlerAction.ASSIGN)) {
+            return SettlerResult.refused("core.settler.not_allowed");
+        }
+        return enlist(worksite, structureId, settlerId);
+    }
+
+    /** Puts {@code settlerId} on the crew of the job running on {@code structureId}, if the crew has room for it. */
+    public @NotNull SettlerResult enlist(@NotNull ConstructionService.Worksite worksite, @NotNull UUID structureId,
+                                         @NotNull UUID settlerId) {
+        final SettlerSite site = settlers.site(worksite.getKey()).orElse(null);
+        if (site == null) {
             return SettlerResult.refused("core.settler.not_loaded");
         }
         final SiteKey key = worksite.getKey();
@@ -91,9 +107,6 @@ public class CrewService implements Listener {
         final Settler settler = settlers.roster(key).flatMap(roster -> roster.find(settlerId)).orElse(null);
         if (settler == null) {
             return SettlerResult.refused("core.settler.not_found");
-        }
-        if (!site.allows(player, key, SettlerAction.ASSIGN)) {
-            return SettlerResult.refused("core.settler.not_allowed");
         }
         if (!builds(settler)) {
             return SettlerResult.refused("core.settler.crew.not_builder");
