@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Opens the menus for a camp's placed structures: the list of them, and for each one what can be done to it. The list
@@ -61,6 +62,12 @@ public class StructureMenus {
     /** Every structure camp {@code camp} has. Back leads to {@code previous}. */
     public void openList(@NotNull Player player, @NotNull SiteKey camp, @Nullable Windowed previous) {
         new PlacedStructuresMenu(this, camp, previous).show(player);
+    }
+
+    /** What can be done to structure {@code id} of camp {@code camp}, with Back leading to {@code returnTo}. */
+    public void openActions(@NotNull Player player, @NotNull SiteKey camp, @NotNull UUID id,
+                            @NotNull Windowed returnTo) {
+        new StructureActionsMenu(this, player, camp, id, null, null, returnTo).show(player);
     }
 
     @NotNull Optional<Holding> holding(@NotNull SiteKey camp) {

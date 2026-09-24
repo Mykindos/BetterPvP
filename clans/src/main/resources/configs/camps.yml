@@ -238,6 +238,27 @@ structures:
           coins-per-minute: 20
           # The least a rush ever costs.
           min-coins: 100
+      job_board:
+        icon: OAK_SIGN
+        cost: {wood: 60, stone: 20}
+        seconds: 300
+        workforce: 2
+        piece: camps/upgrades/job_board
+      surveyors_table:
+        icon: CARTOGRAPHY_TABLE
+        cost: {wood: 140, stone: 80, iron: 10}
+        seconds: 900
+        workforce: 4
+        piece: camps/upgrades/surveyors_table
+        settings:
+          # How long a surveyed next stage shows, in seconds.
+          preview-seconds: 30
+      crew_report:
+        icon: WRITABLE_BOOK
+        cost: {wood: 200, stone: 120, iron: 40}
+        seconds: 1500
+        workforce: 6
+        piece: camps/upgrades/crew_report
   storehouse:
     icon: CHEST
     stages:
