@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructure;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.BuildQueue;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.RushOrder;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -38,17 +40,22 @@ public class StructureMenus {
     private final CampPermissions permissions;
     private final CampResources resources;
     private final BlueprintSessions blueprints;
+    private final BuildQueue buildQueue;
+    private final RushOrder rushOrder;
 
     @Inject
     public StructureMenus(@NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
                           @NotNull CampStore store, @NotNull CampPermissions permissions,
-                          @NotNull CampResources resources, @NotNull BlueprintSessions blueprints) {
+                          @NotNull CampResources resources, @NotNull BlueprintSessions blueprints,
+                          @NotNull BuildQueue buildQueue, @NotNull RushOrder rushOrder) {
         this.construction = construction;
         this.catalogue = catalogue;
         this.store = store;
         this.permissions = permissions;
         this.resources = resources;
         this.blueprints = blueprints;
+        this.buildQueue = buildQueue;
+        this.rushOrder = rushOrder;
     }
 
     /** Every structure camp {@code camp} has. Back leads to {@code previous}. */

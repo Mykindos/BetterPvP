@@ -240,6 +240,10 @@ public class CampConfig implements Reloadable {
             return settings.get(key) instanceof Number number ? number.intValue() : fallback;
         }
 
+        public double setting(@NotNull String key, double fallback) {
+            return settings.get(key) instanceof Number number ? number.doubleValue() : fallback;
+        }
+
         /** The whole numbers listed under {@code key}, by their names. */
         public @NotNull Map<String, Integer> amounts(@NotNull String key) {
             final Map<String, Integer> amounts = new LinkedHashMap<>();

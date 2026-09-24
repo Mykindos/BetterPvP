@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceOverflow;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.SalvageBin;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
@@ -40,18 +41,20 @@ public class CampConstruction implements ConstructionSite {
     private final CampConfig config;
     private final ResourceOverflow overflow;
     private final CrewRule crews;
+    private final SalvageBin salvageBin;
 
     @Inject
     public CampConstruction(@NotNull CampStore store, @NotNull CampResources resources,
                             @NotNull CampPermissions permissions, @NotNull CampConfig config,
                             @NotNull ResourceOverflow overflow, @NotNull CrewRule crews,
-                            @NotNull ConstructionService service) {
+                            @NotNull SalvageBin salvageBin, @NotNull ConstructionService service) {
         this.store = store;
         this.resources = resources;
         this.permissions = permissions;
         this.config = config;
         this.overflow = overflow;
         this.crews = crews;
+        this.salvageBin = salvageBin;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -91,6 +94,12 @@ public class CampConstruction implements ConstructionSite {
         }
         return Optional.of(Translations.component("clans.camp.construction.needs_hall",
                 Component.text(type.getTier())).color(NamedTextColor.RED));
+    }
+
+    @Override
+    public double demolishRefund(@NotNull SiteKey site, @NotNull PlacedStructure structure,
+                                 @NotNull StructureType type) {
+        return salvageBin.refund(site, type.getFlags().getDemolishRefund());
     }
 
     @Override

@@ -367,6 +367,85 @@ class ConstructionServiceTest {
         assertTrue(service.upgradeUnavailable(player, CAMP, hall.getId(), "bell").isPresent());
     }
 
+    @Test
+    void theSiteDecidesTheShareDemolishingGivesBack() {
+        final PlacedStructure hall = finished("hall");
+        site.refundShare = 1.0;
+        final StructureType type = catalogue.find("hall").orElseThrow();
+
+        assertEquals(10, service.demolishRefund(CAMP, hall, type).getAmounts().get("wood"));
+        assertTrue(service.demolish(player, world, hall.getId()).isSuccess());
+        assertEquals(100, site.balance.get("wood"), "all of the 10 it cost");
+    }
+
+    @Test
+    void claimingAnnouncesTheClaimedJob() {
+        final PlacedStructure hall = build("hall").getStructure();
+        now.addAndGet(10 * MINUTE);
+
+        service.claim(player, world, hall.getId());
+
+        assertTrue(events.stream().anyMatch(event -> event instanceof StructureClaimedEvent claimed
+                && claimed.getStructure() == hall && claimed.getJob().getKind() == JobKind.BUILD
+                && claimed.getWorld() == world));
+    }
+
+    @Test
+    void theSiteCanAdvanceAndRepairWithoutAPlayersPermission() {
+        final PlacedStructure hall = finished("hall");
+        final PlacedStructure dock = finished("dock");
+        site.allowed = false;
+
+        assertFalse(service.advance(player, world, hall.getId()).isSuccess());
+        assertTrue(service.advance(world, hall.getId()).isSuccess());
+        assertEquals(60, site.balance.get("wood"), "still paid for");
+
+        assertFalse(service.repair(player, world, dock.getId()).isSuccess());
+        assertTrue(service.repair(world, dock.getId()).isSuccess());
+    }
+
+    @Test
+    void theSiteStillChecksWhatAnAdvanceNeeds() {
+        final PlacedStructure hall = finished("hall");
+        site.balance.put("wood", 5);
+
+        assertFalse(service.advance(world, hall.getId()).isSuccess());
+        assertNull(hall.getJob());
+    }
+
+    @Test
+    void finishingAJobMakesItReadyToClaimEvenWhileHeld() {
+        site.rules.add(new JobRule() {
+            @Override
+            public @NotNull String id() {
+                return "siege";
+            }
+
+            @Override
+            public boolean holds(@NotNull SiteKey key, @NotNull PlacedStructure structure, @NotNull Job job) {
+                return true;
+            }
+        });
+        final PlacedStructure hall = build("hall").getStructure();
+        assertEquals(StructureStatus.PAUSED, hall.status(now.get()));
+
+        assertTrue(service.finish(world, hall.getId()).isSuccess());
+
+        assertEquals(StructureStatus.READY_TO_CLAIM, hall.status(now.get()));
+        assertTrue(service.claim(player, world, hall.getId()).isSuccess());
+        assertEquals(StructureCondition.ACTIVE, hall.getCondition());
+    }
+
+    @Test
+    void thereIsNothingToFinishWithoutAnUnfinishedJob() {
+        final PlacedStructure hall = finished("hall");
+        assertFalse(service.finish(world, hall.getId()).isSuccess());
+
+        service.advance(player, world, hall.getId());
+        now.addAndGet(5 * MINUTE);
+        assertFalse(service.finish(world, hall.getId()).isSuccess(), "already done");
+    }
+
     private ConstructionResult build(String type) {
         return service.build(player, world, catalogue.find(type).orElseThrow(), new Location(world, 0, 64, 0), 0);
     }
@@ -390,6 +469,7 @@ class ConstructionServiceTest {
         private final Map<String, Integer> balance = new HashMap<>();
         private final List<JobRule> rules = new ArrayList<>();
         private boolean allowed = true;
+        private double refundShare = -1;
         private int changes;
         private int dropsSeenWithoutTheStructure;
 
@@ -416,6 +496,12 @@ class ConstructionServiceTest {
         @Override
         public @NotNull List<JobRule> jobRules() {
             return rules;
+        }
+
+        @Override
+        public double demolishRefund(@NotNull SiteKey key, @NotNull PlacedStructure structure,
+                                     @NotNull StructureType type) {
+            return refundShare < 0 ? ConstructionSite.super.demolishRefund(key, structure, type) : refundShare;
         }
 
         @Override

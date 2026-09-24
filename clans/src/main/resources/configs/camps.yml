@@ -142,6 +142,14 @@ structures:
         cost: {wood: 150, stone: 100}
         build-seconds: 1200
         workforce: 2
+      - schematic: camps/workshop_2
+        cost: {wood: 300, stone: 200, iron: 40}
+        build-seconds: 2400
+        workforce: 4
+      - schematic: camps/workshop_3
+        cost: {wood: 600, stone: 450, iron: 120}
+        build-seconds: 5400
+        workforce: 6
     move: {cost: {}, seconds: 0}
     repair: {cost: {wood: 40}, seconds: 180}
     demolish-refund: 0.0
@@ -152,6 +160,33 @@ structures:
         seconds: 600
         workforce: 2
         piece: camps/upgrades/tool_rack
+      salvage_bin:
+        icon: COMPOSTER
+        cost: {wood: 80, stone: 40}
+        seconds: 600
+        workforce: 2
+        piece: camps/upgrades/salvage_bin
+        settings:
+          # The share of what a structure cost to reach its stage that demolishing it gives back, when that is more
+          # than the structure's own demolish-refund.
+          refund: 0.5
+      build_queue:
+        icon: PAPER
+        cost: {wood: 160, stone: 80, iron: 20}
+        seconds: 1200
+        workforce: 4
+        piece: camps/upgrades/build_queue
+      rush_order:
+        icon: CLOCK
+        cost: {wood: 250, stone: 150, iron: 60}
+        seconds: 1800
+        workforce: 6
+        piece: camps/upgrades/rush_order
+        settings:
+          # What rushing a job costs, in coins for every minute it has left. Once a day per camp.
+          coins-per-minute: 20
+          # The least a rush ever costs.
+          min-coins: 100
   storehouse:
     icon: CHEST
     stages:

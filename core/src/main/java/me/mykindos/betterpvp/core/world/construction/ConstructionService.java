@@ -171,7 +171,9 @@ public class ConstructionService {
             if (job.getKind() == JobKind.FIT_UPGRADE && job.getUpgrade() != null) {
                 type.upgrade(job.getUpgrade()).ifPresent(upgrade -> fitted(worksite, structure, upgrade));
             }
-            return changed(worksite, structure);
+            final ConstructionResult result = changed(worksite, structure);
+            UtilServer.callEvent(new StructureClaimedEvent(worksite.key, worksite.world, structure, job));
+            return result;
         });
     }
 
@@ -213,53 +215,87 @@ public class ConstructionService {
     }
 
     public @NotNull ConstructionResult advance(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
-        return act(player, world, id, ConstructionAction.ADVANCE, (worksite, structure, type) -> {
-            final int next = structure.getStage() + 1;
-            if (!type.hasStage(next)) {
-                return ConstructionResult.refused("core.construction.max_stage");
-            }
-            if (structure.getJob() != null || structure.getCondition() != StructureCondition.ACTIVE) {
-                return ConstructionResult.refused("core.construction.advance_needs_idle");
-            }
+        return act(player, world, id, ConstructionAction.ADVANCE, this::advancing);
+    }
 
-            final Optional<Component> problem = requirements(worksite, type, next)
-                    .or(() -> fit(worksite, type, next, structure.getPosition(), structure.getId()));
-            if (problem.isPresent()) {
-                return ConstructionResult.refused(problem.get());
-            }
-            final StructureStage stage = type.stage(next);
-            final Optional<ConstructionResult> unpaid = pay(worksite, stage.getCost());
-            if (unpaid.isPresent()) {
-                return unpaid.get();
-            }
+    /**
+     * Advances structure {@code id} on the site's own behalf, with no player whose permission to check. Requirements,
+     * fit and cost are checked and paid as usual.
+     */
+    public @NotNull ConstructionResult advance(@NotNull World world, @NotNull UUID id) {
+        return act(null, world, id, ConstructionAction.ADVANCE, this::advancing);
+    }
 
-            structure.setJob(Job.start(JobKind.ADVANCE, stage.getBuildTime(), stage.getCost(), next, clock.getAsLong()));
+    public @NotNull ConstructionResult repair(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
+        return act(player, world, id, ConstructionAction.REPAIR, this::repairing);
+    }
+
+    /** Repairs structure {@code id} on the site's own behalf, with no player whose permission to check. */
+    public @NotNull ConstructionResult repair(@NotNull World world, @NotNull UUID id) {
+        return act(null, world, id, ConstructionAction.REPAIR, this::repairing);
+    }
+
+    /**
+     * Finishes the job on structure {@code id} at once, whatever holds it, so it waits to be claimed. Nobody's
+     * permission is checked and nothing is paid, so the caller decides who may and what it costs.
+     */
+    public @NotNull ConstructionResult finish(@NotNull World world, @NotNull UUID id) {
+        return act(null, world, id, ConstructionAction.CLAIM, (worksite, structure, type) -> {
+            final Job job = structure.getJob();
+            if (job == null || job.isDone(clock.getAsLong())) {
+                return ConstructionResult.refused("core.construction.nothing_to_finish");
+            }
+            job.finish(clock.getAsLong());
             return changed(worksite, structure);
         });
     }
 
-    public @NotNull ConstructionResult repair(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
-        return act(player, world, id, ConstructionAction.REPAIR, (worksite, structure, type) -> {
-            final StructureCondition condition = structure.getCondition();
-            if (condition != StructureCondition.DISABLED && condition != StructureCondition.NEEDS_REPAIR) {
-                return ConstructionResult.refused("core.construction.no_repair_needed");
-            }
-            if (structure.getJob() != null) {
-                return ConstructionResult.refused("core.construction.already_working");
-            }
-            final Optional<ConstructionResult> unpaid = pay(worksite, type.getRepairCost());
-            if (unpaid.isPresent()) {
-                return unpaid.get();
-            }
+    private @NotNull ConstructionResult advancing(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
+                                                  @NotNull StructureType type) {
+        final int next = structure.getStage() + 1;
+        if (!type.hasStage(next)) {
+            return ConstructionResult.refused("core.construction.max_stage");
+        }
+        if (structure.getJob() != null || structure.getCondition() != StructureCondition.ACTIVE) {
+            return ConstructionResult.refused("core.construction.advance_needs_idle");
+        }
 
-            if (type.getRepairTime().isZero()) {
-                structure.setCondition(StructureCondition.ACTIVE);
-            } else {
-                structure.setJob(Job.start(JobKind.REPAIR, type.getRepairTime(), type.getRepairCost(),
-                        structure.getStage(), clock.getAsLong()));
-            }
-            return changed(worksite, structure);
-        });
+        final Optional<Component> problem = requirements(worksite, type, next)
+                .or(() -> fit(worksite, type, next, structure.getPosition(), structure.getId()));
+        if (problem.isPresent()) {
+            return ConstructionResult.refused(problem.get());
+        }
+        final StructureStage stage = type.stage(next);
+        final Optional<ConstructionResult> unpaid = pay(worksite, stage.getCost());
+        if (unpaid.isPresent()) {
+            return unpaid.get();
+        }
+
+        structure.setJob(Job.start(JobKind.ADVANCE, stage.getBuildTime(), stage.getCost(), next, clock.getAsLong()));
+        return changed(worksite, structure);
+    }
+
+    private @NotNull ConstructionResult repairing(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
+                                                  @NotNull StructureType type) {
+        final StructureCondition condition = structure.getCondition();
+        if (condition != StructureCondition.DISABLED && condition != StructureCondition.NEEDS_REPAIR) {
+            return ConstructionResult.refused("core.construction.no_repair_needed");
+        }
+        if (structure.getJob() != null) {
+            return ConstructionResult.refused("core.construction.already_working");
+        }
+        final Optional<ConstructionResult> unpaid = pay(worksite, type.getRepairCost());
+        if (unpaid.isPresent()) {
+            return unpaid.get();
+        }
+
+        if (type.getRepairTime().isZero()) {
+            structure.setCondition(StructureCondition.ACTIVE);
+        } else {
+            structure.setJob(Job.start(JobKind.REPAIR, type.getRepairTime(), type.getRepairCost(),
+                    structure.getStage(), clock.getAsLong()));
+        }
+        return changed(worksite, structure);
     }
 
     /**
@@ -342,8 +378,7 @@ public class ConstructionService {
             final Location centre = shapes.placementOf(world, structure)
                     .map(placement -> placement.blockBounds().getCenter().toLocation(world))
                     .orElseGet(() -> structure.getPosition().toLocation(world));
-            worksite.site.ledger().refund(worksite.key,
-                    type.costUpTo(structure.getStage()).share(type.getFlags().getDemolishRefund()));
+            worksite.site.ledger().refund(worksite.key, demolishRefund(worksite.key, structure, type));
             remove(worksite, structure, true);
             for (StructureContents contents : worksite.site.contents()) {
                 contents.drop(worksite.key, structure, centre);
@@ -351,6 +386,15 @@ public class ConstructionService {
             StructureStorage.drop(structure, centre);
             return ConstructionResult.done(structure);
         });
+    }
+
+    /** What demolishing {@code structure} on {@code site} gives back. */
+    public @NotNull ResourceCost demolishRefund(@NotNull SiteKey site, @NotNull PlacedStructure structure,
+                                                @NotNull StructureType type) {
+        final ConstructionSite owner = sites.get(site.getSiteId());
+        final double share = owner == null ? type.getFlags().getDemolishRefund()
+                : owner.demolishRefund(site, structure, type);
+        return type.costUpTo(structure.getStage()).share(share);
     }
 
     /** Applies job rules and announces any status that changed, for every structure on one site. */
@@ -447,7 +491,8 @@ public class ConstructionService {
         return Optional.empty();
     }
 
-    private @NotNull ConstructionResult act(@NotNull Player player, @NotNull World world, @NotNull UUID id,
+    /** Runs {@code body} on structure {@code id}, first checking that {@code player}, if there is one, may. */
+    private @NotNull ConstructionResult act(@Nullable Player player, @NotNull World world, @NotNull UUID id,
                                             @NotNull ConstructionAction action, @NotNull Action body) {
         final Optional<Worksite> found = worksite(world);
         if (found.isEmpty()) {
@@ -462,7 +507,7 @@ public class ConstructionService {
         if (type.isEmpty()) {
             return ConstructionResult.refused("core.construction.unknown_type");
         }
-        if (!worksite.site.allows(player, worksite.key, action)) {
+        if (player != null && !worksite.site.allows(player, worksite.key, action)) {
             return ConstructionResult.refused("core.construction.action_not_allowed");
         }
         return body.run(worksite, structure.get(), type.get());

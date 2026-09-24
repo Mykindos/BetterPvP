@@ -102,6 +102,13 @@ public class Job {
         holds.remove(reason);
     }
 
+    /** Completes it at {@code now} and lets go of whatever held it, so it waits to be claimed. */
+    public void finish(long now) {
+        holds.clear();
+        progress = 1.0;
+        checkpointAt = now;
+    }
+
     public void setRate(double rate, long now) {
         checkpoint(now);
         this.rate = Math.max(0, rate);
