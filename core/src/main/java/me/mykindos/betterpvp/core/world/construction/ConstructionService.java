@@ -172,7 +172,7 @@ public class ConstructionService {
                 type.upgrade(job.getUpgrade()).ifPresent(upgrade -> fitted(worksite, structure, upgrade));
             }
             final ConstructionResult result = changed(worksite, structure);
-            UtilServer.callEvent(new StructureClaimedEvent(worksite.key, worksite.world, structure, job));
+            UtilServer.callEvent(new StructureClaimedEvent(worksite.key, worksite.world, structure, job, player));
             return result;
         });
     }

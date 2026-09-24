@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.menu.StructureMenus;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWageFund;
 import me.mykindos.betterpvp.clans.world.camp.settler.FarmWorkplace;
+import me.mykindos.betterpvp.clans.world.camp.settler.WageFundPaidEvent;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.CrewMenus;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.CampProsperity;
@@ -27,6 +28,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
@@ -147,6 +149,7 @@ public class HallMenus {
         gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - (int) amount);
         wageFund.deposit(key, amount);
         payroll.settle(key);
+        UtilServer.callEvent(new WageFundPaidEvent(key, player, amount));
         tell(player, "clans.camp.hall.wages.paid", Component.text(UtilFormat.formatNumber((int) amount),
                 NamedTextColor.GOLD));
     }

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -125,6 +126,7 @@ public class ResourceChestDeposit implements Listener {
 
         taken.forEach(slot -> inventory.setItem(slot, null));
         resources.add(clanId, camp, amounts);
+        UtilServer.callEvent(new ResourcesDepositedEvent(Camps.keyFor(clanId), player, amounts));
         message(player, Translations.component("clans.camp.deposit.done", describe(amounts),
                 Component.text(held + adding), Component.text(capacity)).color(NamedTextColor.GREEN));
     }

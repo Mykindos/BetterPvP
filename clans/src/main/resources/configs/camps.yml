@@ -84,6 +84,31 @@ structures:
         settings:
           # The most coins one member pays toward wages in a real day.
           daily-cap: 500
+      camp_ledger:
+        icon: WRITABLE_BOOK
+        cost: {wood: 80, stone: 40}
+        seconds: 600
+        workforce: 2
+        piece: camps/upgrades/camp_ledger
+        settings:
+          # How many entries a camp keeps, the oldest dropped first.
+          max-entries: 200
+      rival_board:
+        icon: WHITE_BANNER
+        cost: {wood: 500, stone: 400, iron: 100}
+        seconds: 3600
+        workforce: 6
+        piece: camps/upgrades/rival_board
+        settings:
+          # How many camps ranked just above and just below this one the board shows.
+          above: 5
+          below: 5
+      deputy_steward:
+        icon: ARMOR_STAND
+        cost: {wood: 600, stone: 500, iron: 150}
+        seconds: 3600
+        workforce: 6
+        piece: camps/upgrades/deputy_steward
   barracks:
     icon: RED_BED
     stages:
