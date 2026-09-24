@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.SettlerConfig;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.GuestQuarters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -51,7 +52,8 @@ import java.util.stream.Stream;
 /**
  * How settlers come to a camp. Boats bring candidates to the Dock while it works, and they wait there a while. The
  * Steward keeps a hiring board that turns over on its own or for a fee. Clans reaching a milestone level are sent a
- * settler who waits at the Dock until there is room. Recruiters bring boats sooner and Hagglers bring prices down.
+ * settler who waits at the Dock until there is room. Recruiters bring boats sooner and Hagglers bring prices down. A
+ * candidate kept by {@link GuestQuarters} stays on the board when it turns over.
  * <p>
  * Everything is worked out from timestamps each minute, on the server holding the camp's world, so boats that came
  * while the camp was closed are still waiting if their time is not up.
@@ -75,6 +77,7 @@ public class CampRecruitment implements Listener {
     private final CampPermissions permissions;
     private final CampCoins coins;
     private final CampWideTraits campWide;
+    private final GuestQuarters guestQuarters;
     private final LongSupplier clock;
 
     @Inject
@@ -83,9 +86,10 @@ public class CampRecruitment implements Listener {
                            @NotNull RecruitConfig config, @NotNull TraitRegistry traits,
                            @NotNull ConstructionService construction, @NotNull SiteInstances instances,
                            @NotNull ClanManager clanManager, @NotNull CampPermissions permissions,
-                           @NotNull CampCoins coins, @NotNull CampWideTraits campWide) {
+                           @NotNull CampCoins coins, @NotNull CampWideTraits campWide,
+                           @NotNull GuestQuarters guestQuarters) {
         this(store, settlers, generator, settlerConfig, config, traits, construction, instances, clanManager,
-                permissions, coins, campWide, System::currentTimeMillis);
+                permissions, coins, campWide, guestQuarters, System::currentTimeMillis);
     }
 
     CampRecruitment(@NotNull CampStore store, @NotNull SettlerService settlers, @NotNull SettlerGenerator generator,
@@ -93,7 +97,8 @@ public class CampRecruitment implements Listener {
                     @NotNull TraitRegistry traits, @NotNull ConstructionService construction,
                     @NotNull SiteInstances instances, @NotNull ClanManager clanManager,
                     @NotNull CampPermissions permissions, @NotNull CampCoins coins,
-                    @NotNull CampWideTraits campWide, @NotNull LongSupplier clock) {
+                    @NotNull CampWideTraits campWide, @NotNull GuestQuarters guestQuarters,
+                    @NotNull LongSupplier clock) {
         this.store = store;
         this.settlers = settlers;
         this.generator = generator;
@@ -106,6 +111,7 @@ public class CampRecruitment implements Listener {
         this.permissions = permissions;
         this.coins = coins;
         this.campWide = campWide;
+        this.guestQuarters = guestQuarters;
         this.clock = clock;
     }
 
@@ -263,8 +269,8 @@ public class CampRecruitment implements Listener {
 
     private void rollBoard(@NotNull SiteKey key, @NotNull Camp camp, long now) {
         final Random random = ThreadLocalRandom.current();
-        final List<SettlerCandidate> board = new ArrayList<>();
-        for (int i = 0; i < config.getBoardSize(); i++) {
+        final List<SettlerCandidate> board = new ArrayList<>(guestQuarters.carryOver(key, camp).stream().toList());
+        for (int i = board.size(); i < config.getBoardSize(); i++) {
             final SettlerRarity rarity = config.getBoardOdds().rarity(random);
             board.add(new SettlerCandidate(roll(rarity, config.getBoardOdds().profession(random), "hiring", random),
                     config.getBoardPrices().getOrDefault(rarity, 0L), 0));
