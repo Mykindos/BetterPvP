@@ -21,11 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Consumer;
 
-/** What the Steward offers: settlers, hiring, wages, crews, the farm, construction and permissions, each nested. */
+/** What the Steward offers: settlers, hiring, wages, crews, the farm, construction, upgrades and permissions, each nested. */
 public class GreatHallMenu extends AbstractGui implements Windowed {
 
     GreatHallMenu(@NotNull HallMenus menus, @NotNull Player viewer, @NotNull SiteKey key) {
-        super(9, 3);
+        super(9, 4);
         setItem(10, entry(Material.PLAYER_HEAD, "settlers",
                 player -> new SettlerRosterMenu(menus, key, this, 0, 0).show(player)));
         setItem(11, entry(Material.OAK_SIGN, "hiring",
@@ -39,10 +39,12 @@ public class GreatHallMenu extends AbstractGui implements Windowed {
         setItem(15, entry(Material.CRAFTING_TABLE, "construction",
                 player -> new ConstructionMenu(player, key, List.copyOf(menus.getStructures().all()),
                         menus.getConstruction(), menus.getCatalogue(), menus.getBlueprints(), this).show(player)));
-        setItem(16, entry(Material.WRITABLE_BOOK, "permissions",
+        setItem(21, entry(Material.ANVIL, "upgrades",
+                player -> new UpgradesMenu(menus, player, key, this).show(player)));
+        setItem(23, entry(Material.WRITABLE_BOOK, "permissions",
                 player -> new CampPermissionsMenu(key.getOwnerId(), menus.getPermissions(),
                         menus.isLeader(player, key), CampPermissionsMenu.Page.CONSTRUCTION, this).show(player)));
-        setItem(22, new BackButton(null));
+        setItem(31, new BackButton(null));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 

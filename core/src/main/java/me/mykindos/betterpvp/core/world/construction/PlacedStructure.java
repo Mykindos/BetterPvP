@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.UUID;
 
 /** One structure a holding owns: what it is, where it stands, what shape it is in and what is being done to it. */
@@ -26,6 +28,8 @@ public class PlacedStructure {
     private @Nullable Job job;
     /** What its containers hold, by {@link StructureStorage} slot. Null when they are all empty. */
     private @Nullable Map<String, List<String>> storage;
+    /** The upgrade picked at each stage, by stage. A stage missing from it has not been picked from. */
+    private Map<Integer, String> upgrades = new TreeMap<>();
 
     public PlacedStructure(@NotNull UUID id, @NotNull String type, @NotNull StructurePosition position,
                            @NotNull StructureCondition condition) {
@@ -33,6 +37,15 @@ public class PlacedStructure {
         this.type = type;
         this.position = position;
         this.condition = condition;
+    }
+
+    public boolean hasUpgrade(@NotNull String upgrade) {
+        return upgrades.containsValue(upgrade);
+    }
+
+    /** The upgrade picked at {@code stage}, if one was. */
+    public @NotNull Optional<String> upgradeAt(int stage) {
+        return Optional.ofNullable(upgrades.get(stage));
     }
 
     public @NotNull StructureStatus status(long now) {
@@ -49,7 +62,7 @@ public class PlacedStructure {
             return switch (job.getKind()) {
                 case BUILD, MOVE -> StructureStatus.UNDER_CONSTRUCTION;
                 case ADVANCE -> StructureStatus.ADVANCING;
-                case REPAIR -> fromCondition();
+                case REPAIR, FIT_UPGRADE -> fromCondition();
             };
         }
         return fromCondition();

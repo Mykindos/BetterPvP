@@ -11,5 +11,6 @@ public enum ConstructionAction {
     ADVANCE,
     CLAIM,
     DEMOLISH,
-    REPAIR
+    REPAIR,
+    PICK_UPGRADE
 }

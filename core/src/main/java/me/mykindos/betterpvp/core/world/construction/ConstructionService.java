@@ -3,12 +3,12 @@ package me.mykindos.betterpvp.core.world.construction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Value;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
-import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.LongSupplier;
 
 /**
- * Every construction action a player can take, checked and paid for: build, cancel, claim, move, advance, repair and
- * demolish. Each action works out which site the world belongs to, asks that site's {@link ConstructionSite} for its
+ * Every construction action a player can take, checked and paid for: build, cancel, claim, move, advance, repair,
+ * demolish and fitting an upgrade. Each action works out which site the world belongs to, asks that site's {@link ConstructionSite} for its
  * holding, costs and permissions, and fires events for whatever shows the result in the world.
  * <p>
  * Structure status is time-driven as well as action-driven (a job finishes by itself), so {@link #refresh} is called
@@ -164,8 +164,13 @@ public class ConstructionService {
                 case ADVANCE -> structure.setStage(job.getTargetStage());
                 case MOVE -> structure.setPosition(job.getTarget());
                 case REPAIR -> structure.setCondition(StructureCondition.ACTIVE);
+                case FIT_UPGRADE -> {
+                }
             }
             structure.setJob(null);
+            if (job.getKind() == JobKind.FIT_UPGRADE && job.getUpgrade() != null) {
+                type.upgrade(job.getUpgrade()).ifPresent(upgrade -> fitted(worksite, structure, upgrade));
+            }
             return changed(worksite, structure);
         });
     }
@@ -258,6 +263,66 @@ public class ConstructionService {
     }
 
     /**
+     * Fits one of a structure's upgrades. It takes one upgrade from each stage it has reached, while it stands working
+     * with nothing else under way. An upgrade that takes no time is fitted at once, otherwise it is a job claimed like
+     * any other.
+     */
+    public @NotNull ConstructionResult upgrade(@NotNull Player player, @NotNull World world, @NotNull UUID id,
+                                               @NotNull String upgradeId) {
+        return act(player, world, id, ConstructionAction.PICK_UPGRADE, (worksite, structure, type) -> {
+            final Optional<StructureUpgrade> found = type.upgrade(upgradeId);
+            if (found.isEmpty()) {
+                return ConstructionResult.refused("core.construction.unknown_upgrade");
+            }
+            final StructureUpgrade upgrade = found.get();
+            final Optional<Component> problem = upgradeProblem(structure, upgrade);
+            if (problem.isPresent()) {
+                return ConstructionResult.refused(problem.get());
+            }
+            final Optional<ConstructionResult> unpaid = pay(worksite, upgrade.getCost());
+            if (unpaid.isPresent()) {
+                return unpaid.get();
+            }
+
+            if (upgrade.getTime().isZero()) {
+                fitted(worksite, structure, upgrade);
+                return changed(worksite, structure);
+            }
+            final Job job = Job.start(JobKind.FIT_UPGRADE, upgrade.getTime(), upgrade.getCost(), structure.getStage(),
+                    clock.getAsLong());
+            job.setUpgrade(upgrade.getId());
+            structure.setJob(job);
+            return changed(worksite, structure);
+        });
+    }
+
+    /**
+     * Why {@code player} could not fit {@code upgradeId} to structure {@code id} on {@code site}, or empty if they
+     * could. Works whether the site's world is loaded or not.
+     */
+    public @NotNull Optional<Component> upgradeUnavailable(@NotNull Player player, @NotNull SiteKey site,
+                                                           @NotNull UUID id, @NotNull String upgradeId) {
+        final ConstructionSite owner = sites.get(site.getSiteId());
+        final Optional<PlacedStructure> structure = Optional.ofNullable(owner)
+                .flatMap(found -> found.holding(site))
+                .flatMap(holding -> holding.find(id));
+        if (structure.isEmpty()) {
+            return Optional.of(text("core.construction.missing_structure"));
+        }
+        final Optional<StructureUpgrade> upgrade = catalogue.find(structure.get().getType())
+                .flatMap(type -> type.upgrade(upgradeId));
+        if (upgrade.isEmpty()) {
+            return Optional.of(text("core.construction.unknown_upgrade"));
+        }
+        if (!owner.allows(player, site, ConstructionAction.PICK_UPGRADE)) {
+            return Optional.of(text("core.construction.action_not_allowed"));
+        }
+        return upgradeProblem(structure.get(), upgrade.get())
+                .or(() -> owner.ledger().canAfford(site, upgrade.get().getCost())
+                        ? Optional.empty() : Optional.of(text("core.construction.cannot_afford")));
+    }
+
+    /**
      * Takes a finished structure down. A share of what it cost comes back, and everything it held is dropped where it
      * stood once it is gone from the holding.
      */
@@ -311,6 +376,29 @@ public class ConstructionService {
                 .or(() -> fit(worksite, type, 0, position, null))
                 .or(() -> worksite.site.ledger().canAfford(worksite.key, type.stage(0).getCost())
                         ? Optional.empty() : Optional.of(text("core.construction.cannot_afford")));
+    }
+
+    private @NotNull Optional<Component> upgradeProblem(@NotNull PlacedStructure structure,
+                                                        @NotNull StructureUpgrade upgrade) {
+        if (structure.getStage() < upgrade.getStage()) {
+            return Optional.of(text("core.construction.upgrade_locked"));
+        }
+        if (structure.upgradeAt(upgrade.getStage()).isPresent()) {
+            return Optional.of(text("core.construction.upgrade_taken"));
+        }
+        if (structure.getJob() != null) {
+            return Optional.of(text("core.construction.busy"));
+        }
+        if (structure.getCondition() != StructureCondition.ACTIVE) {
+            return Optional.of(text("core.construction.upgrade_needs_active"));
+        }
+        return Optional.empty();
+    }
+
+    private void fitted(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
+                        @NotNull StructureUpgrade upgrade) {
+        structure.getUpgrades().put(upgrade.getStage(), upgrade.getId());
+        UtilServer.callEvent(new StructureUpgradedEvent(worksite.key, structure, upgrade));
     }
 
     private @NotNull Optional<Component> requirements(@NotNull Worksite worksite, @NotNull StructureType type, int stage) {

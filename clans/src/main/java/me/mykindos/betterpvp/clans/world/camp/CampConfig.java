@@ -124,6 +124,11 @@ public class CampConfig implements Reloadable {
         return actions;
     }
 
+    /** The numbers for upgrade {@code upgrade} on structure {@code structure}, if {@code camps.yml} lists them. */
+    public @NotNull Optional<UpgradeNumbers> upgrade(@NotNull String structure, @NotNull String upgrade) {
+        return structure(structure).map(numbers -> numbers.getUpgrades().get(upgrade));
+    }
+
     /** The numbers for structure {@code id}, or nothing if {@code camps.yml} does not list it. */
     public @NotNull Optional<StructureNumbers> structure(@NotNull String id) {
         return Optional.ofNullable(structures.get(id));
@@ -144,11 +149,30 @@ public class CampConfig implements Reloadable {
             stages.add(new StructureStage(id, ResourceCost.NONE, Duration.ZERO));
         }
 
+        final Map<String, UpgradeNumbers> upgrades = new HashMap<>();
+        final ConfigurationSection upgradeSection = section.getConfigurationSection("upgrades");
+        if (upgradeSection != null) {
+            for (String upgrade : upgradeSection.getKeys(false)) {
+                final ConfigurationSection numbers = upgradeSection.getConfigurationSection(upgrade);
+                if (numbers != null) {
+                    upgrades.put(upgrade, readUpgrade(numbers));
+                }
+            }
+        }
+
         final Material icon = Material.matchMaterial(section.getString("icon", "BRICKS"));
         return new StructureNumbers(List.copyOf(stages),
                 cost(section.get("move.cost")), Duration.ofSeconds(section.getLong("move.seconds", 0)),
                 cost(section.get("repair.cost")), Duration.ofSeconds(section.getLong("repair.seconds", 0)),
-                section.getDouble("demolish-refund", 0), icon == null ? Material.BRICKS : icon);
+                section.getDouble("demolish-refund", 0), icon == null ? Material.BRICKS : icon, Map.copyOf(upgrades));
+    }
+
+    private static @NotNull UpgradeNumbers readUpgrade(@NotNull ConfigurationSection section) {
+        final Material icon = Material.matchMaterial(section.getString("icon", "ANVIL"));
+        final ConfigurationSection settings = section.getConfigurationSection("settings");
+        return new UpgradeNumbers(cost(section.get("cost")), Duration.ofSeconds(section.getLong("seconds", 0)),
+                section.getInt("workforce", 0), section.getString("piece"), icon == null ? Material.ANVIL : icon,
+                settings == null ? Map.of() : settings.getValues(true));
     }
 
     /** Reads a {@code {wood: 10, stone: 5}} cost, from a config section or a plain map. */
@@ -198,6 +222,34 @@ public class CampConfig implements Reloadable {
         Duration repairTime;
         double demolishRefund;
         Material icon;
+        /** By upgrade id. */
+        Map<String, UpgradeNumbers> upgrades;
+    }
+
+    /** One upgrade's numbers, and whatever its effect reads from its {@code settings}. */
+    @Value
+    public static class UpgradeNumbers {
+        ResourceCost cost;
+        Duration time;
+        int workforce;
+        @Nullable String piece;
+        Material icon;
+        Map<String, Object> settings;
+
+        public int setting(@NotNull String key, int fallback) {
+            return settings.get(key) instanceof Number number ? number.intValue() : fallback;
+        }
+
+        /** The whole numbers listed under {@code key}, by their names. */
+        public @NotNull Map<String, Integer> amounts(@NotNull String key) {
+            final Map<String, Integer> amounts = new LinkedHashMap<>();
+            settings.forEach((path, value) -> {
+                if (path.startsWith(key + ".") && value instanceof Number number) {
+                    amounts.put(path.substring(key.length() + 1), number.intValue());
+                }
+            });
+            return amounts;
+        }
     }
 
     /** One item's worth: which resource, and how much of it. */

@@ -6,13 +6,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
+import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWageFund;
 import me.mykindos.betterpvp.clans.world.camp.settler.FarmWorkplace;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.CrewMenus;
-import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.CampProsperity;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
+import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.CampProsperity;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.RecruitConfig;
+import me.mykindos.betterpvp.clans.world.camp.structure.CampStructure;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -37,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Opens the Great Hall's menus, all reached from the Steward: the hub, and under it the settlers, the hiring board,
- * the wage fund, the crews, the farm, the construction menu and the camp's permissions. Carries out what the wage fund asks for.
+ * the wage fund, the crews, the farm, the construction menu, upgrades and the camp's permissions. Carries out what the wage fund asks for.
  */
 @Singleton
 @Getter(AccessLevel.PACKAGE)
@@ -60,6 +62,7 @@ public class HallMenus {
     private final RecruitConfig recruitConfig;
     private final FarmWorkplace farm;
     private final CampProsperity prosperity;
+    private final CampStore store;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
@@ -69,7 +72,7 @@ public class HallMenus {
                      @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
                      @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm,
-                     @NotNull CampProsperity prosperity) {
+                     @NotNull CampProsperity prosperity, @NotNull CampStore store) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -87,6 +90,12 @@ public class HallMenus {
         this.recruitConfig = recruitConfig;
         this.farm = farm;
         this.prosperity = prosperity;
+        this.store = store;
+    }
+
+    /** What a structure is called at {@code stage}, 0 being the first. Players see these, never a stage number. */
+    static @NotNull Component stageName(@NotNull CampStructure type, int stage) {
+        return Translations.component("clans.camp.structure." + type.getId() + ".stage." + (stage + 1));
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */
@@ -129,6 +138,10 @@ public class HallMenus {
         payroll.settle(key);
         tell(player, "clans.camp.hall.wages.paid", Component.text(UtilFormat.formatNumber((int) amount),
                 NamedTextColor.GOLD));
+    }
+
+    void tell(@NotNull Player player, @NotNull Component message) {
+        UtilMessage.message(player, Translations.component("clans.prefix.camp"), message);
     }
 
     void tell(@NotNull Player player, @NotNull String key, @NotNull ComponentLike... args) {

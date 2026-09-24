@@ -288,6 +288,70 @@ class ConstructionServiceTest {
         assertTrue(service.unavailable(player, CAMP, workshop).isPresent(), "cannot afford it");
     }
 
+    @Test
+    void anInstantUpgradeIsFittedAtOnceAndTakesItsStagesPick() {
+        final PlacedStructure hall = finished("hall");
+
+        assertTrue(service.upgrade(player, world, hall.getId(), "lantern").isSuccess());
+
+        assertTrue(hall.hasUpgrade("lantern"));
+        assertEquals(85, site.balance.get("wood"));
+        assertTrue(events.stream().anyMatch(event -> event instanceof StructureUpgradedEvent upgraded
+                && upgraded.getUpgrade().getId().equals("lantern")));
+        assertFalse(service.upgrade(player, world, hall.getId(), "bell").isSuccess(), "one pick per stage");
+        assertEquals(85, site.balance.get("wood"));
+    }
+
+    @Test
+    void aTimedUpgradeIsFittedOnlyOnceClaimed() {
+        final PlacedStructure hall = finished("hall");
+
+        assertTrue(service.upgrade(player, world, hall.getId(), "bell").isSuccess());
+        assertFalse(hall.hasUpgrade("bell"));
+        assertEquals(StructureStatus.ACTIVE, hall.status(now.get()), "it stays usable while the upgrade goes in");
+
+        now.addAndGet(5 * MINUTE);
+        assertEquals(StructureStatus.READY_TO_CLAIM, hall.status(now.get()));
+        assertTrue(service.claim(player, world, hall.getId()).isSuccess());
+        assertEquals(Optional.of("bell"), hall.upgradeAt(0));
+        assertNull(hall.getJob());
+    }
+
+    @Test
+    void cancellingAnUpgradeGivesItsCostBackAndLeavesTheStageOpen() {
+        final PlacedStructure hall = finished("hall");
+        service.upgrade(player, world, hall.getId(), "bell");
+
+        assertTrue(service.cancel(player, world, hall.getId()).isSuccess());
+
+        assertEquals(90, site.balance.get("wood"));
+        assertTrue(hall.upgradeAt(0).isEmpty());
+        assertTrue(service.upgrade(player, world, hall.getId(), "lantern").isSuccess());
+    }
+
+    @Test
+    void aLaterStagesUpgradeWaitsForItAndAnEarlierStageCanStillBePicked() {
+        final PlacedStructure hall = finished("hall");
+        assertFalse(service.upgrade(player, world, hall.getId(), "tower").isSuccess(), "not reached yet");
+
+        service.advance(player, world, hall.getId());
+        now.addAndGet(5 * MINUTE);
+        service.claim(player, world, hall.getId());
+
+        assertTrue(service.upgrade(player, world, hall.getId(), "tower").isSuccess());
+        assertTrue(service.upgrade(player, world, hall.getId(), "lantern").isSuccess(), "stage 1 was never picked from");
+        assertEquals(2, hall.getUpgrades().size());
+    }
+
+    @Test
+    void upgradeAvailabilityCanBeAskedWithoutTheWorld() {
+        final PlacedStructure hall = finished("hall");
+        assertTrue(service.upgradeUnavailable(player, CAMP, hall.getId(), "lantern").isEmpty());
+
+        service.upgrade(player, world, hall.getId(), "lantern");
+        assertTrue(service.upgradeUnavailable(player, CAMP, hall.getId(), "bell").isPresent());
+    }
+
     private ConstructionResult build(String type) {
         return service.build(player, world, catalogue.find(type).orElseThrow(), new Location(world, 0, 64, 0), 0);
     }
@@ -412,6 +476,15 @@ class ConstructionServiceTest {
         @Override
         public @NotNull StructureFlags getFlags() {
             return flags;
+        }
+
+        @Override
+        public @NotNull List<StructureUpgrade> getUpgrades() {
+            final ResourceCost five = ResourceCost.of(Map.of("wood", 5));
+            return List.of(
+                    new StructureUpgrade("lantern", 0, five, Duration.ZERO, 0, null),
+                    new StructureUpgrade("bell", 0, five, Duration.ofMinutes(5), 0, null),
+                    new StructureUpgrade("tower", 1, five, Duration.ZERO, 0, null));
         }
     }
 }
