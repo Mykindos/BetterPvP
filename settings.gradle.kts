@@ -46,7 +46,6 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            version("kotlin", "2.3.0")
             version("paper", "1.21.11-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-beta.19")
             version("jackson", "2.17.2")
@@ -74,11 +73,6 @@ dependencyResolutionManagement {
 
             // Library - lombok
             library("lombok", "org.projectlombok", "lombok").version("1.18.34")
-
-            // Library - Kotlin
-            library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
-            library("kotlin-reflect", "org.jetbrains.kotlin", "kotlin-reflect").versionRef("kotlin")
-            plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
 
             // Library - Tests
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
@@ -158,7 +152,6 @@ dependencyResolutionManagement {
             library("jedis", "redis.clients", "jedis").version("5.2.0")
 
             // Bundled Libraries
-            bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("junit-jupiter", "mockbukkit"))
             bundle("paper", listOf("paper-api"))
             bundle(
