@@ -65,7 +65,7 @@ public final class Footprint {
         return columns.contains(pack(x, z));
     }
 
-    static long pack(int x, int z) {
+    public static long pack(int x, int z) {
         return ((long) x << 32) | (z & 0xFFFFFFFFL);
     }
 

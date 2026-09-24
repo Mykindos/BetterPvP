@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.world.construction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
@@ -64,6 +66,32 @@ public class FitCheck {
         return Optional.empty();
     }
 
+    /**
+     * The columns of {@code placement} that stop it fitting, packed with {@link Footprint#pack}: those outside the
+     * build zones it needs and those shared with another structure over a shared height. Empty if it fits.
+     *
+     * @param ignoring a structure not to collide with, being the one that is moving or growing, or null
+     */
+    public @NotNull LongSet clashes(@NotNull World world, @NotNull Holding holding, @NotNull StructureType type,
+                                    @NotNull SchematicPlacement placement, @Nullable UUID ignoring) {
+        final Footprint footprint = placement.getFootprint();
+        final List<Footprint> others = occupied(world, holding, ignoring).stream()
+                .filter(other -> other.getMaxY() >= footprint.getMinY() && footprint.getMaxY() >= other.getMinY())
+                .toList();
+        final LongSet clashing = new LongOpenHashSet();
+        final LongIterator columns = footprint.getColumns().iterator();
+        while (columns.hasNext()) {
+            final long column = columns.nextLong();
+            final int x = Footprint.unpackX(column);
+            final int z = Footprint.unpackZ(column);
+            if (!inBuildZones(world, footprint, column, type.getRequiredZoneTag())
+                    || others.stream().anyMatch(other -> other.containsColumn(x, z))) {
+                clashing.add(column);
+            }
+        }
+        return clashing;
+    }
+
     /** A zone tag's name for players, falling back to the tag itself for one without a translation. */
     private static @NotNull Component zoneTag(@NotNull String tag) {
         return Component.translatable("core.construction.zone_tag." + tag, tag.replace('_', ' '));
@@ -75,15 +103,20 @@ public class FitCheck {
         }
         final LongIterator columns = footprint.getColumns().iterator();
         while (columns.hasNext()) {
-            final long column = columns.nextLong();
-            final double x = Footprint.unpackX(column) + 0.5;
-            final double z = Footprint.unpackZ(column) + 0.5;
-            if (!inBuildZone(new Location(world, x, footprint.getMinY() + 0.5, z), requiredTag)
-                    || !inBuildZone(new Location(world, x, footprint.getMaxY() + 0.5, z), requiredTag)) {
+            if (!inBuildZones(world, footprint, columns.nextLong(), requiredTag)) {
                 return false;
             }
         }
         return true;
+    }
+
+    /** Whether one column of {@code footprint} is inside the build zones at both its bottom and its top. */
+    private boolean inBuildZones(@NotNull World world, @NotNull Footprint footprint, long column,
+                                 @Nullable String requiredTag) {
+        final double x = Footprint.unpackX(column) + 0.5;
+        final double z = Footprint.unpackZ(column) + 0.5;
+        return inBuildZone(new Location(world, x, footprint.getMinY() + 0.5, z), requiredTag)
+                && inBuildZone(new Location(world, x, footprint.getMaxY() + 0.5, z), requiredTag);
     }
 
     private boolean inBuildZone(@NotNull Location location, @Nullable String requiredTag) {

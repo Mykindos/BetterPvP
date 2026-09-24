@@ -53,6 +53,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
     private final SiteKey camp;
     private final UUID id;
     private final @Nullable Windowed back;
+    private final @Nullable Windowed returnTo;
     private final @Nullable ConstructionService.Worksite worksite;
     private Component title = Component.empty();
 
@@ -62,12 +63,20 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
      */
     StructureActionsMenu(@NotNull StructureMenus menus, @NotNull Player viewer, @NotNull SiteKey camp, @NotNull UUID id,
                          @Nullable Windowed back, @Nullable ConstructionAction confirming) {
+        this(menus, viewer, camp, id, back, confirming, null);
+    }
+
+    /** @param returnTo where Back goes instead of the structure list, or null for the list */
+    StructureActionsMenu(@NotNull StructureMenus menus, @NotNull Player viewer, @NotNull SiteKey camp, @NotNull UUID id,
+                         @Nullable Windowed back, @Nullable ConstructionAction confirming,
+                         @Nullable Windowed returnTo) {
         super(9, 4);
         this.menus = menus;
         this.viewer = viewer;
         this.camp = camp;
         this.id = id;
         this.back = back;
+        this.returnTo = returnTo;
         this.worksite = menus.worksite(viewer, camp).orElse(null);
 
         final Optional<PlacedStructure> found = menus.holding(camp).flatMap(holding -> holding.find(id));
@@ -81,7 +90,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                     .displayName(Translations.component("core.construction.missing_structure").color(NamedTextColor.RED))
                     .build()));
         }
-        setItem(31, new BackButton(new PlacedStructuresMenu(menus, camp, back)));
+        setItem(31, new BackButton(returnTo != null ? returnTo : new PlacedStructuresMenu(menus, camp, back)));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 
@@ -199,7 +208,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                 return;
             }
             if (needsConfirm && !armed) {
-                new StructureActionsMenu(menus, player, camp, id, back, action).show(player);
+                new StructureActionsMenu(menus, player, camp, id, back, action, returnTo).show(player);
                 return;
             }
             final ConstructionResult result = run.apply(menus.getConstruction(), worksite.getWorld());
@@ -334,7 +343,9 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
     private void reopen(@NotNull Player player) {
         final boolean stands = menus.holding(camp).flatMap(holding -> holding.find(id)).isPresent();
         if (stands) {
-            new StructureActionsMenu(menus, player, camp, id, back, null).show(player);
+            new StructureActionsMenu(menus, player, camp, id, back, null, returnTo).show(player);
+        } else if (returnTo != null) {
+            returnTo.show(player);
         } else {
             menus.openList(player, camp, back);
         }
