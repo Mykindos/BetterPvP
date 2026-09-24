@@ -306,9 +306,48 @@ structures:
         cost: {wood: 120, stone: 60}
         build-seconds: 900
         workforce: 2
+      - schematic: camps/storehouse_2
+        cost: {wood: 240, stone: 120, iron: 30}
+        build-seconds: 1800
+        workforce: 4
+      - schematic: camps/storehouse_3
+        cost: {wood: 500, stone: 280, iron: 90}
+        build-seconds: 4500
+        workforce: 6
     move: {cost: {}, seconds: 0}
     repair: {cost: {wood: 40}, seconds: 180}
     demolish-refund: 0.0
+    upgrades:
+      sorting_table:
+        icon: HOPPER
+        cost: {wood: 80, stone: 30}
+        seconds: 600
+        workforce: 2
+        piece: camps/upgrades/sorting_table
+      tally_board:
+        icon: OAK_SIGN
+        cost: {wood: 60}
+        seconds: 300
+        workforce: 2
+        piece: camps/upgrades/tally_board
+      rank_lockbox:
+        icon: IRON_BARS
+        cost: {wood: 60, iron: 20}
+        seconds: 600
+        workforce: 2
+        piece: camps/upgrades/rank_lockbox
+      item_finder:
+        icon: SPYGLASS
+        cost: {wood: 160, stone: 80, iron: 20}
+        seconds: 1200
+        workforce: 4
+        piece: camps/upgrades/item_finder
+      remote_access:
+        icon: ENDER_CHEST
+        cost: {wood: 250, stone: 150, iron: 60}
+        seconds: 1800
+        workforce: 6
+        piece: camps/upgrades/remote_access
 
 # What each rank may do in its camp, until a clan changes it. RECRUIT, MEMBER, ADMIN, LEADER, and ALLY for members of
 # allied clans. ally-containers is whether allies may open the camp's containers.

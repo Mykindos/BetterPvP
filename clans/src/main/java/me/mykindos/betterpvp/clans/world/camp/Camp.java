@@ -126,6 +126,12 @@ public class Camp {
     /** When the Great bell was last rung, or 0 before it ever was. */
     private long bellRungAt;
 
+    /** The ranks that may open a Storehouse's rank lockbox, or null for the defaults. The leader always may. */
+    private @Nullable Set<ClanMember.MemberRank> lockboxRanks;
+
+    /** What each Storehouse's rank lockbox holds, by structure id, as encoded items by slot. */
+    private Map<UUID, List<String>> lockboxes = new HashMap<>();
+
     public int getResource(String resource) {
         return resources.getOrDefault(resource, 0);
     }
