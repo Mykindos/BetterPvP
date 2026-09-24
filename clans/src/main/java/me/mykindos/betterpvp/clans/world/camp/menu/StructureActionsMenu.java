@@ -1,12 +1,16 @@
 package me.mykindos.betterpvp.clans.world.camp.menu;
 
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructure;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.BuildQueue;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.QueuedAction;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.RushOrder;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -121,6 +125,20 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                     (service, world) -> service.repair(viewer, world, id)));
         }
 
+        final BuildQueue queue = menus.getBuildQueue();
+        final Optional<ConstructionAction> queueable = BuildQueue.queueable(structure, type);
+        final boolean busyElsewhere = menus.holding(camp)
+                .map(holding -> BuildQueue.busyElsewhere(holding, id))
+                .orElse(false);
+        if (queue.isActive(camp) && queueable.isPresent() && busyElsewhere) {
+            buttons.add(queue(structure, type, queueable.get()));
+        }
+
+        final RushOrder rush = menus.getRushOrder();
+        if (job != null && !job.isDone(now) && rush.isActive(camp)) {
+            buttons.add(rush(structure, type, rush.price(job, now)));
+        }
+
         if (type.getFlags().isMovable()) {
             buttons.add(move(type, busy ? Translations.component("core.construction.busy")
                     : unaffordable(type.getMoveCost())));
@@ -140,7 +158,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                     || condition == StructureCondition.NOT_PLACED
                     ? Translations.component("core.construction.demolish_needs_standing")
                     : busy ? Translations.component("core.construction.busy") : null;
-            final ResourceCost refund = type.costUpTo(structure.getStage()).share(type.getFlags().getDemolishRefund());
+            final ResourceCost refund = menus.getConstruction().demolishRefund(camp, structure, type);
             buttons.add(button(Material.TNT, ConstructionAction.DEMOLISH, confirming,
                     Translations.component("clans.camp.menu.structures.action.demolish"),
                     List.of(refundLine(refund),
@@ -191,6 +209,70 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                 }
             } else {
                 menus.tell(player, Translations.component(done, type.getDisplayName()).color(NamedTextColor.GRAY));
+            }
+            reopen(player);
+        });
+    }
+
+    /** Queues {@code action} to start once the camp's next job is claimed, instead of starting it now. */
+    private @NotNull SimpleItem queue(@NotNull PlacedStructure structure, @NotNull CampStructure type,
+                                      @NotNull ConstructionAction action) {
+        final BuildQueue queue = menus.getBuildQueue();
+        final Optional<QueuedAction> waiting = queue.queued(camp);
+        final Component blocked;
+        if (!menus.getPermissions().allows(viewer, camp.getOwnerId(), action)) {
+            blocked = Translations.component("clans.settler.card.not_allowed");
+        } else {
+            blocked = waiting.map(queued -> Translations.component("clans.camp.upgrade.build_queue.full",
+                    queue.describe(queued))).orElse(null);
+        }
+        final QueuedAction preview = new QueuedAction(id, type.getId(), action, viewer.getUniqueId());
+        final ItemView.ItemViewBuilder view = view(Material.PAPER,
+                Translations.component("clans.camp.upgrade.build_queue.button", queue.describe(preview)),
+                List.of(Translations.component("clans.camp.upgrade.build_queue.button.description")), blocked);
+        if (blocked == null) {
+            view.action(ClickActions.ALL, Translations.component("clans.camp.menu.structures.act"));
+        }
+        return new SimpleItem(view.build(), click -> {
+            if (blocked != null) {
+                return;
+            }
+            final Player player = click.getPlayer();
+            if (queue.queue(player, camp, structure, action)) {
+                menus.tell(player, Translations.component("clans.camp.upgrade.build_queue.queued",
+                        queue.describe(preview)).color(NamedTextColor.GRAY));
+            }
+            reopen(player);
+        });
+    }
+
+    /** Pays coins from the viewer's own balance to finish the running job at once. */
+    private @NotNull SimpleItem rush(@NotNull PlacedStructure structure, @NotNull CampStructure type, long price) {
+        final RushOrder rush = menus.getRushOrder();
+        final Component blocked = worksite == null
+                ? Translations.component("clans.camp.menu.structures.not_in_camp")
+                : rush.problem(viewer, camp, structure).orElse(null);
+        final ItemView.ItemViewBuilder view = view(Material.CLOCK,
+                Translations.component("clans.camp.upgrade.rush_order.button"),
+                List.of(Translations.component("clans.camp.upgrade.rush_order.price",
+                                Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD)),
+                        Translations.component("clans.camp.upgrade.rush_order.button.description")), blocked);
+        if (blocked == null) {
+            view.action(ClickActions.ALL, Translations.component("clans.camp.menu.structures.act"));
+        }
+        return new SimpleItem(view.build(), click -> {
+            final Player player = click.getPlayer();
+            if (blocked != null || worksite == null) {
+                return;
+            }
+            final ConstructionResult result = rush.rush(player, worksite, structure);
+            if (!result.isSuccess()) {
+                if (result.getReason() != null) {
+                    menus.tell(player, result.getReason());
+                }
+            } else {
+                menus.tell(player, Translations.component("clans.camp.upgrade.rush_order.done",
+                        type.getDisplayName()).color(NamedTextColor.GRAY));
             }
             reopen(player);
         });
