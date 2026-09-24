@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.clans.world.camp.settler.StarterCrew;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.DockArrivals;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.StartingCamp;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.DeputySteward;
 import me.mykindos.betterpvp.clans.world.model.Dock;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -42,6 +43,7 @@ public class CampContent {
     private final StarterCrew starterCrew;
     private final WorldContent steward;
     private final WorldContent arrivals;
+    private final WorldContent deputy;
     private final WorldContent buildZones = new BuildZones();
     private final StartingCamp startingCamp;
     private final CampGrounds grounds;
@@ -53,7 +55,7 @@ public class CampContent {
                         @NotNull CampStructures campStructures, @NotNull StartingCamp startingCamp,
                         @NotNull CampGrounds grounds, @NotNull SettlerPresence settlerPresence,
                         @NotNull StarterCrew starterCrew, @NotNull Steward steward,
-                        @NotNull DockArrivals arrivals) {
+                        @NotNull DockArrivals arrivals, @NotNull DeputySteward deputy) {
         this.clientManager = clientManager;
         this.clansSceneFactory = clansSceneFactory;
         this.structures = views.content();
@@ -61,6 +63,7 @@ public class CampContent {
         this.starterCrew = starterCrew;
         this.steward = steward.content();
         this.arrivals = arrivals.content();
+        this.deputy = deputy.content();
         this.startingCamp = startingCamp;
         this.grounds = grounds;
         contentService.register(clans, new WorldContentBinding(sites.selector(Camps.SITE_ID), this::content));
@@ -68,6 +71,6 @@ public class CampContent {
 
     private @NotNull List<WorldContent> content() {
         return List.of(grounds, new Dock(clientManager, clansSceneFactory, false), buildZones, startingCamp, starterCrew,
-                structures, settlers, steward, arrivals);
+                structures, settlers, steward, arrivals, deputy);
     }
 }
