@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -13,7 +12,6 @@ import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.settler.SettlerDeparture;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
-import me.mykindos.betterpvp.core.world.construction.StructureStatus;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -38,10 +36,11 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Tells a member arriving at their camp what is waiting for them. Alerts come first, one per structure that needs
- * repairing plus one for settlers on strike, with a single bell when there is at least one. Notices follow for
- * structures ready to claim, disabled or waiting for a crew, and settlers who left in the last day. Joining and the
- * world changes that follow it all count as one arrival. Nothing is said when nothing is waiting.
+ * Tells a member arriving at their camp what is waiting for them. Warnings come first, marked with an exclamation mark
+ * in red: structures that need repairing, are disabled or wait for a crew, and settlers on strike. Notices follow,
+ * marked with a bell in yellow: structures ready to claim and settlers who left in the last day. A single bell rings
+ * when there is at least one line. Joining and the world changes that follow it all count as one arrival. Nothing is
+ * said when nothing is waiting.
  */
 @BPvPListener
 @Singleton
@@ -92,24 +91,20 @@ public class CampArrivalNotices implements Listener {
     }
 
     private void announce(@NotNull Player player, @NotNull World world) {
-        final List<Component> alerts = new ArrayList<>();
+        final List<Component> warnings = new ArrayList<>();
         final List<Component> notices = new ArrayList<>();
         final long now = construction.now();
         construction.worksite(world).ifPresent(worksite -> {
             for (PlacedStructure structure : worksite.getHolding().getStructures()) {
-                final StructureStatus status = structure.status(now);
                 final Component name = catalogue.find(structure.getType())
                         .map(type -> type.getDisplayName())
-                        .orElseGet(() -> Component.text(structure.getType()));
-                switch (status) {
-                    case NEEDS_REPAIR -> alerts.add(alert(Translations.component("clans.camp.notice.needs_repair",
-                            name.color(NamedTextColor.WHITE))));
-                    case READY_TO_CLAIM -> notices.add(Translations.component("clans.camp.notice.ready",
-                            name.color(NamedTextColor.YELLOW)).color(NamedTextColor.GREEN));
-                    case DISABLED -> notices.add(Translations.component("clans.camp.notice.disabled",
-                            name.color(NamedTextColor.YELLOW)).color(NamedTextColor.RED));
-                    case PAUSED -> notices.add(Translations.component("clans.camp.notice.needs_crew",
-                            name.color(NamedTextColor.YELLOW)).color(NamedTextColor.RED));
+                        .orElseGet(() -> Component.text(structure.getType()))
+                        .color(NamedTextColor.WHITE);
+                switch (structure.status(now)) {
+                    case NEEDS_REPAIR -> warnings.add(warning(Translations.component("clans.camp.notice.needs_repair", name)));
+                    case DISABLED -> warnings.add(warning(Translations.component("clans.camp.notice.disabled", name)));
+                    case PAUSED -> warnings.add(warning(Translations.component("clans.camp.notice.needs_crew", name)));
+                    case READY_TO_CLAIM -> notices.add(notice(Translations.component("clans.camp.notice.ready", name)));
                     default -> {
                     }
                 }
@@ -117,30 +112,38 @@ public class CampArrivalNotices implements Listener {
             settlers.roster(worksite.getKey()).ifPresent(roster -> {
                 final int striking = roster.inState(SettlerState.STRIKING).size();
                 if (striking > 0) {
-                    alerts.add(alert(Translations.component("clans.camp.notice.striking", Component.text(striking))));
+                    warnings.add(warning(Translations.component("clans.camp.notice.striking",
+                            Component.text(striking))));
                 }
                 for (SettlerDeparture departure : roster.getDepartures()) {
                     if (now - departure.getAt() <= DAY_MILLIS) {
-                        notices.add(Translations.component("clans.camp.notice.left."
+                        notices.add(notice(Translations.component("clans.camp.notice.left."
                                         + departure.getReason().name().toLowerCase(Locale.ROOT),
-                                Component.text(departure.getName(), departure.getRarity().getColor()))
-                                .color(NamedTextColor.GRAY));
+                                Component.text(departure.getName(), NamedTextColor.WHITE))));
                     }
                 }
             });
         });
 
-        alerts.forEach(player::sendMessage);
-        if (!alerts.isEmpty()) {
-            player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1f, 0.8f);
+        if (warnings.isEmpty() && notices.isEmpty()) {
+            return;
         }
-        notices.forEach(line -> UtilMessage.message(player, "clans.prefix.camp", line));
+        warnings.forEach(player::sendMessage);
+        notices.forEach(player::sendMessage);
+        player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1f, 0.8f);
     }
 
-    private @NotNull Component alert(@NotNull Component line) {
-        final Component icon = Component.object(ObjectContents.sprite(Key.key("blocks"),
-                Key.key("betterpvp", "menu/icon/regular/exclamation_mark_icon")));
-        return Component.join(JoinConfiguration.spaces(), icon,
-                line.color(NamedTextColor.RED).decorate(TextDecoration.BOLD));
+    private @NotNull Component warning(@NotNull Component line) {
+        return iconLine("exclamation_mark_icon", line.color(NamedTextColor.RED));
+    }
+
+    private @NotNull Component notice(@NotNull Component line) {
+        return iconLine("bell_icon", line.color(NamedTextColor.YELLOW));
+    }
+
+    private @NotNull Component iconLine(@NotNull String icon, @NotNull Component line) {
+        final Component sprite = Component.object(ObjectContents.sprite(Key.key("blocks"),
+                Key.key("betterpvp", "menu/icon/regular/" + icon)));
+        return Component.join(JoinConfiguration.spaces(), sprite, line.decorate(TextDecoration.BOLD));
     }
 }
