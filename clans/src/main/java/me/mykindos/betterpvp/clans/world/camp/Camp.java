@@ -14,11 +14,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * A camp as it is kept between visits: everything about it that its world does not hold by itself.
@@ -63,6 +65,18 @@ public class Camp {
 
     /** When the hiring board was last rolled, or 0 before it ever was. */
     private long boardRolledAt;
+
+    /** The hiring board candidate kept through rerolls, or null for none. */
+    private @Nullable UUID reservedCandidate;
+
+    /** Members who pay what the wage fund cannot. */
+    private Set<UUID> wageContributors = new HashSet<>();
+
+    /** Coins each member has paid toward wages on {@link #wageContributionDay}. */
+    private Map<UUID, Long> wageContributions = new HashMap<>();
+
+    /** The day {@link #wageContributions} counts, in days since the epoch. */
+    private long wageContributionDay;
 
     /** The clan levels whose settlers have been sent. */
     private Set<Integer> milestones = new HashSet<>();

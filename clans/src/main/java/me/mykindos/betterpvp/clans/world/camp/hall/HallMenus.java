@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.clans.world.camp.settler.recruit.RecruitConfig;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.Harbourmaster;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.GuestQuarters;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -68,6 +70,8 @@ public class HallMenus {
     private final CampUpgrades upgrades;
     private final StructureMenus structureMenus;
     private final Harbourmaster harbourmaster;
+    private final GuestQuarters guestQuarters;
+    private final WagePolicy wagePolicy;
 
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
@@ -78,7 +82,8 @@ public class HallMenus {
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
                      @NotNull RecruitConfig recruitConfig, @NotNull FarmWorkplace farm,
                      @NotNull CampProsperity prosperity, @NotNull CampStore store, @NotNull CampUpgrades upgrades,
-                     @NotNull StructureMenus structureMenus, @NotNull Harbourmaster harbourmaster) {
+                     @NotNull StructureMenus structureMenus, @NotNull Harbourmaster harbourmaster,
+                     @NotNull GuestQuarters guestQuarters, @NotNull WagePolicy wagePolicy) {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
         this.permissions = permissions;
@@ -100,6 +105,8 @@ public class HallMenus {
         this.upgrades = upgrades;
         this.structureMenus = structureMenus;
         this.harbourmaster = harbourmaster;
+        this.guestQuarters = guestQuarters;
+        this.wagePolicy = wagePolicy;
     }
 
     /** The hub for camp {@code key}, for members of its clan only. */

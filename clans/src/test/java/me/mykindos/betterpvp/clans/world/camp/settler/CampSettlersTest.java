@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.ToolRack;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
@@ -66,7 +67,8 @@ class CampSettlersTest {
                 mock(SettlerCards.class), mock(CampBuilders.class), mock(CampResources.class),
                 mock(CampWageFund.class), mock(CampMorale.class),
                 new CampProfessions(new ProfessionRegistry()),
-                new CampTraits(new TraitRegistry()), new ToolRack(new CampUpgrades(store)));
+                new CampTraits(new TraitRegistry()), new ToolRack(new CampUpgrades(store)),
+                mock(WagePolicy.class));
     }
 
     private PlacedStructure place(String type, int stage, StructureCondition condition) {

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.world.camp.settler.recruit;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.Camp;
+import me.mykindos.betterpvp.clans.world.camp.CampConstruction;
 import me.mykindos.betterpvp.clans.world.camp.CampPermissions;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
@@ -10,7 +11,12 @@ import me.mykindos.betterpvp.clans.world.camp.settler.CampProfessions;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.SettlerConfig;
+import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.GuestQuarters;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
+import me.mykindos.betterpvp.core.world.construction.StructureCondition;
+import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.RarityNumbers;
 import me.mykindos.betterpvp.core.world.settler.Roster;
@@ -80,6 +86,7 @@ class CampRecruitmentTest {
 
     private MockedStatic<Bukkit> bukkit;
     private CampRecruitment recruitment;
+    private GuestQuarters guestQuarters;
 
     @BeforeEach
     void setUp() {
@@ -119,13 +126,14 @@ class CampRecruitmentTest {
         when(permissions.allows(any(Player.class), eq(CLAN), eq(SettlerAction.HIRE))).thenReturn(true);
         when(coins.take(any(), anyLong())).thenReturn(true);
 
+        guestQuarters = new GuestQuarters(new CampUpgrades(store), store, permissions);
         final ProfessionRegistry professions = new ProfessionRegistry();
         final TraitRegistry traits = new TraitRegistry();
         new CampProfessions(professions);
         new CampTraits(traits);
         recruitment = new CampRecruitment(store, settlers, new SettlerGenerator(professions, traits), settlerConfig,
                 config, traits, mock(ConstructionService.class), mock(SiteInstances.class), clanManager, permissions,
-                coins, new CampWideTraits(settlerConfig), now::get);
+                coins, new CampWideTraits(settlerConfig), guestQuarters, now::get);
     }
 
     @AfterEach
@@ -269,5 +277,54 @@ class CampRecruitmentTest {
 
         assertEquals((long) (4 * HOUR * 0.7), recruitment.interval(SITE));
         assertEquals(4_000, recruitment.price(SITE, new SettlerCandidate(recruiter, 5_000, 0)));
+    }
+
+    @Test
+    void aReservedCandidateStaysThroughRerollsAndRefreshes() {
+        fitGuestQuarters();
+        final SettlerCandidate kept = recruitment.board(SITE).get(2);
+        assertNull(guestQuarters.toggle(player, SITE, kept.getSettler().getId()));
+
+        assertNull(recruitment.reroll(player, SITE));
+        assertTrue(recruitment.board(SITE).contains(kept));
+        assertEquals(4, recruitment.board(SITE).size());
+
+        now.addAndGet(12 * HOUR);
+        assertTrue(recruitment.board(SITE).contains(kept));
+        assertTrue(guestQuarters.isReserved(SITE, kept));
+    }
+
+    @Test
+    void anUnreservedOrHiredCandidateIsNoLongerKept() {
+        fitGuestQuarters();
+        final SettlerCandidate kept = recruitment.board(SITE).getFirst();
+        final UUID id = kept.getSettler().getId();
+        assertNull(guestQuarters.toggle(player, SITE, id));
+        assertNull(guestQuarters.toggle(player, SITE, id));
+        assertNull(camp.getReservedCandidate());
+
+        assertNull(guestQuarters.toggle(player, SITE, id));
+        assertTrue(recruitment.hire(player, SITE, id).isSuccess());
+        assertNull(recruitment.reroll(player, SITE));
+        assertNull(camp.getReservedCandidate());
+    }
+
+    @Test
+    void reservingNeedsTheUpgrade() {
+        final SettlerCandidate candidate = recruitment.board(SITE).getFirst();
+
+        assertEquals("clans.camp.upgrade.guest_quarters.inactive",
+                guestQuarters.toggle(player, SITE, candidate.getSettler().getId()));
+        camp.setReservedCandidate(candidate.getSettler().getId());
+        assertNull(recruitment.reroll(player, SITE));
+        assertFalse(recruitment.board(SITE).contains(candidate));
+    }
+
+    private void fitGuestQuarters() {
+        final PlacedStructure hall = new PlacedStructure(UUID.randomUUID(), CampConstruction.GREAT_HALL,
+                new StructurePosition(0, 64, 0, 0), StructureCondition.ACTIVE);
+        hall.setStage(1);
+        hall.getUpgrades().put(1, GuestQuarters.ID);
+        camp.getHolding().getStructures().add(hall);
     }
 }
