@@ -232,6 +232,7 @@ public class CampRecruitment implements Listener {
         camp.getArrivals().remove(candidate);
         camp.getHiringBoard().remove(candidate);
         store.changed(key.getOwnerId());
+        UtilServer.callEvent(new SettlerHiredEvent(key, player, candidate.getSettler(), price));
         return result;
     }
 

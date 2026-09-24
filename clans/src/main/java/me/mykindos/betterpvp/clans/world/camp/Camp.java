@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.clans.world.camp;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.DeputyPost;
+import me.mykindos.betterpvp.clans.world.camp.upgrade.LedgerEntry;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.QueuedAction;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
@@ -111,6 +113,12 @@ public class Camp {
 
     /** Members who respawn at the Barracks' second door. */
     private Set<UUID> secondDoor = new HashSet<>();
+
+    /** What members did in the camp, oldest first. Only the newest entries are kept. */
+    private List<LedgerEntry> ledger = new ArrayList<>();
+
+    /** Where the Deputy Steward stands, or null while it is not placed. */
+    private @Nullable DeputyPost deputy;
 
     public int getResource(String resource) {
         return resources.getOrDefault(resource, 0);
