@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureStatus;
 import me.mykindos.betterpvp.core.world.construction.StructureStorage;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
+import me.mykindos.betterpvp.core.world.construction.StructureUpgrade;
 import me.mykindos.betterpvp.core.world.content.SceneSpawn;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
 import me.mykindos.betterpvp.core.world.schematic.LayerPlan;
@@ -24,11 +25,15 @@ import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * One structure as it appears in the world, kept in step with its status.
@@ -36,6 +41,8 @@ import java.util.Set;
  * A build rises with its job's progress, leaving its top layers for the claim. A structure waiting to be claimed shows
  * those layers as a blinking glow and can be clicked anywhere. Once claimed, they go down one at a time. Anything that
  * changes its shape, a new stage or a move being claimed, takes the old build down and puts the new one up.
+ * <p>
+ * The pieces of the upgrades it has stand on top of the finished build, and come down before any of it does.
  */
 final class StructureView {
 
@@ -54,6 +61,7 @@ final class StructureView {
     private @Nullable PlacedStructure structure;
     private List<StructureStorage.Slot> slots = List.of();
     private final Set<String> stocked = new HashSet<>();
+    private final Map<String, RenderedBuild> pieces = new HashMap<>();
     private boolean settled;
 
     StructureView(@NotNull StructureViews views, @NotNull World world, @NotNull WorldContentScope scope) {
@@ -103,6 +111,9 @@ final class StructureView {
             prop.setLabel(label(type, structure, status, now));
             prop.setClaimable(status == StructureStatus.READY_TO_CLAIM);
         }
+        if (!animating && build.isComplete()) {
+            showPieces(structure, type);
+        }
         lastStatus = status;
     }
 
@@ -115,6 +126,39 @@ final class StructureView {
         if (build.isComplete()) {
             animating = false;
         }
+    }
+
+    /** Puts up the piece of every upgrade the structure has, and takes down any it no longer has. */
+    private void showPieces(@NotNull PlacedStructure structure, @NotNull StructureType type) {
+        final Set<String> wanted = new HashSet<>();
+        for (StructureUpgrade upgrade : type.getUpgrades()) {
+            if (!structure.hasUpgrade(upgrade.getId()) || upgrade.getPiece() == null) {
+                continue;
+            }
+            wanted.add(upgrade.getId());
+            if (pieces.containsKey(upgrade.getId())) {
+                continue;
+            }
+            views.getShapes().pieceOf(world, structure, upgrade).ifPresent(placed -> {
+                final UUID id = UUID.nameUUIDFromBytes((structure.getId() + ":" + upgrade.getId())
+                        .getBytes(StandardCharsets.UTF_8));
+                final RenderedBuild piece = views.getRenderer().open(placed, LayerPlan.of(placed.getSchematic()), id);
+                piece.showAll();
+                pieces.put(upgrade.getId(), piece);
+            });
+        }
+        pieces.entrySet().removeIf(entry -> {
+            if (wanted.contains(entry.getKey())) {
+                return false;
+            }
+            entry.getValue().revert();
+            return true;
+        });
+    }
+
+    private void hidePieces() {
+        pieces.values().forEach(RenderedBuild::revert);
+        pieces.clear();
     }
 
     void blink() {
@@ -149,6 +193,7 @@ final class StructureView {
         animating = false;
         slots = List.of();
         stocked.clear();
+        pieces.clear();
         settled = false;
     }
 
@@ -170,6 +215,9 @@ final class StructureView {
     private void show(int layers) {
         if (build == null) {
             return;
+        }
+        if (layers < plan.size()) {
+            hidePieces();
         }
         final List<StructureStorage.Slot> lowered = new ArrayList<>();
         for (StructureStorage.Slot slot : slots) {
@@ -271,16 +319,22 @@ final class StructureView {
             case PAUSED -> Translations.component("core.construction.label.paused").color(NamedTextColor.RED);
             case DISABLED -> structure.getJob() == null
                     ? Translations.component("core.construction.label.disabled").color(NamedTextColor.RED)
-                    : timed("repairing", structure, now);
+                    : underWay(structure, now);
             case NEEDS_REPAIR -> structure.getJob() == null
                     ? Translations.component("core.construction.label.needs_repair").color(NamedTextColor.RED)
-                    : timed("repairing", structure, now);
-            case ACTIVE, NOT_PLACED -> null;
+                    : underWay(structure, now);
+            case ACTIVE -> structure.getJob() == null ? null : underWay(structure, now);
+            case NOT_PLACED -> null;
         };
         if (state == null) {
             return Component.empty();
         }
         return type.getDisplayName().decorate(TextDecoration.BOLD).appendNewline().append(state);
+    }
+
+    /** A label line for a job that leaves the structure standing as it was: a repair, or an upgrade being fitted. */
+    private static @NotNull Component underWay(@NotNull PlacedStructure structure, long now) {
+        return timed(structure.getJob().getKind() == JobKind.FIT_UPGRADE ? "upgrading" : "repairing", structure, now);
     }
 
     /** A label line saying what is being done and how long is left, under {@code core.construction.label.<doing>}. */

@@ -4,8 +4,9 @@ import me.mykindos.betterpvp.clans.world.camp.CampConfig;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureFlags;
-import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.construction.StructureStage;
+import me.mykindos.betterpvp.core.world.construction.StructureType;
+import me.mykindos.betterpvp.core.world.construction.StructureUpgrade;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,15 +29,17 @@ public final class CampStructure implements StructureType {
     private final @Nullable String zoneTag;
     private final StructureFlags flags;
     private final CampConfig config;
+    private final CampUpgrades upgrades;
 
     CampStructure(@NotNull String id, int tier, @NotNull Set<String> required, @Nullable String zoneTag,
-                  @NotNull StructureFlags flags, @NotNull CampConfig config) {
+                  @NotNull StructureFlags flags, @NotNull CampConfig config, @NotNull CampUpgrades upgrades) {
         this.id = id;
         this.tier = tier;
         this.required = Set.copyOf(required);
         this.zoneTag = zoneTag;
         this.flags = flags;
         this.config = config;
+        this.upgrades = upgrades;
     }
 
     @Override
@@ -91,6 +95,25 @@ public final class CampStructure implements StructureType {
         return numbers().getMoveTime();
     }
 
+    /** The upgrades registered for it, with their numbers from {@code camps.yml}. Stage order, then registration order. */
+    @Override
+    public @NotNull List<StructureUpgrade> getUpgrades() {
+        final Map<String, CampConfig.UpgradeNumbers> numbers = numbers().getUpgrades();
+        return upgrades.declared(id).stream().map(declared -> {
+            final CampConfig.UpgradeNumbers found = numbers.get(declared.getId());
+            return found == null
+                    ? new StructureUpgrade(declared.getId(), declared.getStage(), ResourceCost.NONE, Duration.ZERO, 0, null)
+                    : new StructureUpgrade(declared.getId(), declared.getStage(), found.getCost(), found.getTime(),
+                    found.getWorkforce(), found.getPiece());
+        }).toList();
+    }
+
+    /** What the menus show an upgrade as. */
+    public @NotNull Material upgradeIcon(@NotNull String upgrade) {
+        final CampConfig.UpgradeNumbers found = numbers().getUpgrades().get(upgrade);
+        return found == null ? Material.ANVIL : found.getIcon();
+    }
+
     @Override
     public @NotNull ResourceCost getRepairCost() {
         return numbers().getRepairCost();
@@ -104,6 +127,6 @@ public final class CampStructure implements StructureType {
     private @NotNull CampConfig.StructureNumbers numbers() {
         return config.structure(id).orElseGet(() -> new CampConfig.StructureNumbers(
                 List.of(new StructureStage("camps/" + id, ResourceCost.NONE, Duration.ZERO)),
-                ResourceCost.NONE, Duration.ZERO, ResourceCost.NONE, Duration.ZERO, 0, Material.BRICKS));
+                ResourceCost.NONE, Duration.ZERO, ResourceCost.NONE, Duration.ZERO, 0, Material.BRICKS, Map.of()));
     }
 }

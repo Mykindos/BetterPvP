@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.JobRule;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructureUpgrade;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
@@ -55,6 +56,12 @@ public class CrewRule implements JobRule {
 
     /** How much Workforce {@code job} needs. */
     public int threshold(@NotNull PlacedStructure structure, @NotNull Job job) {
+        if (job.getKind() == JobKind.FIT_UPGRADE) {
+            return job.getUpgrade() == null ? 0 : catalogue.find(structure.getType())
+                    .flatMap(type -> type.upgrade(job.getUpgrade()))
+                    .map(StructureUpgrade::getWorkforce)
+                    .orElse(0);
+        }
         final int stage = job.getKind() == JobKind.REPAIR || job.getKind() == JobKind.MOVE
                 ? structure.getStage() : job.getTargetStage();
         final int workforce = catalogue.find(structure.getType())
