@@ -89,10 +89,9 @@ if (extractedTables.isEmpty()) {
         group = "jooq"
         description = "Moves jOOQ generated files to src/main/java for ${project.name}"
 
+        val sourceDir = file("build/generated-jooq/me/mykindos/betterpvp/${project.name}/database/jooq")
+        val targetDir = file("src/main/java/me/mykindos/betterpvp/${project.name}/database/jooq")
         doLast {
-            val sourceDir = file("build/generated-jooq/me/mykindos/betterpvp/${project.name}/database/jooq")
-            val targetDir = file("src/main/java/me/mykindos/betterpvp/${project.name}/database/jooq")
-
             // Clean the target directory before moving
             if (targetDir.exists()) {
                 println("Cleaning jOOQ directory: ${targetDir.absolutePath}")

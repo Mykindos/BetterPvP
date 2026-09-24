@@ -34,7 +34,6 @@ val outputBuckets = mapOf(
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     java apply true
-    `java-gradle-plugin` apply true
     `version-catalog` apply true
     kotlin("jvm") version libs.versions.kotlin apply true
     id("com.gradleup.shadow") version "9.4.1" apply false // Building fat jar
@@ -42,10 +41,6 @@ plugins {
     id("org.flywaydb.flyway") version "12.5.0" apply false // Flyway
     id("me.champeau.jmh") version "0.7.3" apply false // JMH micro-benchmarks
     id("org.sonarqube") version "7.3.0.8198" apply true
-}
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 java {
@@ -112,17 +107,14 @@ subprojects {
         mergeServiceFiles()
         duplicatesStrategy = DuplicatesStrategy.INCLUDE // required for flywayg
 
+        val projectPath = project.path
+        val bucketDirs = outputBuckets.filterValues { projectPath in it }.keys.map { rootDir.resolve("build/$it") }
         doLast {
             val builtJar = archiveFile.get().asFile
             if (builtJar.name.contains("jmh", ignoreCase = true)) return@doLast
 
-            outputBuckets.forEach { (bucket, projects) ->
-                if (project.path in projects) {
-                    copy {
-                        from(builtJar)
-                        into(file("$rootDir/build/$bucket"))
-                    }
-                }
+            bucketDirs.forEach { dir ->
+                builtJar.copyTo(dir.resolve(builtJar.name), overwrite = true)
             }
         }
     }
