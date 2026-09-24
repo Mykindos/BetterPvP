@@ -34,7 +34,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Everything that could change a camp's land without a player breaking or placing a block, which the camp zones cannot
- * see: explosions, fire, decay, mobs, trampling and bone meal. Also tells a player why the zones turned them away.
+ * see: explosions, fire, decay, mobs, trampling and bone meal. Also tells a player when the zones keep them out of a
+ * container.
  */
 @BPvPListener
 @Singleton
@@ -54,13 +55,11 @@ public class CampProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDenied(ZoneInteractEvent event) {
-        if (!event.isInform() || event.getResult() != Event.Result.DENY || !event.getZone().hasTag(CampGrounds.TAG)) {
+        if (!event.isInform() || event.getResult() != Event.Result.DENY
+                || event.getInteraction() != ZoneInteraction.INTERACT || !event.getZone().hasTag(CampGrounds.TAG)) {
             return;
         }
-        final String key = event.getInteraction() == ZoneInteraction.INTERACT
-                ? "clans.camp.protection.private"
-                : "clans.camp.protection.land";
-        UtilMessage.message(event.getPlayer(), "clans.prefix.camp", key);
+        UtilMessage.message(event.getPlayer(), "clans.prefix.camp", "clans.camp.protection.private");
     }
 
     @EventHandler(ignoreCancelled = true)
