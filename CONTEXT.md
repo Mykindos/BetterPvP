@@ -24,7 +24,7 @@ This document is not a full code map. It is the shared domain model and architec
 ## Module Map
 
 This root file holds the shared language. Modules with their own domain model and lifecycles keep a local `CONTEXT.md`.
-Code layout and conventions live in `CLAUDE.md` files, not here.
+Code layout lives in `docs/ARCHITECTURE.md` and module `CLAUDE.md` files, not here.
 
 - [champions/CONTEXT.md](champions/CONTEXT.md) - roles, builds, skills and the combat lifecycle
 - [clans/CONTEXT.md](clans/CONTEXT.md) - clan state, territory, resources and conflict flows
