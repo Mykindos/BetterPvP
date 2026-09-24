@@ -120,6 +120,12 @@ public class Camp {
     /** Where the Deputy Steward stands, or null while it is not placed. */
     private @Nullable DeputyPost deputy;
 
+    /** When the feast laid at the Feast table ends, or 0 before one ever was. */
+    private long feastUntil;
+
+    /** When the Great bell was last rung, or 0 before it ever was. */
+    private long bellRungAt;
+
     public int getResource(String resource) {
         return resources.getOrDefault(resource, 0);
     }
