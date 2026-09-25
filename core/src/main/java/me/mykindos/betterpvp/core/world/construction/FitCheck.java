@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,15 +24,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Whether a structure can stand somewhere: every column it covers inside a build zone carrying the tag it needs, and no
- * column shared with another structure at the same height. The same check serves a ghost following the player, a
- * placement, a move and an advance, for any position and rotation.
+ * Whether a structure can stand somewhere: every column it covers inside a build zone carrying the tag it needs, and its
+ * bounds at least {@link #CLEARANCE} blocks from every other structure's bounds. The same check serves a ghost following
+ * the player, a placement, a move and an advance, for any position and rotation.
  */
 @Singleton
 public class FitCheck {
 
     /** What every build zone is tagged with. */
     public static final String BUILD_ZONE = "build_zone";
+    /** How many blocks of open ground a structure's bounds keep from another's on every side. */
+    public static final int CLEARANCE = 5;
 
     private final ZoneManager zones;
     private final StructureShapes shapes;
@@ -58,38 +61,52 @@ public class FitCheck {
                     .color(NamedTextColor.RED));
         }
 
-        for (Footprint other : occupied(world, holding, ignoring)) {
-            if (footprint.intersects(other)) {
-                return Optional.of(Translations.component("core.construction.overlaps").color(NamedTextColor.RED));
-            }
+        final BoundingBox bounds = placement.selectionBounds();
+        if (nearby(bounds, occupied(world, holding, ignoring)).isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return Optional.of(Translations.component("core.construction.too_close", Component.text(CLEARANCE))
+                .color(NamedTextColor.RED));
     }
 
     /**
      * The columns of {@code placement} that stop it fitting, packed with {@link Footprint#pack}: those outside the
-     * build zones it needs and those shared with another structure over a shared height. Empty if it fits.
+     * build zones it needs and those within {@link #CLEARANCE} of another structure's bounds. When the bounds are too
+     * close but none of the built columns is, every column clashes. Empty if it fits.
      *
      * @param ignoring a structure not to collide with, being the one that is moving or growing, or null
      */
     public @NotNull LongSet clashes(@NotNull World world, @NotNull Holding holding, @NotNull StructureType type,
                                     @NotNull SchematicPlacement placement, @Nullable UUID ignoring) {
         final Footprint footprint = placement.getFootprint();
-        final List<Footprint> others = occupied(world, holding, ignoring).stream()
-                .filter(other -> other.getMaxY() >= footprint.getMinY() && footprint.getMaxY() >= other.getMinY())
-                .toList();
+        final BoundingBox bounds = placement.selectionBounds();
+        final List<BoundingBox> nearby = nearby(bounds, occupied(world, holding, ignoring));
         final LongSet clashing = new LongOpenHashSet();
+        boolean columnTooClose = false;
         final LongIterator columns = footprint.getColumns().iterator();
         while (columns.hasNext()) {
             final long column = columns.nextLong();
             final int x = Footprint.unpackX(column);
             final int z = Footprint.unpackZ(column);
-            if (!inBuildZones(world, footprint, column, type.getRequiredZoneTag())
-                    || others.stream().anyMatch(other -> other.containsColumn(x, z))) {
+            final BoundingBox cell = new BoundingBox(x, bounds.getMinY(), z, x + 1, bounds.getMaxY(), z + 1);
+            final boolean tooClose = nearby.stream().anyMatch(cell::overlaps);
+            columnTooClose |= tooClose;
+            if (tooClose || !inBuildZones(world, footprint, column, type.getRequiredZoneTag())) {
                 clashing.add(column);
             }
         }
+        if (!nearby.isEmpty() && !columnTooClose) {
+            clashing.addAll(footprint.getColumns());
+        }
         return clashing;
+    }
+
+    /** The {@code others}, each grown by {@link #CLEARANCE}, that {@code bounds} runs into. */
+    private static @NotNull List<BoundingBox> nearby(@NotNull BoundingBox bounds, @NotNull List<BoundingBox> others) {
+        return others.stream()
+                .map(other -> other.expand(CLEARANCE))
+                .filter(bounds::overlaps)
+                .toList();
     }
 
     /** A zone tag's name for players, falling back to the tag itself for one without a translation. */
@@ -129,25 +146,25 @@ public class FitCheck {
     }
 
     /**
-     * Everything the holding's other structures take up: where each stands, plus where a move is taking it and the
-     * bigger stage it is advancing into, since that ground is spoken for.
+     * The bounds of the holding's other structures: where each stands, plus where a move is taking it and the bigger
+     * stage it is advancing into, since that ground is spoken for.
      */
-    private @NotNull List<Footprint> occupied(@NotNull World world, @NotNull Holding holding, @Nullable UUID ignoring) {
-        final List<Footprint> occupied = new ArrayList<>();
+    private @NotNull List<BoundingBox> occupied(@NotNull World world, @NotNull Holding holding, @Nullable UUID ignoring) {
+        final List<BoundingBox> occupied = new ArrayList<>();
         for (PlacedStructure structure : holding.getStructures()) {
             if (structure.getId().equals(ignoring) || structure.getCondition() == StructureCondition.NOT_PLACED) {
                 continue;
             }
-            shapes.footprintOf(world, structure.getType(), structure.getStage(), structure.getPosition())
+            shapes.boundsOf(world, structure.getType(), structure.getStage(), structure.getPosition())
                     .ifPresent(occupied::add);
 
             final Job job = structure.getJob();
             if (job != null && job.getKind() == JobKind.MOVE && job.getTarget() != null) {
-                shapes.footprintOf(world, structure.getType(), structure.getStage(), job.getTarget())
+                shapes.boundsOf(world, structure.getType(), structure.getStage(), job.getTarget())
                         .ifPresent(occupied::add);
             }
             if (job != null && job.getKind() == JobKind.ADVANCE) {
-                shapes.footprintOf(world, structure.getType(), job.getTargetStage(), structure.getPosition())
+                shapes.boundsOf(world, structure.getType(), job.getTargetStage(), structure.getPosition())
                         .ifPresent(occupied::add);
             }
         }

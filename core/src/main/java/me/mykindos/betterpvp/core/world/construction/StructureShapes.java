@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -16,8 +17,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Where a structure's build lands for a given stage and position. Footprints are kept once worked out, since the fit
- * check asks for every other structure's footprint each time a ghost moves.
+ * Where a structure's build lands for a given stage and position. Footprints and bounds are kept once worked out,
+ * since the fit check asks for every other structure's bounds each time a ghost moves.
  */
 @Singleton
 public class StructureShapes {
@@ -25,6 +26,7 @@ public class StructureShapes {
     private final StructureCatalogue catalogue;
     private final SchematicService schematics;
     private final Map<String, Footprint> footprints = new ConcurrentHashMap<>();
+    private final Map<String, BoundingBox> bounds = new ConcurrentHashMap<>();
 
     @Inject
     public StructureShapes(@NotNull StructureCatalogue catalogue, @NotNull SchematicService schematics) {
@@ -73,8 +75,7 @@ public class StructureShapes {
 
     public @NotNull Optional<Footprint> footprintOf(@NotNull World world, @NotNull String type, int stage,
                                                     @NotNull StructurePosition position) {
-        final String key = type + ":" + stage + ":" + position.getX() + ":" + position.getY() + ":" + position.getZ()
-                + ":" + position.getQuarterTurns();
+        final String key = key(type, stage, position);
         final Footprint known = footprints.get(key);
         if (known != null) {
             return Optional.of(known);
@@ -85,8 +86,29 @@ public class StructureShapes {
         });
     }
 
-    /** Forgets every footprint, for when the builds behind them are reloaded. */
+    /** The structure's bounds, the captured selection turned and moved to where it stands. */
+    public @NotNull Optional<BoundingBox> boundsOf(@NotNull World world, @NotNull String type, int stage,
+                                                   @NotNull StructurePosition position) {
+        final String key = key(type, stage, position);
+        final BoundingBox known = bounds.get(key);
+        if (known != null) {
+            return Optional.of(known.clone());
+        }
+        return placementOf(world, type, stage, position).map(placement -> {
+            final BoundingBox box = placement.selectionBounds();
+            bounds.put(key, box.clone());
+            return box;
+        });
+    }
+
+    /** Forgets every footprint and bounds, for when the builds behind them are reloaded. */
     public void clear() {
         footprints.clear();
+        bounds.clear();
+    }
+
+    private static @NotNull String key(@NotNull String type, int stage, @NotNull StructurePosition position) {
+        return type + ":" + stage + ":" + position.getX() + ":" + position.getY() + ":" + position.getZ()
+                + ":" + position.getQuarterTurns();
     }
 }

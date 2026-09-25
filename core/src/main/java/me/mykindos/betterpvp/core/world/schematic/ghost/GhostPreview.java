@@ -9,11 +9,8 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,11 +19,12 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * A see-where-it-goes copy of a structure that only one player can see, drawn from glowing block displays.
+ * A see-where-it-goes copy of a structure that only one player can see, drawn block for block from glowing block
+ * displays, each carrying the block's own state, so a door closed in the build shows closed.
  * <p>
  * The glow says whether it fits: green where it can go, red where it cannot. It is moved and turned with
  * {@link #show}, which moves the existing displays when only the position changes and rebuilds them when the rotation
- * does. Each rotation's mesh is worked out once and kept.
+ * does. Each rotation's blocks are worked out once and kept.
  */
 public final class GhostPreview {
 
@@ -38,11 +36,11 @@ public final class GhostPreview {
     private final Player viewer;
     @Getter
     private final Schematic schematic;
-    private final GhostMesher mesher;
+    private final GhostShell shell;
 
-    private final Map<Integer, List<GhostPiece>> meshes = new HashMap<>();
+    private final Map<Integer, List<Schematic.PlacedBlock>> turned = new HashMap<>();
     private final List<BlockDisplay> displays = new ArrayList<>();
-    private List<GhostPiece> shown = List.of();
+    private List<Schematic.PlacedBlock> shown = List.of();
 
     @Getter
     private @Nullable Location anchor;
@@ -50,20 +48,21 @@ public final class GhostPreview {
     private int quarterTurns = -1;
     @Getter
     private boolean valid = true;
-    /** Colours each piece on its own when set, instead of the whole ghost by {@link #valid}. */
-    private @Nullable Predicate<GhostPiece> fits;
+    /** Colours each block on its own when set, instead of the whole ghost by {@link #valid}. */
+    private @Nullable Predicate<Schematic.PlacedBlock> fits;
 
     public GhostPreview(@NotNull Plugin plugin, @NotNull Player viewer, @NotNull Schematic schematic,
-                        @NotNull GhostMesher mesher) {
+                        @NotNull GhostShell shell) {
         this.plugin = plugin;
         this.viewer = viewer;
         this.schematic = schematic;
-        this.mesher = mesher;
+        this.shell = shell;
     }
 
+
     /** How many displays the ghost is drawn with at {@code quarterTurns}, for callers bounding entity counts. */
-    public int pieceCount(int quarterTurns) {
-        return mesh(quarterTurns).size();
+    public int displayCount(int quarterTurns) {
+        return blocks(quarterTurns).size();
     }
 
     /** Shows the ghost with its anchor block on {@code anchor}, turned {@code quarterTurns} times. */
@@ -84,8 +83,8 @@ public final class GhostPreview {
 
         this.anchor = block;
         for (int i = 0; i < displays.size(); i++) {
-            final GhostPiece piece = shown.get(i);
-            displays.get(i).teleport(block.clone().add(piece.getX(), piece.getY(), piece.getZ()));
+            final Schematic.PlacedBlock shownBlock = shown.get(i);
+            displays.get(i).teleport(block.clone().add(shownBlock.getX(), shownBlock.getY(), shownBlock.getZ()));
         }
     }
 
@@ -100,10 +99,10 @@ public final class GhostPreview {
     }
 
     /**
-     * Glows each piece green where {@code fits} says it can go and red where not, rather than the whole ghost one
-     * colour. Pieces are in blocks from the anchor, already turned. Lasts until {@link #setValid} is called.
+     * Glows each block green where {@code fits} says it can go and red where not, rather than the whole ghost one
+     * colour. Blocks are in blocks from the anchor, already turned. Lasts until {@link #setValid} is called.
      */
-    public void tint(@NotNull Predicate<GhostPiece> fits) {
+    public void tint(@NotNull Predicate<Schematic.PlacedBlock> fits) {
         this.fits = fits;
         recolor();
     }
@@ -115,30 +114,28 @@ public final class GhostPreview {
         this.quarterTurns = -1;
     }
 
-    private @NotNull List<GhostPiece> mesh(int quarterTurns) {
-        return meshes.computeIfAbsent(quarterTurns, turns -> {
+    private @NotNull List<Schematic.PlacedBlock> blocks(int quarterTurns) {
+        return turned.computeIfAbsent(quarterTurns, turns -> {
             // Placed on a world-less origin, so the blocks come out already turned and relative to the anchor.
             final List<Schematic.PlacedBlock> blocks = SchematicPlacement.of(schematic,
                     new Location(null, 0, 0, 0), turns).getBlocks();
-            return List.copyOf(mesher.mesh(blocks));
+            return List.copyOf(shell.visible(blocks));
         });
     }
 
     private void spawn() {
-        shown = mesh(quarterTurns);
-        for (GhostPiece piece : shown) {
-            final Location at = anchor.clone().add(piece.getX(), piece.getY(), piece.getZ());
+        shown = blocks(quarterTurns);
+        for (Schematic.PlacedBlock block : shown) {
+            final Location at = anchor.clone().add(block.getX(), block.getY(), block.getZ());
             final BlockDisplay display = at.getWorld().spawn(at, BlockDisplay.class, spawned -> {
                 // Hidden before it is ever sent, so nobody but the viewer gets a single frame of it.
                 spawned.setVisibleByDefault(false);
                 spawned.setPersistent(false);
-                spawned.setBlock(piece.getData());
-                spawned.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f(),
-                        new Vector3f(piece.getWidth(), piece.getHeight(), piece.getDepth()), new AxisAngle4f()));
+                spawned.setBlock(block.getData());
                 spawned.setBrightness(new Display.Brightness(15, 15));
                 spawned.setTeleportDuration(2);
                 spawned.setGlowing(true);
-                spawned.setGlowColorOverride(color(piece));
+                spawned.setGlowColorOverride(color(block));
             });
             viewer.showEntity(plugin, display);
             displays.add(display);
@@ -157,8 +154,8 @@ public final class GhostPreview {
         }
     }
 
-    private @NotNull Color color(@NotNull GhostPiece piece) {
-        final boolean green = fits == null ? valid : fits.test(piece);
+    private @NotNull Color color(@NotNull Schematic.PlacedBlock block) {
+        final boolean green = fits == null ? valid : fits.test(block);
         return green ? VALID : INVALID;
     }
 }

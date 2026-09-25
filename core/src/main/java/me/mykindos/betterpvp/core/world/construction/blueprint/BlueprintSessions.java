@@ -2,11 +2,14 @@ package me.mykindos.betterpvp.core.world.construction.blueprint;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.title.TitleQueue;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -44,8 +47,9 @@ import java.util.UUID;
 
 /**
  * Holding a blueprint in the main hand shows a ghost of its structure on the block the player looks at, green where it
- * can be built and red, with the reason, where it cannot. Each press of sneak turns it a quarter, and right-click builds
- * it there, using the blueprint up. A blueprint bound to a placed structure moves that structure there instead.
+ * can be built and red where it cannot, with the structure's name as a title and what to do, or why not, as the
+ * subtitle. Each press of sneak turns it a quarter, and right-click builds it there, using the blueprint up. A blueprint
+ * bound to a placed structure moves that structure there instead.
  */
 @BPvPListener
 @Singleton
@@ -59,19 +63,22 @@ public class BlueprintSessions implements Listener {
     private final SchematicService schematics;
     private final ConstructionService construction;
     private final GhostPreviews previews;
+    private final ClientManager clientManager;
 
     private final Map<UUID, Session> sessions = new HashMap<>();
 
     @Inject
     public BlueprintSessions(@NotNull StructureBlueprintItem blueprint, @NotNull ItemFactory itemFactory,
                              @NotNull StructureCatalogue catalogue, @NotNull SchematicService schematics,
-                             @NotNull ConstructionService construction, @NotNull GhostPreviews previews) {
+                             @NotNull ConstructionService construction, @NotNull GhostPreviews previews,
+                             @NotNull ClientManager clientManager) {
         this.blueprint = blueprint;
         this.itemFactory = itemFactory;
         this.catalogue = catalogue;
         this.schematics = schematics;
         this.construction = construction;
         this.previews = previews;
+        this.clientManager = clientManager;
     }
 
     /** A blueprint for {@code type}. */
@@ -141,7 +148,6 @@ public class BlueprintSessions implements Listener {
         final Session session = sessions.get(player.getUniqueId());
         final Location anchor = anchor(player);
         if (session == null || anchor == null) {
-            player.sendActionBar(Translations.component("core.construction.blueprint.look_at_ground").color(NamedTextColor.RED));
             return;
         }
 
@@ -165,7 +171,7 @@ public class BlueprintSessions implements Listener {
 
     @EventHandler
     public void onQuit(@NotNull PlayerQuitEvent event) {
-        sessions.remove(event.getPlayer().getUniqueId());
+        end(event.getPlayer());
     }
 
     private @NotNull Optional<Session> session(@NotNull Player player, @NotNull StructureBlueprintComponent held) {
@@ -190,16 +196,23 @@ public class BlueprintSessions implements Listener {
         end(player);
         final int facing = BlockTransform.quarterTurnsBetween(schematic.get().getAnchorYaw(), player.getLocation().getYaw());
         final Session session = new Session(held.getStructure(), held.getMoving(),
-                previews.open(player, schematic.get()), facing);
+                previews.open(player, schematic.get()), clientManager.search().online(player).getGamer().getTitleQueue(),
+                facing);
         sessions.put(player.getUniqueId(), session);
         return Optional.of(session);
     }
 
     private void update(@NotNull Player player, @NotNull Session session) {
         final Optional<StructureType> type = catalogue.find(session.type);
-        final Location anchor = anchor(player);
-        if (type.isEmpty() || anchor == null) {
+        if (type.isEmpty()) {
             session.preview.hide();
+            return;
+        }
+        final Location anchor = anchor(player);
+        if (anchor == null) {
+            session.preview.hide();
+            title(session, type.get().getDisplayName().color(NamedTextColor.RED),
+                    Translations.component("core.construction.blueprint.look_at_ground").color(NamedTextColor.RED));
             return;
         }
 
@@ -208,14 +221,40 @@ public class BlueprintSessions implements Listener {
                 : construction.moveProblem(player, player.getWorld(), session.moving, anchor, session.quarterTurns);
         session.preview.setValid(problem.isEmpty());
         session.preview.show(anchor, session.quarterTurns);
-        player.sendActionBar(problem.orElse(Translations.component(session.moving == null
+        title(session, type.get().getDisplayName().color(problem.isEmpty() ? NamedTextColor.GREEN : NamedTextColor.RED),
+                problem.orElse(Translations.component(session.moving == null
                         ? "core.construction.blueprint.hint" : "core.construction.blueprint.move_hint")
-                .color(NamedTextColor.GREEN)));
+                        .color(NamedTextColor.GRAY)));
+    }
+
+    /**
+     * Shows {@code title} over {@code subtitle} for as long as the blueprint is held. Titles expire, so the same one is
+     * queued again shortly before it runs out, and a changed one replaces it at once.
+     */
+    private static void title(@NotNull Session session, @NotNull Component title, @NotNull Component subtitle) {
+        final TitleComponent current = session.title;
+        if (current != null && !current.isInvalid() && current.getRemaining() > 300
+                && title.equals(session.titleText) && subtitle.equals(session.subtitleText)) {
+            return;
+        }
+
+        if (current != null) {
+            session.titles.remove(current);
+        }
+        session.titleText = title;
+        session.subtitleText = subtitle;
+        session.title = new TitleComponent(0, 0.5, 0.25, false, gamer -> title, gamer -> subtitle);
+        session.titles.add(10, session.title);
     }
 
     private void end(@NotNull Player player) {
-        if (sessions.remove(player.getUniqueId()) != null) {
-            previews.close(player);
+        final Session session = sessions.remove(player.getUniqueId());
+        if (session == null) {
+            return;
+        }
+        previews.close(player);
+        if (session.title != null) {
+            session.titles.remove(session.title);
         }
     }
 
@@ -229,12 +268,18 @@ public class BlueprintSessions implements Listener {
         private final String type;
         private final @Nullable UUID moving;
         private final GhostPreview preview;
+        private final TitleQueue titles;
         private int quarterTurns;
+        private @Nullable TitleComponent title;
+        private @Nullable Component titleText;
+        private @Nullable Component subtitleText;
 
-        private Session(@NotNull String type, @Nullable UUID moving, @NotNull GhostPreview preview, int quarterTurns) {
+        private Session(@NotNull String type, @Nullable UUID moving, @NotNull GhostPreview preview,
+                        @NotNull TitleQueue titles, int quarterTurns) {
             this.type = type;
             this.moving = moving;
             this.preview = preview;
+            this.titles = titles;
             this.quarterTurns = quarterTurns;
         }
     }

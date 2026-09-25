@@ -28,7 +28,6 @@ import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
-import me.mykindos.betterpvp.core.world.schematic.ghost.GhostPiece;
 import me.mykindos.betterpvp.core.world.schematic.ghost.GhostPreview;
 import me.mykindos.betterpvp.core.world.schematic.ghost.GhostPreviews;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -176,7 +175,7 @@ public class SurveyorsTable implements Listener {
                     Component.text(seconds)).color(NamedTextColor.GREEN));
         } else {
             final Component reason = fitCheck.problem(world, worksite.getHolding(), type, placement, id)
-                    .orElse(Translations.component("core.construction.overlaps"));
+                    .orElse(Translations.component("core.construction.too_close", Component.text(FitCheck.CLEARANCE)));
             tell(player, Translations.component("clans.camp.upgrade.surveyors_table.clashes", stage,
                     Component.text(seconds), reason.color(NamedTextColor.RED)).color(NamedTextColor.GOLD));
         }
@@ -191,18 +190,11 @@ public class SurveyorsTable implements Listener {
     }
 
     /**
-     * Whether no column under {@code piece} clashes. Pieces are in blocks from the anchor, and clashing columns are
-     * world columns packed with {@link Footprint#pack}.
+     * Whether the column under {@code block} does not clash. Blocks are in blocks from the anchor, and clashing columns
+     * are world columns packed with {@link Footprint#pack}.
      */
-    static boolean fits(@NotNull LongSet clashes, int anchorX, int anchorZ, @NotNull GhostPiece piece) {
-        for (int dx = 0; dx < piece.getWidth(); dx++) {
-            for (int dz = 0; dz < piece.getDepth(); dz++) {
-                if (clashes.contains(Footprint.pack(anchorX + piece.getX() + dx, anchorZ + piece.getZ() + dz))) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    static boolean fits(@NotNull LongSet clashes, int anchorX, int anchorZ, @NotNull Schematic.PlacedBlock block) {
+        return !clashes.contains(Footprint.pack(anchorX + block.getX(), anchorZ + block.getZ()));
     }
 
     @UpdateEvent(delay = 1000)

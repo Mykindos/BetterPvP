@@ -10,7 +10,8 @@ import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
-import me.mykindos.betterpvp.core.world.schematic.ghost.GhostPiece;
+import me.mykindos.betterpvp.core.world.schematic.Schematic;
+import org.bukkit.block.data.BlockData;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class WorkshopPagesTest {
 
@@ -49,14 +51,15 @@ class WorkshopPagesTest {
     }
 
     @Test
-    void aGhostPieceFitsOnlyIfNoColumnUnderItClashes() {
+    void aGhostBlockFitsOnlyIfTheColumnUnderItDoesNotClash() {
         final LongSet clashes = LongSet.of(Footprint.pack(12, 5));
-        final GhostPiece box = new GhostPiece(null, 0, 0, 0, 2, 1, 2);
+        final BlockData stone = mock(BlockData.class);
+        final Schematic.PlacedBlock block = new Schematic.PlacedBlock(1, 0, 1, stone);
 
-        assertTrue(SurveyorsTable.fits(clashes, 0, 0, box));
-        assertFalse(SurveyorsTable.fits(clashes, 11, 4, box), "covers 11..12 by 4..5");
-        assertTrue(SurveyorsTable.fits(clashes, 13, 4, box));
-        assertFalse(SurveyorsTable.fits(clashes, 12, 5, new GhostPiece(null, 0, 3, 0, 1, 1, 1)),
+        assertTrue(SurveyorsTable.fits(clashes, 0, 0, block));
+        assertFalse(SurveyorsTable.fits(clashes, 11, 4, block));
+        assertTrue(SurveyorsTable.fits(clashes, 12, 4, block));
+        assertFalse(SurveyorsTable.fits(clashes, 12, 5, new Schematic.PlacedBlock(0, 3, 0, stone)),
                 "height does not matter, only the column");
     }
 

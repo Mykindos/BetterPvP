@@ -78,7 +78,7 @@ public class StructureGhostSubCommand extends Command {
 
         UtilMessage.simpleMessage(player, StructureCommand.PREFIX,
                 "Showing <green>%s</green> as %d display(s) for %d block(s). It %s.", args[0],
-                preview.pieceCount(placement.getQuarterTurns()), placement.getBlocks().size(),
+                preview.displayCount(placement.getQuarterTurns()), placement.getBlocks().size(),
                 fits ? "<green>fits</green>" : "<red>is blocked</red>");
     }
 }

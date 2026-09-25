@@ -1,17 +1,13 @@
 package me.mykindos.betterpvp.core.world.construction.view;
 
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
-import me.mykindos.betterpvp.core.world.schematic.ghost.GhostMesher;
-import me.mykindos.betterpvp.core.world.schematic.ghost.GhostPiece;
+import me.mykindos.betterpvp.core.world.schematic.ghost.GhostShell;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
-import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,14 +24,12 @@ final class ClaimFlash {
     private boolean lit = true;
 
     /** @param blocks the structure's blocks, at their world positions */
-    ClaimFlash(@NotNull World world, @NotNull List<Schematic.PlacedBlock> blocks, @NotNull GhostMesher mesher) {
-        for (GhostPiece piece : mesher.mesh(blocks)) {
-            final Location at = new Location(world, piece.getX(), piece.getY(), piece.getZ());
+    ClaimFlash(@NotNull World world, @NotNull List<Schematic.PlacedBlock> blocks, @NotNull GhostShell shell) {
+        for (Schematic.PlacedBlock block : shell.visible(blocks)) {
+            final Location at = new Location(world, block.getX(), block.getY(), block.getZ());
             displays.add(world.spawn(at, BlockDisplay.class, spawned -> {
                 spawned.setPersistent(false);
-                spawned.setBlock(piece.getData());
-                spawned.setTransformation(new Transformation(new Vector3f(), new AxisAngle4f(),
-                        new Vector3f(piece.getWidth(), piece.getHeight(), piece.getDepth()), new AxisAngle4f()));
+                spawned.setBlock(block.getData());
                 spawned.setBrightness(new Display.Brightness(15, 15));
                 spawned.setGlowing(true);
                 spawned.setGlowColorOverride(COLOUR);

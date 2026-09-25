@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.core.world.schematic;
 
 import dev.brauw.mapper.region.Region;
 import org.bukkit.Material;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Door;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -52,6 +54,18 @@ class LayerPlanTest {
     }
 
     @Test
+    void bothHalvesOfADoorGoDownTogether() {
+        final Schematic.PlacedBlock lower = new Schematic.PlacedBlock(1, 1, 0, door(Bisected.Half.BOTTOM));
+        final Schematic.PlacedBlock upper = new Schematic.PlacedBlock(1, 2, 0, door(Bisected.Half.TOP));
+        final LayerPlan plan = LayerPlan.of(new Schematic(2, 3, 1,
+                List.of(block(0, 0, 0), block(0, 1, 0), block(0, 2, 0), lower, upper)));
+
+        assertEquals(3, plan.size());
+        assertEquals(List.of(block(0, 1, 0), lower, upper), plan.layer(1));
+        assertEquals(List.of(block(0, 2, 0)), plan.layer(2));
+    }
+
+    @Test
     void progressMapsToWholeLayers() {
         assertEquals(0, LayerPlan.layersAt(0.0, 10));
         assertEquals(4, LayerPlan.layersAt(0.49, 10));
@@ -70,6 +84,13 @@ class LayerPlanTest {
 
     private static CapturedRegion.RelativePoint point(double x, double y, double z) {
         return CapturedRegion.RelativePoint.builder().x(x).y(y).z(z).build();
+    }
+
+    private static Door door(Bisected.Half half) {
+        final Door door = mock(Door.class);
+        when(door.getMaterial()).thenReturn(Material.OAK_DOOR);
+        when(door.getHalf()).thenReturn(half);
+        return door;
     }
 
     private static BlockData data(Material material) {

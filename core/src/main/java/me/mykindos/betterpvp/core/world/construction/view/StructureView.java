@@ -89,7 +89,7 @@ final class StructureView {
 
         if (status == StructureStatus.READY_TO_CLAIM) {
             if (flash == null) {
-                flash = new ClaimFlash(world, blocks(), views.getMesher());
+                flash = new ClaimFlash(world, blocks(), views.getShell());
             }
         } else if (flash != null) {
             flash.remove();

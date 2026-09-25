@@ -23,7 +23,7 @@ import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.schematic.SchematicRenderer;
-import me.mykindos.betterpvp.core.world.schematic.ghost.GhostMesher;
+import me.mykindos.betterpvp.core.world.schematic.ghost.GhostShell;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -74,7 +74,7 @@ public class StructureViews implements Listener {
     @Getter(AccessLevel.PACKAGE)
     private final ConstructionPropFactory propFactory;
     @Getter(AccessLevel.PACKAGE)
-    private final GhostMesher mesher = GhostMesher.standard();
+    private final GhostShell shell = GhostShell.standard();
 
     private final Map<String, Loaded> worlds = new HashMap<>();
 

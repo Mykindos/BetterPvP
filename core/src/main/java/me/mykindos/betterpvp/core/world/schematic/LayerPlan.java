@@ -2,10 +2,13 @@ package me.mykindos.betterpvp.core.world.schematic;
 
 import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
+import org.bukkit.block.data.Bisected;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,6 +20,9 @@ import java.util.TreeMap;
  * {@code layer:<n>} captured with the structure: every block inside it goes down as part of layer key {@code n} instead
  * of its own height. Keys are ordered ascending, and an unmarked block's key is its height above the schematic's lowest
  * level, so {@code layer:-1} lands before the foundations (scaffolding) and {@code layer:1000} after the roof.
+ * <p>
+ * The top half of a two-block block (a door, a tall plant) always goes down in the same layer as the half under it, so
+ * no layer leaves half a door standing for a neighbour update to break.
  */
 @CustomLog
 public final class LayerPlan {
@@ -32,12 +38,17 @@ public final class LayerPlan {
     /** Plans the solid blocks of {@code schematic}, in schematic space. */
     public static @NotNull LayerPlan of(@NotNull Schematic schematic) {
         final List<LayerOverride> overrides = overrides(schematic);
+        final Map<Long, Schematic.PlacedBlock> byPosition = new HashMap<>(schematic.getBlocks().size());
+        schematic.getBlocks().forEach(block -> byPosition.put(pack(block.getX(), block.getY(), block.getZ()), block));
+
         final Map<Integer, List<Schematic.PlacedBlock>> byKey = new TreeMap<>();
         for (Schematic.PlacedBlock block : schematic.getBlocks()) {
             if (block.getData().getMaterial().isAir()) {
                 continue;
             }
-            byKey.computeIfAbsent(keyOf(block, schematic, overrides), key -> new ArrayList<>()).add(block);
+            final Schematic.PlacedBlock lower = lowerHalfOf(block, byPosition);
+            byKey.computeIfAbsent(keyOf(lower == null ? block : lower, schematic, overrides),
+                    key -> new ArrayList<>()).add(block);
         }
 
         final List<List<Schematic.PlacedBlock>> layers = new ArrayList<>(byKey.size());
@@ -57,6 +68,24 @@ public final class LayerPlan {
     /** How many layers a build {@code progress} of the way through (0 to 1) shows, out of the first {@code limit}. */
     public static int layersAt(double progress, int limit) {
         return (int) Math.floor(Math.clamp(progress, 0.0, 1.0) * limit);
+    }
+
+    /** The bottom half {@code block} stands on, if it is the top half of a two-block block. */
+    private static @Nullable Schematic.PlacedBlock lowerHalfOf(@NotNull Schematic.PlacedBlock block,
+                                                              @NotNull Map<Long, Schematic.PlacedBlock> byPosition) {
+        if (!(block.getData() instanceof Bisected top) || top.getHalf() != Bisected.Half.TOP) {
+            return null;
+        }
+        final Schematic.PlacedBlock below = byPosition.get(pack(block.getX(), block.getY() - 1, block.getZ()));
+        if (below == null || below.getData().getMaterial() != block.getData().getMaterial()
+                || !(below.getData() instanceof Bisected bottom) || bottom.getHalf() != Bisected.Half.BOTTOM) {
+            return null;
+        }
+        return below;
+    }
+
+    private static long pack(int x, int y, int z) {
+        return ((long) (x & 0x3FFFFFF) << 38) | ((long) (z & 0x3FFFFFF) << 12) | (y & 0xFFF);
     }
 
     private static int keyOf(@NotNull Schematic.PlacedBlock block, @NotNull Schematic schematic,

@@ -27,7 +27,7 @@ import java.util.UUID;
 public class GhostPreviews implements Listener {
 
     private final Core core;
-    private final GhostMesher mesher = GhostMesher.standard();
+    private final GhostShell shell = GhostShell.standard();
     private final Map<UUID, GhostPreview> previews = new HashMap<>();
 
     @Inject
@@ -38,7 +38,7 @@ public class GhostPreviews implements Listener {
     /** Opens a ghost of {@code schematic} for {@code viewer}, closing any ghost they already had. Nothing shows until it is placed. */
     public @NotNull GhostPreview open(@NotNull Player viewer, @NotNull Schematic schematic) {
         close(viewer);
-        final GhostPreview preview = new GhostPreview(core, viewer, schematic, mesher);
+        final GhostPreview preview = new GhostPreview(core, viewer, schematic, shell);
         previews.put(viewer.getUniqueId(), preview);
         return preview;
     }

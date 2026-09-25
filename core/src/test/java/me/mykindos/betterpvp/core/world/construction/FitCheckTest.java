@@ -81,31 +81,35 @@ class FitCheckTest {
     }
 
     @Test
-    void itMustNotOverlapAnotherStructureUnlessItIsThatStructure() {
-        final PlacedStructure other = new PlacedStructure(UUID.randomUUID(), "hall",
-                new StructurePosition(3, 64, 0, 0), StructureCondition.ACTIVE);
-        holding.getStructures().add(other);
-        final Footprint occupied = at(3).getFootprint();
-        when(shapes.footprintOf(any(), anyString(), anyInt(), any())).thenReturn(Optional.of(occupied));
+    void itMustKeepItsDistanceFromAnotherStructureUnlessItIsThatStructure() {
+        final PlacedStructure other = standingAt(9);
 
-        assertFalse(fitCheck.problem(world, holding, type(null), at(2), null).isEmpty());
-        assertTrue(fitCheck.problem(world, holding, type(null), at(2), other.getId()).isEmpty());
-        assertTrue(fitCheck.problem(world, holding, type(null), at(6), null).isEmpty());
+        assertFalse(fitCheck.problem(world, holding, type(null), at(3), null).isEmpty(),
+                "4 blocks of ground between the two is too close");
+        assertTrue(fitCheck.problem(world, holding, type(null), at(3), other.getId()).isEmpty());
+        assertTrue(fitCheck.problem(world, holding, type(null), at(2), null).isEmpty(),
+                "5 blocks of ground between the two is far enough");
     }
 
     @Test
-    void clashesAreTheColumnsOutsideTheZonesOrUnderAnotherStructure() {
+    void clashesAreTheColumnsOutsideTheZonesOrTooCloseToAnotherStructure() {
         assertTrue(fitCheck.clashes(world, holding, type(null), at(2), null).isEmpty());
         assertEquals(LongSet.of(Footprint.pack(10, 0)), fitCheck.clashes(world, holding, type(null), at(9), null));
 
-        final PlacedStructure other = new PlacedStructure(UUID.randomUUID(), "hall",
-                new StructurePosition(3, 64, 0, 0), StructureCondition.ACTIVE);
-        holding.getStructures().add(other);
-        final Footprint occupied = at(3).getFootprint();
-        when(shapes.footprintOf(any(), anyString(), anyInt(), any())).thenReturn(Optional.of(occupied));
+        final PlacedStructure other = standingAt(9);
 
-        assertEquals(LongSet.of(Footprint.pack(3, 0)), fitCheck.clashes(world, holding, type(null), at(2), null));
-        assertTrue(fitCheck.clashes(world, holding, type(null), at(2), other.getId()).isEmpty());
+        assertEquals(LongSet.of(Footprint.pack(4, 0)), fitCheck.clashes(world, holding, type(null), at(3), null));
+        assertTrue(fitCheck.clashes(world, holding, type(null), at(3), other.getId()).isEmpty());
+        assertTrue(fitCheck.clashes(world, holding, type(null), at(2), null).isEmpty());
+    }
+
+    private PlacedStructure standingAt(int x) {
+        final PlacedStructure other = new PlacedStructure(UUID.randomUUID(), "hall",
+                new StructurePosition(x, 64, 0, 0), StructureCondition.ACTIVE);
+        holding.getStructures().add(other);
+        when(shapes.boundsOf(any(), anyString(), anyInt(), any()))
+                .thenAnswer(invocation -> Optional.of(at(x).selectionBounds()));
+        return other;
     }
 
     private SchematicPlacement at(int x) {
