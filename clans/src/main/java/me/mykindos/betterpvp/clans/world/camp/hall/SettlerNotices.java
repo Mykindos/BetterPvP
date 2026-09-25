@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.world.camp.settler.recruit.SettlerBoatEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ChatHint;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeftEvent;
 import me.mykindos.betterpvp.core.world.settler.wage.SettlerStrikeEvent;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -37,10 +38,15 @@ public class SettlerNotices implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onStrike(@NotNull SettlerStrikeEvent event) {
-        tell(event.getSite(), Translations.component(event.isStriking()
-                        ? "clans.camp.hall.wages.strike_started" : "clans.camp.hall.wages.strike_ended",
-                Component.text(event.getSettlers().size()))
-                .color(event.isStriking() ? NamedTextColor.RED : NamedTextColor.GREEN));
+        final Component count = Component.text(event.getSettlers().size());
+        if (!event.isStriking()) {
+            tell(event.getSite(), Translations.component("clans.camp.hall.wages.strike_ended", count)
+                    .color(NamedTextColor.GREEN));
+            return;
+        }
+        tell(event.getSite(), ChatHint.INFO.attach(
+                Translations.component("clans.camp.hall.wages.strike_started", count).color(NamedTextColor.RED),
+                Translations.component("clans.camp.hall.wages.strike_hint").color(NamedTextColor.GRAY)));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

@@ -104,9 +104,19 @@ public class CampMorale implements MoraleModel {
         return Math.max(number("idle-floor", -30), Math.floor(hours) * number("idle-per-hour", -1));
     }
 
+    /** The morale every settler loses right after a dismissal, before it fades. */
+    public int dismissalPenalty() {
+        return (int) Math.round(-number("dismissal", -10));
+    }
+
+    /** How long a dismissal takes to fade out of everyone's morale. */
+    public @NotNull Duration dismissalFade() {
+        return Duration.ofMinutes((long) (number("dismissal-hours", 48) * 60));
+    }
+
     /** Every recent dismissal weighs on everyone, less as it fades. */
     double dismissals(@NotNull Roster roster, long now) {
-        final double window = number("dismissal-hours", 48) * HOUR_MILLIS;
+        final double window = dismissalFade().toMillis();
         double total = 0;
         for (SettlerDeparture departure : roster.departedSince((long) (now - window), SettlerLeaveReason.DISMISSED)) {
             total += number("dismissal", -10) * Math.max(0, 1 - (now - departure.getAt()) / window);

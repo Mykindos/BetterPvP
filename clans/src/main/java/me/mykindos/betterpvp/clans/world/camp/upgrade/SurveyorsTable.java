@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ChatHint;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.FitCheck;
 import me.mykindos.betterpvp.core.world.construction.Holding;
@@ -176,8 +177,9 @@ public class SurveyorsTable implements Listener {
         } else {
             final Component reason = fitCheck.problem(world, worksite.getHolding(), type, placement, id)
                     .orElseGet(() -> FitCheck.tooClose(type));
-            tell(player, Translations.component("clans.camp.upgrade.surveyors_table.clashes", stage,
-                    Component.text(seconds), reason.color(NamedTextColor.RED)).color(NamedTextColor.GOLD));
+            tell(player, ChatHint.INFO.attach(
+                    Translations.component("clans.camp.upgrade.surveyors_table.clashes", stage).color(NamedTextColor.GOLD),
+                    reason.color(NamedTextColor.RED)));
         }
         return true;
     }

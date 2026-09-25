@@ -130,7 +130,7 @@ public class BuildQueue implements Listener {
         return queued;
     }
 
-    /** What a queued action is called, such as "Advance: Workshop". */
+    /** What a queued action is called, such as "Workshop advance". */
     public @NotNull Component describe(@NotNull QueuedAction queued) {
         final Component name = catalogue.find(queued.getType())
                 .map(StructureType::getDisplayName)
@@ -171,9 +171,13 @@ public class BuildQueue implements Listener {
             return;
         }
         queued.setDroppedAt(construction.now());
-        final Component reason = result.getReason() == null ? Component.empty() : result.getReason();
-        tellOnline(key, Translations.component("clans.camp.upgrade.build_queue.dropped", describe(queued), reason)
-                .color(NamedTextColor.RED), queued);
+        Component message = Translations.component("clans.camp.upgrade.build_queue.dropped", describe(queued))
+                .color(NamedTextColor.RED);
+        if (result.getReason() != null) {
+            message = message.appendNewline()
+                    .append(Translations.component("clans.camp.reason", result.getReason()).color(NamedTextColor.GRAY));
+        }
+        tellOnline(key, message, queued);
         store.cached(key.getOwnerId()).ifPresent(camp -> camp.setDroppedAction(queued));
         store.changed(key.getOwnerId());
     }

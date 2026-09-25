@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AccessLevel;
 import lombok.Getter;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampMorale;
 import me.mykindos.betterpvp.clans.world.camp.settler.recruit.CampRecruitment;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -40,17 +41,20 @@ public class SettlerCards {
     private final Payroll payroll;
     @Getter(AccessLevel.PACKAGE)
     private final CampRecruitment recruitment;
+    @Getter(AccessLevel.PACKAGE)
+    private final CampMorale morale;
 
     @Inject
     public SettlerCards(@NotNull SettlerService service, @NotNull ProfessionRegistry professions,
                         @NotNull TraitRegistry traits, @NotNull CrewMenus crews, @NotNull Payroll payroll,
-                        @NotNull CampRecruitment recruitment) {
+                        @NotNull CampRecruitment recruitment, @NotNull CampMorale morale) {
         this.service = service;
         this.professions = professions;
         this.traits = traits;
         this.crews = crews;
         this.payroll = payroll;
         this.recruitment = recruitment;
+        this.morale = morale;
     }
 
     /**

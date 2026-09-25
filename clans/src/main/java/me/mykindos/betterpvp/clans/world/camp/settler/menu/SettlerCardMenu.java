@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.settler.Profession;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -89,10 +91,12 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         final NamedTextColor color = morale > 0 ? NamedTextColor.GREEN : morale < 0 ? NamedTextColor.RED : NamedTextColor.GRAY;
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.CAKE)
-                .displayName(Translations.component("clans.settler.card.morale",
-                        Component.text(morale, color)).color(NamedTextColor.YELLOW));
+                .displayName(Translations.component("clans.settler.card.morale_title").color(NamedTextColor.YELLOW))
+                .lore(Component.text(morale, color));
         if (settler.getUnhappySince() > 0) {
-            view.frameLore(true).lore(Translations.component("clans.settler.card.unhappy").color(NamedTextColor.RED));
+            view.frameLore(true).lore(Translations.component("clans.settler.card.unhappy",
+                    Component.text(cards.getMorale().leaveBelow(), NamedTextColor.WHITE),
+                    duration(cards.getMorale().leaveAfter())).color(NamedTextColor.RED));
         }
         return new SimpleItem(view.build());
     }
@@ -164,7 +168,9 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                 .displayName(Translations.component("clans.settler.card.dismiss")
                         .color(allowed ? NamedTextColor.RED : NamedTextColor.GRAY))
                 .frameLore(true)
-                .lore(Translations.component("clans.settler.card.dismiss_warning").color(NamedTextColor.GRAY));
+                .lore(Translations.component("clans.settler.card.dismiss_warning",
+                        Component.text(cards.getMorale().dismissalPenalty(), NamedTextColor.WHITE),
+                        duration(cards.getMorale().dismissalFade())).color(NamedTextColor.GRAY));
         if (allowed) {
             view.action(ClickActions.SHIFT, Translations.component("clans.settler.card.dismiss"));
         } else {
@@ -182,6 +188,10 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                         Component.text(settler.getName(), settler.getRarity().getColor())).color(NamedTextColor.GRAY));
             }
         }));
+    }
+
+    private static @NotNull Component duration(@NotNull Duration duration) {
+        return Component.text(UtilTime.humanReadableFormat(duration), NamedTextColor.WHITE);
     }
 
     private static @Nullable UUID structureId(@Nullable String assignment) {

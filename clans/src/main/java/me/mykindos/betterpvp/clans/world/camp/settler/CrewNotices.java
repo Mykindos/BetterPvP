@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ChatHint;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
@@ -66,9 +67,10 @@ public class CrewNotices implements Listener {
         final Component name = catalogue.find(structure.getType())
                 .map(StructureType::getDisplayName)
                 .orElseGet(() -> Component.text(structure.getType()));
-        final Component message = Translations.component("clans.settler.crew.needed", name.color(NamedTextColor.YELLOW),
-                        Component.text(rule.threshold(structure, job), NamedTextColor.YELLOW))
-                .color(NamedTextColor.GRAY);
+        final Component message = ChatHint.INFO.attach(
+                Translations.component("clans.settler.crew.needed", name.color(NamedTextColor.YELLOW),
+                        Component.text(rule.threshold(structure, job), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY),
+                Translations.component("clans.settler.crew.needed_hint").color(NamedTextColor.GRAY));
 
         for (SiteInstance instance : instances.forKey(site)) {
             final World world = Bukkit.getWorld(instance.getWorldName());
