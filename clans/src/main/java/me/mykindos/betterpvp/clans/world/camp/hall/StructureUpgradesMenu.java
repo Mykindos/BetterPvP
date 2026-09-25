@@ -83,6 +83,7 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
         }
         return new SimpleItem(ItemView.builder()
                 .material(structure.getStage() < stage ? Material.GRAY_DYE : type.getIcon())
+                .hideAdditionalTooltip(true)
                 .displayName(type.stageName(stage).color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .frameLore(true)
                 .lore(state)
@@ -100,6 +101,7 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
 
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(greyed ? Material.GRAY_STAINED_GLASS_PANE : type.upgradeIcon(upgrade.getId()))
+                .hideAdditionalTooltip(true)
                 .displayName(upgradeName(upgrade.getId())
                         .color(chosen ? NamedTextColor.GREEN : greyed ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
                         .decorate(TextDecoration.BOLD))

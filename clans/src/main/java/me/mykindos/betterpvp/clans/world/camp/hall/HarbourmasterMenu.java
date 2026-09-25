@@ -169,6 +169,7 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                 final String choice = choices.get(i);
                 setItem(first + i, new SimpleItem(ItemView.builder()
                         .material(Material.IRON_PICKAXE)
+                        .hideAdditionalTooltip(true)
                         .displayName(profession(menus, choice).color(NamedTextColor.YELLOW))
                         .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.harbourmaster.pick"))
                         .build(), click -> {

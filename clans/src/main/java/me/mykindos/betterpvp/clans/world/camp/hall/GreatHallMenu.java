@@ -53,6 +53,7 @@ public class GreatHallMenu extends AbstractGui implements Windowed {
                                              @NotNull Consumer<Player> open) {
         return new SimpleItem(ItemView.builder()
                 .material(icon)
+                .hideAdditionalTooltip(true)
                 .displayName(Translations.component("clans.camp.hall." + id + ".name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .frameLore(true)

@@ -129,6 +129,7 @@ public class SettlerRosterMenu extends AbstractGui implements Windowed {
                                               @NotNull Consumer<Player> next) {
         return new SimpleItem(ItemView.builder()
                 .material(icon)
+                .hideAdditionalTooltip(true)
                 .displayName(Translations.component(name, shown.color(NamedTextColor.WHITE)).color(NamedTextColor.YELLOW))
                 .action(ClickActions.ALL, Translations.component("clans.camp.hall.settlers.next_filter"))
                 .build(), click -> next.accept(click.getPlayer()));

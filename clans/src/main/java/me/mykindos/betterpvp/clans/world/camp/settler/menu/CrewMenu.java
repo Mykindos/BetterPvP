@@ -119,6 +119,7 @@ public class CrewMenu extends AbstractGui implements Windowed {
 
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(icon)
+                .hideAdditionalTooltip(true)
                 .displayName(name.color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .frameLore(true)
                 .lore(CrewJobsMenu.jobName(job).color(NamedTextColor.GRAY))
