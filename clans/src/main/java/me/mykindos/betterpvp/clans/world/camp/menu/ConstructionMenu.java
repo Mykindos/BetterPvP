@@ -133,7 +133,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
         player.closeInventory();
     }
 
-    static @NotNull Component cost(@NotNull ResourceCost cost) {
+    public static @NotNull Component cost(@NotNull ResourceCost cost) {
         if (cost.isFree()) {
             return Translations.component("clans.camp.menu.build.free").color(NamedTextColor.WHITE);
         }

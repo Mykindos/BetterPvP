@@ -96,7 +96,7 @@ public class FeastTableMenu extends AbstractGui implements Windowed {
             final Component name = material == null ? Component.text(item)
                     : Component.translatable(material.translationKey());
             lines.add(Translations.component("clans.camp.upgrade.feast_table.value", name.color(NamedTextColor.WHITE),
-                    Component.text(points, NamedTextColor.GOLD)).color(NamedTextColor.GRAY));
+                    Component.text(points, NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
         });
         return lines;
     }

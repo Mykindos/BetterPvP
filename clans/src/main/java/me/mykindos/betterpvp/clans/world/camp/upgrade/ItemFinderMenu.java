@@ -62,7 +62,8 @@ public class ItemFinderMenu extends AbstractGui implements Windowed {
                 .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.item_finder.by_item").color(NamedTextColor.GRAY));
         if (search != null) {
-            summary.lore(Translations.component("clans.camp.upgrade.item_finder.searching", search.getLabel())
+            summary.lore(Translations.component("clans.camp.upgrade.item_finder.searching",
+                    search.getLabel().color(NamedTextColor.WHITE))
                     .color(NamedTextColor.GRAY));
         }
         setItem(6, new SimpleItem(summary.build()));

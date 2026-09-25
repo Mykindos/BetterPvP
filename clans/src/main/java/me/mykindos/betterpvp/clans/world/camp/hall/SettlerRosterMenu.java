@@ -91,15 +91,15 @@ public class SettlerRosterMenu extends AbstractGui implements Windowed {
             final OptionalInt cap = menus.getSettlers().workingCap(key, each.getId());
             if (cap.isPresent()) {
                 view.lore(Translations.component("clans.camp.hall.settlers.working",
-                        Translations.component(each.getKey()), Component.text(roster.working(each.getId())),
-                        Component.text(cap.getAsInt())).color(NamedTextColor.GRAY));
+                        Translations.component(each.getKey()), Component.text(roster.working(each.getId()), NamedTextColor.WHITE),
+                        Component.text(cap.getAsInt(), NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
             }
         }
         view.lore(Translations.component("clans.camp.prosperity.value",
-                Component.text(menus.getProsperity().of(key), NamedTextColor.GOLD)).color(NamedTextColor.GRAY));
+                Component.text(menus.getProsperity().of(key), NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
         if (roster.size() > 0) {
             final double morale = roster.getSettlers().stream().mapToInt(Settler::getMorale).average().orElse(0);
-            view.lore(Translations.component("clans.camp.hall.settlers.morale", Component.text((int) Math.round(morale)))
+            view.lore(Translations.component("clans.camp.hall.settlers.morale", Component.text((int) Math.round(morale), NamedTextColor.WHITE))
                     .color(NamedTextColor.GRAY));
         }
         return new SimpleItem(view.build());
@@ -151,7 +151,7 @@ public class SettlerRosterMenu extends AbstractGui implements Windowed {
                 .lore(Translations.component("clans.settler.card.state." + settler.getState().name().toLowerCase(Locale.ROOT))
                         .color(settler.getState() == SettlerState.STRIKING ? NamedTextColor.RED : NamedTextColor.GRAY))
                 .lore(Translations.component("clans.settler.card.morale", Component.text(morale,
-                        morale > 0 ? NamedTextColor.GREEN : morale < 0 ? NamedTextColor.RED : NamedTextColor.GRAY))
+                        morale > 0 ? NamedTextColor.GREEN : morale < 0 ? NamedTextColor.RED : NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.hall.settlers.open_card"))
                 .build();
