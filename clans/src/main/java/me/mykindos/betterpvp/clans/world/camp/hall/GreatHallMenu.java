@@ -26,7 +26,7 @@ public class GreatHallMenu extends AbstractGui implements Windowed {
 
     GreatHallMenu(@NotNull HallMenus menus, @NotNull Player viewer, @NotNull SiteKey key) {
         super(9, 4);
-        setItem(10, entry(Material.PLAYER_HEAD, "settlers",
+        setItem(4, entry(Material.PLAYER_HEAD, "settlers",
                 player -> new SettlerRosterMenu(menus, key, this, 0, 0).show(player)));
         setItem(11, entry(Material.OAK_SIGN, "hiring",
                 player -> new HiringBoardMenu(menus, player, key, this).show(player)));
