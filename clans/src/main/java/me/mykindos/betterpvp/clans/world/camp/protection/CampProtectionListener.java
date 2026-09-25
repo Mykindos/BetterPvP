@@ -24,6 +24,7 @@ import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Everything that could change a camp's land without a player breaking or placing a block, which the camp zones cannot
  * see: explosions, fire, decay, mobs, trampling and bone meal. Also tells a player when the zones keep them out of a
- * container.
+ * container. Vanilla mobs never spawn on their own in a camp.
  */
 @BPvPListener
 @Singleton
@@ -60,6 +61,17 @@ public class CampProtectionListener implements Listener {
             return;
         }
         UtilMessage.message(event.getPlayer(), "clans.prefix.camp", "clans.camp.protection.private");
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onNaturalSpawn(CreatureSpawnEvent event) {
+        final boolean natural = switch (event.getSpawnReason()) {
+            case NATURAL, CHUNK_GEN, PATROL, RAID, TRAP, JOCKEY, MOUNT, VILLAGE_DEFENSE, REINFORCEMENTS -> true;
+            default -> false;
+        };
+        if (natural && isCamp(event.getLocation().getWorld())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
