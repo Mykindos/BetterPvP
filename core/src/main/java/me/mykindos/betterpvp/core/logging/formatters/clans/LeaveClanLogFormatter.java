@@ -53,7 +53,6 @@ public class LeaveClanLogFormatter implements ILogFormatter {
                         Translations.component("core.log.leave-clan.4").color(NamedTextColor.RED)))
                 .material(Material.RED_BED)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

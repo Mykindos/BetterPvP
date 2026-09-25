@@ -24,7 +24,6 @@ public class SortingTableMenu extends AbstractGui implements Windowed {
                 .material(Material.HOPPER)
                 .displayName(Translations.component("clans.camp.upgrade.sorting_table.button")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.sorting_table.button.description")
                         .color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.sorting_table.use"))

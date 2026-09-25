@@ -285,8 +285,7 @@ public class DeputySteward implements Listener {
 
     private void interact(@NotNull Player player, @NotNull SiteKey key) {
         if (!isActive(key)) {
-            UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                    Translations.component("clans.camp.upgrade.deputy_steward.hall_inactive")
+            UtilMessage.plain(player, Translations.component("clans.camp.upgrade.deputy_steward.hall_inactive")
                             .color(NamedTextColor.GRAY));
             return;
         }

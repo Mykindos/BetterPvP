@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -30,7 +29,6 @@ public class DominationMapStatButton extends ControlItem<AbstractStatMenu> {
         return ItemView.builder()
                 .material(Material.MAP)
                 .displayName(Translations.component("core.menu.stats.champions.button.map-specific.name"))
-                .frameLore(true)
                 .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }

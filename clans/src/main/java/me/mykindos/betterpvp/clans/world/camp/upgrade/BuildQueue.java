@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.UUID;
+import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
 
 /**
  * Workshop upgrade: while a job runs, the camp can queue one advance or repair on an idle structure. It starts when
@@ -166,8 +167,8 @@ public class BuildQueue implements Listener {
         }
 
         if (result.isSuccess()) {
-            tellOnline(key, Translations.component("clans.camp.upgrade.build_queue.started", describe(queued))
-                    .color(NamedTextColor.GREEN), null);
+            tellOnline(key, ChatIcon.NEWS.line(Translations.component("clans.camp.upgrade.build_queue.started",
+                    describe(queued)).color(NamedTextColor.GREEN)), null);
             return;
         }
         queued.setDroppedAt(construction.now());
@@ -177,7 +178,7 @@ public class BuildQueue implements Listener {
             message = message.appendNewline()
                     .append(Translations.component("clans.camp.reason", result.getReason()).color(NamedTextColor.GRAY));
         }
-        tellOnline(key, message, queued);
+        tellOnline(key, ChatIcon.PROBLEM.line(message), queued);
         store.cached(key.getOwnerId()).ifPresent(camp -> camp.setDroppedAction(queued));
         store.changed(key.getOwnerId());
     }
@@ -186,7 +187,7 @@ public class BuildQueue implements Listener {
     private void tellOnline(@NotNull SiteKey key, @NotNull Component message, @Nullable QueuedAction dropped) {
         clanManager.getClanById(key.getOwnerId()).ifPresent(clan -> {
             for (Player member : clan.getMembersAsPlayers()) {
-                UtilMessage.message(member, Translations.component("clans.prefix.camp"), message);
+                UtilMessage.plain(member, message);
                 if (dropped != null) {
                     dropped.getTold().add(member.getUniqueId());
                 }
@@ -221,9 +222,9 @@ public class BuildQueue implements Listener {
                 }
                 dropped.getTold().add(player.getUniqueId());
                 store.changed(clan.getAsLong());
-                UtilMessage.message(player, Translations.component("clans.prefix.camp"),
+                UtilMessage.plain(player, ChatIcon.PROBLEM.line(
                         Translations.component("clans.camp.upgrade.build_queue.dropped_notice", describe(dropped))
-                                .color(NamedTextColor.RED));
+                                .color(NamedTextColor.RED)));
             });
         }, 40L);
     }

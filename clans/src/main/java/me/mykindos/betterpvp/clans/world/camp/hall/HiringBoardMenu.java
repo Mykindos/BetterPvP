@@ -50,7 +50,6 @@ public class HiringBoardMenu extends AbstractGui implements Windowed {
                 .material(Material.OAK_SIGN)
                 .displayName(Translations.component("clans.camp.hall.hiring.name").color(NamedTextColor.YELLOW)
                         .decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.hall.hiring.refresh",
                         Component.text(UtilTime.humanReadableFormat(Duration.ofMillis(refresh)))).color(NamedTextColor.GRAY))
                 .build()));

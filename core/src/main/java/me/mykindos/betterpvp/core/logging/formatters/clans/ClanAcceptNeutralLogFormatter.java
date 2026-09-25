@@ -56,7 +56,6 @@ public class ClanAcceptNeutralLogFormatter implements ILogFormatter {
                 .material(Material.GRAY_DYE)
                 .lore(lore)
                 .glow(true)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

@@ -15,11 +15,9 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -27,7 +25,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.SMALL_CAPS;
 
 @CustomLog
 @Singleton
@@ -85,12 +82,7 @@ public class TipListener implements Listener {
 
         if (tipList.size() > 0) {
             Tip tip = tipList.random();
-            UtilMessage.message(player, Component.empty());
-            UtilMessage.message(player, Component.empty()
-                    .append(Component.text("TIP", NamedTextColor.GOLD, TextDecoration.BOLD).font(SMALL_CAPS))
-                    .appendSpace()
-                    .append(tip.getComponent()));
-            UtilMessage.message(player, Component.empty());
+            UtilMessage.spaced(player, ChatIcon.TIP.line(tip.getComponent()));
             new SoundEffect(Sound.BLOCK_NOTE_BLOCK_CHIME, 1.5f, 1.0f).play(player);
             event.getGamer().setLastTipNow();
         } else {

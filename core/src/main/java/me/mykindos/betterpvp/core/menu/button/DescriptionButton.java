@@ -40,7 +40,6 @@ public class DescriptionButton extends AbstractItem {
                         final TextComponent key = Component.text(entry.getKey() + ": ", NamedTextColor.GRAY);
                         return key.append(entry.getValue());
                     }).toList())
-                    .frameLore(true)
                     .build();
         } else {
             return icon;

@@ -45,7 +45,6 @@ public class PlayerItemButton extends LogRepositoryButton {
                 .material(Material.PLAYER_HEAD)
                 .customModelData(0)
                 .lore(lore)
-                .frameLore(true)
                 .build();
     }
 }

@@ -147,6 +147,6 @@ public class ResourceChestDeposit implements Listener {
     }
 
     private static void message(@NotNull Player player, @NotNull Component message) {
-        UtilMessage.message(player, Translations.component("clans.prefix.camp"), message);
+        UtilMessage.plain(player, message);
     }
 }

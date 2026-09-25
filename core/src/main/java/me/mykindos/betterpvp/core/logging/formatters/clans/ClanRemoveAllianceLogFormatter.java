@@ -56,7 +56,6 @@ public class ClanRemoveAllianceLogFormatter implements ILogFormatter {
                 .material(Material.BLACK_DYE)
                 .lore(lore)
                 .glow(true)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

@@ -40,7 +40,6 @@ public class FarmMenu extends AbstractGui implements Windowed {
                 .material(Material.HAY_BLOCK)
                 .displayName(Translations.component("clans.camp.hall.farm.name").color(NamedTextColor.YELLOW)
                         .decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.hall.farm.growth", percent(farm.growth(key)))
                         .color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.camp.hall.farm.extra_drop", percent(farm.extraDrop(key)))
@@ -94,7 +93,6 @@ public class FarmMenu extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PLAYER_HEAD)
                 .displayName(Component.text(farmer.getName(), farmer.getRarity().getColor()))
-                .frameLore(true)
                 .lore(farmer.getRarity().displayName())
                 .lore(Translations.component("clans.settler.card.morale", Component.text(farmer.getMorale(), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY));

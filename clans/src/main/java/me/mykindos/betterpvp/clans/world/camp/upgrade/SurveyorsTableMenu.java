@@ -40,7 +40,6 @@ public class SurveyorsTableMenu extends AbstractGui implements Windowed {
             setItem(slot, new SimpleItem(ItemView.builder()
                     .material(type.getIcon())
                     .displayName(type.getDisplayName().color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                    .frameLore(true)
                     .lore(type.stageName(structure.getStage()).color(NamedTextColor.GRAY))
                     .lore(Translations.component("clans.camp.upgrade.surveyors_table.next",
                             type.stageName(structure.getStage() + 1).color(NamedTextColor.WHITE)).color(NamedTextColor.GRAY))

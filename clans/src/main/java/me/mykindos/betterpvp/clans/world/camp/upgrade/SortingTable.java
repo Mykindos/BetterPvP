@@ -172,6 +172,6 @@ public class SortingTable implements Listener {
     }
 
     private static void tell(@NotNull Player player, @NotNull Component message) {
-        UtilMessage.message(player, Translations.component("clans.prefix.camp"), message);
+        UtilMessage.plain(player, message);
     }
 }

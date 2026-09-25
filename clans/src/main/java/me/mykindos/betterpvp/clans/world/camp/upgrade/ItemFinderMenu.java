@@ -49,7 +49,6 @@ public class ItemFinderMenu extends AbstractGui implements Windowed {
                 .material(Material.NAME_TAG)
                 .displayName(Translations.component("clans.camp.upgrade.item_finder.by_name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.item_finder.by_name.description")
                         .color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.item_finder.search"))
@@ -59,7 +58,6 @@ public class ItemFinderMenu extends AbstractGui implements Windowed {
                 .material(Material.SPYGLASS)
                 .displayName(Translations.component("clans.camp.upgrade.item_finder.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.item_finder.by_item").color(NamedTextColor.GRAY));
         if (search != null) {
             summary.lore(Translations.component("clans.camp.upgrade.item_finder.searching",
@@ -89,7 +87,6 @@ public class ItemFinderMenu extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.CHEST)
                 .displayName(chests.name(found.getChest()).color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(StorehouseChests.position(found.getChest()).color(NamedTextColor.DARK_GRAY))
                 .lore(Translations.component("clans.camp.upgrade.item_finder.holds",
                         Component.text(found.getCount(), NamedTextColor.WHITE)).color(NamedTextColor.GRAY))

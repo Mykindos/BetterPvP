@@ -45,7 +45,6 @@ public class RivalBoardMenu extends AbstractGui implements Windowed {
                         .color(row.isOwn() ? NamedTextColor.GOLD : NamedTextColor.YELLOW)
                         .decorate(TextDecoration.BOLD))
                 .glow(row.isOwn())
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.prosperity.value",
                         Component.text(UtilFormat.formatNumber(row.getProsperity()), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY))

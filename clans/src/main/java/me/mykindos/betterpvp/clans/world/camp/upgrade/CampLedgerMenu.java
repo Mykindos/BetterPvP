@@ -49,7 +49,6 @@ public class CampLedgerMenu extends AbstractPagedGui<Item> implements Windowed {
             items.add(new SimpleItem(ItemView.builder()
                     .material(icon(entry.getKind()))
                     .displayName(ledger.describe(entry).color(NamedTextColor.YELLOW))
-                    .frameLore(true)
                     .lore(Translations.component("clans.camp.upgrade.camp_ledger.by",
                             Component.text(entry.getMemberName() == null ? "?" : entry.getMemberName(),
                                     NamedTextColor.WHITE)).color(NamedTextColor.GRAY))

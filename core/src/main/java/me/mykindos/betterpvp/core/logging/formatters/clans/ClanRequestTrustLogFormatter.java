@@ -56,7 +56,6 @@ public class ClanRequestTrustLogFormatter implements ILogFormatter {
                 .material(Material.GREEN_DYE)
                 .lore(lore)
                 .glow(false)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

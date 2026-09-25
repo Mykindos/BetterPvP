@@ -50,7 +50,6 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
         final String netDominanceText = String.format("%.1f%%", netDominance);
 
         final ItemView.ItemViewBuilder builder = ItemView.of(this.clan.getBanner().get()).toBuilder()
-                .frameLore(true)
                 .hideAdditionalTooltip(true)
                 .displayName(Component.text(this.clan.getName(), this.viewerRelation.getSecondary()))
                 .lore(Translations.component("clans.menu.clan.button.details.lore.net-dominance").color(NamedTextColor.GRAY)

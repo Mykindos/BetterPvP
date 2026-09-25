@@ -30,7 +30,6 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
                     .material(Material.WOODEN_SWORD)
                     .displayName(Translations.component("champions.menu.settings.tooltips.name").color(color))
                     .lore(Translations.component("champions.menu.settings.tooltips.lore").color(NamedTextColor.GRAY))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -56,7 +55,6 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
                         .displayName(Translations.component("champions.menu.settings.button.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                         .lore(Translations.component("champions.menu.settings.button.lore").color(NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
-                        .frameLore(true)
                         .build())
                 .build();
     }

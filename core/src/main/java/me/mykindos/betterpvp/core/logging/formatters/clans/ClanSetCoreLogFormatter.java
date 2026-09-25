@@ -56,7 +56,6 @@ public class ClanSetCoreLogFormatter implements ILogFormatter {
                         Translations.component("core.log.clan-set-core.4").color(NamedTextColor.LIGHT_PURPLE)))
                 .material(Material.RESPAWN_ANCHOR)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

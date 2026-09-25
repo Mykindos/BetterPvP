@@ -44,7 +44,6 @@ public class FeastTableMenu extends AbstractGui implements Windowed {
                 .material(Material.CAKE)
                 .displayName(Translations.component("clans.camp.upgrade.feast_table.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(left > 0
                         ? Translations.component("clans.camp.upgrade.feast_table.laid_for", time(left))
                         .color(NamedTextColor.GREEN)
@@ -55,7 +54,6 @@ public class FeastTableMenu extends AbstractGui implements Windowed {
                 .material(Material.PAPER)
                 .displayName(Translations.component("clans.camp.upgrade.feast_table.values")
                         .color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(values())
                 .build()));
 
@@ -63,7 +61,6 @@ public class FeastTableMenu extends AbstractGui implements Windowed {
                 .material(Material.BREAD)
                 .displayName(Translations.component("clans.camp.upgrade.feast_table.lay.name")
                         .color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.feast_table.lay.description",
                         Component.text(feast.cost(), NamedTextColor.WHITE),
                         Component.text("+" + feast.bonus(), NamedTextColor.GREEN),

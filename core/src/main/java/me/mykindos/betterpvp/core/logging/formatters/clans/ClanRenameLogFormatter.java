@@ -55,7 +55,6 @@ public class ClanRenameLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)))
                 .material(Material.OAK_SIGN)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

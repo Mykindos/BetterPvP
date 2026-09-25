@@ -53,7 +53,6 @@ public class PlacedStructuresMenu extends AbstractGui implements Windowed {
             final PlacedStructure structure = structures.get(slot);
             final CampStructure type = menus.type(structure.getType()).orElseThrow();
             setItem(slot, new SimpleItem(summary(type, structure, now)
-                    .lore(Component.empty())
                     .action(ClickActions.ALL, Translations.component("clans.camp.menu.structures.manage"))
                     .build(), click -> new StructureActionsMenu(menus, click.getPlayer(), camp, structure.getId(),
                     previous, null).show(click.getPlayer())));
@@ -74,8 +73,7 @@ public class PlacedStructuresMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.PAPER)
                 .displayName(Translations.component("clans.camp.upgrade.build_queue.menu")
-                        .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true);
+                        .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
         if (queued == null) {
             view.lore(Translations.component("clans.camp.upgrade.build_queue.menu.empty").color(NamedTextColor.GRAY));
             return new SimpleItem(view.build());
@@ -107,7 +105,6 @@ public class PlacedStructuresMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(type.getIcon())
                 .displayName(type.getDisplayName().color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(type.stageName(structure.getStage()).color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.camp.menu.structures.status",
                         Translations.component("clans.camp.menu.structures.status." + status.name().toLowerCase(Locale.ROOT))

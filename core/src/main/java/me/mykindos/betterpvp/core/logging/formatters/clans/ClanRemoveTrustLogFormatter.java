@@ -56,7 +56,6 @@ public class ClanRemoveTrustLogFormatter implements ILogFormatter {
                 .material(Material.ORANGE_DYE)
                 .lore(lore)
                 .glow(true)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

@@ -35,8 +35,7 @@ public class TerritoryButton extends AbstractItem {
                 .lore(Translations.component("clans.menu.clan.button.territory.lore.claimed",
                         Component.text(clan.getTerritory().size(), NamedTextColor.WHITE),
                         Component.text(Math.min(clan.getMembers().size() + 3, 9), NamedTextColor.GRAY))
-                        .color(NamedTextColor.GRAY))
-                .frameLore(true);
+                        .color(NamedTextColor.GRAY));
 
         if (admin) {
             builder.action(ClickActions.LEFT, Translations.component("clans.menu.clan.button.territory.action.claim"));

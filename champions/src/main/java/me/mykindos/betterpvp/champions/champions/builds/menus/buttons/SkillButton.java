@@ -65,7 +65,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
 
         final ItemView.ItemViewBuilder builder = ItemView.builder();
         if (skill.getTags() != null) {
-            builder.prelore(skill.getTags());
+            builder.lore(skill.getTags()).lore(Component.empty());
         }
 
         builder.lore(Arrays.stream(skill.getDescription(displayLevel)).map(c -> c.colorIfAbsent(NamedTextColor.GRAY)
@@ -89,7 +89,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             builder.action(ClickActions.RIGHT, Translations.component("champions.menu.skill.decrease-level"));
         }
 
-        return builder.hideAdditionalTooltip(true).frameLore(true).build();
+        return builder.hideAdditionalTooltip(true).build();
     }
 
     /**

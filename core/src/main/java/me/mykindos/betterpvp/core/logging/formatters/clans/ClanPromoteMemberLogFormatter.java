@@ -61,7 +61,6 @@ public class ClanPromoteMemberLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW)))
                 .material(Material.LIME_CANDLE)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.LongSupplier;
+import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
 
 /**
  * Great Hall upgrade: once per cooldown a member rings the bell, which lifts every settler's morale for a while, sends
@@ -168,15 +169,15 @@ public class GreatBell implements Listener, MoraleBoost {
         presence.get().gather(key, world, spot);
 
         final Optional<Clan> clan = clanManager.getClanById(key.getOwnerId());
-        final Component message = Translations.component("clans.camp.upgrade.great_bell.rung",
-                Component.text(ringer.getName(), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY);
+        final Component message = ChatIcon.NEWS.line(Translations.component("clans.camp.upgrade.great_bell.rung",
+                Component.text(ringer.getName(), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY));
         for (Player player : world.getPlayers()) {
             if (clan.flatMap(found -> found.getMemberByUUID(player.getUniqueId())).isEmpty()) {
                 continue;
             }
             player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1.5f, 0.8f);
             player.playSound(player.getLocation(), Sound.BLOCK_BELL_RESONATE, 1f, 1f);
-            UtilMessage.message(player, Translations.component("clans.prefix.camp"), message);
+            UtilMessage.plain(player, message);
         }
     }
 

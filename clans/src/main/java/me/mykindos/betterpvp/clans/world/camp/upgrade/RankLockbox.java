@@ -213,8 +213,7 @@ public class RankLockbox implements Listener, StructureContents {
     }
 
     private static void tell(@NotNull Player player, @NotNull String key) {
-        UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                Translations.component(key).color(NamedTextColor.RED));
+        UtilMessage.plain(player, Translations.component(key).color(NamedTextColor.RED));
     }
 
     /** Marks a lockbox's inventory with the camp and Storehouse it belongs to. */

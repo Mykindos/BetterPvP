@@ -37,7 +37,6 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .material(Material.WRITABLE_BOOK)
                     .displayName(Translations.component("core.menu.settings.general.button.tips.name").color(color))
                     .lore(Translations.component("core.menu.settings.general.button.tips.lore.1").color(NamedTextColor.GRAY))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -49,7 +48,6 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .material(Material.WRITABLE_BOOK)
                     .displayName(Translations.component("core.menu.settings.general.button.chat.name").color(color))
                     .lore(Translations.component("core.menu.settings.general.button.chat.lore.1").color(NamedTextColor.GRAY))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -61,7 +59,6 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .material(Material.WRITABLE_BOOK)
                     .displayName(Translations.component("core.menu.settings.general.button.drop-protection.name").color(color))
                     .lore(Translations.component("core.menu.settings.general.button.drop-protection.lore.1").color(NamedTextColor.GRAY))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -73,7 +70,6 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .material(Material.JUKEBOX)
                     .displayName(Translations.component("core.menu.settings.general.button.sounds.name").color(color))
                     .lore(Translations.component("core.menu.settings.general.button.sounds.lore.1").color(NamedTextColor.GRAY))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -90,7 +86,6 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                             Translations.component("core.menu.settings.general.button.show-tag.lore.3").color(NamedTextColor.GRAY),
                             Translations.component("core.menu.settings.general.button.show-tag.lore.4").color(NamedTextColor.GRAY)
                     ))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -121,7 +116,7 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                 .icon(ItemView.builder()
                         .material(Material.REDSTONE_TORCH)
                         .displayName(Translations.component("core.menu.settings.general.description.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
-                        .lore(Translations.component("core.menu.settings.general.description.lore.1").color(NamedTextColor.GRAY)).frameLore(true)
+                        .lore(Translations.component("core.menu.settings.general.description.lore.1").color(NamedTextColor.GRAY))
                         .build())
                 .build();
     }

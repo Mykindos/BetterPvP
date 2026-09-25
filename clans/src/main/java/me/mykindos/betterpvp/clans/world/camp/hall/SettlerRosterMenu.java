@@ -85,8 +85,7 @@ public class SettlerRosterMenu extends AbstractGui implements Windowed {
                 .material(Material.BELL)
                 .displayName(Translations.component("clans.camp.hall.settlers.population",
                         Component.text(roster.size()), Component.text(menus.getSettlers().populationCap(key)))
-                        .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true);
+                        .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
         for (Profession each : menus.getProfessions().all()) {
             final OptionalInt cap = menus.getSettlers().workingCap(key, each.getId());
             if (cap.isPresent()) {
@@ -145,7 +144,6 @@ public class SettlerRosterMenu extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PLAYER_HEAD)
                 .displayName(Component.text(settler.getName(), settler.getRarity().getColor()))
-                .frameLore(true)
                 .lore(settler.getRarity().displayName())
                 .lore(work.color(NamedTextColor.YELLOW))
                 .lore(Translations.component("clans.settler.card.state." + settler.getState().name().toLowerCase(Locale.ROOT))

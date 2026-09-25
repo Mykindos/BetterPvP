@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ChatHint;
+import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeftEvent;
 import me.mykindos.betterpvp.core.world.settler.wage.SettlerStrikeEvent;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -40,20 +41,20 @@ public class SettlerNotices implements Listener {
     public void onStrike(@NotNull SettlerStrikeEvent event) {
         final Component count = Component.text(event.getSettlers().size());
         if (!event.isStriking()) {
-            tell(event.getSite(), Translations.component("clans.camp.hall.wages.strike_ended", count)
-                    .color(NamedTextColor.GREEN));
+            tell(event.getSite(), ChatIcon.NEWS.line(Translations.component("clans.camp.hall.wages.strike_ended", count)
+                    .color(NamedTextColor.GREEN)));
             return;
         }
-        tell(event.getSite(), ChatHint.INFO.attach(
+        tell(event.getSite(), ChatIcon.PROBLEM.line(ChatHint.INFO.attach(
                 Translations.component("clans.camp.hall.wages.strike_started", count).color(NamedTextColor.RED),
-                Translations.component("clans.camp.hall.wages.strike_hint").color(NamedTextColor.GRAY)));
+                Translations.component("clans.camp.hall.wages.strike_hint").color(NamedTextColor.GRAY))));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBoat(@NotNull SettlerBoatEvent event) {
-        tell(event.getSite(), Translations.component(event.isMilestone()
+        tell(event.getSite(), ChatIcon.NEWS.line(Translations.component(event.isMilestone()
                 ? "clans.settler.recruit.milestone_arrived" : "clans.settler.recruit.boat_arrived")
-                .color(NamedTextColor.GREEN));
+                .color(NamedTextColor.GREEN)));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -64,9 +65,9 @@ public class SettlerNotices implements Listener {
             case DISMISSED -> null;
         };
         if (key != null) {
-            tell(event.getSite(), Translations.component(key,
+            tell(event.getSite(), ChatIcon.PROBLEM.line(Translations.component(key,
                     Component.text(event.getSettler().getName(), event.getSettler().getRarity().getColor()))
-                    .color(NamedTextColor.RED));
+                    .color(NamedTextColor.RED)));
         }
     }
 
@@ -77,7 +78,7 @@ public class SettlerNotices implements Listener {
         clanManager.getClanById(site.getOwnerId()).ifPresent(clan -> clan.getMembers().forEach(member -> {
             final Player player = Bukkit.getPlayer(member.getUuid());
             if (player != null) {
-                UtilMessage.message(player, Translations.component("clans.prefix.camp"), message);
+                UtilMessage.plain(player, message);
             }
         }));
     }

@@ -121,7 +121,6 @@ public class CrewMenu extends AbstractGui implements Windowed {
                 .material(icon)
                 .hideAdditionalTooltip(true)
                 .displayName(name.color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(CrewJobsMenu.jobName(job).color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.settler.crew.workforce", Component.text(workforce, NamedTextColor.WHITE),
                         Component.text(threshold, NamedTextColor.WHITE)).color(workforce >= threshold ? NamedTextColor.GREEN : NamedTextColor.RED))
@@ -143,7 +142,6 @@ public class CrewMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.PLAYER_HEAD)
                 .displayName(Component.text(settler.getName(), settler.getRarity().getColor()))
-                .frameLore(true)
                 .lore(settler.getRarity().displayName());
         if (settler.getSpecialty() != null && settler.getProfession() != null) {
             menus.getProfessions().find(settler.getProfession()).ifPresent(profession -> view.lore(

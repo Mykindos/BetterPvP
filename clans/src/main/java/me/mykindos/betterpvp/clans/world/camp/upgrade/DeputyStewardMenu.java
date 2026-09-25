@@ -30,7 +30,6 @@ public class DeputyStewardMenu extends AbstractGui implements Windowed {
                 .material(Material.ARMOR_STAND)
                 .displayName(Translations.component("clans.camp.upgrade.deputy_steward.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component(placed ? "clans.camp.upgrade.deputy_steward.placed"
                         : "clans.camp.upgrade.deputy_steward.not_placed")
                         .color(placed ? NamedTextColor.GREEN : NamedTextColor.GRAY))
@@ -49,14 +48,12 @@ public class DeputyStewardMenu extends AbstractGui implements Windowed {
         return new SimpleItem(ItemView.builder()
                 .material(icon)
                 .displayName(Translations.component(prefix + ".name").color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(Translations.component(prefix + ".description").color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component(prefix + ".name"))
                 .build(), click -> {
                     final Player player = click.getPlayer();
                     final String problem = action.apply(player, key);
-                    UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                            Translations.component(problem == null ? done : problem)
+                    UtilMessage.plain(player, Translations.component(problem == null ? done : problem)
                                     .color(problem == null ? NamedTextColor.GREEN : NamedTextColor.RED));
                     player.closeInventory();
                 });

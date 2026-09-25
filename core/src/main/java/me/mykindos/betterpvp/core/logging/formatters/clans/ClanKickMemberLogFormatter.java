@@ -56,7 +56,6 @@ public class ClanKickMemberLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW)))
                 .material(Material.PURPLE_BED)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

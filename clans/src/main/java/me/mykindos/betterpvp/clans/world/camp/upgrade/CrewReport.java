@@ -54,8 +54,7 @@ public class CrewReport implements Listener {
     /** Opens the report for camp {@code camp}, if its Workshop has one working. */
     public void open(@NotNull Player player, @NotNull SiteKey camp, @Nullable Windowed previous) {
         if (!isActive(camp)) {
-            UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                    Translations.component("clans.camp.upgrade.crew_report.inactive").color(NamedTextColor.RED));
+            UtilMessage.plain(player, Translations.component("clans.camp.upgrade.crew_report.inactive").color(NamedTextColor.RED));
             return;
         }
         new CrewReportMenu(this, camp, previous).show(player);

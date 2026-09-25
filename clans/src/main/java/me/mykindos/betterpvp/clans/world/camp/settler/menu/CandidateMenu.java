@@ -91,7 +91,7 @@ public class CandidateMenu extends AbstractGui implements Windowed {
         if (allowed) {
             view.action(ClickActions.ALL, Translations.component(key));
         } else {
-            view.frameLore(true).lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
+            view.lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
         }
         return new SimpleItem(view.build(), click -> {
             if (allowed) {

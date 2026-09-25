@@ -56,7 +56,6 @@ public class ClanAcceptAllianceLogFormatter implements ILogFormatter {
                 .material(Material.LIME_DYE)
                 .lore(lore)
                 .glow(true)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

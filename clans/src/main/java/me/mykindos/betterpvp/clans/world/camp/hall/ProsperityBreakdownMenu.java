@@ -27,7 +27,6 @@ public class ProsperityBreakdownMenu extends AbstractGui implements Windowed {
                 .material(Material.EMERALD)
                 .displayName(Translations.component("clans.camp.upgrade.prosperity_breakdown.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.prosperity.value",
                         Component.text(factors.getTotal(), NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
         if (factors.getFactors().isEmpty()) {
@@ -70,7 +69,6 @@ public class ProsperityBreakdownMenu extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(material)
                 .displayName(name.color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.prosperity_breakdown.adds", signed(factor.getAmount()))
                         .color(NamedTextColor.GRAY))
                 .build();

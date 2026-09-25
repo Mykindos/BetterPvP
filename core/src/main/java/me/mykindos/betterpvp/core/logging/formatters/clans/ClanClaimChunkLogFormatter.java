@@ -56,7 +56,6 @@ public class ClanClaimChunkLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.CHUNK), NamedTextColor.YELLOW)))
                 .material(Material.COBBLESTONE)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

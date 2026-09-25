@@ -57,7 +57,6 @@ public class ClanInviteLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW)))
                 .material(Material.WRITABLE_BOOK)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

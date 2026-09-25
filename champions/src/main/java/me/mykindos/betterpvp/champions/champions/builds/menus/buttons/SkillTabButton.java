@@ -80,7 +80,6 @@ public class SkillTabButton extends ControlItem<SkillMenu> {
                 .action(ClickActions.LEFT, Translations.component("champions.menu.skill.slot.change"))
                 .glow(gui.getSelectedTab() == type)
                 .hideAdditionalTooltip(true)
-                .frameLore(true)
                 .build();
     }
 

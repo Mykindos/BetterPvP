@@ -55,7 +55,6 @@ public class ClanEnemyLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW)))
                 .material(Material.IRON_SWORD)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

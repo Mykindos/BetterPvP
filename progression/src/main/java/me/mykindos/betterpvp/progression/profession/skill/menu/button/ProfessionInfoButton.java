@@ -94,7 +94,7 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
             });
         }
 
-        return builder.frameLore(true).build();
+        return builder.build();
 
     }
 

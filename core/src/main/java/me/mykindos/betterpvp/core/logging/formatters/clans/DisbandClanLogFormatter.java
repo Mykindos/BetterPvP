@@ -54,7 +54,6 @@ public class DisbandClanLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)))
                 .material(Material.BARRIER)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

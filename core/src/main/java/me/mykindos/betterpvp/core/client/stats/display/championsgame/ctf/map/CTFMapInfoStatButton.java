@@ -34,7 +34,6 @@ public class CTFMapInfoStatButton extends CTFStatButton {
                 .displayName(Translations.component("core.menu.stats.champions.button.map.name",
                         Component.text(mapName)))
                 .lore(getCTFStatsDescription("", mapName))
-                .frameLore(true)
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .build();
     }

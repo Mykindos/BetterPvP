@@ -30,7 +30,6 @@ public abstract class ViewClanCollectionButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         Collection<Clan> pool = getPool();
         return base.toBuilder()
-                .frameLore(true)
                 .displayName(Component.text(collectionName, NamedTextColor.YELLOW))
                 .lore(Translations.component("clans.menu.clan.button.collection.lore.online",
                         Component.text(String.format("%,d", pool.stream().filter(Clan::isOnline).count()), NamedTextColor.WHITE),

@@ -40,14 +40,12 @@ public class RemoteAccessMenu extends AbstractGui implements Windowed {
             setItem(i, new SimpleItem(ItemView.builder()
                     .material(Material.CHEST)
                     .displayName(chests.name(chest).color(NamedTextColor.YELLOW))
-                    .frameLore(true)
                     .lore(StorehouseChests.position(chest).color(NamedTextColor.DARK_GRAY))
                     .action(ClickActions.ALL, Translations.component("clans.camp.hall.open"))
                     .build(), click -> {
                         final String problem = access.open(click.getPlayer(), key, chest);
                         if (problem != null) {
-                            UtilMessage.message(click.getPlayer(), Translations.component("clans.prefix.camp"),
-                                    Translations.component(problem).color(NamedTextColor.RED));
+                            UtilMessage.plain(click.getPlayer(), Translations.component(problem).color(NamedTextColor.RED));
                         }
                     }));
         }

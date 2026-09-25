@@ -50,7 +50,6 @@ public class CrewReportMenu extends AbstractGui implements Windowed {
         for (int slot = 0; slot < tallies.size() && slot < 45; slot++) {
             final CrewTally tally = tallies.get(slot);
             setItem(slot, new SimpleItem(summary(tally)
-                    .lore(Component.empty())
                     .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.crew_report.open"))
                     .build(), click -> new JobMenu(tally).show(click.getPlayer())));
         }
@@ -65,7 +64,6 @@ public class CrewReportMenu extends AbstractGui implements Windowed {
                 .material(type.getIcon())
                 .displayName(type.getDisplayName().color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .glow(!tally.isFinished())
-                .frameLore(true)
                 .lore(kind(type, tally).color(NamedTextColor.WHITE))
                 .lore(tally.isFinished()
                         ? Translations.component("clans.camp.upgrade.crew_report.finished").color(NamedTextColor.GRAY)
@@ -127,7 +125,6 @@ public class CrewReportMenu extends AbstractGui implements Windowed {
                                         found.getRarity().getColor()))
                                 .orElse(Translations.component("clans.camp.upgrade.crew_report.gone")
                                         .color(NamedTextColor.GRAY)))
-                        .frameLore(true)
                         .lore(Translations.component("clans.camp.upgrade.crew_report.share",
                                 Component.text(Math.round(tally.shareOf(id) * 100) + "%", NamedTextColor.WHITE))
                                 .color(NamedTextColor.GRAY))

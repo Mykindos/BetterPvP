@@ -52,7 +52,6 @@ public enum CoinItem {
         final ItemStack item = ItemView.builder()
                 .material(material)
                 .displayName(Component.text(this.name, TextColor.color(255, 215, 0)))
-                .frameLore(true)
                 .lore(Component.text("Contains ", NamedTextColor.GRAY)
                         .append(Component.text(UtilFormat.formatNumber(amount) + " coins.", NamedTextColor.YELLOW)))
                 .build()

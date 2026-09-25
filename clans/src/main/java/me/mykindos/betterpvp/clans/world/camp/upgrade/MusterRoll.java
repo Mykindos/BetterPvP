@@ -125,8 +125,7 @@ public class MusterRoll implements Listener {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(where != null ? Material.PLAYER_HEAD : Material.SKELETON_SKULL)
                 .displayName(Component.text(MemberListMenu.name(member),
-                        where != null ? NamedTextColor.GREEN : NamedTextColor.GRAY).decorate(TextDecoration.BOLD))
-                .frameLore(true);
+                        where != null ? NamedTextColor.GREEN : NamedTextColor.GRAY).decorate(TextDecoration.BOLD));
         if (where != null) {
             return view
                     .lore(MemberListMenu.place(where).color(NamedTextColor.WHITE))

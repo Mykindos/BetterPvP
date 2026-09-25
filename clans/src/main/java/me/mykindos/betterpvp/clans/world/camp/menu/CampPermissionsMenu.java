@@ -155,7 +155,6 @@ public class CampPermissionsMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(allowed ? Material.LIME_DYE : Material.GRAY_DYE)
                 .displayName(name.color(allowed ? NamedTextColor.GREEN : NamedTextColor.RED))
-                .frameLore(true)
                 .lore(Translations.component(allowed ? "clans.camp.menu.permissions.allowed" : "clans.camp.menu.permissions.denied")
                         .color(NamedTextColor.GRAY));
         if (changeable) {

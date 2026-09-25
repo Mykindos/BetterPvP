@@ -53,7 +53,6 @@ public class JoinClanLogFormatter implements ILogFormatter {
                         Translations.component("core.log.join-clan.4").color(NamedTextColor.GREEN)))
                 .material(Material.LIME_BED)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

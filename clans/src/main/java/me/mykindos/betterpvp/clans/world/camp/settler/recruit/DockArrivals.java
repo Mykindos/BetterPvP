@@ -163,8 +163,7 @@ public class DockArrivals implements Listener {
 
     private void open(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID id) {
         if (!camps.isMember(player, player.getWorld())) {
-            UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                    Translations.component("clans.settler.recruit.members_only").color(NamedTextColor.GRAY));
+            UtilMessage.plain(player, Translations.component("clans.settler.recruit.members_only").color(NamedTextColor.GRAY));
             return;
         }
         cards.openCandidate(player, key, id, null);

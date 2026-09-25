@@ -5,10 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteraction;
 import me.mykindos.betterpvp.core.world.zone.ZoneInteractEvent;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.FallingBlock;
@@ -60,7 +61,7 @@ public class CampProtectionListener implements Listener {
                 || event.getInteraction() != ZoneInteraction.INTERACT || !event.getZone().hasTag(CampGrounds.TAG)) {
             return;
         }
-        UtilMessage.message(event.getPlayer(), "clans.prefix.camp", "clans.camp.protection.private");
+        event.getPlayer().sendActionBar(Translations.component("clans.camp.protection.private").color(NamedTextColor.RED));
     }
 
     @EventHandler(ignoreCancelled = true)

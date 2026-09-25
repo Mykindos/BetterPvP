@@ -94,7 +94,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                 .displayName(Translations.component("clans.settler.card.morale_title").color(NamedTextColor.YELLOW))
                 .lore(Component.text(morale, color));
         if (settler.getUnhappySince() > 0) {
-            view.frameLore(true).lore(Translations.component("clans.settler.card.unhappy",
+            view.lore(Translations.component("clans.settler.card.unhappy",
                     Component.text(cards.getMorale().leaveBelow(), NamedTextColor.WHITE),
                     duration(cards.getMorale().leaveAfter())).color(NamedTextColor.RED));
         }
@@ -105,8 +105,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         final String state = settler.getState().name().toLowerCase(Locale.ROOT);
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(settler.getState() == SettlerState.WORKING ? Material.CLOCK : Material.COMPASS)
-                .displayName(Translations.component("clans.settler.card.state." + state).color(NamedTextColor.YELLOW))
-                .frameLore(true);
+                .displayName(Translations.component("clans.settler.card.state." + state).color(NamedTextColor.YELLOW));
         if (settler.getAssignment() != null) {
             view.lore(Translations.component(settler.getAssignment().equals(CampGrounds.FARM)
                     ? "clans.settler.card.workplace.farm" : "clans.settler.card.workplace.construction")
@@ -149,7 +148,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         if (allowed) {
             view.action(ClickActions.ALL, Translations.component(working ? "clans.settler.card.unassign" : "clans.settler.card.assign_farm"));
         } else {
-            view.frameLore(true).lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
+            view.lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
         }
         setItem(29, new SimpleItem(view.build(), click -> {
             if (!allowed || !cards.allows(click.getPlayer(), site, SettlerAction.ASSIGN)) {
@@ -167,7 +166,6 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                 .material(Material.BARRIER)
                 .displayName(Translations.component("clans.settler.card.dismiss")
                         .color(allowed ? NamedTextColor.RED : NamedTextColor.GRAY))
-                .frameLore(true)
                 .lore(Translations.component("clans.settler.card.dismiss_warning",
                         Component.text(cards.getMorale().dismissalPenalty(), NamedTextColor.WHITE),
                         duration(cards.getMorale().dismissalFade())).color(NamedTextColor.GRAY));

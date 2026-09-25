@@ -160,15 +160,14 @@ public class BlueprintSessions implements Listener {
                 : construction.move(player, player.getWorld(), moving, anchor, session.quarterTurns);
         if (!result.isSuccess()) {
             if (result.getReason() != null) {
-                UtilMessage.message(player, Translations.component("core.prefix.construction"), result.getReason());
+                UtilMessage.plain(player, result.getReason());
             }
             return;
         }
 
         player.getInventory().getItemInMainHand().subtract();
         end(player);
-        UtilMessage.message(player, Translations.component("core.prefix.construction"),
-                Translations.component(moving == null ? "core.construction.blueprint.started"
+        UtilMessage.plain(player, Translations.component(moving == null ? "core.construction.blueprint.started"
                         : "core.construction.blueprint.move_started", type.get().getDisplayName()));
     }
 

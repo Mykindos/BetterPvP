@@ -34,7 +34,6 @@ public class DominationMapInfoStatButton extends DominationStatButton {
                 .displayName(Translations.component("core.menu.stats.champions.button.map.name",
                         Component.text(mapName)))
                 .lore(getDominationStatsDescription("", mapName))
-                .frameLore(true)
                 //.action(ClickActions.ALL, Component.text("Show Detailed Stats"))
                 .build();
     }

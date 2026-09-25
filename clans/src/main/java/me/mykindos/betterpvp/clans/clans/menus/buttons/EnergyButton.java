@@ -58,7 +58,6 @@ public class EnergyButton extends AbstractItem {
                 .material(Material.PAPER)
                 .itemModel(Key.key("betterpvp", "menu/icon/regular/sun_icon"))
                 .displayName(Translations.component("clans.menu.clan.button.energy.name").color(TextColor.color(179, 79, 255)).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.menu.clan.button.energy.lore.description.1").color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.menu.clan.button.energy.lore.description.2").color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.menu.clan.button.energy.lore.description.3").color(NamedTextColor.GRAY))

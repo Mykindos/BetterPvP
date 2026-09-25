@@ -72,7 +72,6 @@ public class PlayerLoginLogFormatter implements ILogFormatter {
                 .displayName(Component.text("Log In", NamedTextColor.GREEN))
                 .material(Material.LIME_BED)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

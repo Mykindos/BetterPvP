@@ -76,6 +76,20 @@ public class UtilMessage {
         sender.sendMessage(getPrefix(prefix).append(normalize(message)));
     }
 
+    /** Sends {@code message} without a prefix, gray where it sets no color, for feedback and alerts. */
+    public static void plain(Audience sender, Component message) {
+        sender.sendMessage(normalize(message));
+    }
+
+    /** Sends {@code lines} as one block with an empty line above and below, for tips and summaries. */
+    public static void spaced(Audience sender, Component... lines) {
+        sender.sendMessage(Component.empty());
+        for (Component line : lines) {
+            sender.sendMessage(normalize(line));
+        }
+        sender.sendMessage(Component.empty());
+    }
+
     /**
      * Sends a message to a CommandSender with appropriate formatting
      * Can also send to players

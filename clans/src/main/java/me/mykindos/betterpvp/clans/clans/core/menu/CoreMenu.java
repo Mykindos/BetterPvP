@@ -45,7 +45,6 @@ public class CoreMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder vaultItem = ItemView.builder()
                 .material(Material.ENDER_CHEST)
                 .displayName(Translations.component("clans.menu.core.button.vault.name").color(TextColor.color(84, 115, 255)).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.menu.core.button.vault.lore.description.1").color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.menu.core.button.vault.lore.description.2").color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.menu.core.button.vault.lore.description.3").color(NamedTextColor.GRAY))

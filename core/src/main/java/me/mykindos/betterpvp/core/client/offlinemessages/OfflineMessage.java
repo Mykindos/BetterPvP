@@ -59,7 +59,6 @@ public class OfflineMessage implements Describable {
                 .material(action.getMaterial())
                 .customModelData(action.getCustomModelData())
                 .lore(lore)
-                .frameLore(true)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

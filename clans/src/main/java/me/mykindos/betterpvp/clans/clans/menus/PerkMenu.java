@@ -46,7 +46,6 @@ public class PerkMenu extends AbstractGui implements Windowed {
                     .material(owns ? perk.getIcon().getMaterial() : Material.BARRIER)
                     .displayName(name)
                     .lore(Arrays.stream(perk.getDescription()).toList())
-                    .frameLore(true)
                     .build();
 
             setItem(slot, new SimpleItem(perkItem));

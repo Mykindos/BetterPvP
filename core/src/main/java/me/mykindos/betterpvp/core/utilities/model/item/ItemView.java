@@ -59,13 +59,8 @@ public class ItemView implements ItemProvider {
     @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) int amount = 1;
     @Builder.Default @Range(from = -1, to = Integer.MAX_VALUE) Integer durability = 0;
     List<EnchantmentEntry> enchantments;
-    /**
-     * Creates lore for before the outline, if frameLore is true
-     */
-    @Singular("prelore") List<? extends Component> prelore;
     @Singular("lore") List<? extends Component> lore;
     @Singular List<ItemFlag> flags;
-    @Builder.Default boolean frameLore = false;
     @Builder.Default boolean glow = false;
     @Singular Map<ClickAction, ? extends Component> actions;
 
@@ -118,18 +113,6 @@ public class ItemView implements ItemProvider {
         }
 
         meta.lore(lore);
-        if (frameLore && meta.hasLore()) {
-            List<Component> divided = Objects.requireNonNull(meta.lore());
-
-            divided.add(0, UtilMessage.DIVIDER);
-            divided.add(1, Component.empty());
-            divided.add(Component.empty());
-            if (!prelore.isEmpty()) {
-                divided.addAll(0, prelore);
-            }
-            divided.add(UtilMessage.DIVIDER);
-            meta.lore(divided);
-        }
 
         meta.setAttributeModifiers(material.getDefaultAttributeModifiers());
 
@@ -235,10 +218,8 @@ public class ItemView implements ItemProvider {
                 ", amount=" + amount +
                 ", durability=" + durability +
                 ", enchantments=" + enchantments +
-                ", prelore=" + prelore +
                 ", lore=" + lore +
                 ", flags=" + flags +
-                ", frameLore=" + frameLore +
                 ", glow=" + glow +
                 ", actions=" + actions +
                 ')';

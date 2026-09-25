@@ -143,8 +143,7 @@ public class CasualtyBoard implements Listener {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(death == null ? Material.PLAYER_HEAD : Material.SKELETON_SKULL)
                 .displayName(Component.text(MemberListMenu.name(member),
-                        death == null ? NamedTextColor.GRAY : NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true);
+                        death == null ? NamedTextColor.GRAY : NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
         if (death == null) {
             return view.lore(Translations.component("clans.camp.upgrade.casualty_board.none")
                     .color(NamedTextColor.GRAY)).build();

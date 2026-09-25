@@ -40,7 +40,6 @@ public class DominationStatButton extends ChampionsStatButton {
                 .material(Material.BEACON)
                 .displayName(Translations.component("core.menu.stats.champions.button.domination.name"))
                 .lore(getDominationStatsDescription("", ""))
-                .frameLore(true)
                 .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }

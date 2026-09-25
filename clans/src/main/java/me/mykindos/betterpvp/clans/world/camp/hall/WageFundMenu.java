@@ -63,7 +63,6 @@ public class WageFundMenu extends AbstractGui implements Windowed {
                 .displayName(Translations.component("clans.camp.hall.wages.fund",
                         Component.text(UtilFormat.formatNumber((int) fund), NamedTextColor.GOLD))
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.hall.wages.hourly",
                         Component.text(UtilFormat.formatNumber((int) Math.ceil(hourly)), NamedTextColor.GOLD))
                         .color(NamedTextColor.GRAY));
@@ -88,7 +87,7 @@ public class WageFundMenu extends AbstractGui implements Windowed {
         if (allowed) {
             view.action(ClickActions.ALL, Translations.component("clans.camp.hall.wages.pay", coins));
         } else {
-            view.frameLore(true).lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
+            view.lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
         }
         return new SimpleItem(view.build(), click -> {
             if (allowed) {
@@ -107,7 +106,6 @@ public class WageFundMenu extends AbstractGui implements Windowed {
                 .material(on ? Material.LIME_DYE : Material.GRAY_DYE)
                 .displayName(Translations.component("clans.camp.upgrade.wage_policy.toggle", state)
                         .color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.wage_policy.explain",
                         Component.text(UtilFormat.formatNumber((int) policy.dailyCap()), NamedTextColor.GOLD))
                         .color(NamedTextColor.GRAY))

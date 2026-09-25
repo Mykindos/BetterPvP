@@ -41,7 +41,6 @@ public class CTFTeamStatButton extends DominationStatButton {
                 .displayName(Translations.component("core.menu.stats.champions.button.team.name",
                         Component.text(teamName)))
                 .lore(getDominationStatsDescription(teamName, ""))
-                .frameLore(true)
                 .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }

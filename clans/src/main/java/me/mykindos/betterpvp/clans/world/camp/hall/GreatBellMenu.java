@@ -46,7 +46,6 @@ public class GreatBellMenu extends AbstractGui implements Windowed {
                 .material(Material.BELL)
                 .displayName(Translations.component("clans.camp.upgrade.great_bell.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(status)
                 .build()));
 
@@ -54,7 +53,6 @@ public class GreatBellMenu extends AbstractGui implements Windowed {
                 .material(ready > 0 ? Material.GRAY_DYE : Material.BELL)
                 .displayName(Translations.component("clans.camp.upgrade.great_bell.ring.name")
                         .color(ready > 0 ? NamedTextColor.GRAY : NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.great_bell.ring.description",
                         Component.text("+" + bell.bonus(), NamedTextColor.GREEN), time(bell.length().toMillis()))
                         .color(NamedTextColor.GRAY))

@@ -43,7 +43,6 @@ public class RankLockboxMenu extends AbstractGui implements Windowed {
                 .material(Material.IRON_BARS)
                 .displayName(Translations.component("clans.camp.upgrade.rank_lockbox.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.rank_lockbox.hint").color(NamedTextColor.GRAY))
                 .lore(Translations.component(lockbox.isLeader(viewer, key.getOwnerId())
                         ? "clans.camp.upgrade.rank_lockbox.editable"
@@ -64,7 +63,6 @@ public class RankLockboxMenu extends AbstractGui implements Windowed {
                 .material(allowed ? Material.LIME_DYE : Material.GRAY_DYE)
                 .displayName(Translations.component("clans.camp.rank." + rank.name().toLowerCase(Locale.ROOT))
                         .color(allowed ? NamedTextColor.GREEN : NamedTextColor.RED))
-                .frameLore(true)
                 .lore(Translations.component(allowed
                         ? "clans.camp.upgrade.rank_lockbox.allowed"
                         : "clans.camp.upgrade.rank_lockbox.not_allowed").color(NamedTextColor.GRAY));
@@ -77,8 +75,7 @@ public class RankLockboxMenu extends AbstractGui implements Windowed {
             final Player player = click.getPlayer();
             final String problem = lockbox.toggle(player, key.getOwnerId(), rank);
             if (problem != null) {
-                UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                        Translations.component(problem).color(NamedTextColor.RED));
+                UtilMessage.plain(player, Translations.component(problem).color(NamedTextColor.RED));
                 return;
             }
             new RankLockboxMenu(lockbox, player, key, previous).show(player);

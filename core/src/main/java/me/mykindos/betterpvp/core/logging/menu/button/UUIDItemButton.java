@@ -33,7 +33,6 @@ public class UUIDItemButton extends LogRepositoryButton {
                 .material(Material.IRON_SWORD)
                 .customModelData(0)
                 .lore(lore)
-                .frameLore(true)
                 .build();
     }
 }

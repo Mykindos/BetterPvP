@@ -155,11 +155,10 @@ public class HallMenus {
     }
 
     void tell(@NotNull Player player, @NotNull Component message) {
-        UtilMessage.message(player, Translations.component("clans.prefix.camp"), message);
+        UtilMessage.plain(player, message);
     }
 
     void tell(@NotNull Player player, @NotNull String key, @NotNull ComponentLike... args) {
-        UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                Translations.component(key, args).color(NamedTextColor.GRAY));
+        UtilMessage.plain(player, Translations.component(key, args).color(NamedTextColor.GRAY));
     }
 }

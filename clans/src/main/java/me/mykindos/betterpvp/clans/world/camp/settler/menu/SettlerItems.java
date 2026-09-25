@@ -25,7 +25,6 @@ public final class SettlerItems {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.NAME_TAG)
                 .displayName(Component.text(settler.getName(), settler.getRarity().getColor()))
-                .frameLore(true)
                 .lore(settler.getRarity().displayName());
         if (settler.getHistory() != null) {
             final ComponentLike[] args = settler.getHistoryArgs().stream()
@@ -44,8 +43,7 @@ public final class SettlerItems {
                 .hideAdditionalTooltip(true)
                 .displayName((profession == null
                         ? Translations.component("clans.settler.card.no_profession")
-                        : Translations.component(profession.getKey())).color(NamedTextColor.YELLOW))
-                .frameLore(true);
+                        : Translations.component(profession.getKey())).color(NamedTextColor.YELLOW));
         if (profession != null && settler.getSpecialty() != null) {
             view.lore(Translations.component(profession.specialtyKey(settler.getSpecialty())).color(NamedTextColor.GRAY));
         }
@@ -62,7 +60,6 @@ public final class SettlerItems {
                 .material(trait.isTradeOff() ? Material.REDSTONE : Material.GLOWSTONE_DUST)
                 .displayName(Translations.component(trait.nameKey())
                         .color(trait.isTradeOff() ? NamedTextColor.GOLD : NamedTextColor.AQUA))
-                .frameLore(true)
                 .lore(Translations.component(trait.descriptionKey()).color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.settler.card.group." + group).color(NamedTextColor.DARK_GRAY))
                 .build();

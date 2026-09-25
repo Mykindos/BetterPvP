@@ -75,7 +75,6 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
                 .material(Material.SPYGLASS)
                 .displayName(Translations.component("clans.camp.menu.structures.title").color(NamedTextColor.YELLOW)
                         .decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.menu.structures.open_description").color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.hall.open"))
                 .build(), click -> structureMenus.openList(click.getPlayer(), camp, this)));
@@ -89,7 +88,6 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
                 .material(structure.getIcon())
                 .displayName(structure.getDisplayName().color(unavailable.isEmpty() ? NamedTextColor.GREEN : NamedTextColor.RED)
                         .decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(structure.getDescription().color(NamedTextColor.GRAY))
                 .lore(Component.empty())
                 .lore(Translations.component("clans.camp.menu.build.tier", Component.text(structure.getTier()))
@@ -115,8 +113,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
                 : Component.text(UtilTime.humanReadableFormat(first.getBuildTime())).color(NamedTextColor.WHITE))
                 .color(NamedTextColor.GRAY));
 
-        view.lore(Component.empty());
-        unavailable.ifPresentOrElse(view::lore,
+        unavailable.ifPresentOrElse(problem -> view.lore(Component.empty()).lore(problem),
                 () -> view.action(ClickActions.ALL, Translations.component("clans.camp.menu.build.action")));
         return view.build();
     }
@@ -124,12 +121,11 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
     private void choose(@NotNull Player player, @NotNull CampStructure structure) {
         final Optional<Component> unavailable = construction.unavailable(player, camp, structure);
         if (unavailable.isPresent()) {
-            UtilMessage.message(player, Translations.component("clans.prefix.camp"), unavailable.get());
+            UtilMessage.plain(player, unavailable.get());
             return;
         }
         player.getInventory().addItem(blueprints.blueprintFor(structure));
-        UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                Translations.component("clans.camp.menu.build.given", structure.getDisplayName()));
+        UtilMessage.plain(player, Translations.component("clans.camp.menu.build.given", structure.getDisplayName()));
         player.closeInventory();
     }
 

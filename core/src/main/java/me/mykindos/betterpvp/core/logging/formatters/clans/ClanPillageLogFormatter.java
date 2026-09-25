@@ -54,7 +54,6 @@ public class ClanPillageLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW)))
                 .material(Material.GOAT_HORN)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

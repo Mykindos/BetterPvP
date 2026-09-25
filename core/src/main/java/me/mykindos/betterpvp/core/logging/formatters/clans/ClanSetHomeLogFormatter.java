@@ -57,7 +57,6 @@ public class ClanSetHomeLogFormatter implements ILogFormatter {
                         Translations.component("core.log.clan-set-home.4").color(NamedTextColor.LIGHT_PURPLE)))
                 .material(Material.RED_BED)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

@@ -57,7 +57,6 @@ public class ClanProgressionButton extends ControlItem<ClanMenu> {
                         .appendSpace().append(Component.text(currentLevel, NamedTextColor.YELLOW)))
                 .lore(Translations.component("clans.menu.clan.button.progression.lore.progress").color(NamedTextColor.GRAY)
                         .appendSpace().append(Component.text(String.format("%,.1f / %,.1f XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
-                .frameLore(true)
                 .action(ClickActions.ALL, Translations.component("clans.menu.clan.button.progression.action"))
                 .build();
     }

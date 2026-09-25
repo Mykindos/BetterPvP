@@ -49,7 +49,6 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                 .material(Material.SPYGLASS)
                 .displayName(Translations.component("clans.camp.upgrade.harbourmaster.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(status(menus, key))
                 .build()));
 
@@ -57,7 +56,6 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                 .material(Material.ENDER_EYE)
                 .displayName(Translations.component("clans.camp.upgrade.harbourmaster.look.name")
                         .color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.harbourmaster.look.description")
                         .color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.harbourmaster.use"))
@@ -73,7 +71,6 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                 .material(Material.COMPASS)
                 .displayName(Translations.component("clans.camp.upgrade.harbourmaster.choose.name")
                         .color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.harbourmaster.choose.description")
                         .color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.hall.open"))
@@ -95,7 +92,6 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                 .material(Material.SPYGLASS)
                 .displayName(Translations.component("clans.camp.upgrade.harbourmaster.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(status(menus, key))
                 .action(ClickActions.ALL, Translations.component("clans.camp.hall.open"))
                 .build(), click -> open.accept(click.getPlayer()));

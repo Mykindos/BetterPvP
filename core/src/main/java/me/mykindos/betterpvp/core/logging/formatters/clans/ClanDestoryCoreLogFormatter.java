@@ -55,7 +55,6 @@ public class ClanDestoryCoreLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.AQUA)))
                 .material(Material.TNT)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

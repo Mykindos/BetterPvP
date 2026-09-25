@@ -24,6 +24,10 @@ public class TraitItems {
 
     public static ItemView of(Trait trait) {
         List<Component> lore = new ArrayList<>();
+        if (trait.getTags() != null) {
+            lore.add(trait.getTags());
+            lore.add(Component.empty());
+        }
         lore.add(Translations.component("champions.menu.trait.innate").color(NamedTextColor.LIGHT_PURPLE));
         lore.add(Component.empty());
         Arrays.stream(trait.getDescription(trait.getTraitLevel()))
@@ -37,11 +41,7 @@ public class TraitItems {
                 .lore(lore)
                 .flag(ItemFlag.HIDE_ATTRIBUTES);
 
-        if (trait.getTags() != null) {
-            builder.prelore(trait.getTags());
-        }
-
-        return builder.hideAdditionalTooltip(true).frameLore(true).build();
+        return builder.hideAdditionalTooltip(true).build();
     }
 
     /**

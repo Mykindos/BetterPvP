@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
 
 /**
  * A camp with a Lookout warns its online members when someone from outside the clan lands there. The same visitor is
@@ -64,12 +65,12 @@ public class LookoutWatch implements Listener {
             return;
         }
 
-        final Component message = Translations.component("clans.camp.lookout.landed",
-                Component.text(visitor.getName(), NamedTextColor.YELLOW)).color(NamedTextColor.RED);
+        final Component message = ChatIcon.PROBLEM.line(Translations.component("clans.camp.lookout.landed",
+                Component.text(visitor.getName(), NamedTextColor.YELLOW)).color(NamedTextColor.RED));
         clanManager.getClanById(clanId.getAsLong()).ifPresent(clan -> clan.getMembers().forEach(member -> {
             final Player online = Bukkit.getPlayer(member.getUuid());
             if (online != null) {
-                UtilMessage.message(online, Translations.component("clans.prefix.camp"), message);
+                UtilMessage.plain(online, message);
             }
         }));
     }

@@ -69,8 +69,7 @@ public class CampLedger implements Listener {
         upgrades.declare(CampConstruction.GREAT_HALL, ID, 1);
         upgrades.page(ID, (player, camp, structure, previous) -> {
             if (!isActive(camp)) {
-                UtilMessage.message(player, Translations.component("clans.prefix.camp"),
-                        Translations.component("clans.camp.upgrade.camp_ledger.inactive").color(NamedTextColor.GRAY));
+                UtilMessage.plain(player, Translations.component("clans.camp.upgrade.camp_ledger.inactive").color(NamedTextColor.GRAY));
                 return;
             }
             new CampLedgerMenu(this, camp, previous).show(player);

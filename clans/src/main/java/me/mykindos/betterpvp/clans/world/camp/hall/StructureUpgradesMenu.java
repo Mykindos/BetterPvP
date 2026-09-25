@@ -83,7 +83,6 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
                 .material(structure.getStage() < stage ? Material.GRAY_DYE : type.getIcon())
                 .hideAdditionalTooltip(true)
                 .displayName(type.stageName(stage).color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(state)
                 .build());
     }
@@ -104,7 +103,6 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
                         .color(chosen ? NamedTextColor.GREEN : greyed ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
                         .decorate(TextDecoration.BOLD))
                 .glow(chosen)
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade." + upgrade.getId() + ".description")
                         .color(NamedTextColor.GRAY));
 

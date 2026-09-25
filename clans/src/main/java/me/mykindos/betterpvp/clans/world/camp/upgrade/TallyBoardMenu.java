@@ -32,7 +32,6 @@ public class TallyBoardMenu extends AbstractGui implements Windowed {
                 .material(Material.OAK_SIGN)
                 .displayName(Translations.component("clans.camp.upgrade.tally_board.name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.upgrade.tally_board.even", Component.text(tally.size()))
                         .color(NamedTextColor.GRAY))
                 .build()));
@@ -55,7 +54,6 @@ public class TallyBoardMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.CHEST)
                 .displayName(chests.name(share.getChest()).color(NamedTextColor.YELLOW))
-                .frameLore(true)
                 .lore(StorehouseChests.position(share.getChest()).color(NamedTextColor.DARK_GRAY));
         for (ResourceKind kind : ResourceKind.values()) {
             view.lore(Translations.component("clans.camp.resource.amount",

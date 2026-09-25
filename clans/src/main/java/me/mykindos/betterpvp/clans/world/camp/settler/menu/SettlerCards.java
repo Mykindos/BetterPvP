@@ -94,6 +94,6 @@ public class SettlerCards {
     }
 
     public void tell(@NotNull Player player, @NotNull Component message) {
-        UtilMessage.message(player, Translations.component("clans.prefix.settler"), message);
+        UtilMessage.plain(player, message);
     }
 }

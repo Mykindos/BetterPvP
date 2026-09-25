@@ -65,13 +65,12 @@ public class CrewMenus {
               @Nullable Windowed previous) {
         final SettlerResult result = crews.join(player, player.getWorld(), structureId, settlerId);
         if (!result.isSuccess() && result.getReason() != null) {
-            UtilMessage.message(player, Translations.component("clans.prefix.settler"), result.getReason());
+            UtilMessage.plain(player, result.getReason());
         }
         openCrew(player, structureId, previous);
     }
 
     private void tell(@NotNull Player player, @NotNull String key) {
-        UtilMessage.message(player, Translations.component("clans.prefix.settler"),
-                Translations.component(key).color(NamedTextColor.GRAY));
+        UtilMessage.plain(player, Translations.component(key).color(NamedTextColor.GRAY));
     }
 }

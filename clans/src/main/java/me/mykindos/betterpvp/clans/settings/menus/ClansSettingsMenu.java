@@ -34,7 +34,6 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .lore(Translations.component("clans.menu.settings.button.sidebar.lore").color(NamedTextColor.GRAY))
                     .lore(Translations.component("clans.menu.settings.button.sidebar.mode",
                             Component.text(mode.name(), color)).color(NamedTextColor.GRAY))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -51,7 +50,6 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .material(Material.MAP)
                     .displayName(Translations.component("clans.menu.settings.button.map-poi.name").color(color))
                     .lore(Translations.component("clans.menu.settings.button.map-poi.lore").color(NamedTextColor.GRAY))
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -67,7 +65,6 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .displayName(Translations.component("clans.menu.settings.button.map-player-names.name").color(color))
                     .lore(Translations.component("clans.menu.settings.button.map-player-names.lore").color(NamedTextColor.GRAY))
                     .hideAdditionalTooltip(true)
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -83,7 +80,6 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .displayName(Translations.component("clans.menu.settings.button.territory-popups.name").color(color))
                     .lore(Translations.component("clans.menu.settings.button.territory-popups.lore").color(NamedTextColor.GRAY))
                     .hideAdditionalTooltip(true)
-                    .frameLore(true)
                     .build()
                     .get();
         }).build();
@@ -105,7 +101,6 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                         .displayName(Translations.component("clans.menu.settings.tab.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                         .lore(Translations.component("clans.menu.settings.tab.lore").color(NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
-                        .frameLore(true)
                         .build())
                 .build();
     }

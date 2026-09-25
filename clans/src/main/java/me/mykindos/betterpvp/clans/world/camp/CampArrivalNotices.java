@@ -14,10 +14,8 @@ import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.object.ObjectContents;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -34,6 +32,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
 
 /**
  * Tells a member arriving at their camp what is waiting for them. Warnings come first, marked with an exclamation mark
@@ -128,22 +128,17 @@ public class CampArrivalNotices implements Listener {
         if (warnings.isEmpty() && notices.isEmpty()) {
             return;
         }
-        warnings.forEach(player::sendMessage);
-        notices.forEach(player::sendMessage);
+        final List<Component> lines = new ArrayList<>(warnings);
+        lines.addAll(notices);
+        UtilMessage.spaced(player, lines.toArray(Component[]::new));
         player.playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1f, 0.8f);
     }
 
     private @NotNull Component warning(@NotNull Component line) {
-        return iconLine("exclamation_mark_icon", line.color(NamedTextColor.RED));
+        return ChatIcon.PROBLEM.line(line.color(NamedTextColor.RED).decorate(TextDecoration.BOLD));
     }
 
     private @NotNull Component notice(@NotNull Component line) {
-        return iconLine("bell_icon", line.color(NamedTextColor.YELLOW));
-    }
-
-    private @NotNull Component iconLine(@NotNull String icon, @NotNull Component line) {
-        final Component sprite = Component.object(ObjectContents.sprite(Key.key("blocks"),
-                Key.key("betterpvp", "menu/icon/regular/" + icon)));
-        return Component.join(JoinConfiguration.spaces(), sprite, line.decorate(TextDecoration.BOLD));
+        return ChatIcon.NEWS.line(line.color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
     }
 }

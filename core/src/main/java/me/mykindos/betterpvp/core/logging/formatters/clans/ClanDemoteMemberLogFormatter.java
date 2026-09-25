@@ -61,7 +61,6 @@ public class ClanDemoteMemberLogFormatter implements ILogFormatter {
                         Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW)))
                 .material(Material.RED_CANDLE)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

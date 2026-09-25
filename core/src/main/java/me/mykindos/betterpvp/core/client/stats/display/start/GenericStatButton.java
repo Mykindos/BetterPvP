@@ -39,7 +39,6 @@ public class GenericStatButton extends ControlItem<IAbstractStatMenu> {
                 .material(Material.ANVIL)
                 .displayName(Translations.component("core.menu.stats.button.generic.name"))
                 .lore(getGenericStatsDescription())
-                .frameLore(true)
                 .action(ClickActions.ALL, Translations.component("core.menu.stats.button.generic.action"))
                 .build();
     }

@@ -72,7 +72,6 @@ public class PlayerLogoutLogFormatter implements ILogFormatter {
                 .displayName(Component.text("Log out", NamedTextColor.RED))
                 .material(Material.RED_BED)
                 .lore(lore)
-                .frameLore(false)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

@@ -56,7 +56,6 @@ public class GreatHallMenu extends AbstractGui implements Windowed {
                 .hideAdditionalTooltip(true)
                 .displayName(Translations.component("clans.camp.hall." + id + ".name")
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.camp.hall." + id + ".description").color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.hall.open"))
                 .build(), click -> open.accept(click.getPlayer()));

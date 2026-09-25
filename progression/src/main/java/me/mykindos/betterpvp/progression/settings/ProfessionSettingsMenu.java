@@ -40,7 +40,6 @@ public class ProfessionSettingsMenu extends AbstractGui implements SettingCatego
                         .lore(Translations.component("progression.menu.settings.button.lore").color(NamedTextColor.GRAY))
                         .flag(ItemFlag.HIDE_ATTRIBUTES)
                         .hideAdditionalTooltip(true)
-                        .frameLore(true)
                         .build())
                 .build();
     }

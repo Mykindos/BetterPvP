@@ -330,8 +330,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(icon)
                 .displayName(name.color(blocked == null ? NamedTextColor.GREEN : NamedTextColor.GRAY)
-                        .decorate(TextDecoration.BOLD))
-                .frameLore(true);
+                        .decorate(TextDecoration.BOLD));
         details.forEach(line -> view.lore(line.colorIfAbsent(NamedTextColor.GRAY)));
         if (blocked != null) {
             view.lore(Component.empty());

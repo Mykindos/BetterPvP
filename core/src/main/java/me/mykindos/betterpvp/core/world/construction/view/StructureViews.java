@@ -205,7 +205,7 @@ public class StructureViews implements Listener {
     void claim(@NotNull Player player, @NotNull World world, @NotNull UUID structure) {
         final ConstructionResult result = service.claim(player, world, structure);
         if (!result.isSuccess() && result.getReason() != null) {
-            UtilMessage.message(player, Translations.component("core.prefix.construction"), result.getReason());
+            UtilMessage.plain(player, result.getReason());
         }
     }
 

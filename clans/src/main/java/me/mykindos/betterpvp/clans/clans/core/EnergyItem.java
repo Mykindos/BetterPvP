@@ -64,7 +64,6 @@ public enum EnergyItem {
         final ItemStack item = ItemView.builder()
                 .material(material)
                 .displayName(Component.text(this.name, TextColor.color(227, 156, 255)))
-                .frameLore(true)
                 .lore(Component.text("Deposit this item into your clan core", NamedTextColor.GRAY))
                 .lore(Component.text("to gain energy.", NamedTextColor.GRAY))
                 .lore(Component.empty())

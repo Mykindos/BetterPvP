@@ -79,7 +79,6 @@ public class QualifiedStatListButton extends ControlItem<IAbstractStatMenu> {
                         Component.text(pageNum + 1)))
                 .material(Material.PAPER)
                 .lore(description)
-                .frameLore(true)
                 .build();
     }
 

@@ -40,7 +40,6 @@ public class ChampionsStatButton extends ControlItem<IAbstractStatMenu> {
                 .material(Material.IRON_SWORD)
                 .displayName(Translations.component("core.menu.stats.button.champions.name"))
                 .lore(getChampionsStatsDescription("", "", ""))
-                .frameLore(true)
                 .action(ClickActions.ALL, Translations.component("core.menu.stats.button.show-detailed.action"))
                 .build();
     }

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ChatHint;
+import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
@@ -67,10 +68,10 @@ public class CrewNotices implements Listener {
         final Component name = catalogue.find(structure.getType())
                 .map(StructureType::getDisplayName)
                 .orElseGet(() -> Component.text(structure.getType()));
-        final Component message = ChatHint.INFO.attach(
+        final Component message = ChatIcon.PROBLEM.line(ChatHint.INFO.attach(
                 Translations.component("clans.settler.crew.needed", name.color(NamedTextColor.YELLOW),
                         Component.text(rule.threshold(structure, job), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY),
-                Translations.component("clans.settler.crew.needed_hint").color(NamedTextColor.GRAY));
+                Translations.component("clans.settler.crew.needed_hint").color(NamedTextColor.GRAY)));
 
         for (SiteInstance instance : instances.forKey(site)) {
             final World world = Bukkit.getWorld(instance.getWorldName());
@@ -79,7 +80,7 @@ public class CrewNotices implements Listener {
             }
             for (Player player : world.getPlayers()) {
                 if (camps.isMember(player, world)) {
-                    UtilMessage.message(player, Translations.component("clans.prefix.settler"), message);
+                    UtilMessage.plain(player, message);
                 }
             }
         }

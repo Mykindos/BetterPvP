@@ -230,7 +230,6 @@ public class ClanEnergyListener extends ClanListener {
                 final ItemStack item = ItemView.builder()
                         .material(Material.AMETHYST_SHARD)
                         .displayName(Component.text("Energy Shard", TextColor.color(227, 156, 255)))
-                        .frameLore(true)
                         .lore(Component.text("Deposit this item into your clan core", NamedTextColor.GRAY))
                         .lore(Component.text("to gain energy.", NamedTextColor.GRAY))
                         .lore(Component.empty())

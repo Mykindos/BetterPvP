@@ -25,7 +25,6 @@ public class ClanMailboxButton extends FlashingButton<CoreMenu> {
     private static final ItemView MAILBOX_ITEM = ItemView.builder()
             .material(Material.CHEST)
             .displayName(Translations.component("clans.menu.core.button.mailbox.name").color(TextColor.color(84, 115, 255)).decorate(TextDecoration.BOLD))
-            .frameLore(true)
             .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.1").color(NamedTextColor.GRAY))
             .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.2").color(NamedTextColor.GRAY))
             .build();
@@ -46,7 +45,6 @@ public class ClanMailboxButton extends FlashingButton<CoreMenu> {
         return ItemView.builder()
                 .material(Material.SMOKER)
                 .displayName(Translations.component("clans.menu.core.button.mailbox.name").color(TextColor.color(84, 115, 255)).decorate(TextDecoration.BOLD))
-                .frameLore(true)
                 .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.1").color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.menu.core.button.mailbox.lore.description.2").color(NamedTextColor.GRAY))
                 .glow(this.isFlash())

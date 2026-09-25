@@ -220,7 +220,7 @@ public class SurveyorsTable implements Listener {
     }
 
     private static void tell(@NotNull Player player, @NotNull Component message) {
-        UtilMessage.message(player, Translations.component("clans.prefix.camp"), message);
+        UtilMessage.plain(player, message);
     }
 
     /** A ghost one player is shown, and when it goes away. */

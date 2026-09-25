@@ -33,7 +33,6 @@ public class ViewClanButton extends SimpleItem {
                         Component.text(String.format("%,d", clan.getOnlineMemberCount()), NamedTextColor.WHITE),
                         Component.text(String.format("%,d", clan.getMembers().size()), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY))
-                .frameLore(true)
                 .action(ClickActions.ALL, Translations.component("clans.menu.clan.button.view-clan.action"))
                 .build());
         this.viewerClan = viewerClan;

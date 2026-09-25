@@ -46,7 +46,6 @@ public class JobBoardMenu extends AbstractGui implements Windowed {
             final JobBoard.Entry entry = entries.get(slot);
             final CampStructure type = type(board, entry.getStructure()).orElseThrow();
             setItem(slot, new SimpleItem(entry(board, camp, type, entry)
-                    .lore(Component.empty())
                     .action(ClickActions.ALL, Translations.component("clans.camp.menu.structures.manage"))
                     .build(), click -> board.getStructureMenus().openActions(click.getPlayer(), camp,
                     entry.getStructure().getId(), new JobBoardMenu(board, camp, previous))));
@@ -63,7 +62,6 @@ public class JobBoardMenu extends AbstractGui implements Windowed {
                 .material(type.getIcon())
                 .displayName(type.getDisplayName().color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .glow(entry.getState() == JobBoard.State.READY)
-                .frameLore(true)
                 .lore(type.stageName(structure.getStage()).color(NamedTextColor.GRAY))
                 .lore(kind(type, job).color(NamedTextColor.WHITE))
                 .lore(state(board, camp, entry));

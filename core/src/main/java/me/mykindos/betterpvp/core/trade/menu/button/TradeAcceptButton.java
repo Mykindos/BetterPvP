@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.trade.TradeState;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
@@ -39,7 +38,6 @@ public class TradeAcceptButton extends AbstractItem {
                     .material(Material.RED_CONCRETE)
                     .itemModel(Key.key("betterpvp", "menu/icon/shadowed/exclamation_mark_icon"))
                     .displayName(Translations.component("core.trade.button.accept.settling").color(NamedTextColor.RED).decorate(TextDecoration.BOLD))
-                    .lore(Component.empty())
                     .action(ClickActions.LEFT, Translations.component("core.trade.button.accept.back-out"))
                     .build();
         }
@@ -49,7 +47,6 @@ public class TradeAcceptButton extends AbstractItem {
                     .material(Material.YELLOW_CONCRETE)
                     .itemModel(Key.key("betterpvp", "menu/icon/shadowed/question_mark_icon"))
                     .displayName(Translations.component("core.trade.button.accept.waiting").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
-                    .lore(Component.empty())
                     .action(ClickActions.LEFT, Translations.component("core.trade.button.accept.withdraw"))
                     .build();
         }
@@ -58,7 +55,6 @@ public class TradeAcceptButton extends AbstractItem {
                 .material(Material.LIME_CONCRETE)
                 .itemModel(Key.key("betterpvp", "menu/icon/shadowed/check_icon"))
                 .displayName(Translations.component("core.trade.button.accept.name").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
-                .lore(Component.empty())
                 .action(ClickActions.LEFT, Translations.component("core.trade.button.accept.confirm"))
                 .build();
     }

@@ -34,7 +34,6 @@ public class CTFTeamMapInfoStatButton extends CTFStatButton {
                 .material(teamName.equals("Blue") ? Material.BLUE_CARPET : Material.RED_CARPET)
                 .displayName(Component.text(mapName + " Stats"))
                 .lore(getCTFStatsDescription(teamName, mapName))
-                .frameLore(true)
                 .build();
     }
 
