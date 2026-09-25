@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Optional;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * Workshop upgrade: once a day a member can pay coins from their own balance to finish a camp job at once. The price
@@ -118,7 +119,7 @@ public class RushOrder {
         final long price = price(job, now);
         if (gamer(player).getBalance() < price) {
             return Optional.of(Translations.component("clans.camp.upgrade.rush_order.cannot_afford",
-                    Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD)));
+                    CoinsTag.of(Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.YELLOW))));
         }
         return Optional.empty();
     }

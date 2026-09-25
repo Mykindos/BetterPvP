@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.settler.SettlerDeparture;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -101,9 +100,9 @@ public class CampArrivalNotices implements Listener {
                         .orElseGet(() -> Component.text(structure.getType()))
                         .color(NamedTextColor.WHITE);
                 switch (structure.status(now)) {
-                    case NEEDS_REPAIR -> warnings.add(warning(Translations.component("clans.camp.notice.needs_repair", name)));
-                    case DISABLED -> warnings.add(warning(Translations.component("clans.camp.notice.disabled", name)));
-                    case PAUSED -> warnings.add(warning(Translations.component("clans.camp.notice.needs_crew", name)));
+                    case NEEDS_REPAIR -> warnings.add(warning(Translations.component("clans.camp.notice.needs_repair", name.color(NamedTextColor.YELLOW))));
+                    case DISABLED -> warnings.add(warning(Translations.component("clans.camp.notice.disabled", name.color(NamedTextColor.YELLOW))));
+                    case PAUSED -> warnings.add(warning(Translations.component("clans.camp.notice.needs_crew", name.color(NamedTextColor.YELLOW))));
                     case READY_TO_CLAIM -> notices.add(notice(Translations.component("clans.camp.notice.ready", name)));
                     default -> {
                     }
@@ -113,7 +112,7 @@ public class CampArrivalNotices implements Listener {
                 final int striking = roster.inState(SettlerState.STRIKING).size();
                 if (striking > 0) {
                     warnings.add(warning(Translations.component("clans.camp.notice.striking",
-                            Component.text(striking))));
+                            Component.text(striking, NamedTextColor.YELLOW))));
                 }
                 for (SettlerDeparture departure : roster.getDepartures()) {
                     if (now - departure.getAt() <= DAY_MILLIS) {

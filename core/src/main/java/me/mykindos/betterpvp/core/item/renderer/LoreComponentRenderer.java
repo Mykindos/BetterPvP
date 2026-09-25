@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
 import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
 import me.mykindos.betterpvp.core.item.component.impl.purity.PurityComponent;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -92,7 +93,8 @@ public class LoreComponentRenderer implements ItemLoreRenderer {
 
         // Rarity ONLY if NEXO is available
         if (Compatibility.TEXTURE_PROVIDER) {
-            components.add(Component.text(item.getRarity().getGlyph(), NamedTextColor.WHITE).font(NEXO).decoration(TextDecoration.ITALIC, false));
+            components.add(Component.text(item.getRarity().getGlyph(), NamedTextColor.WHITE)
+                    .font(Key.key("betterpvp", "tags")).decoration(TextDecoration.ITALIC, false));
         }
 
         return components;

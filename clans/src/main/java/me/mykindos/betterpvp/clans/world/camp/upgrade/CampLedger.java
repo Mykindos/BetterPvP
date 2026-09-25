@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.LongSupplier;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * Great Hall upgrade: the camp ledger, a page listing who deposited resources, claimed jobs, hired settlers and paid
@@ -69,7 +70,7 @@ public class CampLedger implements Listener {
         upgrades.declare(CampConstruction.GREAT_HALL, ID, 1);
         upgrades.page(ID, (player, camp, structure, previous) -> {
             if (!isActive(camp)) {
-                UtilMessage.plain(player, Translations.component("clans.camp.upgrade.camp_ledger.inactive").color(NamedTextColor.GRAY));
+                UtilMessage.plain(player, Translations.component("clans.camp.upgrade.camp_ledger.inactive").color(NamedTextColor.RED));
                 return;
             }
             new CampLedgerMenu(this, camp, previous).show(player);
@@ -190,7 +191,7 @@ public class CampLedger implements Listener {
     }
 
     private static @NotNull Component coins(@NotNull String amount) {
-        return Component.text(UtilFormat.formatNumber(parse(amount)), NamedTextColor.GOLD);
+        return CoinsTag.of(Component.text(UtilFormat.formatNumber(parse(amount)), NamedTextColor.GOLD));
     }
 
     private static @NotNull String arg(@NotNull List<String> args, int index) {

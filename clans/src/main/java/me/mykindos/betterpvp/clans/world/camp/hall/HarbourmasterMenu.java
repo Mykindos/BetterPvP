@@ -26,7 +26,10 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerTags;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * The Dock's Harbourmaster, reached from the hiring board: when the next boat is due, and once per cooldown either a
@@ -62,7 +65,7 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                 .build(), click -> {
                     final String problem = harbourmaster.look(click.getPlayer(), key);
                     if (problem != null) {
-                        menus.tell(click.getPlayer(), problem);
+                        menus.refuse(click.getPlayer(), problem);
                     }
                     reopen(click.getPlayer());
                 }));
@@ -114,7 +117,7 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
         final String chosen = harbourmaster.chosen(key);
         if (chosen != null) {
             lines.add(Translations.component("clans.camp.upgrade.harbourmaster.chosen",
-                    profession(menus, chosen).color(NamedTextColor.WHITE)).color(NamedTextColor.AQUA));
+                    professionTag(menus, chosen)).color(NamedTextColor.AQUA));
         }
         return lines;
     }
@@ -128,11 +131,11 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
         final long price = menus.getRecruitment().price(key, candidate);
         return SettlerItems.identity(settler)
                 .material(Material.PLAYER_HEAD)
-                .lore(profession(menus, settler.getProfession()).color(NamedTextColor.YELLOW))
+                .lore(professionTag(menus, settler.getProfession()))
                 .lore(price <= 0
                         ? Translations.component("clans.settler.recruit.free").color(NamedTextColor.GREEN)
                         : Translations.component("clans.settler.recruit.price",
-                        Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD))
+                        CoinsTag.of(Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD)))
                         .color(NamedTextColor.GRAY))
                 .build();
     }
@@ -143,6 +146,12 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                 : menus.getProfessions().find(id)
                 .map(found -> Translations.component(found.getKey()))
                 .orElse(Component.text(id));
+    }
+
+    /** The profession's tag for lore, or its name where it has none. */
+    private static @NotNull Component professionTag(@NotNull HallMenus menus, @Nullable String id) {
+        return (id == null ? Optional.<Component>empty() : SettlerTags.role(id))
+                .orElseGet(() -> profession(menus, id).color(NamedTextColor.YELLOW));
     }
 
     private void reopen(@NotNull Player player) {
@@ -171,10 +180,10 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
                         .build(), click -> {
                             final String problem = menus.getHarbourmaster().choose(click.getPlayer(), key, choice);
                             if (problem != null) {
-                                menus.tell(click.getPlayer(), problem);
+                                menus.refuse(click.getPlayer(), problem);
                             } else {
-                                menus.tell(click.getPlayer(), "clans.camp.upgrade.harbourmaster.picked",
-                                        profession(menus, choice).color(NamedTextColor.YELLOW));
+                                menus.confirm(click.getPlayer(), "clans.camp.upgrade.harbourmaster.picked",
+                                        profession(menus, choice).color(NamedTextColor.WHITE));
                             }
                             reopen(click.getPlayer());
                         }));

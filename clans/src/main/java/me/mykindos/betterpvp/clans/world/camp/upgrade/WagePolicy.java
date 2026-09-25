@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import me.mykindos.betterpvp.core.utilities.model.ChatIcon;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * Great Hall upgrade: members who chip in pay what the wage fund cannot, so settlers only strike once they cannot
@@ -149,8 +150,8 @@ public class WagePolicy {
             gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - (int) (long) share);
             camp.getWageContributions().merge(member, share, Long::sum);
             UtilMessage.plain(player, ChatIcon.NEWS.line(Translations.component("clans.camp.upgrade.wage_policy.paid",
-                    Component.text(UtilFormat.formatNumber((int) (long) share), NamedTextColor.GOLD))
-                    .color(NamedTextColor.GRAY)));
+                    CoinsTag.of(Component.text(UtilFormat.formatNumber((int) (long) share), NamedTextColor.WHITE)))
+                    .color(NamedTextColor.YELLOW)));
         });
         store.changed(key.getOwnerId());
     }

@@ -125,7 +125,8 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
             return;
         }
         player.getInventory().addItem(blueprints.blueprintFor(structure));
-        UtilMessage.plain(player, Translations.component("clans.camp.menu.build.given", structure.getDisplayName()));
+        UtilMessage.plain(player, Translations.component("clans.camp.menu.build.given",
+                structure.getDisplayName().color(NamedTextColor.WHITE)).color(NamedTextColor.GREEN));
         player.closeInventory();
     }
 

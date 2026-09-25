@@ -163,10 +163,12 @@ public class SortingTable implements Listener {
         }
         touched.forEach(chest -> chests.save(world, usable.get(chest)));
 
-        tell(player, Translations.component("clans.camp.upgrade.sorting_table.done", Component.text(moved),
-                Component.text(touched.size())).color(NamedTextColor.GREEN));
+        tell(player, Translations.component("clans.camp.upgrade.sorting_table.done",
+                Component.text(moved, NamedTextColor.WHITE), Component.text(touched.size(), NamedTextColor.WHITE))
+                .color(NamedTextColor.GREEN));
         if (left > 0) {
-            tell(player, Translations.component("clans.camp.upgrade.sorting_table.left", Component.text(left))
+            tell(player, Translations.component("clans.camp.upgrade.sorting_table.left",
+                    Component.text(left, NamedTextColor.WHITE))
                     .color(NamedTextColor.YELLOW));
         }
     }

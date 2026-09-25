@@ -65,7 +65,7 @@ public class SettlerCards {
                               @Nullable Supplier<Windowed> previous) {
         recruitment.find(site, candidateId).ifPresentOrElse(
                 candidate -> new CandidateMenu(this, player, site, candidate, previous).show(player),
-                () -> tell(player, Translations.component("clans.settler.recruit.gone").color(NamedTextColor.GRAY)));
+                () -> tell(player, Translations.component("clans.settler.recruit.gone").color(NamedTextColor.RED)));
     }
 
     /** Shows {@code player} the card of settler {@code settlerId}, if it still lives at {@code site}. */

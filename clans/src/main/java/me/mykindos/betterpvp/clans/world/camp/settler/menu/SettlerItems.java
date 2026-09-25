@@ -20,12 +20,12 @@ public final class SettlerItems {
     private SettlerItems() {
     }
 
-    /** Name in its rarity's colour, its rarity, and where it came from. */
+    /** Name in its rarity's colour, its rarity tag, and where it came from. */
     public static @NotNull ItemView.ItemViewBuilder identity(@NotNull Settler settler) {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.NAME_TAG)
                 .displayName(Component.text(settler.getName(), settler.getRarity().getColor()))
-                .lore(settler.getRarity().displayName());
+                .lore(SettlerTags.rarity(settler.getRarity()));
         if (settler.getHistory() != null) {
             final ComponentLike[] args = settler.getHistoryArgs().stream()
                     .map(Component::text)
@@ -45,7 +45,8 @@ public final class SettlerItems {
                         ? Translations.component("clans.settler.card.no_profession")
                         : Translations.component(profession.getKey())).color(NamedTextColor.YELLOW));
         if (profession != null && settler.getSpecialty() != null) {
-            view.lore(Translations.component(profession.specialtyKey(settler.getSpecialty())).color(NamedTextColor.GRAY));
+            view.lore(SettlerTags.role(settler.getSpecialty()).orElseGet(() ->
+                    Translations.component(profession.specialtyKey(settler.getSpecialty())).color(NamedTextColor.GRAY)));
         }
         if (profession == null) {
             view.lore(Translations.component("clans.settler.card.wanders").color(NamedTextColor.GRAY));

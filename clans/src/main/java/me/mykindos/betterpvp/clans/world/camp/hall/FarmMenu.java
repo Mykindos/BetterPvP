@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerTags;
 
 /**
  * The camp's farm: how much faster its crops grow and how often harvests drop more, the Farmers working it, and the
@@ -93,7 +94,7 @@ public class FarmMenu extends AbstractGui implements Windowed {
         return ItemView.builder()
                 .material(Material.PLAYER_HEAD)
                 .displayName(Component.text(farmer.getName(), farmer.getRarity().getColor()))
-                .lore(farmer.getRarity().displayName())
+                .lore(SettlerTags.rarity(farmer.getRarity()))
                 .lore(Translations.component("clans.settler.card.morale", Component.text(farmer.getMorale(), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY));
     }

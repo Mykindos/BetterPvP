@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * What can be done to one placed structure in its current state, each with what it costs and how long it takes. An
@@ -217,7 +218,8 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                     menus.tell(player, result.getReason());
                 }
             } else {
-                menus.tell(player, Translations.component(done, type.getDisplayName()).color(NamedTextColor.GRAY));
+                menus.tell(player, Translations.component(done, type.getDisplayName().color(NamedTextColor.WHITE))
+                        .color(NamedTextColor.GREEN));
             }
             reopen(player);
         });
@@ -249,7 +251,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
             final Player player = click.getPlayer();
             if (queue.queue(player, camp, structure, action)) {
                 menus.tell(player, Translations.component("clans.camp.upgrade.build_queue.queued",
-                        queue.describe(preview)).color(NamedTextColor.GRAY));
+                        queue.describe(preview).color(NamedTextColor.WHITE)).color(NamedTextColor.GREEN));
             }
             reopen(player);
         });
@@ -264,7 +266,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = view(Material.CLOCK,
                 Translations.component("clans.camp.upgrade.rush_order.button"),
                 List.of(Translations.component("clans.camp.upgrade.rush_order.price",
-                                Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD)),
+                                CoinsTag.of(Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD))),
                         Translations.component("clans.camp.upgrade.rush_order.button.description")), blocked);
         if (blocked == null) {
             view.action(ClickActions.ALL, Translations.component("clans.camp.menu.structures.act"));
@@ -281,7 +283,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                 }
             } else {
                 menus.tell(player, Translations.component("clans.camp.upgrade.rush_order.done",
-                        type.getDisplayName()).color(NamedTextColor.GRAY));
+                        type.getDisplayName().color(NamedTextColor.WHITE)).color(NamedTextColor.GREEN));
             }
             reopen(player);
         });
@@ -304,7 +306,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
             final Player player = click.getPlayer();
             player.getInventory().addItem(menus.getBlueprints().blueprintToMove(type, id));
             menus.tell(player, Translations.component("clans.camp.menu.structures.action.move.given",
-                    type.getDisplayName()).color(NamedTextColor.GRAY));
+                    type.getDisplayName().color(NamedTextColor.WHITE)).color(NamedTextColor.GREEN));
             player.closeInventory();
         });
     }

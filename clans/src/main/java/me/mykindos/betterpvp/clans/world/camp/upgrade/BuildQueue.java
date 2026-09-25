@@ -168,11 +168,12 @@ public class BuildQueue implements Listener {
 
         if (result.isSuccess()) {
             tellOnline(key, ChatIcon.NEWS.line(Translations.component("clans.camp.upgrade.build_queue.started",
-                    describe(queued)).color(NamedTextColor.GREEN)), null);
+                    describe(queued).color(NamedTextColor.WHITE)).color(NamedTextColor.YELLOW)), null);
             return;
         }
         queued.setDroppedAt(construction.now());
-        Component message = Translations.component("clans.camp.upgrade.build_queue.dropped", describe(queued))
+        Component message = Translations.component("clans.camp.upgrade.build_queue.dropped",
+                        describe(queued).color(NamedTextColor.YELLOW))
                 .color(NamedTextColor.RED);
         if (result.getReason() != null) {
             message = message.appendNewline()
@@ -223,7 +224,8 @@ public class BuildQueue implements Listener {
                 dropped.getTold().add(player.getUniqueId());
                 store.changed(clan.getAsLong());
                 UtilMessage.plain(player, ChatIcon.PROBLEM.line(
-                        Translations.component("clans.camp.upgrade.build_queue.dropped_notice", describe(dropped))
+                        Translations.component("clans.camp.upgrade.build_queue.dropped_notice",
+                                describe(dropped).color(NamedTextColor.YELLOW))
                                 .color(NamedTextColor.RED)));
             });
         }, 40L);

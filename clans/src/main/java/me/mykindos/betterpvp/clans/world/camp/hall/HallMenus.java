@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
@@ -117,7 +118,7 @@ public class HallMenus {
                 .flatMap(clan -> clan.getMemberByUUID(player.getUniqueId()))
                 .isPresent();
         if (!member) {
-            tell(player, "clans.camp.hall.members_only");
+            refuse(player, "clans.camp.hall.members_only");
             return;
         }
         new GreatHallMenu(this, player, key).show(player);
@@ -137,28 +138,34 @@ public class HallMenus {
     /** Moves {@code amount} of the player's coins into the wage fund, then settles wages so strikers can return. */
     void pay(@NotNull Player player, @NotNull SiteKey key, long amount) {
         if (!mayPay(player, key)) {
-            tell(player, "clans.settler.card.not_allowed");
+            refuse(player, "clans.settler.card.not_allowed");
             return;
         }
         final Gamer gamer = clientManager.search().online(player).getGamer();
         if (gamer.getBalance() < amount) {
-            tell(player, "clans.camp.hall.wages.cannot_afford", Component.text(UtilFormat.formatNumber((int) amount),
-                    NamedTextColor.GOLD));
+            refuse(player, "clans.camp.hall.wages.cannot_afford", CoinsTag.of(Component.text(
+                    UtilFormat.formatNumber((int) amount), NamedTextColor.YELLOW)));
             return;
         }
         gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - (int) amount);
         wageFund.deposit(key, amount);
         payroll.settle(key);
         UtilServer.callEvent(new WageFundPaidEvent(key, player, amount));
-        tell(player, "clans.camp.hall.wages.paid", Component.text(UtilFormat.formatNumber((int) amount),
-                NamedTextColor.GOLD));
+        confirm(player, "clans.camp.hall.wages.paid", CoinsTag.of(Component.text(
+                UtilFormat.formatNumber((int) amount), NamedTextColor.WHITE)));
     }
 
     void tell(@NotNull Player player, @NotNull Component message) {
         UtilMessage.plain(player, message);
     }
 
-    void tell(@NotNull Player player, @NotNull String key, @NotNull ComponentLike... args) {
-        UtilMessage.plain(player, Translations.component(key, args).color(NamedTextColor.GRAY));
+    /** Tells the player why something was refused, in red. */
+    void refuse(@NotNull Player player, @NotNull String key, @NotNull ComponentLike... args) {
+        UtilMessage.plain(player, Translations.component(key, args).color(NamedTextColor.RED));
+    }
+
+    /** Tells the player what they just did, in green. */
+    void confirm(@NotNull Player player, @NotNull String key, @NotNull ComponentLike... args) {
+        UtilMessage.plain(player, Translations.component(key, args).color(NamedTextColor.GREEN));
     }
 }

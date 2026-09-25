@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * One settler: who it is, where it came from, what it does and how it feels, with buttons to put it to work or send
@@ -80,7 +81,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         final double wage = cards.getPayroll().hourly(site, settler);
         if (wage > 0) {
             view.lore(Translations.component("clans.settler.card.wage",
-                    Component.text(UtilFormat.formatNumber((int) Math.ceil(wage)), NamedTextColor.GOLD))
+                    CoinsTag.of(Component.text(UtilFormat.formatNumber((int) Math.ceil(wage)), NamedTextColor.GOLD)))
                     .color(NamedTextColor.GRAY));
         }
         return new SimpleItem(view.build());
@@ -91,8 +92,8 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         final NamedTextColor color = morale > 0 ? NamedTextColor.GREEN : morale < 0 ? NamedTextColor.RED : NamedTextColor.GRAY;
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.CAKE)
-                .displayName(Translations.component("clans.settler.card.morale_title").color(NamedTextColor.YELLOW))
-                .lore(Component.text(morale, color));
+                .displayName(Translations.component("clans.settler.card.morale",
+                        Component.text(morale, color)).color(NamedTextColor.YELLOW));
         if (settler.getUnhappySince() > 0) {
             view.lore(Translations.component("clans.settler.card.unhappy",
                     Component.text(cards.getMorale().leaveBelow(), NamedTextColor.WHITE),
@@ -183,7 +184,7 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
             if (cards.getService().dismiss(site, settler.getId()).isSuccess()) {
                 player.closeInventory();
                 cards.tell(player, Translations.component("clans.settler.card.dismissed",
-                        Component.text(settler.getName(), settler.getRarity().getColor())).color(NamedTextColor.GRAY));
+                        Component.text(settler.getName(), settler.getRarity().getColor())).color(NamedTextColor.GREEN));
             }
         }));
     }

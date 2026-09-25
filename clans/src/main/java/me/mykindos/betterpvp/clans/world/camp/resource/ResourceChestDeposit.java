@@ -119,16 +119,17 @@ public class ResourceChestDeposit implements Listener {
         final int held = resources.total(camp);
         final int adding = amounts.values().stream().mapToInt(Integer::intValue).sum();
         if (held + adding > capacity) {
-            message(player, Translations.component("clans.camp.deposit.full", Component.text(held),
-                    Component.text(capacity)).color(NamedTextColor.RED));
+            message(player, Translations.component("clans.camp.deposit.full", Component.text(held, NamedTextColor.YELLOW),
+                    Component.text(capacity, NamedTextColor.YELLOW)).color(NamedTextColor.RED));
             return;
         }
 
         taken.forEach(slot -> inventory.setItem(slot, null));
         resources.add(clanId, camp, amounts);
         UtilServer.callEvent(new ResourcesDepositedEvent(Camps.keyFor(clanId), player, amounts));
-        message(player, Translations.component("clans.camp.deposit.done", describe(amounts),
-                Component.text(held + adding), Component.text(capacity)).color(NamedTextColor.GREEN));
+        message(player, Translations.component("clans.camp.deposit.done", describe(amounts).color(NamedTextColor.WHITE),
+                Component.text(held + adding, NamedTextColor.WHITE), Component.text(capacity, NamedTextColor.WHITE))
+                .color(NamedTextColor.GREEN));
     }
 
     /** The key a deposit value is listed under: a custom item's own key, or {@code minecraft:<material>}. */

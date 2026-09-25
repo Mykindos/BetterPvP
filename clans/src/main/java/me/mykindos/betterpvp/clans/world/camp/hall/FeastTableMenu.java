@@ -73,10 +73,10 @@ public class FeastTableMenu extends AbstractGui implements Windowed {
                     final Player player = click.getPlayer();
                     final String problem = feast.lay(player, key);
                     if (problem != null) {
-                        menus.tell(player, problem);
+                        menus.refuse(player, problem);
                     } else {
-                        menus.tell(player, "clans.camp.upgrade.feast_table.laid",
-                                Component.text("+" + feast.bonus(), NamedTextColor.GREEN),
+                        menus.confirm(player, "clans.camp.upgrade.feast_table.laid",
+                                Component.text("+" + feast.bonus(), NamedTextColor.WHITE),
                                 time(feast.length().toMillis()));
                     }
                     new FeastTableMenu(menus, feast, player, key, previous).show(player);

@@ -48,6 +48,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.LongSupplier;
 import java.util.stream.Stream;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /**
  * How settlers come to a camp. Boats bring candidates to the Dock while it works, and they wait there a while. The
@@ -221,7 +223,8 @@ public class CampRecruitment implements Listener {
         }
         final long price = price(key, candidate);
         if (!coins.take(player, price)) {
-            return SettlerResult.refused("clans.settler.recruit.cannot_afford", Component.text(price));
+            return SettlerResult.refused("clans.settler.recruit.cannot_afford",
+                    CoinsTag.of(Component.text(price, NamedTextColor.YELLOW)));
         }
 
         final SettlerResult result = settlers.grant(key, candidate.getSettler());

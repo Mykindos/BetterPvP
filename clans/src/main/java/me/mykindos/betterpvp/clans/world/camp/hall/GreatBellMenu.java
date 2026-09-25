@@ -61,7 +61,7 @@ public class GreatBellMenu extends AbstractGui implements Windowed {
                     final Player player = click.getPlayer();
                     final String problem = bell.ring(player, key, hall);
                     if (problem != null) {
-                        menus.tell(player, problem);
+                        menus.refuse(player, problem);
                     }
                     new GreatBellMenu(menus, bell, key, hall, previous).show(player);
                 }));

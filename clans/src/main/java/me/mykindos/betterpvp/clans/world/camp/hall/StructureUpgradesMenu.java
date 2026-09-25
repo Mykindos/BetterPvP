@@ -153,8 +153,9 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
             }
             return;
         }
-        menus.tell(player, structure.hasUpgrade(upgrade.getId())
-                ? "clans.camp.upgrade.menu.fitted" : "clans.camp.upgrade.menu.started", upgradeName(upgrade.getId()));
+        menus.confirm(player, structure.hasUpgrade(upgrade.getId())
+                ? "clans.camp.upgrade.menu.fitted" : "clans.camp.upgrade.menu.started",
+                upgradeName(upgrade.getId()).color(NamedTextColor.WHITE));
         new StructureUpgradesMenu(menus, player, key, structure, type, previous).show(player);
     }
 

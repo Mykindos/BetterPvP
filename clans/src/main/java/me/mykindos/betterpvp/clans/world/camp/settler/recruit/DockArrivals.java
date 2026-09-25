@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * Candidates waiting at a camp's Dock, standing in a ring around its {@code settler_arrival} point. Right-clicking
@@ -152,7 +153,7 @@ public class DockArrivals implements Listener {
         final Component role = price <= 0
                 ? Translations.component("clans.settler.recruit.free").color(NamedTextColor.GREEN)
                 : Translations.component("clans.settler.recruit.price",
-                Component.text(UtilFormat.formatNumber((int) price))).color(NamedTextColor.GOLD);
+                CoinsTag.of(Component.text(UtilFormat.formatNumber((int) price)))).color(NamedTextColor.GOLD);
         final ModeledNPC npc = new ModeledNPC(factory);
         npc.addDecorator(object -> models.dress(npc, campSettlers.look(waiting.key, settler),
                 Component.text(settler.getName(), settler.getRarity().getColor()), role));
@@ -163,7 +164,7 @@ public class DockArrivals implements Listener {
 
     private void open(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID id) {
         if (!camps.isMember(player, player.getWorld())) {
-            UtilMessage.plain(player, Translations.component("clans.settler.recruit.members_only").color(NamedTextColor.GRAY));
+            UtilMessage.plain(player, Translations.component("clans.settler.recruit.members_only").color(NamedTextColor.RED));
             return;
         }
         cards.openCandidate(player, key, id, null);

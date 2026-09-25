@@ -39,14 +39,15 @@ public class SettlerNotices implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onStrike(@NotNull SettlerStrikeEvent event) {
-        final Component count = Component.text(event.getSettlers().size());
+        final int count = event.getSettlers().size();
         if (!event.isStriking()) {
-            tell(event.getSite(), ChatIcon.NEWS.line(Translations.component("clans.camp.hall.wages.strike_ended", count)
-                    .color(NamedTextColor.GREEN)));
+            tell(event.getSite(), ChatIcon.NEWS.line(Translations.component("clans.camp.hall.wages.strike_ended",
+                    Component.text(count, NamedTextColor.WHITE)).color(NamedTextColor.YELLOW)));
             return;
         }
         tell(event.getSite(), ChatIcon.PROBLEM.line(ChatHint.INFO.attach(
-                Translations.component("clans.camp.hall.wages.strike_started", count).color(NamedTextColor.RED),
+                Translations.component("clans.camp.hall.wages.strike_started",
+                        Component.text(count, NamedTextColor.YELLOW)).color(NamedTextColor.RED),
                 Translations.component("clans.camp.hall.wages.strike_hint").color(NamedTextColor.GRAY))));
     }
 
@@ -54,7 +55,7 @@ public class SettlerNotices implements Listener {
     public void onBoat(@NotNull SettlerBoatEvent event) {
         tell(event.getSite(), ChatIcon.NEWS.line(Translations.component(event.isMilestone()
                 ? "clans.settler.recruit.milestone_arrived" : "clans.settler.recruit.boat_arrived")
-                .color(NamedTextColor.GREEN)));
+                .color(NamedTextColor.YELLOW)));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

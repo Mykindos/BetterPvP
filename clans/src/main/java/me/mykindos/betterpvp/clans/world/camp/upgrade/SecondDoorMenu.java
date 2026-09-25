@@ -61,8 +61,10 @@ public class SecondDoorMenu extends AbstractGui implements Windowed {
             }
             final Player player = click.getPlayer();
             final String problem = door.pick(key, player.getUniqueId(), second);
-            UtilMessage.plain(player, Translations.component(problem != null ? problem : "clans.camp.upgrade.second_door.picked",
-                            Translations.component(name)).color(NamedTextColor.GRAY));
+            UtilMessage.plain(player, problem != null
+                    ? Translations.component(problem).color(NamedTextColor.RED)
+                    : Translations.component("clans.camp.upgrade.second_door.picked",
+                    Translations.component(name).color(NamedTextColor.WHITE)).color(NamedTextColor.GREEN));
             new SecondDoorMenu(door, player, key, previous).show(player);
         });
     }

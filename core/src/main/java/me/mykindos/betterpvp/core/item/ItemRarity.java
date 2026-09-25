@@ -8,12 +8,12 @@ import net.kyori.adventure.text.format.TextColor;
  */
 public enum ItemRarity {
 
-    COMMON(0, "Common", NamedTextColor.WHITE, false, 'ꐥ'),
-    UNCOMMON(1, "Uncommon", NamedTextColor.GREEN, false, 'ꑏ'),
-    RARE(2, "Rare", TextColor.color(74, 103, 255), false, 'ꑅ'),
-    EPIC(3, "Epic", NamedTextColor.DARK_PURPLE, false, 'ꐭ'),
-    LEGENDARY(4, "Legendary", NamedTextColor.GOLD, true, 'ꐵ'),
-    MYTHICAL(5, "Mythical", NamedTextColor.DARK_RED, true, 'ꐾ');
+    COMMON(0, "Common", NamedTextColor.WHITE, false, '\uE00B'),
+    UNCOMMON(1, "Uncommon", NamedTextColor.GREEN, false, '\uE03B'),
+    RARE(2, "Rare", TextColor.color(74, 103, 255), false, '\uE02F'),
+    EPIC(3, "Epic", NamedTextColor.DARK_PURPLE, false, '\uE013'),
+    LEGENDARY(4, "Legendary", NamedTextColor.GOLD, true, '\uE01E'),
+    MYTHICAL(5, "Mythical", NamedTextColor.DARK_RED, true, '\uE028');
 
     private final int importance;
     private final String name;

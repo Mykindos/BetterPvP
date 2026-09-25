@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.List;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * The Steward's hiring board: settlers looking for work, each for a price. A new set turns up on its own after a
@@ -62,8 +63,8 @@ public class HiringBoardMenu extends AbstractGui implements Windowed {
             final boolean reserved = reserving && quarters.isReserved(key, candidate);
             final ItemView.ItemViewBuilder view = SettlerItems.identity(candidate.getSettler())
                     .material(Material.PLAYER_HEAD)
-                    .lore(Translations.component("clans.settler.recruit.price", Component.text(
-                            UtilFormat.formatNumber((int) recruitment.price(key, candidate)), NamedTextColor.GOLD))
+                    .lore(Translations.component("clans.settler.recruit.price", CoinsTag.of(Component.text(
+                            UtilFormat.formatNumber((int) recruitment.price(key, candidate)), NamedTextColor.GOLD)))
                             .color(NamedTextColor.GRAY));
             if (reserved) {
                 view.lore(Translations.component("clans.camp.upgrade.guest_quarters.reserved").color(NamedTextColor.AQUA))
@@ -82,7 +83,7 @@ public class HiringBoardMenu extends AbstractGui implements Windowed {
                 if (reserving && ClickActions.RIGHT.accepts(click.getClickType())) {
                     final String problem = quarters.toggle(player, key, candidate.getSettler().getId());
                     if (problem != null) {
-                        menus.tell(player, problem);
+                        menus.refuse(player, problem);
                     }
                     new HiringBoardMenu(menus, player, key, previous).show(player);
                     return;
@@ -92,8 +93,8 @@ public class HiringBoardMenu extends AbstractGui implements Windowed {
             }));
         }
 
-        final Component reroll = Component.text(UtilFormat.formatNumber((int) menus.getRecruitConfig().getReroll()),
-                NamedTextColor.GOLD);
+        final Component reroll = CoinsTag.of(Component.text(
+                UtilFormat.formatNumber((int) menus.getRecruitConfig().getReroll()), NamedTextColor.GOLD));
         setItem(26, new SimpleItem(ItemView.builder()
                 .material(Material.CLOCK)
                 .displayName(Translations.component("clans.camp.hall.hiring.reroll", reroll).color(NamedTextColor.YELLOW))
@@ -101,7 +102,7 @@ public class HiringBoardMenu extends AbstractGui implements Windowed {
                 .build(), click -> {
                     final String problem = recruitment.reroll(click.getPlayer(), key);
                     if (problem != null) {
-                        menus.tell(click.getPlayer(), problem, reroll);
+                        menus.refuse(click.getPlayer(), problem, reroll);
                     }
                     new HiringBoardMenu(menus, click.getPlayer(), key, previous).show(click.getPlayer());
                 }));

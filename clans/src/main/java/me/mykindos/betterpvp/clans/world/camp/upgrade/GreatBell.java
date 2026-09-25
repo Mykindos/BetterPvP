@@ -170,7 +170,7 @@ public class GreatBell implements Listener, MoraleBoost {
 
         final Optional<Clan> clan = clanManager.getClanById(key.getOwnerId());
         final Component message = ChatIcon.NEWS.line(Translations.component("clans.camp.upgrade.great_bell.rung",
-                Component.text(ringer.getName(), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY));
+                Component.text(ringer.getName(), NamedTextColor.WHITE)).color(NamedTextColor.YELLOW));
         for (Player player : world.getPlayers()) {
             if (clan.flatMap(found -> found.getMemberByUUID(player.getUniqueId())).isEmpty()) {
                 continue;

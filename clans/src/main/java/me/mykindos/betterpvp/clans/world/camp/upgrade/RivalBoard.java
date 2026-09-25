@@ -72,7 +72,7 @@ public class RivalBoard implements Listener {
     /** Reads the standings off the main thread, then shows the board. */
     public void open(@NotNull Player player, @NotNull SiteKey key, @Nullable Windowed previous) {
         if (!isActive(key)) {
-            UtilMessage.plain(player, Translations.component("clans.camp.upgrade.rival_board.inactive").color(NamedTextColor.GRAY));
+            UtilMessage.plain(player, Translations.component("clans.camp.upgrade.rival_board.inactive").color(NamedTextColor.RED));
             return;
         }
         final int own = prosperity.of(key);

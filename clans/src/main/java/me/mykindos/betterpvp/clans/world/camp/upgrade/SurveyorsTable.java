@@ -33,7 +33,6 @@ import me.mykindos.betterpvp.core.world.schematic.ghost.GhostPreview;
 import me.mykindos.betterpvp.core.world.schematic.ghost.GhostPreviews;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -170,15 +169,16 @@ public class SurveyorsTable implements Listener {
         final int seconds = seconds();
         surveys.put(player.getUniqueId(), new Survey(preview, construction.now() + seconds * 1000L));
 
-        final ComponentLike stage = type.stageName(next).color(NamedTextColor.YELLOW);
         if (clashes.isEmpty()) {
-            tell(player, Translations.component("clans.camp.upgrade.surveyors_table.fits", stage,
+            tell(player, Translations.component("clans.camp.upgrade.surveyors_table.fits",
+                    type.stageName(next).color(NamedTextColor.WHITE),
                     Component.text(seconds)).color(NamedTextColor.GREEN));
         } else {
             final Component reason = fitCheck.problem(world, worksite.getHolding(), type, placement, id)
                     .orElseGet(() -> FitCheck.tooClose(type));
             tell(player, ChatHint.INFO.attach(
-                    Translations.component("clans.camp.upgrade.surveyors_table.clashes", stage).color(NamedTextColor.GOLD),
+                    Translations.component("clans.camp.upgrade.surveyors_table.clashes",
+                            type.stageName(next).color(NamedTextColor.YELLOW)).color(NamedTextColor.RED),
                     reason.color(NamedTextColor.RED)));
         }
         return true;

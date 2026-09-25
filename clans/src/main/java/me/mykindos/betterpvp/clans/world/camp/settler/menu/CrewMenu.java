@@ -142,11 +142,11 @@ public class CrewMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.PLAYER_HEAD)
                 .displayName(Component.text(settler.getName(), settler.getRarity().getColor()))
-                .lore(settler.getRarity().displayName());
-        if (settler.getSpecialty() != null && settler.getProfession() != null) {
-            menus.getProfessions().find(settler.getProfession()).ifPresent(profession -> view.lore(
-                    Translations.component(profession.specialtyKey(settler.getSpecialty())).color(NamedTextColor.GRAY)));
-        }
+                .lore(SettlerTags.line(settler.getSpecialty() == null
+                        ? List.of(SettlerTags.rarity(settler.getRarity()))
+                        : SettlerTags.role(settler.getSpecialty())
+                        .map(tag -> List.of(SettlerTags.rarity(settler.getRarity()), tag))
+                        .orElse(List.of(SettlerTags.rarity(settler.getRarity())))));
         final Optional<BuilderStats> stats = site.builderStats(key, settler, structure, job, crew);
         stats.ifPresent(found -> view.lore(Translations.component("clans.settler.crew.brings",
                 Component.text(found.getWorkforce()), Component.text(format(found.getSpeed()))).color(NamedTextColor.GRAY)));

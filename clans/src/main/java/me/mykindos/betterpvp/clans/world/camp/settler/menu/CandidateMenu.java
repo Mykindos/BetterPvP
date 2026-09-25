@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * Someone who could join the camp: who they are, what they would do, what they ask, and how long they will wait.
@@ -80,7 +81,7 @@ public class CandidateMenu extends AbstractGui implements Windowed {
         return price <= 0
                 ? Translations.component("clans.settler.recruit.free").color(NamedTextColor.GREEN)
                 : Translations.component("clans.settler.recruit.price",
-                Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD)).color(NamedTextColor.GRAY);
+                CoinsTag.of(Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.GOLD))).color(NamedTextColor.GRAY);
     }
 
     private @NotNull SimpleItem button(@NotNull Material icon, @NotNull String key, boolean allowed,

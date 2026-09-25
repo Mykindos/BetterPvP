@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.camp.hall;
 
+import java.util.ArrayList;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampProfessions;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
+import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerTags;
 
 /**
  * Everyone living in the camp, with how many more it has room for and how many of each profession can work. Filters
@@ -135,17 +137,15 @@ public class SettlerRosterMenu extends AbstractGui implements Windowed {
     }
 
     private @NotNull ItemView entry(@NotNull Settler settler) {
-        final Component work = settler.getProfession() == null
-                ? Translations.component("clans.settler.card.no_profession")
-                : menus.getProfessions().find(settler.getProfession())
-                .map(found -> Translations.component(found.getKey()))
-                .orElse(Component.text(settler.getProfession()));
+        final List<Component> tags = new ArrayList<>(List.of(SettlerTags.rarity(settler.getRarity())));
+        if (settler.getProfession() != null) {
+            SettlerTags.role(settler.getProfession()).ifPresent(tags::add);
+        }
         final int morale = settler.getMorale();
         return ItemView.builder()
                 .material(Material.PLAYER_HEAD)
                 .displayName(Component.text(settler.getName(), settler.getRarity().getColor()))
-                .lore(settler.getRarity().displayName())
-                .lore(work.color(NamedTextColor.YELLOW))
+                .lore(SettlerTags.line(tags))
                 .lore(Translations.component("clans.settler.card.state." + settler.getState().name().toLowerCase(Locale.ROOT))
                         .color(settler.getState() == SettlerState.STRIKING ? NamedTextColor.RED : NamedTextColor.GRAY))
                 .lore(Translations.component("clans.settler.card.morale", Component.text(morale,

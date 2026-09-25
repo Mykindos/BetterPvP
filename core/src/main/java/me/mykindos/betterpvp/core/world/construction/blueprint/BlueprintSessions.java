@@ -168,7 +168,8 @@ public class BlueprintSessions implements Listener {
         player.getInventory().getItemInMainHand().subtract();
         end(player);
         UtilMessage.plain(player, Translations.component(moving == null ? "core.construction.blueprint.started"
-                        : "core.construction.blueprint.move_started", type.get().getDisplayName()));
+                        : "core.construction.blueprint.move_started", type.get().getDisplayName().color(NamedTextColor.WHITE))
+                .color(NamedTextColor.GREEN));
     }
 
     @EventHandler

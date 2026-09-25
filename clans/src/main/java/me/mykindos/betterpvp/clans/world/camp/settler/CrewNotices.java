@@ -70,7 +70,7 @@ public class CrewNotices implements Listener {
                 .orElseGet(() -> Component.text(structure.getType()));
         final Component message = ChatIcon.PROBLEM.line(ChatHint.INFO.attach(
                 Translations.component("clans.settler.crew.needed", name.color(NamedTextColor.YELLOW),
-                        Component.text(rule.threshold(structure, job), NamedTextColor.YELLOW)).color(NamedTextColor.GRAY),
+                        Component.text(rule.threshold(structure, job), NamedTextColor.YELLOW)).color(NamedTextColor.RED),
                 Translations.component("clans.settler.crew.needed_hint").color(NamedTextColor.GRAY)));
 
         for (SiteInstance instance : instances.forKey(site)) {

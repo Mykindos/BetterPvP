@@ -92,7 +92,7 @@ public class PlacedStructuresMenu extends AbstractGui implements Windowed {
             }
             if (queue.clear(camp) != null) {
                 menus.tell(player, Translations.component("clans.camp.upgrade.build_queue.cleared",
-                        queue.describe(queued)).color(NamedTextColor.GRAY));
+                        queue.describe(queued).color(NamedTextColor.WHITE)).color(NamedTextColor.GREEN));
             }
             new PlacedStructuresMenu(menus, camp, previous).show(player);
         });

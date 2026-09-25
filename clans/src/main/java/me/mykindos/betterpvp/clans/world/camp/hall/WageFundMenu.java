@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
  * The camp's wage fund: what it holds, what the camp's settlers cost an hour, how long that lasts, and whether anyone
@@ -61,10 +62,10 @@ public class WageFundMenu extends AbstractGui implements Windowed {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.GOLD_BLOCK)
                 .displayName(Translations.component("clans.camp.hall.wages.fund",
-                        Component.text(UtilFormat.formatNumber((int) fund), NamedTextColor.GOLD))
+                        CoinsTag.of(Component.text(UtilFormat.formatNumber((int) fund), NamedTextColor.GOLD)))
                         .color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .lore(Translations.component("clans.camp.hall.wages.hourly",
-                        Component.text(UtilFormat.formatNumber((int) Math.ceil(hourly)), NamedTextColor.GOLD))
+                        CoinsTag.of(Component.text(UtilFormat.formatNumber((int) Math.ceil(hourly)), NamedTextColor.GOLD)))
                         .color(NamedTextColor.GRAY));
         if (hourly > 0) {
             final Duration covers = Duration.ofMillis((long) (fund / hourly * 3_600_000));
@@ -79,7 +80,7 @@ public class WageFundMenu extends AbstractGui implements Windowed {
     }
 
     private @NotNull SimpleItem payButton(long amount, boolean allowed) {
-        final Component coins = Component.text(UtilFormat.formatNumber((int) amount), NamedTextColor.GOLD);
+        final Component coins = CoinsTag.of(Component.text(UtilFormat.formatNumber((int) amount), NamedTextColor.GOLD));
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(Material.GOLD_NUGGET)
                 .displayName(Translations.component("clans.camp.hall.wages.pay", coins)
@@ -107,11 +108,11 @@ public class WageFundMenu extends AbstractGui implements Windowed {
                 .displayName(Translations.component("clans.camp.upgrade.wage_policy.toggle", state)
                         .color(NamedTextColor.YELLOW))
                 .lore(Translations.component("clans.camp.upgrade.wage_policy.explain",
-                        Component.text(UtilFormat.formatNumber((int) policy.dailyCap()), NamedTextColor.GOLD))
+                        CoinsTag.of(Component.text(UtilFormat.formatNumber((int) policy.dailyCap()), NamedTextColor.GOLD)))
                         .color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.camp.upgrade.wage_policy.today",
-                        Component.text(UtilFormat.formatNumber((int) policy.paidToday(key, viewer.getUniqueId())),
-                                NamedTextColor.GOLD)).color(NamedTextColor.GRAY))
+                        CoinsTag.of(Component.text(UtilFormat.formatNumber((int) policy.paidToday(key, viewer.getUniqueId())),
+                                NamedTextColor.GOLD))).color(NamedTextColor.GRAY))
                 .action(ClickActions.ALL, Translations.component("clans.camp.upgrade.wage_policy.toggle", state))
                 .build();
         return new SimpleItem(view, click -> {
