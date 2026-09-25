@@ -26,7 +26,7 @@ import java.util.UUID;
 /**
  * Draws the in-combat HUD: a health bar, a mirrored mana bar, and the numeric readouts that float
  * above them, all painted onto the {@code status_bar.png} backdrop. Whatever the action bar had
- * queued (cooldown readouts, etc.) is appended to the right of the frame.
+ * queued (cooldown readouts, etc.) is centred above the frame.
  * <p>
  * The frame is a centered action bar, so the client positions it by its total advance. Every glyph
  * and cursor shift here is paid back via {@link FontCanvas#space(int)} so the frame's net advance
@@ -42,6 +42,10 @@ public class StatusBar extends ActionBar {
     // A 10-box bar is 39 glyph pieces of 2px each (the end cap adds 1px). The fill lights only the
     // leading (health) / trailing (mana) pieces the player's values warrant.
     private static final int BAR_PIECES = 39;
+    // Where the cursor rests after the frame, which is the frame's whole advance. The backdrop's art is
+    // centred on its x=111 (x=0 is an invisible anchor pixel), so it starts 8px left of the cursor and
+    // half of this advance lands on that centre, the same spot vanilla centres the crosshair on.
+    private static final int FRAME_ADVANCE = 206;
 
     private final EntityHealthService healthService;
     private final EnergyService energyService;
@@ -129,7 +133,7 @@ public class StatusBar extends ActionBar {
     }
 
     private void drawBackdrop(FontCanvas canvas) {
-        canvas.space(-10);
+        canvas.space(FRAME_ADVANCE - BACKDROP_WIDTH);
         canvas.glyph('\uE012', NamedTextColor.WHITE, "hud/down_40").space(-1); // cancel the glyph's +1 advance
     }
 
@@ -186,14 +190,14 @@ public class StatusBar extends ActionBar {
         final int health = ceil(healthService.getHealth(viewer));
         final int maxHealth = ceil(healthService.getMaxHealth(viewer));
         final int bonus = ceil(healthService.getBonusHealth(viewer));
-        drawReadout(canvas, 50, font, // health fill spans x[11,90]
+        drawReadout(canvas, 52, font, // health fill spans x[13,92]
                 health + "/" + maxHealth, palette.getBase(),
                 bonus == 0 ? "" : "+" + bonus, palette.getBonus());
 
         final int energy = ceil(energyService.getEnergy(viewer.getUniqueId()));
         final int maxEnergy = ceil(energyService.getMaxEnergy());
         final int boost = ceil(energyService.getMax(viewer.getUniqueId()) - energyService.getMaxEnergy());
-        drawReadout(canvas, 152, font, // mana fill spans x[113,192]
+        drawReadout(canvas, 154, font, // mana fill spans x[115,194]
                 energy + "/" + maxEnergy, TextColor.color(48, 114, 255),
                 boost <= 0 ? "" : "+" + boost, TextColor.color(130, 190, 255));
     }
@@ -203,32 +207,27 @@ public class StatusBar extends ActionBar {
     // 6px regardless of colour, so the split leaves the readout's total advance unchanged.
     private void drawReadout(FontCanvas canvas, int center, Key font,
                              String base, TextColor baseColor, String suffix, TextColor suffixColor) {
-        final int rightEdge = BACKDROP_WIDTH - 10; // cursor rest position after the frame
         final int advance = (base.length() + suffix.length()) * 6;
         final int left = center - (advance - 1) / 2; // the last glyph drops its trailing 1px gap
-        canvas.space(left - rightEdge);
+        canvas.space(left - FRAME_ADVANCE);
         canvas.append(shadowed(base, baseColor, font));
         if (!suffix.isEmpty()) {
             canvas.append(shadowed(suffix, suffixColor, font));
         }
-        canvas.space(rightEdge - left - advance);
+        canvas.space(FRAME_ADVANCE - left - advance);
     }
 
-    // Centre the queued message (cooldown readouts, etc.) over the frame. The cursor rests at the
-    // frame's right edge, which equals the frame's total advance; we step left to a centred start,
-    // draw, then settle back to the right edge. The two width-dependent shifts cancel, so the net
-    // advance stays exactly the frame's width REGARDLESS of the measured width — the frame never
-    // shifts even when the estimate is slightly off (bold text, block glyphs only affect centring).
-    // The queued text floats above the bars: the HUD uses down-shifted fonts, so default-baseline
-    // text sits higher and never overlaps it.
+    // Centre the queued message (cooldown readouts, etc.) over the frame, then pay back its measured
+    // width. The frame keeps its place only while that measure matches what the client draws, since
+    // any difference changes the total advance the action bar is centred on. The queued text floats
+    // above the bars: the HUD uses down-shifted fonts, so default-baseline text sits higher.
     private void appendQueued(FontCanvas canvas, Player viewer, Component queued) {
         final int width = UtilFont.componentWidth(Translations.render(queued, viewer.locale()));
         if (width <= 0) return;
-        final int rightEdge = BACKDROP_WIDTH - 10;
-        final int left = (rightEdge - width) / 2; // centre the message within [0, rightEdge]
-        canvas.space(left - rightEdge);
+        final int left = (FRAME_ADVANCE - width) / 2;
+        canvas.space(left - FRAME_ADVANCE);
         canvas.append(queued);
-        canvas.space(rightEdge - left - width);
+        canvas.space(FRAME_ADVANCE - left - width);
     }
 
     private void sendActionBar(Gamer gamer, Component component) {
@@ -247,7 +246,7 @@ public class StatusBar extends ActionBar {
     }
 
     private static Component shadowed(String text, TextColor color, Key font) {
-        return Component.text(text, color).font(font).shadowColor(ShadowColor.shadowColor(0xFF000000));
+        return Component.text(text, color).font(font).shadowColor(SHADOW);
     }
 
     /** Number of lit pieces for {@code value} out of {@code max}, on the bar's 39-piece scale. */

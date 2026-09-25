@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import me.mykindos.betterpvp.core.utilities.model.display.IDisplayQueue;
 import me.mykindos.betterpvp.core.utilities.model.display.component.TimedComponent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.ShadowColor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,6 +20,9 @@ import java.util.UUID;
 public class ActionBar implements IDisplayQueue<DisplayObject<Component>> {
 
     protected static final Component EMPTY = Component.empty();
+
+    /** Queued components draw this shadow unless they set their own. */
+    protected static final ShadowColor SHADOW = ShadowColor.shadowColor(0xFF000000);
 
     /**
      * These components are sent to the player for a set amount of seconds, in order of priority, and are removed after being shown.
@@ -115,7 +119,7 @@ public class ActionBar implements IDisplayQueue<DisplayObject<Component>> {
                 timed.startTime();
             }
 
-            return advComponent;
+            return advComponent.shadowColorIfAbsent(SHADOW);
         }
     }
 
