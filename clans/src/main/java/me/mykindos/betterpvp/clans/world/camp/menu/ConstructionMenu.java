@@ -100,7 +100,8 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
             structure.getRequiredStructures().forEach(id -> catalogue.find(id)
                     .ifPresent(required -> names.add(required.getDisplayName())));
             view.lore(Translations.component("clans.camp.menu.build.requires",
-                    Component.join(JoinConfiguration.commas(true), names)).color(NamedTextColor.GRAY));
+                    Component.join(JoinConfiguration.commas(true), names).color(NamedTextColor.WHITE))
+                    .color(NamedTextColor.GRAY));
         }
         if (structure.getTier() > 1) {
             final Component hall = catalogue.find(CampConstruction.GREAT_HALL)
@@ -110,8 +111,9 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
         }
         view.lore(Translations.component("clans.camp.menu.build.cost", cost(first.getCost())).color(NamedTextColor.GRAY));
         view.lore(Translations.component("clans.camp.menu.build.time", first.getBuildTime().isZero()
-                ? Translations.component("clans.camp.menu.build.instant")
-                : Component.text(UtilTime.humanReadableFormat(first.getBuildTime()))).color(NamedTextColor.GRAY));
+                ? Translations.component("clans.camp.menu.build.instant").color(NamedTextColor.WHITE)
+                : Component.text(UtilTime.humanReadableFormat(first.getBuildTime())).color(NamedTextColor.WHITE))
+                .color(NamedTextColor.GRAY));
 
         view.lore(Component.empty());
         unavailable.ifPresentOrElse(view::lore,
@@ -133,11 +135,12 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
 
     static @NotNull Component cost(@NotNull ResourceCost cost) {
         if (cost.isFree()) {
-            return Translations.component("clans.camp.menu.build.free");
+            return Translations.component("clans.camp.menu.build.free").color(NamedTextColor.WHITE);
         }
         final List<Component> parts = new ArrayList<>();
         cost.getAmounts().forEach((resource, amount) -> ResourceKind.byId(resource).ifPresent(kind ->
-                parts.add(Translations.component("clans.camp.resource.amount", Component.text(amount), kind.displayName()))));
+                parts.add(Translations.component("clans.camp.resource.amount", Component.text(amount), kind.displayName())
+                        .color(kind.color()))));
         return Component.join(JoinConfiguration.commas(true), parts);
     }
 
