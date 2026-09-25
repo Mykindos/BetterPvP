@@ -71,7 +71,7 @@ public class CrewReportMenu extends AbstractGui implements Windowed {
                         ? Translations.component("clans.camp.upgrade.crew_report.finished").color(NamedTextColor.GRAY)
                         : Translations.component("clans.camp.upgrade.crew_report.running").color(NamedTextColor.GREEN))
                 .lore(Translations.component("clans.camp.upgrade.crew_report.builders",
-                        Component.text(tally.getShares().size())).color(NamedTextColor.GRAY));
+                        Component.text(tally.getShares().size(), NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
     }
 
     private static @NotNull Component kind(@NotNull CampStructure type, @NotNull CrewTally tally) {

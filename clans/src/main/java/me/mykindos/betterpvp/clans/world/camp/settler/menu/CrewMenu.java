@@ -123,9 +123,9 @@ public class CrewMenu extends AbstractGui implements Windowed {
                 .displayName(name.color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .frameLore(true)
                 .lore(CrewJobsMenu.jobName(job).color(NamedTextColor.GRAY))
-                .lore(Translations.component("clans.settler.crew.workforce", Component.text(workforce),
-                        Component.text(threshold)).color(workforce >= threshold ? NamedTextColor.GREEN : NamedTextColor.RED))
-                .lore(Translations.component("clans.settler.crew.speed", Component.text(format(speed)))
+                .lore(Translations.component("clans.settler.crew.workforce", Component.text(workforce, NamedTextColor.WHITE),
+                        Component.text(threshold, NamedTextColor.WHITE)).color(workforce >= threshold ? NamedTextColor.GREEN : NamedTextColor.RED))
+                .lore(Translations.component("clans.settler.crew.speed", Component.text(format(speed), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY));
         if (job.isHeld()) {
             view.lore(Translations.component("clans.settler.crew.waiting",

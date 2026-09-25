@@ -118,7 +118,7 @@ public class HarbourmasterMenu extends AbstractGui implements Windowed {
         final String chosen = harbourmaster.chosen(key);
         if (chosen != null) {
             lines.add(Translations.component("clans.camp.upgrade.harbourmaster.chosen",
-                    profession(menus, chosen)).color(NamedTextColor.AQUA));
+                    profession(menus, chosen).color(NamedTextColor.WHITE)).color(NamedTextColor.AQUA));
         }
         return lines;
     }

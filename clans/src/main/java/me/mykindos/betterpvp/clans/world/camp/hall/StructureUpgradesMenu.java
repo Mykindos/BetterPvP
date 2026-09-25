@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.clans.world.camp.hall;
 
-import me.mykindos.betterpvp.clans.world.camp.resource.ResourceKind;
+import me.mykindos.betterpvp.clans.world.camp.menu.ConstructionMenu;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructure;
 import me.mykindos.betterpvp.clans.world.camp.structure.UpgradePage;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
@@ -16,11 +16,9 @@ import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
-import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureUpgrade;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
@@ -29,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +73,8 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
         if (structure.getStage() < stage) {
             state = Translations.component("clans.camp.upgrade.menu.stage_locked").color(NamedTextColor.RED);
         } else if (picked.isPresent()) {
-            state = Translations.component("clans.camp.upgrade.menu.stage_chosen", upgradeName(picked.get()))
+            state = Translations.component("clans.camp.upgrade.menu.stage_chosen",
+                    upgradeName(picked.get()).color(NamedTextColor.WHITE))
                     .color(NamedTextColor.GREEN);
         } else {
             state = Translations.component("clans.camp.upgrade.menu.stage_open").color(NamedTextColor.YELLOW);
@@ -100,7 +98,7 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
         final boolean greyed = !chosen && !fitting && unavailable.isPresent();
 
         final ItemView.ItemViewBuilder view = ItemView.builder()
-                .material(greyed ? Material.GRAY_STAINED_GLASS_PANE : type.upgradeIcon(upgrade.getId()))
+                .material(greyed ? Material.RED_CONCRETE : type.upgradeIcon(upgrade.getId()))
                 .hideAdditionalTooltip(true)
                 .displayName(upgradeName(upgrade.getId())
                         .color(chosen ? NamedTextColor.GREEN : greyed ? NamedTextColor.GRAY : NamedTextColor.YELLOW)
@@ -112,13 +110,14 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
 
         if (!chosen) {
             view.lore(Component.empty());
-            view.lore(Translations.component("clans.camp.upgrade.menu.cost", cost(upgrade.getCost()))
+            view.lore(Translations.component("clans.camp.upgrade.menu.cost", ConstructionMenu.cost(upgrade.getCost()))
                     .color(NamedTextColor.GRAY));
-            view.lore(Translations.component("clans.camp.upgrade.menu.time", time(upgrade.getTime()))
+            view.lore(Translations.component("clans.camp.upgrade.menu.time",
+                    time(upgrade.getTime()).color(NamedTextColor.WHITE))
                     .color(NamedTextColor.GRAY));
             if (upgrade.getWorkforce() > 0) {
                 view.lore(Translations.component("clans.camp.upgrade.menu.workforce",
-                        Component.text(upgrade.getWorkforce())).color(NamedTextColor.GRAY));
+                        Component.text(upgrade.getWorkforce(), NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
             }
         }
 
@@ -170,15 +169,6 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
                 : Component.text(UtilTime.humanReadableFormat(time));
     }
 
-    private static @NotNull Component cost(@NotNull ResourceCost cost) {
-        if (cost.isFree()) {
-            return Translations.component("clans.camp.menu.build.free");
-        }
-        final List<Component> parts = new ArrayList<>();
-        cost.getAmounts().forEach((resource, amount) -> ResourceKind.byId(resource).ifPresent(kind ->
-                parts.add(Translations.component("clans.camp.resource.amount", Component.text(amount), kind.displayName()))));
-        return Component.join(JoinConfiguration.commas(true), parts);
-    }
 
     @Override
     public @NotNull Component getTitle() {

@@ -37,7 +37,7 @@ public class RivalBoardMenu extends AbstractGui implements Windowed {
                 .orElseGet(() -> Translations.component("clans.camp.zone.unnamed"));
         final int change = row.getChange();
         final Component delta = Component.text((change > 0 ? "+" : "") + UtilFormat.formatNumber(change),
-                change > 0 ? NamedTextColor.GREEN : change < 0 ? NamedTextColor.RED : NamedTextColor.GRAY);
+                change > 0 ? NamedTextColor.GREEN : change < 0 ? NamedTextColor.RED : NamedTextColor.WHITE);
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(row.isOwn() ? Material.BELL : Material.WHITE_BANNER)
                 .displayName(Translations.component("clans.camp.upgrade.rival_board.entry",
@@ -47,7 +47,7 @@ public class RivalBoardMenu extends AbstractGui implements Windowed {
                 .glow(row.isOwn())
                 .frameLore(true)
                 .lore(Translations.component("clans.camp.prosperity.value",
-                        Component.text(UtilFormat.formatNumber(row.getProsperity()), NamedTextColor.GOLD))
+                        Component.text(UtilFormat.formatNumber(row.getProsperity()), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.camp.upgrade.rival_board.change", delta).color(NamedTextColor.GRAY));
         if (row.isOwn()) {

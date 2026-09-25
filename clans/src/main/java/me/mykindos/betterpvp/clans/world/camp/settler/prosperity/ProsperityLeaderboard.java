@@ -73,7 +73,7 @@ public class ProsperityLeaderboard extends Leaderboard<Long, Integer> {
                         .material(Material.BELL)
                         .displayName(name)
                         .lore(Translations.component("clans.camp.prosperity.value",
-                                Component.text(entry.getValue(), NamedTextColor.GOLD)).color(NamedTextColor.GRAY))
+                                Component.text(entry.getValue(), NamedTextColor.WHITE)).color(NamedTextColor.GRAY))
                         .build())
                 .build());
     }

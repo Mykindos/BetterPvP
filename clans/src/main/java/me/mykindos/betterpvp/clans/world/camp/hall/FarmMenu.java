@@ -46,8 +46,8 @@ public class FarmMenu extends AbstractGui implements Windowed {
                 .lore(Translations.component("clans.camp.hall.farm.extra_drop", percent(farm.extraDrop(key)))
                         .color(NamedTextColor.GRAY));
         if (slots >= 0) {
-            summary.lore(Translations.component("clans.camp.hall.farm.slots", Component.text(working.size()),
-                    Component.text(slots)).color(NamedTextColor.GRAY));
+            summary.lore(Translations.component("clans.camp.hall.farm.slots", Component.text(working.size(), NamedTextColor.WHITE),
+                    Component.text(slots, NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
         }
         setItem(4, new SimpleItem(summary.build()));
 
@@ -96,7 +96,7 @@ public class FarmMenu extends AbstractGui implements Windowed {
                 .displayName(Component.text(farmer.getName(), farmer.getRarity().getColor()))
                 .frameLore(true)
                 .lore(farmer.getRarity().displayName())
-                .lore(Translations.component("clans.settler.card.morale", Component.text(farmer.getMorale()))
+                .lore(Translations.component("clans.settler.card.morale", Component.text(farmer.getMorale(), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY));
     }
 

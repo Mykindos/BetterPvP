@@ -77,9 +77,10 @@ public class UpgradesMenu extends AbstractGui implements Windowed {
                 .frameLore(true)
                 .lore(type.stageName(structure.getStage()).color(NamedTextColor.GRAY))
                 .lore(Translations.component("clans.camp.upgrade.menu.chosen_count",
-                        Component.text(structure.getUpgrades().size())).color(NamedTextColor.GRAY));
+                        Component.text(structure.getUpgrades().size(), NamedTextColor.WHITE)).color(NamedTextColor.GRAY));
         if (waiting > 0) {
-            view.lore(Translations.component("clans.camp.upgrade.menu.waiting", Component.text(waiting))
+            view.lore(Translations.component("clans.camp.upgrade.menu.waiting",
+                    Component.text(waiting, NamedTextColor.WHITE))
                     .color(NamedTextColor.GREEN));
         }
         view.action(ClickActions.ALL, Translations.component("clans.camp.hall.open"));

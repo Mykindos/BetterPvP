@@ -361,8 +361,8 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
 
     private static @NotNull Component timeLine(@NotNull Duration time) {
         return Translations.component("clans.camp.menu.structures.time", time.isZero()
-                ? Translations.component("clans.camp.menu.build.instant")
-                : Component.text(UtilTime.humanReadableFormat(time)));
+                ? Translations.component("clans.camp.menu.build.instant").color(NamedTextColor.WHITE)
+                : Component.text(UtilTime.humanReadableFormat(time), NamedTextColor.WHITE));
     }
 
     @Override
