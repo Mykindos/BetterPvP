@@ -210,21 +210,20 @@ public class BlueprintSessions implements Listener {
             session.preview.hide();
             return;
         }
-        final Component turn = Translations.component("core.construction.blueprint.turn_hint").color(NamedTextColor.GRAY);
         final Location anchor = anchor(player);
+        final Optional<Component> problem;
         if (anchor == null) {
             session.preview.hide();
-            hud(session, type.get().getDisplayName().color(NamedTextColor.RED),
-                    Translations.component("core.construction.blueprint.look_at_ground").color(NamedTextColor.RED),
-                    turn);
-            return;
+            problem = Optional.of(Translations.component("core.construction.blueprint.look_at_ground")
+                    .color(NamedTextColor.RED));
+        } else {
+            problem = session.moving == null
+                    ? construction.problem(player, player.getWorld(), type.get(), anchor, session.quarterTurns)
+                    : construction.moveProblem(player, player.getWorld(), session.moving, anchor, session.quarterTurns);
+            session.preview.setValid(problem.isEmpty());
+            session.preview.show(anchor, session.quarterTurns);
         }
 
-        final Optional<Component> problem = session.moving == null
-                ? construction.problem(player, player.getWorld(), type.get(), anchor, session.quarterTurns)
-                : construction.moveProblem(player, player.getWorld(), session.moving, anchor, session.quarterTurns);
-        session.preview.setValid(problem.isEmpty());
-        session.preview.show(anchor, session.quarterTurns);
         if (problem.isPresent()) {
             hud(session, type.get().getDisplayName().color(NamedTextColor.RED),
                     Translations.component("core.construction.blueprint.cannot_place").color(NamedTextColor.RED),
@@ -235,7 +234,7 @@ public class BlueprintSessions implements Listener {
                 Translations.component(session.moving == null
                         ? "core.construction.blueprint.hint" : "core.construction.blueprint.move_hint")
                         .color(NamedTextColor.GRAY),
-                turn);
+                Translations.component("core.construction.blueprint.turn_hint").color(NamedTextColor.GRAY));
     }
 
     /**
