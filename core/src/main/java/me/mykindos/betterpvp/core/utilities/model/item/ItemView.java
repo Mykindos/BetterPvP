@@ -48,7 +48,7 @@ public class ItemView implements ItemProvider {
     @Nullable Key itemModel;
     @Nullable @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) Integer maxStackSize = null;
     @Builder.Default boolean hideTooltip = false;
-    @Builder.Default boolean hideAdditionalTooltip = false;
+    @Builder.Default boolean hideAdditionalTooltip = true;
     @Nullable @Builder.Default @Range(from = 0, to = Integer.MAX_VALUE) Integer customModelData = null;
     /**
      * Tint applied through {@link DataComponentTypes#DYED_COLOR}. Any item can carry it, but it only shows on
