@@ -41,6 +41,7 @@ public final class SettlerItems {
                                                               @Nullable Profession profession) {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(profession == null ? Material.LEATHER_BOOTS : Material.IRON_PICKAXE)
+                .hideAdditionalTooltip(true)
                 .displayName((profession == null
                         ? Translations.component("clans.settler.card.no_profession")
                         : Translations.component(profession.getKey())).color(NamedTextColor.YELLOW))

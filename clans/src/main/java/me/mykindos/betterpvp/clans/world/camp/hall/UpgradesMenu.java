@@ -72,6 +72,7 @@ public class UpgradesMenu extends AbstractGui implements Windowed {
 
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(type.getIcon())
+                .hideAdditionalTooltip(true)
                 .displayName(type.getDisplayName().color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .frameLore(true)
                 .lore(type.stageName(structure.getStage()).color(NamedTextColor.GRAY))
