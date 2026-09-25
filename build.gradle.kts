@@ -103,17 +103,16 @@ subprojects {
         destinationDirectory.set(file("$rootDir/build/"))
         mergeServiceFiles()
         duplicatesStrategy = DuplicatesStrategy.INCLUDE // required for flywayg
+    }
 
-        val projectPath = project.path
-        val bucketDirs = outputBuckets.filterValues { projectPath in it }.keys.map { rootDir.resolve("build/$it") }
-        doLast {
-            val builtJar = archiveFile.get().asFile
-            if (builtJar.name.contains("jmh", ignoreCase = true)) return@doLast
-
-            bucketDirs.forEach { dir ->
-                builtJar.copyTo(dir.resolve(builtJar.name), overwrite = true)
-            }
+    // A separate task, because a shadowJar restored from the build cache skips its own actions
+    val shadowJar = tasks.named<ShadowJar>("shadowJar")
+    outputBuckets.filterValues { project.path in it }.keys.forEach { bucket ->
+        val copyToBucket = tasks.register<Copy>("copyShadowJarTo${bucket.replaceFirstChar(Char::titlecase)}") {
+            from(shadowJar)
+            into(rootDir.resolve("build/$bucket"))
         }
+        shadowJar.configure { finalizedBy(copyToBucket) }
     }
 
     tasks.assemble.configure {
