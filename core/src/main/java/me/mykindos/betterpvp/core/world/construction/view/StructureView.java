@@ -39,9 +39,9 @@ import java.util.UUID;
 /**
  * One structure as it appears in the world, kept in step with its status.
  * <p>
- * A build rises with its job's progress, leaving its top layers for the claim. A structure waiting to be claimed shows
- * those layers as a blinking glow and can be clicked anywhere. Once claimed, they go down one at a time. Anything that
- * changes its shape, a new stage or a move being claimed, takes the old build down and puts the new one up.
+ * A build rises layer by layer with its job's progress and stands whole once the job is done. A structure waiting to be
+ * claimed blinks with a glow and can be clicked anywhere. Anything that changes its shape, a new stage or a move being
+ * claimed, takes the old build down and puts the new one up.
  * <p>
  * The pieces of the upgrades it has stand on top of the finished build, and come down before any of it does.
  */
@@ -57,8 +57,6 @@ final class StructureView {
     private @Nullable RenderedBuild build;
     private @Nullable StructureProp prop;
     private @Nullable ClaimFlash flash;
-    private @Nullable StructureStatus lastStatus;
-    private boolean animating;
     private @Nullable PlacedStructure structure;
     private List<StructureStorage.Slot> slots = List.of();
     private final Set<String> stocked = new HashSet<>();
@@ -71,37 +69,27 @@ final class StructureView {
         this.scope = scope;
     }
 
-    void sync(@NotNull PlacedStructure structure, @NotNull StructureType type, int claimLayers, long now) {
+    void sync(@NotNull PlacedStructure structure, @NotNull StructureType type, long now) {
         this.structure = structure;
         final StructureStatus status = structure.status(now);
         if (status == StructureStatus.NOT_PLACED) {
             clear();
-            lastStatus = status;
             return;
         }
 
-        final boolean claimed = lastStatus == StructureStatus.READY_TO_CLAIM
-                && status != StructureStatus.READY_TO_CLAIM && status != StructureStatus.PAUSED;
         final String currentShape = structure.getType() + ":" + structure.getStage() + ":" + structure.getPosition();
         if (!currentShape.equals(shape)) {
-            rebuild(structure, currentShape, claimed ? claimLayers : -1);
+            rebuild(structure, currentShape);
         }
         if (build == null || plan == null) {
-            lastStatus = status;
             return;
         }
 
-        final int reserved = plan.reservedFrom(claimLayers);
-        if (claimed) {
-            animating = true;
-        }
-        if (!animating) {
-            show(target(structure, status, reserved, now));
-        }
+        show(target(structure, now));
 
-        if (status == StructureStatus.READY_TO_CLAIM && isBuilding(structure)) {
+        if (status == StructureStatus.READY_TO_CLAIM) {
             if (flash == null) {
-                flash = new ClaimFlash(world, reservedBlocks(reserved), views.getMesher());
+                flash = new ClaimFlash(world, blocks(), views.getMesher());
             }
         } else if (flash != null) {
             flash.remove();
@@ -112,20 +100,8 @@ final class StructureView {
             prop.setLabel(label(type, structure, status, now));
             prop.setClaimable(status == StructureStatus.READY_TO_CLAIM);
         }
-        if (!animating && build.isComplete()) {
-            showPieces(structure, type);
-        }
-        lastStatus = status;
-    }
-
-    /** Puts the next held-back layer down, while a claim is animating in. */
-    void animate() {
-        if (!animating || build == null) {
-            return;
-        }
-        show(build.getShown() + 1);
         if (build.isComplete()) {
-            animating = false;
+            showPieces(structure, type);
         }
     }
 
@@ -191,7 +167,6 @@ final class StructureView {
         plan = null;
         placement = null;
         shape = null;
-        animating = false;
         slots = List.of();
         stocked.clear();
         pieces.clear();
@@ -277,8 +252,7 @@ final class StructureView {
         }
     }
 
-    /** @param claimLayers when the new shape was just claimed, how many layers to leave for its animation, else -1 */
-    private void rebuild(@NotNull PlacedStructure structure, @NotNull String newShape, int claimLayers) {
+    private void rebuild(@NotNull PlacedStructure structure, @NotNull String newShape) {
         clear();
         views.getShapes().placementOf(world, structure).ifPresent(found -> {
             placement = found;
@@ -286,9 +260,6 @@ final class StructureView {
             build = views.getRenderer().open(found, plan, structure.getId());
             slots = StructureStorage.slots(found, plan);
             shape = newShape;
-            if (claimLayers >= 0) {
-                show(plan.reservedFrom(claimLayers));
-            }
 
             final BoundingBox bounds = found.blockBounds();
             final Location labelAt = new Location(world, bounds.getCenterX(), bounds.getMaxY() + 0.5, bounds.getCenterZ());
@@ -298,14 +269,11 @@ final class StructureView {
         });
     }
 
-    private int target(@NotNull PlacedStructure structure, @NotNull StructureStatus status, int reserved, long now) {
+    private int target(@NotNull PlacedStructure structure, long now) {
         if (!isBuilding(structure)) {
             return plan.size();
         }
-        if (status == StructureStatus.READY_TO_CLAIM) {
-            return reserved;
-        }
-        return LayerPlan.layersAt(structure.getJob().progress(now), reserved);
+        return LayerPlan.layersAt(structure.getJob().progress(now), plan.size());
     }
 
     private static boolean isBuilding(@NotNull PlacedStructure structure) {
@@ -313,9 +281,9 @@ final class StructureView {
         return job != null && job.getKind() == JobKind.BUILD;
     }
 
-    private @NotNull List<Schematic.PlacedBlock> reservedBlocks(int reserved) {
+    private @NotNull List<Schematic.PlacedBlock> blocks() {
         final List<Schematic.PlacedBlock> blocks = new ArrayList<>();
-        for (int layer = reserved; layer < plan.size(); layer++) {
+        for (int layer = 0; layer < plan.size(); layer++) {
             plan.layer(layer).forEach(block -> blocks.add(placement.place(block)));
         }
         return blocks;

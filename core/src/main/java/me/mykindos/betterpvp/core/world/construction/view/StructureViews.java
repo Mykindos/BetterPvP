@@ -119,11 +119,6 @@ public class StructureViews implements Listener {
         }
     }
 
-    @UpdateEvent(delay = 150)
-    public void animate() {
-        worlds.values().forEach(loaded -> loaded.views.values().forEach(StructureView::animate));
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlaced(@NotNull StructurePlacedEvent event) {
         forSite(event.getSite(), (world, loaded) -> sync(world, loaded, event.getSite(), event.getStructure()));
@@ -225,9 +220,8 @@ public class StructureViews implements Listener {
     private void sync(@NotNull World world, @NotNull Loaded loaded, @NotNull SiteKey site,
                       @NotNull PlacedStructure structure) {
         catalogue.find(structure.getType()).ifPresent(type -> {
-            final int claimLayers = service.worksite(world).map(worksite -> worksite.getSite().claimLayers()).orElse(0);
             loaded.views.computeIfAbsent(structure.getId(), id -> new StructureView(this, world, loaded.scope))
-                    .sync(structure, type, claimLayers, service.now());
+                    .sync(structure, type, service.now());
         });
     }
 

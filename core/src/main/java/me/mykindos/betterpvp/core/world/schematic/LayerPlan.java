@@ -54,14 +54,6 @@ public final class LayerPlan {
         return layers.get(index);
     }
 
-    /**
-     * Where the last {@code reserved} layers begin, the ones held back for a finishing animation. A structure with fewer
-     * layers than that reserves all of them.
-     */
-    public int reservedFrom(int reserved) {
-        return Math.max(0, layers.size() - Math.max(0, reserved));
-    }
-
     /** How many layers a build {@code progress} of the way through (0 to 1) shows, out of the first {@code limit}. */
     public static int layersAt(double progress, int limit) {
         return (int) Math.floor(Math.clamp(progress, 0.0, 1.0) * limit);

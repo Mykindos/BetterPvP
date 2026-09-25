@@ -52,16 +52,6 @@ class LayerPlanTest {
     }
 
     @Test
-    void theLastLayersCanBeHeldBack() {
-        final LayerPlan plan = LayerPlan.of(new Schematic(1, 4, 1,
-                List.of(block(0, 0, 0), block(0, 1, 0), block(0, 2, 0), block(0, 3, 0))));
-
-        assertEquals(2, plan.reservedFrom(2));
-        assertEquals(0, plan.reservedFrom(10));
-        assertEquals(4, plan.reservedFrom(0));
-    }
-
-    @Test
     void progressMapsToWholeLayers() {
         assertEquals(0, LayerPlan.layersAt(0.0, 10));
         assertEquals(4, LayerPlan.layersAt(0.49, 10));

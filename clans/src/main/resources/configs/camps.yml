@@ -32,10 +32,6 @@ deposit:
     "minecraft:raw_iron": 1
     "minecraft:iron_ingot": 1
 
-construction:
-  # How many of a structure's top layers wait for the claim, then animate in.
-  claim-layers: 3
-
 # The numbers for each structure. What a structure is (its tier, what it needs, whether it can move or be demolished)
 # is code. Each stage names the structure build it uses, what it costs and how long it takes. Stages run in order,
 # the first being what building it produces. Times are in seconds. workforce is how much Workforce a crew of Builders

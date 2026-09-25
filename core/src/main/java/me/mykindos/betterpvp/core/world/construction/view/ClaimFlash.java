@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The part of a finished structure still waiting to be claimed, drawn as glowing blocks everyone can see, blinking so
- * the structure stands out as ready.
+ * A finished structure waiting to be claimed, drawn over as glowing blocks everyone can see, blinking so it stands out
+ * as ready.
  */
 final class ClaimFlash {
 
@@ -27,7 +27,7 @@ final class ClaimFlash {
     private final List<BlockDisplay> displays = new ArrayList<>();
     private boolean lit = true;
 
-    /** @param blocks the held-back blocks, at their world positions */
+    /** @param blocks the structure's blocks, at their world positions */
     ClaimFlash(@NotNull World world, @NotNull List<Schematic.PlacedBlock> blocks, @NotNull GhostMesher mesher) {
         for (GhostPiece piece : mesher.mesh(blocks)) {
             final Location at = new Location(world, piece.getX(), piece.getY(), piece.getZ());

@@ -69,7 +69,7 @@ class CampRulesTest {
                 ClanMember.MemberRank.RECRUIT, EnumSet.of(ConstructionAction.CLAIM)));
         resources = new CampResources(store, chests, campWide);
         permissions = new CampPermissions(clanManager, store, config);
-        construction = new CampConstruction(store, resources, permissions, config,
+        construction = new CampConstruction(store, resources, permissions,
                 new ResourceOverflow(store, resources, config), mock(CrewRule.class), mock(SalvageBin.class),
                 mock(ConstructionService.class), mock(RankLockbox.class));
     }

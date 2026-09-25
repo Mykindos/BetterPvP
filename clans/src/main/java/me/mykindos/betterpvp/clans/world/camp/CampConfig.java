@@ -41,8 +41,6 @@ public class CampConfig implements Reloadable {
 
     @Getter
     private int chestCapacity;
-    @Getter
-    private int claimLayers;
     private final Map<String, Deposit> deposits = new HashMap<>();
     private final Map<ResourceKind, Material> overflowItems = new EnumMap<>(ResourceKind.class);
     private final Map<ClanMember.MemberRank, Set<ConstructionAction>> permissions =
@@ -66,7 +64,6 @@ public class CampConfig implements Reloadable {
     public void reload() {
         final ExtendedYamlConfiguration config = clans.getConfig("camps");
         chestCapacity = config.getInt("resources.chest-capacity", 250);
-        claimLayers = config.getInt("construction.claim-layers", 3);
 
         deposits.clear();
         overflowItems.clear();

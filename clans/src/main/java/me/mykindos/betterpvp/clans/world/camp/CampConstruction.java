@@ -39,7 +39,6 @@ public class CampConstruction implements ConstructionSite {
     private final CampStore store;
     private final CampResources resources;
     private final CampPermissions permissions;
-    private final CampConfig config;
     private final ResourceOverflow overflow;
     private final CrewRule crews;
     private final SalvageBin salvageBin;
@@ -47,7 +46,7 @@ public class CampConstruction implements ConstructionSite {
 
     @Inject
     public CampConstruction(@NotNull CampStore store, @NotNull CampResources resources,
-                            @NotNull CampPermissions permissions, @NotNull CampConfig config,
+                            @NotNull CampPermissions permissions,
                             @NotNull ResourceOverflow overflow, @NotNull CrewRule crews,
                             @NotNull SalvageBin salvageBin, @NotNull ConstructionService service,
                             @NotNull RankLockbox lockbox) {
@@ -55,7 +54,6 @@ public class CampConstruction implements ConstructionSite {
         this.lockbox = lockbox;
         this.resources = resources;
         this.permissions = permissions;
-        this.config = config;
         this.overflow = overflow;
         this.crews = crews;
         this.salvageBin = salvageBin;
@@ -104,11 +102,6 @@ public class CampConstruction implements ConstructionSite {
     public double demolishRefund(@NotNull SiteKey site, @NotNull PlacedStructure structure,
                                  @NotNull StructureType type) {
         return salvageBin.refund(site, type.getFlags().getDemolishRefund());
-    }
-
-    @Override
-    public int claimLayers() {
-        return config.getClaimLayers();
     }
 
     /** Every job is worked by a crew of Builders. */
