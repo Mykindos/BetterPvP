@@ -175,7 +175,7 @@ public class SurveyorsTable implements Listener {
                     Component.text(seconds)).color(NamedTextColor.GREEN));
         } else {
             final Component reason = fitCheck.problem(world, worksite.getHolding(), type, placement, id)
-                    .orElse(Translations.component("core.construction.too_close", Component.text(FitCheck.CLEARANCE)));
+                    .orElseGet(() -> FitCheck.tooClose(type));
             tell(player, Translations.component("clans.camp.upgrade.surveyors_table.clashes", stage,
                     Component.text(seconds), reason.color(NamedTextColor.RED)).color(NamedTextColor.GOLD));
         }

@@ -65,8 +65,13 @@ public class FitCheck {
         if (nearby(bounds, occupied(world, holding, ignoring)).isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(Translations.component("core.construction.too_close", Component.text(CLEARANCE))
-                .color(NamedTextColor.RED));
+        return Optional.of(tooClose(type));
+    }
+
+    /** Why {@code type} cannot stand where it is: too close to another structure. */
+    public static @NotNull Component tooClose(@NotNull StructureType type) {
+        return Translations.component("core.construction.too_close", type.getDisplayName().color(NamedTextColor.WHITE))
+                .color(NamedTextColor.RED);
     }
 
     /**

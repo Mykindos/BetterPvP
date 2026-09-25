@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.core.world.construction.blueprint;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleQueue;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
@@ -47,9 +49,10 @@ import java.util.UUID;
 
 /**
  * Holding a blueprint in the main hand shows a ghost of its structure on the block the player looks at, green where it
- * can be built and red where it cannot, with the structure's name as a title and what to do, or why not, as the
- * subtitle. Each press of sneak turns it a quarter, and right-click builds it there, using the blueprint up. A blueprint
- * bound to a placed structure moves that structure there instead.
+ * can be built and red where it cannot. The structure's name is the title, what to do or that it cannot go there is
+ * the subtitle, and the action bar shows how to turn it or exactly why it does not fit. Each press of sneak turns it a
+ * quarter, and right-click builds it there, using the blueprint up. A blueprint bound to a placed structure moves that
+ * structure there instead.
  */
 @BPvPListener
 @Singleton
@@ -196,8 +199,7 @@ public class BlueprintSessions implements Listener {
         end(player);
         final int facing = BlockTransform.quarterTurnsBetween(schematic.get().getAnchorYaw(), player.getLocation().getYaw());
         final Session session = new Session(held.getStructure(), held.getMoving(),
-                previews.open(player, schematic.get()), clientManager.search().online(player).getGamer().getTitleQueue(),
-                facing);
+                previews.open(player, schematic.get()), clientManager.search().online(player).getGamer(), facing);
         sessions.put(player.getUniqueId(), session);
         return Optional.of(session);
     }
@@ -208,11 +210,13 @@ public class BlueprintSessions implements Listener {
             session.preview.hide();
             return;
         }
+        final Component turn = Translations.component("core.construction.blueprint.turn_hint").color(NamedTextColor.GRAY);
         final Location anchor = anchor(player);
         if (anchor == null) {
             session.preview.hide();
-            title(session, type.get().getDisplayName().color(NamedTextColor.RED),
-                    Translations.component("core.construction.blueprint.look_at_ground").color(NamedTextColor.RED));
+            hud(session, type.get().getDisplayName().color(NamedTextColor.RED),
+                    Translations.component("core.construction.blueprint.look_at_ground").color(NamedTextColor.RED),
+                    turn);
             return;
         }
 
@@ -221,30 +225,42 @@ public class BlueprintSessions implements Listener {
                 : construction.moveProblem(player, player.getWorld(), session.moving, anchor, session.quarterTurns);
         session.preview.setValid(problem.isEmpty());
         session.preview.show(anchor, session.quarterTurns);
-        title(session, type.get().getDisplayName().color(problem.isEmpty() ? NamedTextColor.GREEN : NamedTextColor.RED),
-                problem.orElse(Translations.component(session.moving == null
+        if (problem.isPresent()) {
+            hud(session, type.get().getDisplayName().color(NamedTextColor.RED),
+                    Translations.component("core.construction.blueprint.cannot_place").color(NamedTextColor.RED),
+                    problem.get());
+            return;
+        }
+        hud(session, type.get().getDisplayName().color(NamedTextColor.GREEN),
+                Translations.component(session.moving == null
                         ? "core.construction.blueprint.hint" : "core.construction.blueprint.move_hint")
-                        .color(NamedTextColor.GRAY)));
+                        .color(NamedTextColor.GRAY),
+                turn);
     }
 
     /**
-     * Shows {@code title} over {@code subtitle} for as long as the blueprint is held. Titles expire, so the same one is
-     * queued again shortly before it runs out, and a changed one replaces it at once.
+     * Shows {@code title} over {@code subtitle}, with {@code actionBar} below, for as long as the blueprint is held.
+     * <p>
+     * The action bar is re-sent every tick from the session, so it only needs its text swapped. A title is sent once and
+     * then runs out on the client, so it is sent with a long stay and replaced only when its text changes or well
+     * before that stay ends. Replacing it any later lets the client start fading it out first, which flickers.
      */
-    private static void title(@NotNull Session session, @NotNull Component title, @NotNull Component subtitle) {
+    private static void hud(@NotNull Session session, @NotNull Component title, @NotNull Component subtitle,
+                            @NotNull Component actionBar) {
+        session.actionBarText = actionBar;
+
         final TitleComponent current = session.title;
-        if (current != null && !current.isInvalid() && current.getRemaining() > 300
+        if (current != null && !current.isInvalid() && current.getRemaining() > 2500
                 && title.equals(session.titleText) && subtitle.equals(session.subtitleText)) {
             return;
         }
-
         if (current != null) {
-            session.titles.remove(current);
+            session.gamer.getTitleQueue().remove(current);
         }
         session.titleText = title;
         session.subtitleText = subtitle;
-        session.title = new TitleComponent(0, 0.5, 0.25, false, gamer -> title, gamer -> subtitle);
-        session.titles.add(10, session.title);
+        session.title = new TitleComponent(0, 5, 0.25, false, gamer -> title, gamer -> subtitle);
+        session.gamer.getTitleQueue().add(10, session.title);
     }
 
     private void end(@NotNull Player player) {
@@ -253,8 +269,15 @@ public class BlueprintSessions implements Listener {
             return;
         }
         previews.close(player);
-        if (session.title != null) {
-            session.titles.remove(session.title);
+        session.gamer.getActionBar().remove(session.actionBar);
+        final TitleComponent title = session.title;
+        if (title != null) {
+            final TitleQueue titles = session.gamer.getTitleQueue();
+            titles.remove(title);
+            // The client keeps a title up until its stay runs out, which is seconds after the blueprint is put away.
+            if (titles.isShowing(title)) {
+                player.clearTitle();
+            }
         }
     }
 
@@ -268,19 +291,23 @@ public class BlueprintSessions implements Listener {
         private final String type;
         private final @Nullable UUID moving;
         private final GhostPreview preview;
-        private final TitleQueue titles;
+        private final Gamer gamer;
+        /** Read by the action bar every tick, off the main thread. */
+        private final PermanentComponent actionBar = new PermanentComponent(viewer -> this.actionBarText);
+        private volatile @Nullable Component actionBarText;
         private int quarterTurns;
         private @Nullable TitleComponent title;
         private @Nullable Component titleText;
         private @Nullable Component subtitleText;
 
         private Session(@NotNull String type, @Nullable UUID moving, @NotNull GhostPreview preview,
-                        @NotNull TitleQueue titles, int quarterTurns) {
+                        @NotNull Gamer gamer, int quarterTurns) {
             this.type = type;
             this.moving = moving;
             this.preview = preview;
-            this.titles = titles;
+            this.gamer = gamer;
             this.quarterTurns = quarterTurns;
+            gamer.getActionBar().add(50, actionBar);
         }
     }
 }

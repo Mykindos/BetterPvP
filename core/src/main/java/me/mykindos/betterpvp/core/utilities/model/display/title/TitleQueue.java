@@ -56,6 +56,13 @@ public class TitleQueue implements IDisplayQueue<TitleComponent> {
         }
     }
 
+    /** Whether {@code component} is the title last sent to the player. */
+    public boolean isShowing(TitleComponent component) {
+        synchronized (lock) {
+            return showing.get() == component;
+        }
+    }
+
     public boolean hasElementsQueued() {
         synchronized (lock) {
             return !components.isEmpty();
