@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities.model.display;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -17,14 +18,18 @@ import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 
 /**
  * Renders a player's skin head as a block of tinted 1px glyphs, the same trick the combat
@@ -50,37 +55,59 @@ public class PlayerHeadProvider {
     // The 1px-left cursor pay-back that tiles pixels edge-to-edge, hoisted to one shared instance.
     private static final Component SPACE_BACK = Component.translatable("space.-1").font(Resources.Font.SPACE);
 
-    private final Core core;
+    private final Executor async;
+    private final SkinDownloader downloader;
+    private final Ticker ticker;
 
     // Finished, ready-to-append head blocks keyed by (player, scale, top) so a change to either layout
-    // input renders a fresh head instead of returning a stale one. Expiry doubles as a skin-change refresh.
-    private final Cache<HeadKey, Component> cache = Caffeine.newBuilder()
-            .maximumSize(512)
-            .expireAfterWrite(Duration.ofMinutes(5))
-            .build();
+    // input renders a fresh head instead of returning a stale one. Each entry is refreshed once its
+    // refresh time passes, which picks up skin changes, and keeps being painted until the refresh lands.
+    private final Cache<HeadKey, CachedHead> cache = Caffeine.newBuilder().maximumSize(512).build();
     // Keys whose skin is mid-fetch, so a head rendered every tick kicks off exactly one load per layout.
     private final Set<HeadKey> inFlight = ConcurrentHashMap.newKeySet();
+    private final TextColor[] placeholderGrid;
+    private final Map<Layout, Component> placeholders = new ConcurrentHashMap<>();
 
     @Inject
     public PlayerHeadProvider(Core core) {
-        this.core = core;
+        this(task -> UtilServer.runTaskAsync(core, task), PlayerHeadProvider::download, Ticker.systemTicker());
+    }
+
+    PlayerHeadProvider(Executor async, SkinDownloader downloader, Ticker ticker) {
+        this.async = async;
+        this.downloader = downloader;
+        this.ticker = ticker;
+        try (InputStream in = PlayerHeadProvider.class.getResourceAsStream("/skins/mhf_question.png")) {
+            this.placeholderGrid = readGrid(ImageIO.read(Objects.requireNonNull(in, "bundled placeholder skin")));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
-     * The player's head as a net-zero-advance component, or empty while the skin is still loading (the
-     * caller draws its frame without the head that tick and it pops in once ready).
+     * The placeholder head (the bundled MHF_Question skin) laid out like {@link #head(Player, int, int)}.
+     */
+    Component placeholder(int scale, int top) {
+        return placeholders.computeIfAbsent(new Layout(scale, top), layout -> build(placeholderGrid, scale, top));
+    }
+
+    /**
+     * The player's head as a net-zero-advance component. Until the skin has loaded, or when the player
+     * has no skin or its download failed, this is the {@link #placeholder(int, int)} head.
      *
      * @param scale on-screen size multiplier per skin pixel (e.g. 4 &rarr; a 32px head)
      * @param top   vertical offset of the head's top row, as an {@code offset/down_N} font index
      */
-    public Optional<Component> head(Player player, int scale, int top) {
+    public Component head(Player player, int scale, int top) {
         final HeadKey key = new HeadKey(player.getUniqueId(), scale, top);
-        final Component cached = cache.getIfPresent(key);
-        if (cached != null) {
-            return Optional.of(cached);
+        final CachedHead cached = cache.getIfPresent(key);
+        if (cached == null || ticker.read() >= cached.getRefreshAt()) {
+            load(player, key);
         }
-        load(player, key);
-        return Optional.empty();
+        if (cached == null || cached.getHead() == null) {
+            return placeholder(scale, top);
+        }
+        return cached.getHead();
     }
 
     private void load(Player player, HeadKey key) {
@@ -100,29 +127,41 @@ public class PlayerHeadProvider {
             return;
         }
 
-        UtilServer.runTaskAsync(core, () -> {
+        async.execute(() -> {
             try {
-                final TextColor[] grid = readGrid(skin);
-                if (grid != null) {
-                    cache.put(key, build(grid, key.getScale(), key.getTop()));
+                final TextColor[] grid = readGrid(downloader.download(skin));
+                if (grid == null) {
+                    retryLater(key);
+                } else {
+                    final long refreshAt = ticker.read() + Duration.ofMinutes(5).toNanos();
+                    cache.put(key, new CachedHead(build(grid, key.getScale(), key.getTop()), refreshAt));
                 }
             } catch (Exception e) {
-                log.warn("Failed to load skin head for {}", key.getPlayer(), e).submit();
+                log.warn("Failed to load skin head for {}: {}", key.getPlayer(), e.toString()).submit();
+                retryLater(key);
             } finally {
                 inFlight.remove(key);
             }
         });
     }
 
-    /** Download the skin and flatten its head face + hat into one 8&times;8 colour grid. */
-    private TextColor[] readGrid(URL skin) throws Exception {
+    private void retryLater(HeadKey key) {
+        final CachedHead previous = cache.getIfPresent(key);
+        final long retryAt = ticker.read() + Duration.ofSeconds(30).toNanos();
+        cache.put(key, new CachedHead(previous == null ? null : previous.getHead(), retryAt));
+    }
+
+    private static BufferedImage download(URL skin) throws IOException {
         final URLConnection conn = skin.openConnection();
         conn.setConnectTimeout(5000);
         conn.setReadTimeout(5000);
-        final BufferedImage img;
         try (InputStream in = conn.getInputStream()) {
-            img = ImageIO.read(in);
+            return ImageIO.read(in);
         }
+    }
+
+    /** Flatten the skin's head face + hat into one 8&times;8 colour grid. */
+    private static TextColor[] readGrid(BufferedImage img) {
         if (img == null) {
             return null;
         }
@@ -172,6 +211,25 @@ public class PlayerHeadProvider {
             }
         }
         return canvas.build().shadowColor(ShadowColor.none());
+    }
+
+    /** Fetches a skin texture image, or null when the response is not an image. */
+    @FunctionalInterface
+    interface SkinDownloader {
+        BufferedImage download(URL skin) throws IOException;
+    }
+
+    /** A rendered head, or null before the first successful load, and when it is next due a refresh. */
+    @Value
+    private static class CachedHead {
+        Component head;
+        long refreshAt;
+    }
+
+    @Value
+    private static class Layout {
+        int scale;
+        int top;
     }
 
     /** Cache identity for a rendered head: the same skin laid out at a different scale or top is a distinct entry. */

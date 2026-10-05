@@ -63,7 +63,7 @@ public class ClanHudInfo {
 
         // Cheap inputs that drive the whole readout. While they are unchanged we hand back the exact same
         // instance, which lets the overlay skip recompositing/resending the head every tick.
-        final Component head = playerHeadProvider.head(player, 3, 5).orElse(null);
+        final Component head = playerHeadProvider.head(player, 3, 16);
         final int coins = (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0);
         final String clanName = clanManager.getClanByPlayer(player).map(Clan::getName).orElse(null);
         final Zone zone = zoneManager.getZone(player);
@@ -76,29 +76,21 @@ public class ClanHudInfo {
             return prev.getRendered();
         }
 
-        final Component rendered = draw(gamer);
+        final Component rendered = draw(gamer, head);
         cache.put(player.getUniqueId(), new CachedHudInfo(coins, clanName, head, zone, rendered));
         return rendered;
     }
 
-    private Component draw(Gamer gamer) {
+    private Component draw(Gamer gamer, Component head) {
         final Player player = gamer.getPlayer();
-        if (player == null) {
-            return null;
-        }
 
         final FontCanvas canvas = new FontCanvas();
         final int avatarHeight = 38;
 
-        final Optional<Component> avatar = playerHeadProvider.head(player, 3, 16);
-        final boolean hasAvatar = avatar.isPresent();
         canvas.space(20);
-        int infoAdvance = 20;
-        if (hasAvatar) {
-            canvas.glyph('\uE000', TextColor.color(0xFDFAFD), "hud/down_40"); // 38px frame, head centered
-            canvas.space(-32).append(avatar.get()).space(32); // -32/+32 cancel; head is net-zero
-            infoAdvance += 38; // only the frame glyph's advance survives the avatar block
-        }
+        canvas.glyph('\uE000', TextColor.color(0xFDFAFD), "hud/down_40"); // 38px frame, head centered
+        canvas.space(-32).append(head).space(32); // -32/+32 cancel; head is net-zero
+        final int infoAdvance = 20 + 38; // only the frame glyph's advance survives the avatar block
 
         // Info
         final Optional<Clan> clanOpt = clanManager.getClanByPlayer(player);
@@ -123,7 +115,7 @@ public class ClanHudInfo {
 
         // Locator. Every drawRow is net-zero, so the only forward advance left is the lead space(20)
         // plus the avatar frame (both already in infoAdvance). Rewinding it lands the cursor back at the
-        // HUD origin, so the locator sits in the same spot regardless of clan/avatar state or text length.
+        // HUD origin, so the locator sits in the same spot regardless of clan state or text length.
         canvas.space(-infoAdvance);
 
         // Locator: the current zone/territory name. Resolve any translatable node (e.g. the wilderness
