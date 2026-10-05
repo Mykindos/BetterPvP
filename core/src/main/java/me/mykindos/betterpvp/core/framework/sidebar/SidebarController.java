@@ -106,7 +106,7 @@ public class SidebarController implements Listener {
         // A single self-gating HUD overlay element: it renders only while the mode is HUD and otherwise
         // returns null, which BossBarOverlay silently skips. Never removed on toggle.
         // Kept out of resetSidebar() because the game module re-runs that on state changes.
-        // Removed first so a rejoin that reuses the same gamer still holds exactly one.
+        // Quit clears the overlays. Removing first keeps a single one if join fires twice without a quit.
         gamer.getBossBarOverlay().remove(hudOverlay);
         gamer.getBossBarOverlay().add(hudOverlay);
 

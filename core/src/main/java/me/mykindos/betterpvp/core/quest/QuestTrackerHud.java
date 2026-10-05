@@ -36,6 +36,7 @@ public class QuestTrackerHud implements Listener {
     @EventHandler
     public void onJoin(ClientJoinEvent event) {
         final Gamer gamer = event.getClient().getGamer();
+        // Quit clears the overlays. Removing first keeps a single one if join fires twice without a quit.
         gamer.getBossBarOverlay().remove(overlay);
         gamer.getBossBarOverlay().add(overlay);
     }
