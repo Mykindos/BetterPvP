@@ -33,6 +33,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DialogSessions implements Listener {
 
     private static final String CLICK_PREFIX = "dialog/";
+    /** How long pressed content shows before the click runs. */
+    private static final int PRESS_TICKS = 3;
 
     private final DialogSender sender;
     private final DialogScheduler scheduler;
@@ -133,8 +135,9 @@ public class DialogSessions implements Listener {
         final List<CanvasElement> elements = screen.getCanvas().getElements();
         final Map<Integer, Key> regionKeys = new HashMap<>();
         for (int index = 0; index < elements.size(); index++) {
-            final DialogClick click = elements.get(index).getClick();
-            if (click != null) {
+            final CanvasElement element = elements.get(index);
+            if (element.getClick() != null) {
+                final DialogClick click = element.getPressed() == null ? element.getClick() : pressing(session, element);
                 regionKeys.put(index, register(session, click));
             }
         }
@@ -169,13 +172,32 @@ public class DialogSessions implements Listener {
         sender.show(player, new CompiledDialog(
                 screen.getName(),
                 DialogCompiler.backdrop(screen.getBackdrop(), screen.getCanvas().getWidth()),
-                DialogCompiler.body(screen.getCanvas(), regionKeys::get, background),
+                DialogCompiler.body(screen.getCanvas(), regionKeys::get, background, session.pressed),
                 screen.getCanvas().getWidth() + DialogCompiler.TEXT_INSET * 2 + 1,
                 fields,
                 buttons,
                 screen.getColumns(),
                 exit,
                 screen.isEscapable()));
+    }
+
+    /** Shows the element pressed, then runs its click and settles the screen once the press has shown. */
+    private DialogClick pressing(Session session, CanvasElement element) {
+        return (player, inputs) -> {
+            session.pressed = element;
+            send(player, session);
+            final int pressedId = session.id;
+            scheduler.later(PRESS_TICKS, () -> {
+                if (sessions.get(player.getUniqueId()) != session || session.id != pressedId) {
+                    return;
+                }
+                session.pressed = null;
+                element.getClick().onClick(player, inputs);
+                if (sessions.get(player.getUniqueId()) == session && session.id == pressedId) {
+                    send(player, session);
+                }
+            });
+        };
     }
 
     private static Key register(Session session, DialogClick click) {
@@ -210,6 +232,7 @@ public class DialogSessions implements Listener {
         private final DialogScreen screen;
         private final Map<String, Object> values;
         private final List<DialogClick> clicks = new ArrayList<>();
+        private CanvasElement pressed;
         private int id;
 
         private Session(DialogScreen screen, Map<String, Object> values) {

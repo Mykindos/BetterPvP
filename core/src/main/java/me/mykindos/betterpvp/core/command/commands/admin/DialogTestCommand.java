@@ -71,10 +71,13 @@ public class DialogTestCommand extends Command {
         canvas.text(84, 60, text(player, "core.dialog.test.clicks", TextColor.color(0xEEF0F5), Component.text(clicks)));
 
         final DialogClick confirm = (who, inputs) -> show(who, selected, clicks + 1);
-        final Component confirmTooltip = text(player, "core.dialog.test.confirm.tooltip", TextColor.color(0xEEF0F5));
-        canvas.art(208, 92, '\uE004', 80, 20).tooltip(confirmTooltip).onClick(confirm);
+        final Component confirmHover = Component.text('\uE008').font(Key.key("betterpvp", "ui"));
+        canvas.art(208, 92, '\uE004', 80, 20)
+                .pressed(Component.text('\uE007').font(Key.key("betterpvp", "ui")))
+                .hover(confirmHover)
+                .onClick(confirm);
         final Component confirmLabel = text(player, "core.dialog.test.confirm", TextColor.color(0x2A1606)).shadowColor(ShadowColor.none());
-        centre(canvas, 208, 92, 80, 20, confirmLabel).tooltip(confirmTooltip).onClick(confirm);
+        centre(canvas, 208, 92, 80, 20, confirmLabel).hover(confirmHover).onClick(confirm);
 
         sessions.open(player, DialogScreen.builder()
                 .name(text(player, "core.dialog.test.name", TextColor.color(0xEEF0F5)))

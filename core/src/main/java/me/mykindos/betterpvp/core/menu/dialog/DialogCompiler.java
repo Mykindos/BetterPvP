@@ -8,10 +8,14 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.ShadowColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntFunction;
 
 /**
@@ -26,6 +30,12 @@ final class DialogCompiler {
     static final int TEXT_INSET = 4;
     static final int LINE_HEIGHT = 9;
 
+    /**
+     * Colour of hover art. Its low three bits per channel (5, 3, 5) are the signature the pack's text shader looks
+     * for, kept in step with {@code rendertype_text.vsh}.
+     */
+    static final TextColor HOVER_SIGNATURE = TextColor.color(0xFDFBFD);
+
     /** The client draws a zero-width title from this many pixels left of the screen centre. */
     private static final int TITLE_ORIGIN = 15;
 
@@ -34,7 +44,7 @@ final class DialogCompiler {
 
     /** The body text. {@code clicks} gives the click key of the element at each index, or null. */
     static Component body(DialogCanvas canvas, IntFunction<Key> clicks) {
-        return body(canvas, clicks, null);
+        return body(canvas, clicks, null, null);
     }
 
     /**
@@ -42,7 +52,7 @@ final class DialogCompiler {
      * that no element handles go to {@code background}, so the server can re-render and clear the focus outline the
      * client draws around a clicked text block.
      */
-    static Component body(DialogCanvas canvas, IntFunction<Key> clicks, Key background) {
+    static Component body(DialogCanvas canvas, IntFunction<Key> clicks, Key background, CanvasElement pressed) {
         final List<CanvasElement> elements = canvas.getElements();
         final int lines = lines(canvas);
         final TextComponent.Builder body = Component.text();
@@ -65,7 +75,8 @@ final class DialogCompiler {
             for (int index : onLine) {
                 final CanvasElement element = elements.get(index);
                 appendSpace(body, element.getX() - cursor);
-                body.append(interactive(shift(element.getContent(), element.getY() % LINE_HEIGHT), element, clicks.apply(index)));
+                final Component content = element == pressed ? element.getPressed() : element.getContent();
+                body.append(interactive(shift(content, element.getY() % LINE_HEIGHT), element, clicks.apply(index)));
                 cursor = element.getX() + element.getWidth();
             }
             appendSpace(body, canvas.getWidth() - cursor);
@@ -118,10 +129,24 @@ final class DialogCompiler {
         if (click != null) {
             result = result.clickEvent(ClickEvent.custom(click, BinaryTagHolder.binaryTagHolder("{}")));
         }
-        if (element.getTooltip() != null) {
+        if (element.getHover() != null) {
+            result = result.hoverEvent(hoverArt(element.getHover()));
+        } else if (element.getTooltip() != null) {
             result = result.hoverEvent(HoverEvent.showText(element.getTooltip()));
         }
         return result;
+    }
+
+    /**
+     * An item tooltip whose name is the hover art, framed by the invisible {@code betterpvp:hover} tooltip style. The
+     * art carries {@link #HOVER_SIGNATURE} so the pack's text shader moves it from the mouse onto its element.
+     */
+    private static HoverEvent<HoverEvent.ShowItem> hoverArt(Component art) {
+        final Component name = art.color(HOVER_SIGNATURE).shadowColor(ShadowColor.none())
+                .decoration(TextDecoration.ITALIC, false);
+        return HoverEvent.showItem(HoverEvent.ShowItem.showItem(Key.key("paper"), 1, Map.of(
+                Key.key("custom_name"), BinaryTagHolder.binaryTagHolder(GsonComponentSerializer.gson().serialize(name)),
+                Key.key("tooltip_style"), BinaryTagHolder.binaryTagHolder("\"betterpvp:hover\""))));
     }
 
     /** Moves every font in the tree {@code offset} pixels down. Negative space stays as it is. */

@@ -42,14 +42,16 @@ public class CanvasElement {
     /**
      * Art drawn in place of this element while the mouse is over it. The art travels in the hover tooltip and the
      * pack's text shader moves it from the mouse onto the element, so it must be a hover glyph generated for this
-     * element's position.
+     * element's position. It takes the place of a text tooltip.
      */
     public CanvasElement hover(Component art) {
-        throw new UnsupportedOperationException();
+        this.hover = art;
+        return this;
     }
 
     /** Content shown in place of this element for a moment after it is clicked, before the click runs. */
     public CanvasElement pressed(Component content) {
-        throw new UnsupportedOperationException();
+        this.pressed = content;
+        return this;
     }
 }
