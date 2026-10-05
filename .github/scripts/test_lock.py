@@ -1,7 +1,6 @@
 """Fails when a commit after a PR's first `test:` commit changes src/test/ without its own `test:` prefix.
 
-Tests are written and approved first, then the implementation has to pass them as they are. The recorded convention
-baselines are the exception, since re-recording them is part of fixing an old break.
+Tests are written and approved first, then the implementation has to pass them as they are.
 
     python3 test_lock.py <base sha> <head sha>
 """
@@ -11,12 +10,6 @@ import sys
 
 def git(*args):
     return subprocess.run(["git", *args], capture_output=True, text=True, check=True).stdout
-
-
-def locked_files(files):
-    """The test files among these paths. The recorded convention baselines are generated, so they stay editable."""
-    baselines = ("conventions/src/test/resources/source-baseline.tsv", "conventions/src/test/resources/archunit_store/")
-    return [f for f in files if "/src/test/" in f"/{f}" and not f.startswith(baselines)]
 
 
 def main():
@@ -33,7 +26,7 @@ def main():
         if not locked:
             continue
         files = git("diff-tree", "--no-commit-id", "--name-only", "-r", sha).split()
-        tests = locked_files(files)
+        tests = [f for f in files if "/src/test/" in f"/{f}"]
         if tests:
             broken.append(f"{sha[:8]} {subject}\n    " + "\n    ".join(tests))
 
