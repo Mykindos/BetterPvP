@@ -23,7 +23,8 @@ def changed_classes(base, head):
             continue
         module, source = path.split("/src/main/java/", 1)
         if pathlib.Path(module, "src/test/java").is_dir():
-            by_module[module].append(source[:-len(".java")].replace("/", ".") + "*")
+            name = source[:-len(".java")].replace("/", ".")
+            by_module[module] += [name, name + "$*"]
     return by_module
 
 
