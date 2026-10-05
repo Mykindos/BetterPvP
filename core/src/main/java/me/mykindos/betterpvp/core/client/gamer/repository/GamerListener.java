@@ -114,7 +114,7 @@ public class GamerListener implements Listener {
         gamer.getPlayerList().add(PlayerListType.HEADER, header);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
         final Gamer gamer = this.manager.search().online(player).getGamer();
