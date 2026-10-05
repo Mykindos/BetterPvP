@@ -102,6 +102,15 @@ class SourceRuleTest {
     }
 
     @Test
+    void ac1_messageStartingWithMiniMessageTagIsHardcoded() {
+        assertEquals(List.of(2), lines(SourceRule.HARDCODED_PLAYER_TEXT, """
+                void tell(Player player) {
+                    UtilMessage.message(player, "Clans", "<gray>Loaded");
+                }
+                """));
+    }
+
+    @Test
     void translatedMessageAndCommentedMessageAreFine() {
         assertEquals(List.of(), lines(SourceRule.HARDCODED_PLAYER_TEXT, """
                 void tell(Player player) {
@@ -127,6 +136,15 @@ class SourceRuleTest {
                 class A {
                     /** The key used to look up the bundle. */
                     String note = "previously";
+                }
+                """));
+    }
+
+    @Test
+    void ac3_noLongerInACommentIsFine() {
+        assertEquals(List.of(), lines(SourceRule.REFACTOR_NARRATIVE, """
+                class A {
+                    // The handle is no longer valid once the chunk unloads.
                 }
                 """));
     }
