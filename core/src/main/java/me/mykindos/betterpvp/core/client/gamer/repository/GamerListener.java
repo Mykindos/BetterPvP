@@ -23,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -110,6 +111,10 @@ public class GamerListener implements Listener {
         gamer.getPlayerList().clear();
         gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
         gamer.getPlayerList().add(PlayerListType.HEADER, header);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onQuit(PlayerQuitEvent event) {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

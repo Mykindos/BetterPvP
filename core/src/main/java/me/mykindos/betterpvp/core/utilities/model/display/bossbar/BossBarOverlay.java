@@ -89,6 +89,13 @@ public class BossBarOverlay {
         }
     }
 
+    /** @return the number of overlays in the list, including ones whose provider renders nothing this tick. */
+    public int size() {
+        synchronized (lock) {
+            return overlays.size();
+        }
+    }
+
     /**
      * Composites all active overlays into the boss bar name and shows it to the player.
      *
