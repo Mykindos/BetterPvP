@@ -1,0 +1,57 @@
+{
+  "$schema": "schema/screen.schema.json",
+  "canvas": { "width": 300, "height": 120 },
+  "name": { "key": "core.dialog.test.name" },
+  "state": { "tab": "overview", "clicks": 0, "rewards": [], "picked": null },
+  "backdrop": [
+    { "box": "panel", "x": 0, "y": 0, "width": 300, "height": 120 }
+  ],
+  "elements": [
+    { "text": { "key": "core.dialog.test.name" }, "x": 0, "y": 4, "width": 300, "align": "center", "style": "title" },
+    {
+      "column": { "x": 8, "y": 22, "cell": [64, 18], "gap": 5 },
+      "children": [
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'overview'}", "width": 64, "height": 18,
+          "label": { "key": "core.dialog.test.tab.1" }, "tooltip": { "key": "core.dialog.test.tab.tooltip" },
+          "on_click": { "set": { "tab": "overview" } } },
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'details'}", "width": 64, "height": 18,
+          "label": { "key": "core.dialog.test.tab.2" }, "tooltip": { "key": "core.dialog.test.tab.tooltip" },
+          "on_click": { "set": { "tab": "details" } } },
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'rewards'}", "width": 64, "height": 18,
+          "label": { "key": "core.dialog.test.tab.3" }, "tooltip": { "key": "core.dialog.test.tab.tooltip" },
+          "on_click": { "set": { "tab": "rewards" } } }
+      ]
+    },
+    {
+      "switch": "{tab}",
+      "cases": {
+        "overview": [
+          { "text": { "key": "core.dialog.test.tab.1" }, "x": 84, "y": 24, "style": "title" },
+          { "text": { "key": "core.dialog.test.description.1" }, "x": 84, "y": 40, "style": "muted" },
+          { "text": { "key": "core.dialog.test.clicks", "args": ["{clicks}"] }, "x": 84, "y": 60 },
+          { "button": "gold", "x": 208, "y": 92, "width": 80, "height": 20, "label": { "key": "core.dialog.test.confirm" },
+            "label_style": "on_gold", "hover": "rim", "pressed": true, "on_click": { "set": { "clicks": "{clicks + 1}" } } }
+        ],
+        "details": [
+          { "text": { "key": "core.dialog.test.tab.2" }, "x": 84, "y": 24, "style": "title" },
+          { "text": { "key": "core.dialog.test.description.2" }, "x": 84, "y": 40, "style": "muted" },
+          { "icon": "coin_spin", "x": 84, "y": 60, "width": 16, "height": 16, "frames": 8, "fps": 10 }
+        ],
+        "rewards": [
+          { "text": { "key": "core.dialog.test.tab.3" }, "x": 84, "y": 24, "style": "title" },
+          { "text": { "key": "core.dialog.test.description.3" }, "x": 84, "y": 86, "style": "muted" },
+          {
+            "repeat": "rewards", "max": 4,
+            "layout": { "grid": { "x": 84, "y": 40, "cell": [100, 18], "gap": 4, "columns": 2 } },
+            "children": [
+              { "button": "steel", "width": 100, "height": 18, "label": "{item}", "hover": "rim",
+                "on_click": { "set": { "picked": "{item}" } } }
+            ]
+          }
+        ]
+      }
+    },
+    { "when": "{picked && tab == 'rewards'}", "then": [ { "text": "{picked}", "x": 84, "y": 100, "style": "value" } ] }
+  ],
+  "exit": { "label": { "key": "core.dialog.test.close" }, "tooltip": { "key": "core.dialog.test.close.tooltip" }, "width": 80 }
+}

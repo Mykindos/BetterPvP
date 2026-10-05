@@ -1,0 +1,281 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://betterpvp.net/schema/gui/screen.schema.json",
+  "title": "BetterPvP GUI screen",
+  "description": "A full-screen dialog GUI. Read by the plugin at startup and by the pack generator (Resourcepack/tools/gui/build_gui.py). See docs/core-gui-screens.md.",
+  "type": "object",
+  "required": ["canvas"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string", "description": "Screen id. Defaults to the file name. Opened as <namespace>:<id>." },
+    "canvas": {
+      "type": "object",
+      "description": "Canvas size in GUI pixels. Keep it within 300 x 170 so the dialog fits a 480 x 270 screen (GUI scale 4 at 1080p).",
+      "required": ["width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "width": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 1000 }
+      }
+    },
+    "name": { "$ref": "#/definitions/text", "description": "Name the client shows in lists. Never drawn on the screen." },
+    "state": { "type": "object", "description": "Default state. Every key the screen reads should be listed here. Java can override them when opening." },
+    "actions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Names of actions Java binds when opening the screen. Other called actions must be registered globally."
+    },
+    "sounds": {
+      "type": "object",
+      "description": "Sound ids for screen events. Missing ones use the theme defaults.",
+      "additionalProperties": false,
+      "properties": {
+        "open": { "type": "string" },
+        "close": { "type": "string" },
+        "click": { "type": "string" },
+        "error": { "type": "string" }
+      }
+    },
+    "components": {
+      "type": "object",
+      "description": "Components only this screen uses. Shared ones go in gui/components/*.json.",
+      "additionalProperties": { "$ref": "#/definitions/component" }
+    },
+    "backdrop": {
+      "type": "array",
+      "description": "Art drawn in the dialog title, behind the canvas, never clipped and never clickable. Boxes and layout groups only.",
+      "items": { "$ref": "#/definitions/node" }
+    },
+    "elements": { "type": "array", "description": "The canvas, top to bottom.", "items": { "$ref": "#/definitions/node" } },
+    "fields": { "type": "array", "description": "Inputs below the canvas. Each writes its value into a state key.", "items": { "$ref": "#/definitions/field" } },
+    "buttons": { "type": "array", "description": "Vanilla buttons in a grid below the canvas.", "items": { "$ref": "#/definitions/nativeButton" } },
+    "columns": { "type": "integer", "minimum": 1, "default": 2, "description": "Columns of the button grid." },
+    "exit": { "$ref": "#/definitions/nativeButton", "description": "The footer button. Closes the screen unless on_click says otherwise." },
+    "escapable": { "type": "boolean", "default": true, "description": "Whether Escape closes the screen." }
+  },
+  "definitions": {
+    "text": {
+      "description": "A template with {bindings}, or a translation key whose args are templates.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "required": ["key"],
+          "additionalProperties": false,
+          "properties": {
+            "key": { "type": "string", "description": "Translation key, present in all 12 locale files." },
+            "args": { "type": "array", "items": { "type": "string" }, "description": "Templates for {0}, {1} and so on." }
+          }
+        }
+      ]
+    },
+    "binding": { "type": "string", "pattern": "^\\{.*\\}$", "description": "An expression in braces, such as {tab == 'skills'}." },
+    "position": {
+      "x": { "type": "integer", "description": "GUI pixels from the left of the canvas, or of the cell a layout gives this element." },
+      "y": { "type": "integer", "description": "GUI pixels from the top of the canvas, or of the cell." }
+    },
+    "action": {
+      "description": "What a click does. A string calls a named action. An array runs actions in order.",
+      "oneOf": [
+        { "type": "string", "description": "Calls a named action bound at open or registered globally." },
+        { "type": "array", "items": { "$ref": "#/definitions/action" } },
+        {
+          "type": "object", "required": ["call"], "additionalProperties": false,
+          "properties": {
+            "call": { "type": "string", "description": "Action name." },
+            "args": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Arguments, as templates." }
+          }
+        },
+        {
+          "type": "object", "required": ["set"], "additionalProperties": false,
+          "properties": { "set": { "type": "object", "additionalProperties": { "type": "string" }, "description": "State keys to set, as templates. Re-renders." } }
+        },
+        {
+          "type": "object", "required": ["open"], "additionalProperties": false,
+          "properties": {
+            "open": { "type": "string", "description": "Screen to open on top: an id in this namespace, or namespace:id." },
+            "state": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Its starting state, as templates." }
+          }
+        },
+        { "type": "object", "required": ["back"], "additionalProperties": false, "properties": { "back": { "const": true, "description": "Returns to the screen below." } } },
+        { "type": "object", "required": ["close"], "additionalProperties": false, "properties": { "close": { "const": true } } },
+        { "type": "object", "required": ["sound"], "additionalProperties": false, "properties": { "sound": { "type": "string", "description": "Sound id to play." } } }
+      ]
+    },
+    "textStyle": {
+      "description": "A registered text style. Core has body, muted, value, title, error and on_gold. Plugins can add more.",
+      "anyOf": [
+        { "enum": ["body", "muted", "value", "title", "error", "on_gold"] },
+        { "type": "string" }
+      ]
+    },
+    "style": { "$ref": "theme.schema.json#/definitions/style" },
+    "hoverStyle": { "$ref": "theme.schema.json#/definitions/hoverStyle" },
+    "sprite": { "$ref": "theme.schema.json#/definitions/sprite" },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "cell": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 2, "maxItems": 2, "description": "Cell width and height." },
+        "gap": { "type": "integer", "minimum": 0, "description": "Pixels between cells." },
+        "columns": { "type": "integer", "minimum": 1, "description": "Cells per row, for grids." }
+      }
+    },
+    "node": {
+      "description": "One element. The key that names its type decides which properties apply.",
+      "oneOf": [
+        {
+          "type": "object", "required": ["text"], "additionalProperties": false,
+          "description": "Text.",
+          "properties": {
+            "text": { "$ref": "#/definitions/text" },
+            "x": { "$ref": "#/definitions/position/x" }, "y": { "$ref": "#/definitions/position/y" },
+            "style": { "$ref": "#/definitions/textStyle" },
+            "align": { "enum": ["left", "center", "right"], "default": "left" },
+            "width": { "type": "integer", "description": "Box the alignment works in." },
+            "tooltip": { "$ref": "#/definitions/text" },
+            "on_click": { "$ref": "#/definitions/action" }
+          }
+        },
+        {
+          "type": "object", "required": ["box", "width", "height"], "additionalProperties": false,
+          "description": "Style art at a size: a panel, frame or divider.",
+          "properties": {
+            "box": { "$ref": "#/definitions/style" },
+            "x": { "$ref": "#/definitions/position/x" }, "y": { "$ref": "#/definitions/position/y" },
+            "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 7, "maximum": 256 }
+          }
+        },
+        {
+          "type": "object", "required": ["button", "width", "height"], "additionalProperties": false,
+          "description": "A clickable box with a centred label.",
+          "properties": {
+            "button": { "$ref": "#/definitions/style" },
+            "x": { "$ref": "#/definitions/position/x" }, "y": { "$ref": "#/definitions/position/y" },
+            "width": { "type": "integer", "minimum": 1, "maximum": 254 }, "height": { "type": "integer", "minimum": 7, "maximum": 256 },
+            "label": { "$ref": "#/definitions/text" },
+            "label_style": { "$ref": "#/definitions/textStyle" },
+            "selected": { "$ref": "#/definitions/binding", "description": "When true, draws selected_style instead." },
+            "selected_style": { "$ref": "#/definitions/style" },
+            "hover": { "$ref": "#/definitions/hoverStyle", "description": "Hover art the pack pins over this button. Replaces the tooltip." },
+            "pressed": { "type": "boolean", "description": "Shows the style's pressed art for a moment after a click." },
+            "tooltip": { "$ref": "#/definitions/text" },
+            "on_click": { "$ref": "#/definitions/action" }
+          }
+        },
+        {
+          "type": "object", "required": ["icon", "width", "height"], "additionalProperties": false,
+          "description": "A sprite from Resourcepack/gui/sprites. With frames above 1 it loops on the client.",
+          "properties": {
+            "icon": { "$ref": "#/definitions/sprite" },
+            "x": { "$ref": "#/definitions/position/x" }, "y": { "$ref": "#/definitions/position/y" },
+            "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 7, "maximum": 256 },
+            "frames": { "type": "integer", "minimum": 1, "description": "Frames stacked top to bottom in the sprite." },
+            "fps": { "type": "integer", "minimum": 1 },
+            "tooltip": { "$ref": "#/definitions/text" },
+            "on_click": { "$ref": "#/definitions/action" }
+          }
+        },
+        {
+          "type": "object", "required": ["row"], "additionalProperties": false, "description": "Children left to right, one per cell.",
+          "properties": { "row": { "$ref": "#/definitions/layout" }, "children": { "type": "array", "items": { "$ref": "#/definitions/node" } } }
+        },
+        {
+          "type": "object", "required": ["column"], "additionalProperties": false, "description": "Children top to bottom, one per cell.",
+          "properties": { "column": { "$ref": "#/definitions/layout" }, "children": { "type": "array", "items": { "$ref": "#/definitions/node" } } }
+        },
+        {
+          "type": "object", "required": ["grid"], "additionalProperties": false, "description": "Children in rows of `columns` cells.",
+          "properties": { "grid": { "$ref": "#/definitions/layout" }, "children": { "type": "array", "items": { "$ref": "#/definitions/node" } } }
+        },
+        {
+          "type": "object", "required": ["repeat", "max", "layout"], "additionalProperties": false,
+          "description": "Repeats its children for each entry of a state list, up to max, one copy per layout cell.",
+          "properties": {
+            "repeat": { "type": "string", "description": "State key of the list." },
+            "as": { "type": "string", "default": "item", "description": "Name each entry is bound as. The index is bound as index." },
+            "max": { "type": "integer", "minimum": 1, "description": "Most copies shown. The pack prepares art for every slot." },
+            "layout": {
+              "type": "object", "additionalProperties": false, "minProperties": 1, "maxProperties": 1,
+              "properties": { "row": { "$ref": "#/definitions/layout" }, "column": { "$ref": "#/definitions/layout" }, "grid": { "$ref": "#/definitions/layout" } }
+            },
+            "children": { "type": "array", "items": { "$ref": "#/definitions/node" } }
+          }
+        },
+        {
+          "type": "object", "required": ["switch", "cases"], "additionalProperties": false,
+          "description": "Shows the case named by a binding, for tabs whose contents differ.",
+          "properties": {
+            "switch": { "$ref": "#/definitions/binding" },
+            "cases": { "type": "object", "additionalProperties": { "type": "array", "items": { "$ref": "#/definitions/node" } } },
+            "default": { "type": "array", "items": { "$ref": "#/definitions/node" } }
+          }
+        },
+        {
+          "type": "object", "required": ["when"], "additionalProperties": false,
+          "description": "Shows then or else by a condition.",
+          "properties": {
+            "when": { "$ref": "#/definitions/binding" },
+            "then": { "type": "array", "items": { "$ref": "#/definitions/node" } },
+            "else": { "type": "array", "items": { "$ref": "#/definitions/node" } }
+          }
+        },
+        {
+          "type": "object", "required": ["use"], "additionalProperties": false,
+          "description": "Places a component, offset by x and y, with its parameters bound.",
+          "properties": {
+            "use": { "type": "string", "description": "Component name: this screen's, then the namespace's, then core's. Or namespace:name." },
+            "x": { "$ref": "#/definitions/position/x" }, "y": { "$ref": "#/definitions/position/y" },
+            "with": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Parameter values, as templates." }
+          }
+        },
+        {
+          "type": "object", "required": ["custom"], "additionalProperties": false,
+          "description": "An element drawn by a Java element type.",
+          "properties": {
+            "custom": { "type": "string", "description": "Registered element type, namespace:name." },
+            "x": { "$ref": "#/definitions/position/x" }, "y": { "$ref": "#/definitions/position/y" },
+            "width": { "type": "integer" }, "height": { "type": "integer" },
+            "properties": { "type": "object", "description": "Properties the element type reads." },
+            "assets": { "type": "array", "items": { "$ref": "#/definitions/node" }, "description": "Every piece of art the type may draw, positioned relative to this element." }
+          }
+        }
+      ]
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "params": { "type": "array", "items": { "type": "string" }, "description": "Parameters, bound like state keys inside the component." },
+        "elements": { "type": "array", "items": { "$ref": "#/definitions/node" } }
+      }
+    },
+    "field": {
+      "oneOf": [
+        { "type": "object", "required": ["text_field", "label"], "additionalProperties": false,
+          "properties": { "text_field": { "type": "string", "description": "State key it writes." }, "label": { "$ref": "#/definitions/text" }, "width": { "type": "integer" }, "max_length": { "type": "integer" } } },
+        { "type": "object", "required": ["toggle", "label"], "additionalProperties": false,
+          "properties": { "toggle": { "type": "string" }, "label": { "$ref": "#/definitions/text" }, "width": { "type": "integer" } } },
+        { "type": "object", "required": ["slider", "label", "start", "end"], "additionalProperties": false,
+          "properties": { "slider": { "type": "string" }, "label": { "$ref": "#/definitions/text" }, "width": { "type": "integer" }, "start": { "type": "number" }, "end": { "type": "number" }, "step": { "type": "number" } } },
+        { "type": "object", "required": ["choice", "label", "options"], "additionalProperties": false,
+          "properties": { "choice": { "type": "string" }, "label": { "$ref": "#/definitions/text" }, "width": { "type": "integer" },
+            "options": { "type": "array", "items": { "type": "object", "required": ["id", "label"], "additionalProperties": false, "properties": { "id": { "type": "string" }, "label": { "$ref": "#/definitions/text" } } } } } }
+      ]
+    },
+    "nativeButton": {
+      "type": "object",
+      "required": ["label"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "$ref": "#/definitions/text" },
+        "tooltip": { "$ref": "#/definitions/text" },
+        "width": { "type": "integer", "minimum": 1, "maximum": 1024, "default": 150 },
+        "on_click": { "$ref": "#/definitions/action" }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://betterpvp.net/schema/gui/assets.schema.json",
+  "title": "BetterPvP GUI asset declarations",
+  "description": "Art for screens built in Java (gui/assets/*.json). Write the nodes the code will place, at the same positions, so the pack generates their art.",
+  "type": "object",
+  "required": ["canvas", "assets"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "canvas": {
+      "type": "object", "required": ["width"], "additionalProperties": false,
+      "properties": { "width": { "type": "integer", "description": "Canvas width of the screens these assets serve. Hover art depends on it." } }
+    },
+    "assets": { "type": "array", "items": { "$ref": "screen.schema.json#/definitions/node" } }
+  }
+}
