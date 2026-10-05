@@ -38,7 +38,8 @@ final class SourceBaseline {
             } else if (lines.size() < allowed) {
                 failures.add(parts[1] + ": " + description + " (" + lines.size() + " found, " + allowed
                         + " in the baseline). Re-record the baseline with ./gradlew :conventions:test "
-                        + "-PupdateBaseline so fixed breaks cannot come back.");
+                        + "-PupdateBaseline so fixed breaks cannot come back, and commit it on its own with a test: "
+                        + "message, since the baseline is locked like the tests.");
             }
         }
         return failures;
