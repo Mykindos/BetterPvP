@@ -36,6 +36,7 @@ public class SidebarController implements Listener {
     private @NotNull Function<Gamer, Sidebar> defaultProvider = gamer -> null;
     @Getter
     private @NotNull Function<Gamer, Component> hudProvider = gamer -> null;
+    private final DisplayObject<Component> hudOverlay = new DisplayObject<>(this::renderHud);
 
     @Inject
     private SidebarController(@NotNull ClientManager clientManager, @NotNull Core core) {
@@ -103,9 +104,11 @@ public class SidebarController implements Listener {
         final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
 
         // A single self-gating HUD overlay element: it renders only while the mode is HUD and otherwise
-        // returns null, which BossBarOverlay silently skips. Added once per join; never removed on toggle.
+        // returns null, which BossBarOverlay silently skips. Never removed on toggle.
         // Kept out of resetSidebar() because the game module re-runs that on state changes.
-        gamer.getBossBarOverlay().add(new DisplayObject<>(this::renderHud));
+        // Quit clears the overlays. Removing first keeps a single one if join fires twice without a quit.
+        gamer.getBossBarOverlay().remove(hudOverlay);
+        gamer.getBossBarOverlay().add(hudOverlay);
 
         resetSidebar(gamer);
     }
