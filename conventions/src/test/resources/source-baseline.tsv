@@ -239,7 +239,7 @@ HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/comm
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/SetSpawnCommand.java	1
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/zone/ZoneCommand.java	1
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/zone/ZoneDiscoveryAddSubCommand.java	4
-HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/zone/ZoneDiscoveryListSubCommand.java	4
+HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/zone/ZoneDiscoveryListSubCommand.java	5
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/zone/ZoneDiscoveryRemoveSubCommand.java	4
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/zone/ZoneDiscoveryResetSubCommand.java	3
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/commands/admin/zone/ZoneDiscoverySubCommand.java	1
@@ -256,7 +256,7 @@ HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/comm
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/command/listener/CommandListener.java	1
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/cooldowns/CooldownManager.java	3
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/cutscene/CutsceneManager.java	2
-HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/cutscene/command/CutsceneCommand.java	17
+HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/cutscene/command/CutsceneCommand.java	18
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/effects/listeners/effects/FrozenListener.java	2
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/effects/listeners/effects/ProtectionListener.java	7
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/effects/types/negative/AntiHealEffect.java	1
@@ -288,7 +288,7 @@ HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/item/impl/in
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/item/overload/OverloadListener.java	1
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/loot/command/LootCommand.java	2
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/quest/QuestManager.java	6
-HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/quest/command/QuestCommand.java	7
+HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/quest/command/QuestCommand.java	11
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/quest/conversation/ConversationManager.java	3
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/repair/SalvageStationListener.java	2
 HARDCODED_PLAYER_TEXT	core/src/main/java/me/mykindos/betterpvp/core/scene/command/NPCCommand.java	4
