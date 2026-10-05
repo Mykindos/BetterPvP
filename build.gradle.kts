@@ -128,6 +128,7 @@ subprojects {
             junit5PluginVersion.set("1.2.3")
             targetClasses.set(providers.gradleProperty("pitTargetClasses").map { it.split(",") }
                 .orElse(listOf("me.mykindos.betterpvp.*")))
+            targetTests.set(listOf("me.mykindos.betterpvp.*Test", "me.mykindos.betterpvp.*Tests"))
             threads.set(4)
             outputFormats.set(listOf("XML", "HTML"))
             timestampedReports.set(false)
