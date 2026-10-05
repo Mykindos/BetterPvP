@@ -2,7 +2,8 @@ name: AI review
 
 # Asks the "BetterPvP PR review" routine on claude.ai to review a pipeline PR. The routine posts one comment per
 # commit, ending in claude-review:<sha>, and skips commits it already reviewed. Its skip check races when two runs
-# start together, so events for one PR wait a minute and a newer event cancels the waiting one.
+# start together, so events for one PR wait a minute and a newer event cancels the waiting one. Each request names
+# its commit, and the routine skips commits that are no longer the head.
 
 on:
   pull_request:
@@ -29,6 +30,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.CLAUDE_REVIEW_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           if [ -z "$TOKEN" ]; then
             echo "::warning::CLAUDE_REVIEW_TOKEN is not set, so no review was requested."
@@ -39,5 +41,5 @@ jobs:
             -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
             -H "anthropic-version: 2023-06-01" \
             -H "Content-Type: application/json" \
-            -d "{\"text\": \"{\\\"pr\\\": $PR}\"}" > /dev/null
+            -d "{\"text\": \"{\\\"pr\\\": $PR, \\\"sha\\\": \\\"$SHA\\\"}\"}" > /dev/null
           echo "Review requested for #$PR."
