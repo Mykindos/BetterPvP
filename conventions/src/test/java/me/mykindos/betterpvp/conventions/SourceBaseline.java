@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.conventions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -25,7 +26,11 @@ final class SourceBaseline {
             List<Integer> lines = found.getOrDefault(key, List.of());
             int allowed = baseline.getOrDefault(key, 0);
             String[] parts = key.split("\t");
-            String description = SourceRule.valueOf(parts[0]).description();
+            String description = Arrays.stream(SourceRule.values())
+                    .filter(rule -> rule.name().equals(parts[0]))
+                    .map(SourceRule::description)
+                    .findFirst()
+                    .orElse("unknown rule " + parts[0]);
             if (lines.size() > allowed) {
                 failures.add(parts[1] + " lines " + lines + ": " + description + " (" + lines.size() + " found, "
                         + allowed + " allowed by the baseline). Fix them, or for a genuine exception add "
