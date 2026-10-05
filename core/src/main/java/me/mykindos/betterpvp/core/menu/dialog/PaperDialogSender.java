@@ -7,6 +7,7 @@ import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.body.DialogBody;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
+import io.papermc.paper.registry.data.dialog.input.NumberRangeDialogInput;
 import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import org.bukkit.entity.Player;
@@ -63,11 +64,15 @@ public class PaperDialogSender implements DialogSender {
             case DialogField.Toggle toggle -> DialogInput.bool(toggle.getKey(), toggle.getLabel())
                     .initial(toggle.isInitial())
                     .build();
-            case DialogField.Slider slider -> DialogInput.numberRange(slider.getKey(), slider.getLabel(), slider.getStart(), slider.getEnd())
-                    .width(slider.getWidth())
-                    .step(slider.getStep())
-                    .initial(slider.getInitial())
-                    .build();
+            case DialogField.Slider slider -> {
+                final NumberRangeDialogInput.Builder builder = DialogInput.numberRange(slider.getKey(), slider.getLabel(), slider.getStart(), slider.getEnd())
+                        .width(slider.getWidth())
+                        .step(slider.getStep());
+                if (slider.getInitial() != null) {
+                    builder.initial(slider.getInitial());
+                }
+                yield builder.build();
+            }
             case DialogField.Choice choice -> DialogInput.singleOption(choice.getKey(), choice.getLabel(), choice.getOptions().stream()
                             .map(option -> SingleOptionDialogInput.OptionEntry.create(option.getId(), option.getDisplay(), option.getId().equals(choice.getInitial())))
                             .toList())

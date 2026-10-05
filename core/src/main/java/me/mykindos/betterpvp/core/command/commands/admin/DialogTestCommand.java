@@ -23,8 +23,6 @@ import org.bukkit.entity.Player;
 @Singleton
 public class DialogTestCommand extends Command {
 
-    private static final int TAB_COUNT = 3;
-
     private final DialogSessions sessions;
 
     @Inject
@@ -49,18 +47,18 @@ public class DialogTestCommand extends Command {
 
     private void show(Player player, int selected, int clicks) {
         final DialogCanvas backdrop = new DialogCanvas(300);
-        backdrop.art(0, 0, '', 150, 120);
-        backdrop.art(150, 0, '', 150, 120);
+        backdrop.art(0, 0, '\uE000', 150, 120);
+        backdrop.art(150, 0, '\uE001', 150, 120);
 
         final DialogCanvas canvas = new DialogCanvas(300);
         canvas.text(8, 3, text(player, "core.dialog.test.name", TextColor.color(0xFFD36B)));
-        for (int tab = 0; tab < TAB_COUNT; tab++) {
+        for (int tab = 0; tab < 3; tab++) {
             final int index = tab;
             final int y = 22 + tab * 23;
             final DialogClick open = (who, inputs) -> show(who, index, clicks);
             final Component name = text(player, "core.dialog.test.tab." + (tab + 1), TextColor.color(0xEEF0F5));
             final Component tooltip = text(player, "core.dialog.test.tab.tooltip", TextColor.color(0xEEF0F5));
-            canvas.art(8, y, tab == selected ? '' : '', 64, 18).tooltip(tooltip).onClick(open);
+            canvas.art(8, y, tab == selected ? '\uE003' : '\uE002', 64, 18).tooltip(tooltip).onClick(open);
             canvas.text(14, y + 5, name).tooltip(tooltip).onClick(open);
         }
 
@@ -70,7 +68,7 @@ public class DialogTestCommand extends Command {
 
         final DialogClick confirm = (who, inputs) -> show(who, selected, clicks + 1);
         final Component confirmTooltip = text(player, "core.dialog.test.confirm.tooltip", TextColor.color(0xEEF0F5));
-        canvas.art(208, 92, '', 80, 20).tooltip(confirmTooltip).onClick(confirm);
+        canvas.art(208, 92, '\uE004', 80, 20).tooltip(confirmTooltip).onClick(confirm);
         canvas.text(224, 98, text(player, "core.dialog.test.confirm", TextColor.color(0x2A1606))).tooltip(confirmTooltip).onClick(confirm);
 
         sessions.open(player, DialogScreen.builder()
@@ -78,7 +76,7 @@ public class DialogTestCommand extends Command {
                 .backdrop(backdrop)
                 .canvas(canvas)
                 .exit(DialogButton.builder()
-                        .label(Component.text('').font(Key.key("betterpvp", "ui")))
+                        .label(Component.text('\uE006').font(Key.key("betterpvp", "ui")))
                         .tooltip(text(player, "core.dialog.test.close.tooltip", TextColor.color(0xEEF0F5)))
                         .width(40)
                         .build())

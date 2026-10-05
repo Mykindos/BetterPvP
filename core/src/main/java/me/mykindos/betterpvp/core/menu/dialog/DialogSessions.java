@@ -80,7 +80,12 @@ public class DialogSessions implements Listener {
         if (parts.length != 2 || !parts[0].equals(String.valueOf(session.id))) {
             return false;
         }
-        final int slot = Integer.parseInt(parts[1]);
+        final int slot;
+        try {
+            slot = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            return false;
+        }
         if (slot < 0 || slot >= session.clicks.size()) {
             return false;
         }
@@ -150,11 +155,12 @@ public class DialogSessions implements Listener {
                 .map(field -> session.values.containsKey(field.getKey()) ? field.withValue(session.values.get(field.getKey())) : field)
                 .toList();
 
+        // One extra pixel so a line ending in a glyph's trailing gap does not wrap.
         sender.show(player, new CompiledDialog(
                 screen.getName(),
                 DialogCompiler.backdrop(screen.getBackdrop(), screen.getCanvas().getWidth()),
                 DialogCompiler.body(screen.getCanvas(), regionKeys::get),
-                screen.getCanvas().getWidth() + DialogCompiler.TEXT_INSET * 2,
+                screen.getCanvas().getWidth() + DialogCompiler.TEXT_INSET * 2 + 1,
                 fields,
                 buttons,
                 screen.getColumns(),

@@ -5,6 +5,7 @@ import lombok.Singular;
 import lombok.Value;
 import lombok.With;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -59,7 +60,8 @@ public sealed interface DialogField permits DialogField.Text, DialogField.Toggle
         float start;
         float end;
         @Builder.Default float step = 1;
-        float initial;
+        /** Starting value, or null for the start of the range. */
+        @Nullable Float initial;
 
         @Override
         public DialogField withValue(Object value) {

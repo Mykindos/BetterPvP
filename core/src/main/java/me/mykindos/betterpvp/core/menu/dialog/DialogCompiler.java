@@ -81,6 +81,10 @@ final class DialogCompiler {
         final int origin = TITLE_ORIGIN - canvasWidth / 2;
         int cursor = 0;
         for (CanvasElement element : elements) {
+            if (element.getY() > VerticalOffsets.MAX) {
+                throw new IllegalArgumentException("Backdrop element at y " + element.getY() + " is too low. Backdrop art carries "
+                        + "its height in its glyph ascent, and y only shifts it 0 to " + VerticalOffsets.MAX + " px");
+            }
             final int target = origin + element.getX();
             appendSpace(title, target - cursor);
             title.append(shift(element.getContent(), element.getY()));
