@@ -14,6 +14,7 @@ include(":hub")
 include(":orchestration")
 include(":orchestration-service")
 include(":proxy")
+include(":conventions")
 
 if (File("./private/").exists()) {
     include(":private:events")

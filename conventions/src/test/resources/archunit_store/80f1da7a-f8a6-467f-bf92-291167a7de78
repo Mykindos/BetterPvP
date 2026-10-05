@@ -1,0 +1,2 @@
+Method <me.mykindos.betterpvp.core.client.repository.ClientSQLLayer.loadAdditionalClientData(me.mykindos.betterpvp.core.client.Client)> calls method <java.lang.Throwable.printStackTrace()> in (ClientSQLLayer.java:215)
+Method <me.mykindos.betterpvp.hub.commands.queue.QueueCommandSupport.logCommandFailure(java.lang.String, java.lang.Exception)> calls method <java.lang.Throwable.printStackTrace()> in (QueueCommandSupport.java:129)
