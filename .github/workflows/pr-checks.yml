@@ -22,6 +22,7 @@ jobs:
       - name: Tests unchanged after their test commit
         run: python3 .github/scripts/test_lock.py "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
       - name: CI script tests
+        if: always()
         run: python3 -m unittest discover -s .github/scripts
 
   mutation:
