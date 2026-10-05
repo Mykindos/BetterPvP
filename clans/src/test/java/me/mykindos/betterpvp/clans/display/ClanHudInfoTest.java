@@ -54,8 +54,8 @@ class ClanHudInfoTest {
         final Component loaded = Component.text("loaded head");
         final AtomicReference<Component> painted = new AtomicReference<>(placeholder);
         final PlayerHeadProvider heads = mock(PlayerHeadProvider.class);
-        lenient().when(heads.head(eq(player), anyInt(), anyInt())).thenReturn(Optional.of(otherLayout));
-        when(heads.head(player, 3, 16)).thenAnswer(invocation -> Optional.of(painted.get()));
+        lenient().when(heads.head(eq(player), anyInt(), anyInt())).thenReturn(otherLayout);
+        when(heads.head(player, 3, 16)).thenAnswer(invocation -> painted.get());
 
         final ClanHudInfo hud = new ClanHudInfo(clanManager, zoneManager, heads);
         final Component first = hud.render(gamer);

@@ -14,14 +14,13 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -81,10 +80,10 @@ class PlayerHeadProviderTest {
         assertNotEquals(Component.empty(), placeholder, "the placeholder is a painted head");
 
         final Player loading = player(skinUrl);
-        assertEquals(Optional.of(placeholder), heads.head(loading, SCALE, TOP), "skin still downloading");
+        assertEquals(placeholder, heads.head(loading, SCALE, TOP), "skin still downloading");
 
         final Player noSkin = player(null);
-        assertEquals(Optional.of(placeholder), heads.head(noSkin, SCALE, TOP), "player has no skin URL");
+        assertEquals(placeholder, heads.head(noSkin, SCALE, TOP), "player has no skin URL");
     }
 
     @Test
@@ -98,16 +97,16 @@ class PlayerHeadProviderTest {
 
         heads.head(player, SCALE, TOP);
         runPending();
-        final Optional<Component> first = heads.head(player, SCALE, TOP);
-        assertTrue(first.isPresent());
-        assertNotEquals(heads.placeholder(SCALE, TOP), first.get());
+        final Component first = heads.head(player, SCALE, TOP);
+        assertNotNull(first);
+        assertNotEquals(heads.placeholder(SCALE, TOP), first);
 
         advance(Duration.ofMinutes(6));
         assertEquals(first, heads.head(player, SCALE, TOP), "expired head is kept while the refresh runs");
 
         runPending();
-        final Optional<Component> refreshed = heads.head(player, SCALE, TOP);
-        assertTrue(refreshed.isPresent());
+        final Component refreshed = heads.head(player, SCALE, TOP);
+        assertNotNull(refreshed);
         assertNotEquals(first, refreshed, "refreshed head replaces the previous one once ready");
     }
 
@@ -127,15 +126,15 @@ class PlayerHeadProviderTest {
         heads.head(player, SCALE, TOP);
         runPending();
         assertEquals(1, attempts.get());
-        assertEquals(Optional.of(placeholder), heads.head(player, SCALE, TOP), "placeholder stays after a failure");
+        assertEquals(placeholder, heads.head(player, SCALE, TOP), "placeholder stays after a failure");
 
         advance(Duration.ofMinutes(5));
         heads.head(player, SCALE, TOP);
         runPending();
         assertEquals(2, attempts.get(), "the download is retried");
 
-        final Optional<Component> loaded = heads.head(player, SCALE, TOP);
-        assertTrue(loaded.isPresent());
-        assertNotEquals(placeholder, loaded.get(), "the retried head replaces the placeholder");
+        final Component loaded = heads.head(player, SCALE, TOP);
+        assertNotNull(loaded);
+        assertNotEquals(placeholder, loaded, "the retried head replaces the placeholder");
     }
 }
