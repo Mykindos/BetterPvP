@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.menu.dialog.screen;
 
 import com.google.gson.JsonParser;
+import net.kyori.adventure.text.TextComponent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +44,9 @@ class ScreenAssetsTest {
         final AssetTable table = new AssetTable("golden", ScreenAssets.collect(screen,
                 (definition, name) -> definition.getComponents().get(name)));
 
-        assertEquals('\uE000', table.code("anim:coin_spin:16x16:8:10"));
-        assertEquals('\uE001', table.code("backdrop:panel:300x160:0#0"));
-        assertEquals('\uE00E', table.code("pressed:steel:100x24"));
+        assertEquals("\uE000", ((TextComponent) table.glyph("anim:coin_spin:16x16:8:10", 0)).content());
+        assertEquals("\uE001", ((TextComponent) table.glyph("backdrop:panel:300x160:0", 0)).content());
+        assertEquals("\uE00E", ((TextComponent) table.glyph("pressed:steel:100x24", 0)).content());
     }
 
     @Test

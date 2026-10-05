@@ -8,11 +8,11 @@ import me.mykindos.betterpvp.core.menu.dialog.DialogField;
 import me.mykindos.betterpvp.core.menu.dialog.DialogScreen;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,8 +98,9 @@ final class ScreenRenderer {
             case Node.Button button -> renderButton(button, context);
             case Node.Icon icon -> {
                 final String asset = ScreenAssets.sprite(icon.getSprite(), icon.getWidth(), icon.getHeight(), icon.getFrames(), icon.getFps());
+                // No shadow: its darkened colour loses the signature and would draw the whole strip.
                 final Component glyph = icon.getFrames() > 1
-                        ? context.glyph(asset).color(ANIMATION_SIGNATURE)
+                        ? context.glyph(asset).color(ANIMATION_SIGNATURE).shadowColor(ShadowColor.none())
                         : context.glyph(asset);
                 final CanvasElement element = context.getCanvas().place(context.getOriginX() + icon.getX(),
                         context.getOriginY() + icon.getY(), glyph, icon.getWidth() + 1, icon.getHeight());
@@ -139,9 +140,8 @@ final class ScreenRenderer {
                 if (type == null) {
                     throw new IllegalArgumentException("Unknown element type " + custom.getType());
                 }
-                final ScreenDefinition declared = context.getScreen().toBuilder().clearBackdrop().clearElements()
-                        .elements(custom.getAssets()).build();
-                final Set<String> allowed = new HashSet<>(ScreenAssets.collect(declared, context.components()));
+                final Set<String> allowed = ScreenAssets.collect(context.getScreen(), custom.getAssets(),
+                        context.getOriginX() + custom.getX(), context.getOriginY() + custom.getY(), context.components());
                 type.render(custom, context.offset(custom.getX(), custom.getY()).restrict(allowed));
             }
         }

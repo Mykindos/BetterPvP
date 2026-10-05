@@ -19,13 +19,11 @@ public class AssetTable {
     private final String namespace;
     @Getter
     private final Key font;
-    private final Set<String> assets;
     private final Map<String, Character> codes = new HashMap<>();
 
     public AssetTable(String namespace, Set<String> assets) {
         this.namespace = namespace;
         this.font = Key.key("betterpvp", "gui/" + namespace);
-        this.assets = Set.copyOf(assets);
         final List<String> glyphs = ScreenAssets.glyphs(assets);
         if (ScreenAssets.FIRST_CODE + glyphs.size() - 1 > ScreenAssets.LAST_CODE) {
             throw new IllegalStateException("Namespace " + namespace + " needs " + glyphs.size() + " glyphs, more than the private use area holds");
@@ -33,10 +31,6 @@ public class AssetTable {
         for (int index = 0; index < glyphs.size(); index++) {
             codes.put(glyphs.get(index), (char) (ScreenAssets.FIRST_CODE + index));
         }
-    }
-
-    public boolean has(String asset) {
-        return assets.contains(asset);
     }
 
     /** One glyph of an asset, in the namespace font. */
@@ -48,9 +42,5 @@ public class AssetTable {
                     + ". Add it to a screen, component or asset file so the pack generates it.");
         }
         return Component.text(code).font(font);
-    }
-
-    public char code(String asset) {
-        return codes.get(asset);
     }
 }

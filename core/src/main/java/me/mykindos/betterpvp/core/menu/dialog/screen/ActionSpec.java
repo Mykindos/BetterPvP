@@ -55,10 +55,6 @@ public sealed interface ActionSpec permits ActionSpec.Call, ActionSpec.Set, Acti
         return new Call(name, Map.of());
     }
 
-    static ActionSpec set(String key, String value) {
-        return new Set(Map.of(key, value));
-    }
-
     @Nullable
     static ActionSpec sequence(List<ActionSpec> actions) {
         return actions.isEmpty() ? null : actions.size() == 1 ? actions.getFirst() : new Sequence(List.copyOf(actions));

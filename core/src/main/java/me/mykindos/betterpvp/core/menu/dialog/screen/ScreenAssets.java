@@ -107,6 +107,14 @@ public final class ScreenAssets {
         return assets;
     }
 
+    /** The assets of some body nodes placed at a canvas origin, such as a custom element's declared art. */
+    public static Set<String> collect(ScreenDefinition screen, List<Node> nodes, int originX, int originY,
+                                      BiFunction<ScreenDefinition, String, ScreenDefinition.Component> components) {
+        final Set<String> assets = new HashSet<>();
+        new Collector(screen, components, assets).walk(nodes, originX, originY, false, new ArrayList<>());
+        return assets;
+    }
+
     /** Top-left of cell {@code index} of a layout, relative to the layout's parent origin. */
     public static int[] cell(Node.Group layout, int index) {
         final int column;

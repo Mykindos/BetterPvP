@@ -38,6 +38,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
+import java.util.regex.Pattern;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
@@ -49,6 +50,11 @@ import java.util.stream.Stream;
 @Singleton
 @CustomLog
 public class GuiScreens implements Listener {
+
+    /** The files the pack generator reads too: screens, components and asset files, no subfolders. */
+    private static final Pattern SCREEN_FILE = Pattern.compile("gui/[^/]+\\.json");
+    private static final Pattern COMPONENT_FILE = Pattern.compile("gui/components/[^/]+\\.json");
+    private static final Pattern ASSET_FILE = Pattern.compile("gui/assets/[^/]+\\.json");
 
     private final GuiRegistry registry;
     private final DialogSessions sessions;
@@ -71,21 +77,33 @@ public class GuiScreens implements Listener {
     public void load(String namespace, Map<String, String> files) {
         final Set<String> assets = new HashSet<>();
         files.forEach((path, json) -> {
-            if (path.startsWith("gui/components/")) {
-                ScreenParser.components(namespace, path, json).forEach((name, component) -> registry.component(namespace, name, component));
+            if (COMPONENT_FILE.matcher(path).matches()) {
+                guard(path, () -> ScreenParser.components(namespace, path, json)
+                        .forEach((name, component) -> registry.component(namespace, name, component)));
             }
         });
         files.forEach((path, json) -> {
-            if (path.startsWith("gui/assets/")) {
-                assets.addAll(ScreenAssets.collect(ScreenParser.assets(namespace, path, json), this::component));
-            } else if (!path.startsWith("gui/components/") && !path.startsWith("gui/schema/")) {
-                final ScreenDefinition screen = ScreenParser.screen(namespace, path, json);
-                screens.put(screen.key(), screen);
-                assets.addAll(ScreenAssets.collect(screen, this::component));
+            if (ASSET_FILE.matcher(path).matches()) {
+                guard(path, () -> assets.addAll(ScreenAssets.collect(ScreenParser.assets(namespace, path, json), this::component)));
+            } else if (SCREEN_FILE.matcher(path).matches()) {
+                guard(path, () -> {
+                    final ScreenDefinition screen = ScreenParser.screen(namespace, path, json);
+                    assets.addAll(ScreenAssets.collect(screen, this::component));
+                    screens.put(screen.key(), screen);
+                });
             }
         });
         declared.put(namespace, assets);
         tables.put(namespace, new AssetTable(namespace, assets));
+    }
+
+    /** A broken file is logged and skipped, so one typo never stops the plugin from enabling. */
+    private void guard(String path, Runnable load) {
+        try {
+            load.run();
+        } catch (RuntimeException e) {
+            log.error("Could not load GUI file {}: {}", path, e.getMessage()).submit();
+        }
     }
 
     /** Loads every {@code gui/} file packaged with a plugin, under a namespace. */
@@ -161,6 +179,9 @@ public class GuiScreens implements Listener {
             }
             if ((asset.startsWith("hover:") || asset.startsWith("anim:")) && ScreenAssets.width(asset) > ScreenAssets.MAX_GLYPH - 2) {
                 problems.add("art " + asset + " is wider than " + (ScreenAssets.MAX_GLYPH - 2) + " px");
+            }
+            if (asset.startsWith("anim:") && ScreenAssets.height(asset) * Integer.parseInt(asset.split(":")[3]) > ScreenAssets.MAX_GLYPH) {
+                problems.add("art " + asset + " is a frame strip taller than " + ScreenAssets.MAX_GLYPH + " px");
             }
         }
         new Checker(screen, problems).walk(screen.getElements());
@@ -279,13 +300,14 @@ public class GuiScreens implements Listener {
                     result = run(player, frame, step, scope);
                     if (result.getKind() == ActionResult.Kind.OPEN || result.getKind() == ActionResult.Kind.BACK
                             || result.getKind() == ActionResult.Kind.CLOSE || result.getKind() == ActionResult.Kind.ERROR) {
-                        break;
+                        yield result;
                     }
+                    // Applied here so the next step sees it. The sequence then re-renders once.
                     if (result.getKind() == ActionResult.Kind.UPDATE && result.getChange() != null) {
                         result.getChange().accept(frame.state);
                     }
                 }
-                yield result.getKind() == ActionResult.Kind.NONE ? ActionResult.update() : result;
+                yield ActionResult.update();
             }
         };
     }
