@@ -1,6 +1,7 @@
 """Fails when a commit after a PR's first `test:` commit changes src/test/ without its own `test:` prefix.
 
-Tests are written and approved first, then the implementation has to pass them as they are.
+Tests are written and approved first, then the implementation has to pass them as they are. The convention checker's
+code under conventions/src/test/java is tooling and is not locked. Its baselines stay locked.
 
     python3 test_lock.py <base sha> <head sha>
 """
@@ -26,7 +27,7 @@ def main():
         if not locked:
             continue
         files = git("diff-tree", "--no-commit-id", "--name-only", "-r", sha).split()
-        tests = [f for f in files if "/src/test/" in f"/{f}"]
+        tests = [f for f in files if "/src/test/" in f"/{f}" and not f.startswith("conventions/src/test/java/")]
         if tests:
             broken.append(f"{sha[:8]} {subject}\n    " + "\n    ".join(tests))
 
