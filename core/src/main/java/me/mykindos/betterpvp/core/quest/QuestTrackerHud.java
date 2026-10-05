@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.quest;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -26,6 +25,7 @@ public class QuestTrackerHud implements Listener {
 
     private final QuestManager questManager;
     private final QuestRegistry questRegistry;
+    private final DisplayObject<Component> overlay = new DisplayObject<>(this::render);
 
     @Inject
     public QuestTrackerHud(QuestManager questManager, QuestRegistry questRegistry) {
@@ -34,13 +34,10 @@ public class QuestTrackerHud implements Listener {
     }
 
     @EventHandler
-    public void onLoad(AsyncClientLoadEvent event) {
-        Gamer gamer = event.getClient().getGamer();
-        gamer.getBossBarOverlay().add(new DisplayObject<>(this::render));
-    }
-
-    @EventHandler
     public void onJoin(ClientJoinEvent event) {
+        final Gamer gamer = event.getClient().getGamer();
+        gamer.getBossBarOverlay().remove(overlay);
+        gamer.getBossBarOverlay().add(overlay);
     }
 
     private Component render(Gamer gamer) {
