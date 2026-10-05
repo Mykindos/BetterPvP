@@ -29,6 +29,14 @@ class SourceBaselineTest {
     }
 
     @Test
+    void baselineRowForAnUnknownRuleAsksToReRecord() {
+        List<String> failures = SourceBaseline.compare(Map.of(), Map.of("RETIRED_RULE\tcore/src/main/java/A.java", 1));
+
+        assertEquals(1, failures.size());
+        assertTrue(failures.get(0).contains("-PupdateBaseline"), failures.get(0));
+    }
+
+    @Test
     void breaksMatchingTheBaselinePass() {
         assertEquals(List.of(), SourceBaseline.compare(Map.of(KEY, List.of(3, 7)), Map.of(KEY, 2)));
     }
