@@ -28,9 +28,4 @@ public enum ChatIcon {
                 Key.key("betterpvp", "icon/chat/" + sprite)));
         return Component.join(JoinConfiguration.spaces(), icon, message);
     }
-
-    /** The pack-relative path of the texture behind this icon's sprite. */
-    public @NotNull String texturePath() {
-        return "assets/betterpvp/textures/gui/sprites/icon/chat/" + sprite + ".png";
-    }
 }

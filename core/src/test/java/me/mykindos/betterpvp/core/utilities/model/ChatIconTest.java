@@ -42,13 +42,6 @@ class ChatIconTest {
         assertEquals(EXPECTED_SPRITES.get(icon), sprite.sprite());
     }
 
-    @ParameterizedTest
-    @EnumSource(ChatIcon.class)
-    @DisplayName("AC2: every icon's texture path is where the gui atlas reads its sprite")
-    void ac2_texturePathMatchesGuiSprite(ChatIcon icon) {
-        assertEquals(guiSpritePath(leadingSprite(icon).sprite()), icon.texturePath());
-    }
-
     @Test
     @DisplayName("AC2: every icon's texture exists in the resource pack")
     void ac2_texturesExistInPack() {
