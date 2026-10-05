@@ -35,6 +35,7 @@ public class DialogSessions implements Listener {
     private static final String CLICK_PREFIX = "dialog/";
 
     private final DialogSender sender;
+    private final DialogScheduler scheduler;
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final AtomicInteger ids = new AtomicInteger();
 
@@ -42,8 +43,9 @@ public class DialogSessions implements Listener {
     private Core core;
 
     @Inject
-    public DialogSessions(DialogSender sender) {
+    public DialogSessions(DialogSender sender, DialogScheduler scheduler) {
         this.sender = sender;
+        this.scheduler = scheduler;
     }
 
     /** Shows {@code screen}, replacing any screen the player has open. */

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.menu.dialog;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 class DialogSessionsTest {
 
     private final List<CompiledDialog> shown = new ArrayList<>();
+    private final List<Runnable> scheduled = new ArrayList<>();
     private DialogSessions sessions;
     private Player player;
 
@@ -42,7 +44,7 @@ class DialogSessionsTest {
             @Override
             public void close(Player target) {
             }
-        });
+        }, (ticks, task) -> scheduled.add(task));
         player = mock(Player.class);
         when(player.getUniqueId()).thenReturn(UUID.randomUUID());
     }
@@ -121,6 +123,31 @@ class DialogSessionsTest {
         assertEquals(2, shown.size());
         final DialogField.Text field = (DialogField.Text) shown.getLast().getFields().getFirst();
         assertEquals("Bob", field.getInitial());
+    }
+
+    @Test
+    @DisplayName("AC17: a click on an element with pressed art shows the pressed art first, then runs and settles")
+    void ac17_pressedArtShowsBeforeClickRuns() {
+        final AtomicReference<String> ran = new AtomicReference<>();
+        final DialogCanvas canvas = new DialogCanvas(200);
+        canvas.text(10, 0, Component.text("Up").font(Resources.Font.UI))
+                .pressed(Component.text("Down").font(Resources.Font.UI))
+                .onClick((who, inputs) -> ran.set("clicked"));
+        sessions.open(player, DialogScreen.builder().name(Component.text("Test")).canvas(canvas).build());
+
+        sessions.handle(player, regionKey(shown.getLast()), DialogInputs.EMPTY);
+        assertTrue(bodyHas(shown.getLast(), "Down"));
+        assertFalse(bodyHas(shown.getLast(), "Up"));
+        assertNull(ran.get());
+
+        scheduled.forEach(Runnable::run);
+        assertEquals("clicked", ran.get());
+        assertTrue(bodyHas(shown.getLast(), "Up"));
+    }
+
+    private static boolean bodyHas(CompiledDialog dialog, String content) {
+        return dialog.getBody().children().stream()
+                .anyMatch(child -> child instanceof TextComponent text && text.content().equals(content));
     }
 
     @Test

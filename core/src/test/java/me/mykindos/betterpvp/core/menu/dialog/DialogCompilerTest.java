@@ -4,12 +4,16 @@ import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilFont;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.DataComponentValue;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.ShadowColor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -93,6 +97,21 @@ class DialogCompilerTest {
         assertEquals(ShadowColor.none(), title.shadowColor());
         // The title draws from 15 px left of the screen centre, the canvas from half its width left of it.
         assertEquals(30 - 100 + 15, position(children, indexOf(children, "Skills"))[1]);
+    }
+
+    @Test
+    @DisplayName("AC18: hover art travels in an item tooltip with the invisible tooltip style")
+    void ac18_hoverArtCompilesToInvisibleTooltip() {
+        final DialogCanvas canvas = new DialogCanvas(200);
+        canvas.art(10, 0, '\uE004', 80, 20).hover(Component.text('\uE007').font(Key.key("betterpvp", "ui")));
+
+        final List<Component> children = DialogCompiler.body(canvas, index -> null).children();
+        final HoverEvent<?> hover = children.get(indexOf(children, "\uE004")).hoverEvent();
+
+        assertEquals(HoverEvent.Action.SHOW_ITEM, hover.action());
+        final Map<Key, DataComponentValue> components = ((HoverEvent.ShowItem) hover.value()).dataComponents();
+        assertEquals(BinaryTagHolder.binaryTagHolder("\"betterpvp:hover\""), components.get(Key.key("tooltip_style")));
+        assertTrue(((BinaryTagHolder) components.get(Key.key("custom_name"))).string().contains("\uE007"));
     }
 
     @Test

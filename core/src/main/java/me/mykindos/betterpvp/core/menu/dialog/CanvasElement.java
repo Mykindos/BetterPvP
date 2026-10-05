@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * One thing placed on a {@link DialogCanvas}: its top-left corner and size in GUI pixels, what it draws, and
- * optionally a tooltip and a click.
+ * optionally a tooltip, a click, hover art and pressed content.
  */
 @Getter
 public class CanvasElement {
@@ -18,6 +18,8 @@ public class CanvasElement {
     private final Component content;
     private @Nullable Component tooltip;
     private @Nullable DialogClick click;
+    private @Nullable Component hover;
+    private @Nullable Component pressed;
 
     CanvasElement(int x, int y, int width, int height, Component content) {
         this.x = x;
@@ -35,5 +37,19 @@ public class CanvasElement {
     public CanvasElement onClick(DialogClick click) {
         this.click = click;
         return this;
+    }
+
+    /**
+     * Art drawn in place of this element while the mouse is over it. The art travels in the hover tooltip and the
+     * pack's text shader moves it from the mouse onto the element, so it must be a hover glyph generated for this
+     * element's position.
+     */
+    public CanvasElement hover(Component art) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** Content shown in place of this element for a moment after it is clicked, before the click runs. */
+    public CanvasElement pressed(Component content) {
+        throw new UnsupportedOperationException();
     }
 }
