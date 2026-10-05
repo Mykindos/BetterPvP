@@ -34,9 +34,21 @@ final class DialogCompiler {
 
     /** The body text. {@code clicks} gives the click key of the element at each index, or null. */
     static Component body(DialogCanvas canvas, IntFunction<Key> clicks) {
+        return body(canvas, clicks, null);
+    }
+
+    /**
+     * The body text. Every line is padded to the canvas width, since the client centres each line. Clicks anywhere
+     * that no element handles go to {@code background}, so the server can re-render and clear the focus outline the
+     * client draws around a clicked text block.
+     */
+    static Component body(DialogCanvas canvas, IntFunction<Key> clicks, Key background) {
         final List<CanvasElement> elements = canvas.getElements();
         final int lines = lines(canvas);
         final TextComponent.Builder body = Component.text();
+        if (background != null) {
+            body.clickEvent(ClickEvent.custom(background, BinaryTagHolder.binaryTagHolder("{}")));
+        }
         for (int line = 0; line < lines; line++) {
             if (line > 0) {
                 body.append(Component.newline());
@@ -56,6 +68,7 @@ final class DialogCompiler {
                 body.append(interactive(shift(element.getContent(), element.getY() % LINE_HEIGHT), element, clicks.apply(index)));
                 cursor = element.getX() + element.getWidth();
             }
+            appendSpace(body, canvas.getWidth() - cursor);
         }
         return body.build();
     }

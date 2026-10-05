@@ -25,7 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Tracks the dialog screen each player has open and routes its clicks. Every screen sent gets a new id, so clicks
  * from a screen that was replaced or closed are ignored. Input values that clicks carry are kept and sent back as
- * initial values when the screen is re-rendered.
+ * initial values when the screen is re-rendered. After a click the screen re-renders, unless the callback already
+ * re-rendered it, opened another screen or closed it.
  */
 @BPvPListener
 @Singleton
@@ -90,7 +91,12 @@ public class DialogSessions implements Listener {
             return false;
         }
         session.values.putAll(inputs.asMap());
+        final int id = session.id;
         session.clicks.get(slot).onClick(player, inputs);
+        // A click focuses the text block and the client outlines it. A fresh screen has no focus.
+        if (sessions.get(player.getUniqueId()) == session && session.id == id) {
+            send(player, session);
+        }
         return true;
     }
 
@@ -131,6 +137,8 @@ public class DialogSessions implements Listener {
             }
         }
 
+        final Key background = register(session, (who, inputs) -> { });
+
         final List<CompiledDialog.Button> buttons = new ArrayList<>();
         for (DialogButton button : screen.getButtons()) {
             buttons.add(compile(button, button.getClick() == null ? null : register(session, button.getClick())));
@@ -159,7 +167,7 @@ public class DialogSessions implements Listener {
         sender.show(player, new CompiledDialog(
                 screen.getName(),
                 DialogCompiler.backdrop(screen.getBackdrop(), screen.getCanvas().getWidth()),
-                DialogCompiler.body(screen.getCanvas(), regionKeys::get),
+                DialogCompiler.body(screen.getCanvas(), regionKeys::get, background),
                 screen.getCanvas().getWidth() + DialogCompiler.TEXT_INSET * 2 + 1,
                 fields,
                 buttons,
