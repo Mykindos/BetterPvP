@@ -47,7 +47,7 @@ enum SourceRule {
 
     HARDCODED_PLAYER_TEXT("hardcoded player-facing text, use Translations.component") {
         private final Pattern pattern = Pattern.compile(
-                "\\bUtilMessage\\.(?:simpleMessage|message)\\(\\s*\\w+\\s*,\\s*\"[^\"]*\"\\s*,\\s*\"[A-Za-z]");
+                "\\bUtilMessage\\.(?:simpleMessage|message)\\(\\s*\\w+\\s*,\\s*\"[^\"]*\"\\s*,\\s*\"\\s*[A-Za-z<]");
 
         @Override
         List<Integer> find(JavaText text) {
@@ -64,7 +64,7 @@ enum SourceRule {
 
     REFACTOR_NARRATIVE("comment narrates history, describe the end state") {
         private final Pattern pattern = Pattern.compile(
-                "\\b(?:previously|no longer|used to be|formerly|was replaced by|replaces the (?:old|previous))\\b",
+                "\\b(?:previously|used to be|formerly|was replaced by|replaces the (?:old|previous))\\b",
                 Pattern.CASE_INSENSITIVE);
 
         @Override

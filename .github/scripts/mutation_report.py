@@ -18,7 +18,7 @@ def git(*args):
 def changed_classes(base, head):
     fork_point = git("merge-base", base, head).strip()
     by_module = defaultdict(list)
-    for path in git("diff", "--name-only", "--diff-filter=AM", fork_point, head).split():
+    for path in git("diff", "--name-only", "-M", "--diff-filter=AMR", fork_point, head).split():
         if not path.endswith(".java") or "/src/main/java/" not in path or "/database/jooq/" in path:
             continue
         module, source = path.split("/src/main/java/", 1)
