@@ -4,8 +4,45 @@
   "title": "Theme names",
   "description": "Written by Resourcepack/tools/gui/build_gui.py --schema-out. Lists the styles, hover styles and sprites the pack can draw.",
   "definitions": {
-    "style": { "anyOf": [ { "enum": [] }, { "type": "string" } ] },
-    "hoverStyle": { "anyOf": [ { "enum": [] }, { "type": "string" } ] },
-    "sprite": { "anyOf": [ { "enum": [] }, { "type": "string" } ] }
+    "style": {
+      "anyOf": [
+        {
+          "enum": [
+            "gold",
+            "panel",
+            "steel",
+            "tab",
+            "tab_selected"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "hoverStyle": {
+      "anyOf": [
+        {
+          "enum": [
+            "rim"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "sprite": {
+      "anyOf": [
+        {
+          "enum": [
+            "coin_spin"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
   }
 }
