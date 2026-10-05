@@ -1,0 +1,36 @@
+name: AI review
+
+# Asks the "BetterPvP PR review" routine on claude.ai to review a pipeline PR. The routine posts one comment per
+# commit, ending in claude-review:<sha>, and skips commits it already reviewed.
+
+on:
+  pull_request:
+    branches: [camps]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+
+permissions: {}
+
+jobs:
+  request:
+    if: >-
+      contains(github.event.pull_request.labels.*.name, 'pipeline')
+      && !github.event.pull_request.draft
+      && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request a review
+        env:
+          TOKEN: ${{ secrets.CLAUDE_REVIEW_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::CLAUDE_REVIEW_TOKEN is not set, so no review was requested."
+            exit 0
+          fi
+          curl -fsS -X POST "https://api.anthropic.com/v1/claude_code/routines/trig_01PYxH68CMKwwMD1CFLYFMsh/fire" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"{\\\"pr\\\": $PR}\"}" > /dev/null
+          echo "Review requested for #$PR."
