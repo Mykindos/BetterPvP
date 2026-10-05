@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.menu.dialog.DialogCanvas;
 import me.mykindos.betterpvp.core.menu.dialog.DialogClick;
 import me.mykindos.betterpvp.core.menu.dialog.DialogScreen;
 import me.mykindos.betterpvp.core.menu.dialog.DialogSessions;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilFont;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -84,9 +85,9 @@ public class DialogTestCommand extends Command {
                 .backdrop(backdrop)
                 .canvas(canvas)
                 .exit(DialogButton.builder()
-                        .label(Component.text('\uE006').font(Key.key("betterpvp", "ui")))
+                        .label(text(player, "core.dialog.test.close", TextColor.color(0xEEF0F5)).font(Resources.Font.UI))
                         .tooltip(text(player, "core.dialog.test.close.tooltip", TextColor.color(0xEEF0F5)))
-                        .width(40)
+                        .width(80)
                         .build())
                 .build());
     }
