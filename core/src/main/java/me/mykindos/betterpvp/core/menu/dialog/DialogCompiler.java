@@ -1,8 +1,17 @@
 package me.mykindos.betterpvp.core.menu.dialog;
 
+import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.ShadowColor;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.IntFunction;
 
 /**
@@ -17,21 +26,98 @@ final class DialogCompiler {
     static final int TEXT_INSET = 4;
     static final int LINE_HEIGHT = 9;
 
+    /** The client draws a zero-width title from this many pixels left of the screen centre. */
+    private static final int TITLE_ORIGIN = 15;
+
     private DialogCompiler() {
     }
 
-    /** The body text. {@code clicks} gives the click key of the element at each index. */
+    /** The body text. {@code clicks} gives the click key of the element at each index, or null. */
     static Component body(DialogCanvas canvas, IntFunction<Key> clicks) {
-        throw new UnsupportedOperationException();
+        final List<CanvasElement> elements = canvas.getElements();
+        final int lines = lines(canvas);
+        final TextComponent.Builder body = Component.text();
+        for (int line = 0; line < lines; line++) {
+            if (line > 0) {
+                body.append(Component.newline());
+            }
+            final List<Integer> onLine = new ArrayList<>();
+            for (int index = 0; index < elements.size(); index++) {
+                if (elements.get(index).getY() / LINE_HEIGHT == line) {
+                    onLine.add(index);
+                }
+            }
+            onLine.sort(Comparator.comparingInt(index -> elements.get(index).getX()));
+
+            int cursor = 0;
+            for (int index : onLine) {
+                final CanvasElement element = elements.get(index);
+                appendSpace(body, element.getX() - cursor);
+                body.append(interactive(shift(element.getContent(), element.getY() % LINE_HEIGHT), element, clicks.apply(index)));
+                cursor = element.getX() + element.getWidth();
+            }
+        }
+        return body.build();
     }
 
     /** Number of text lines the body needs so every element fits inside it. */
     static int lines(DialogCanvas canvas) {
-        throw new UnsupportedOperationException();
+        int bottom = LINE_HEIGHT;
+        for (CanvasElement element : canvas.getElements()) {
+            bottom = Math.max(bottom, element.getY() + element.getHeight());
+        }
+        return (bottom + LINE_HEIGHT - 1) / LINE_HEIGHT;
     }
 
-    /** The title text that draws the backdrop over a body canvas {@code canvasWidth} wide. */
+    /**
+     * The title text that draws the backdrop over a body canvas {@code canvasWidth} wide. Backdrop art carries its
+     * vertical position in its glyph ascent, and an element's y shifts it down by up to {@link VerticalOffsets#MAX}.
+     */
     static Component backdrop(DialogCanvas backdrop, int canvasWidth) {
-        throw new UnsupportedOperationException();
+        final List<CanvasElement> elements = new ArrayList<>(backdrop.getElements());
+        elements.sort(Comparator.comparingInt(CanvasElement::getX));
+
+        final TextComponent.Builder title = Component.text().shadowColor(ShadowColor.none());
+        final int origin = TITLE_ORIGIN - canvasWidth / 2;
+        int cursor = 0;
+        for (CanvasElement element : elements) {
+            final int target = origin + element.getX();
+            appendSpace(title, target - cursor);
+            title.append(shift(element.getContent(), element.getY()));
+            cursor = target + element.getWidth();
+        }
+        appendSpace(title, -cursor);
+        return title.build();
+    }
+
+    private static void appendSpace(TextComponent.Builder builder, int pixels) {
+        if (pixels != 0) {
+            builder.append(Component.translatable("space." + pixels).font(Resources.Font.SPACE));
+        }
+    }
+
+    private static Component interactive(Component content, CanvasElement element, Key click) {
+        Component result = content;
+        if (click != null) {
+            result = result.clickEvent(ClickEvent.custom(click, BinaryTagHolder.binaryTagHolder("{}")));
+        }
+        if (element.getTooltip() != null) {
+            result = result.hoverEvent(HoverEvent.showText(element.getTooltip()));
+        }
+        return result;
+    }
+
+    /** Moves every font in the tree {@code offset} pixels down. Negative space stays as it is. */
+    private static Component shift(Component component, int offset) {
+        return shift(component, offset, Resources.Font.UI);
+    }
+
+    private static Component shift(Component component, int offset, Key inherited) {
+        if (offset == 0) {
+            return component;
+        }
+        final Key font = component.font() != null ? component.font() : inherited;
+        final Component shifted = font.equals(Resources.Font.SPACE) ? component : component.font(VerticalOffsets.font(font, offset));
+        return shifted.children(shifted.children().stream().map(child -> shift(child, offset, font)).toList());
     }
 }
