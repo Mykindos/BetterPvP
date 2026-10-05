@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import info.solidsoft.gradle.pitest.PitestPluginExtension
 
 val outputBuckets = mapOf(
     "clans" to setOf(
@@ -38,6 +39,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
     id("org.flywaydb.flyway") version "12.5.0" apply false // Flyway
     id("me.champeau.jmh") version "0.7.3" apply false // JMH micro-benchmarks
+    id("info.solidsoft.pitest") version "1.19.0" apply false // Mutation testing
     id("org.sonarqube") version "7.3.0.8198" apply true
 }
 
@@ -117,6 +119,20 @@ subprojects {
 
     tasks.assemble.configure {
         dependsOn(tasks.withType<ShadowJar>())
+    }
+
+    // Mutation testing for modules with tests. CI passes -PpitTargetClasses with the classes a PR changes.
+    if (file("src/test/java").isDirectory && project.name != "conventions") {
+        plugins.apply("info.solidsoft.pitest")
+        configure<PitestPluginExtension> {
+            junit5PluginVersion.set("1.2.3")
+            targetClasses.set(providers.gradleProperty("pitTargetClasses").map { it.split(",") }
+                .orElse(listOf("me.mykindos.betterpvp.*")))
+            threads.set(4)
+            outputFormats.set(listOf("XML", "HTML"))
+            timestampedReports.set(false)
+            failWhenNoMutations.set(false)
+        }
     }
 
     tasks.withType<JavaCompile>().configureEach {
