@@ -26,7 +26,6 @@ import java.net.URLConnection;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,7 +87,7 @@ public class PlayerHeadProvider {
     /**
      * The placeholder head (the bundled MHF_Question skin) laid out like {@link #head(Player, int, int)}.
      */
-    public Component placeholder(int scale, int top) {
+    Component placeholder(int scale, int top) {
         return placeholders.computeIfAbsent(new Layout(scale, top), layout -> build(placeholderGrid, scale, top));
     }
 
@@ -99,16 +98,16 @@ public class PlayerHeadProvider {
      * @param scale on-screen size multiplier per skin pixel (e.g. 4 &rarr; a 32px head)
      * @param top   vertical offset of the head's top row, as an {@code offset/down_N} font index
      */
-    public Optional<Component> head(Player player, int scale, int top) {
+    public Component head(Player player, int scale, int top) {
         final HeadKey key = new HeadKey(player.getUniqueId(), scale, top);
         final CachedHead cached = cache.getIfPresent(key);
         if (cached == null || ticker.read() >= cached.getRefreshAt()) {
             load(player, key);
         }
         if (cached == null || cached.getHead() == null) {
-            return Optional.of(placeholder(scale, top));
+            return placeholder(scale, top);
         }
-        return Optional.of(cached.getHead());
+        return cached.getHead();
     }
 
     private void load(Player player, HeadKey key) {
@@ -138,7 +137,7 @@ public class PlayerHeadProvider {
                     cache.put(key, new CachedHead(build(grid, key.getScale(), key.getTop()), refreshAt));
                 }
             } catch (Exception e) {
-                log.warn("Failed to load skin head for {}", key.getPlayer(), e).submit();
+                log.warn("Failed to load skin head for {}: {}", key.getPlayer(), e.toString()).submit();
                 retryLater(key);
             } finally {
                 inFlight.remove(key);

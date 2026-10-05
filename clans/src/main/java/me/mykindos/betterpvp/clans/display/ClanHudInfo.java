@@ -63,7 +63,7 @@ public class ClanHudInfo {
 
         // Cheap inputs that drive the whole readout. While they are unchanged we hand back the exact same
         // instance, which lets the overlay skip recompositing/resending the head every tick.
-        final Component head = playerHeadProvider.head(player, 3, 16).orElseThrow();
+        final Component head = playerHeadProvider.head(player, 3, 16);
         final int coins = (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0);
         final String clanName = clanManager.getClanByPlayer(player).map(Clan::getName).orElse(null);
         final Zone zone = zoneManager.getZone(player);
