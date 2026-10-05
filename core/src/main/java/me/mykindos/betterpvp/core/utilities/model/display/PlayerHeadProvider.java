@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities.model.display;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 
 /**
  * Renders a player's skin head as a block of tinted 1px glyphs, the same trick the combat
@@ -50,20 +53,35 @@ public class PlayerHeadProvider {
     // The 1px-left cursor pay-back that tiles pixels edge-to-edge, hoisted to one shared instance.
     private static final Component SPACE_BACK = Component.translatable("space.-1").font(Resources.Font.SPACE);
 
-    private final Core core;
+    private final Executor async;
+    private final SkinDownloader downloader;
 
     // Finished, ready-to-append head blocks keyed by (player, scale, top) so a change to either layout
     // input renders a fresh head instead of returning a stale one. Expiry doubles as a skin-change refresh.
-    private final Cache<HeadKey, Component> cache = Caffeine.newBuilder()
-            .maximumSize(512)
-            .expireAfterWrite(Duration.ofMinutes(5))
-            .build();
+    private final Cache<HeadKey, Component> cache;
     // Keys whose skin is mid-fetch, so a head rendered every tick kicks off exactly one load per layout.
     private final Set<HeadKey> inFlight = ConcurrentHashMap.newKeySet();
 
     @Inject
     public PlayerHeadProvider(Core core) {
-        this.core = core;
+        this(task -> UtilServer.runTaskAsync(core, task), PlayerHeadProvider::download, Ticker.systemTicker());
+    }
+
+    PlayerHeadProvider(Executor async, SkinDownloader downloader, Ticker ticker) {
+        this.async = async;
+        this.downloader = downloader;
+        this.cache = Caffeine.newBuilder()
+                .maximumSize(512)
+                .expireAfterWrite(Duration.ofMinutes(5))
+                .ticker(ticker)
+                .build();
+    }
+
+    /**
+     * The placeholder head (the bundled MHF_Question skin) laid out like {@link #head(Player, int, int)}.
+     */
+    public Component placeholder(int scale, int top) {
+        return Component.empty();
     }
 
     /**
@@ -100,9 +118,9 @@ public class PlayerHeadProvider {
             return;
         }
 
-        UtilServer.runTaskAsync(core, () -> {
+        async.execute(() -> {
             try {
-                final TextColor[] grid = readGrid(skin);
+                final TextColor[] grid = readGrid(downloader.download(skin));
                 if (grid != null) {
                     cache.put(key, build(grid, key.getScale(), key.getTop()));
                 }
@@ -114,15 +132,17 @@ public class PlayerHeadProvider {
         });
     }
 
-    /** Download the skin and flatten its head face + hat into one 8&times;8 colour grid. */
-    private TextColor[] readGrid(URL skin) throws Exception {
+    private static BufferedImage download(URL skin) throws IOException {
         final URLConnection conn = skin.openConnection();
         conn.setConnectTimeout(5000);
         conn.setReadTimeout(5000);
-        final BufferedImage img;
         try (InputStream in = conn.getInputStream()) {
-            img = ImageIO.read(in);
+            return ImageIO.read(in);
         }
+    }
+
+    /** Flatten the skin's head face + hat into one 8&times;8 colour grid. */
+    private TextColor[] readGrid(BufferedImage img) {
         if (img == null) {
             return null;
         }
@@ -172,6 +192,12 @@ public class PlayerHeadProvider {
             }
         }
         return canvas.build().shadowColor(ShadowColor.none());
+    }
+
+    /** Fetches a skin texture image, or null when the response is not an image. */
+    @FunctionalInterface
+    interface SkinDownloader {
+        BufferedImage download(URL skin) throws IOException;
     }
 
     /** Cache identity for a rendered head: the same skin laid out at a different scale or top is a distinct entry. */
