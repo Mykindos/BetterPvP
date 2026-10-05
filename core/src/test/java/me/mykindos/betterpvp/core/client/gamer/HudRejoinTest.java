@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.client.gamer;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
-import me.mykindos.betterpvp.core.client.gamer.repository.GamerListener;
+import me.mykindos.betterpvp.core.client.gamer.repository.GamerBossBarListener;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
 import me.mykindos.betterpvp.core.quest.QuestManager;
@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.quest.QuestTrackerHud;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayObject;
 import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarColor;
 import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarData;
+import me.mykindos.betterpvp.core.utilities.model.display.bossbar.BossBarOverlay;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -27,10 +28,13 @@ import org.mockito.Answers;
 import org.mockito.MockedStatic;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -89,7 +93,7 @@ class HudRejoinTest {
         verify(player, atLeastOnce()).showBossBar(shown.capture());
         assertEquals(2, shown.getAllValues().stream().distinct().count());
 
-        new GamerListener(core, clientManager).onQuit(new PlayerQuitEvent(player, Component.empty(), PlayerQuitEvent.QuitReason.DISCONNECTED));
+        new GamerBossBarListener(clientManager).onQuit(new PlayerQuitEvent(player, Component.empty(), PlayerQuitEvent.QuitReason.DISCONNECTED));
 
         for (BossBar bar : shown.getAllValues()) {
             verify(player, atLeastOnce()).hideBossBar(bar);
@@ -100,14 +104,23 @@ class HudRejoinTest {
 
     @Test
     @DisplayName("AC3: a fast rejoin leaves exactly one quest tracker overlay")
-    void ac3_fastRejoinKeepsOneQuestTrackerOverlay() {
+    void ac3_fastRejoinKeepsOneQuestTrackerOverlay() throws ReflectiveOperationException {
         final QuestTrackerHud tracker = new QuestTrackerHud(mock(QuestManager.class), mock(QuestRegistry.class));
-        final GamerListener gamerListener = new GamerListener(core, clientManager);
+        final GamerBossBarListener quitListener = new GamerBossBarListener(clientManager);
 
         tracker.onJoin(new ClientJoinEvent(client, player));
-        gamerListener.onQuit(new PlayerQuitEvent(player, Component.empty(), PlayerQuitEvent.QuitReason.DISCONNECTED));
+        final DisplayObject<Component> firstOverlay = overlays().getFirst();
+        quitListener.onQuit(new PlayerQuitEvent(player, Component.empty(), PlayerQuitEvent.QuitReason.DISCONNECTED));
         tracker.onJoin(new ClientJoinEvent(client, player));
 
         assertEquals(1, gamer.getBossBarOverlay().size());
+        assertSame(firstOverlay, overlays().getFirst());
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<DisplayObject<Component>> overlays() throws ReflectiveOperationException {
+        final Field field = BossBarOverlay.class.getDeclaredField("overlays");
+        field.setAccessible(true);
+        return (List<DisplayObject<Component>>) field.get(gamer.getBossBarOverlay());
     }
 }

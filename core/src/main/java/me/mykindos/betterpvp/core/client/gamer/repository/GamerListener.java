@@ -18,13 +18,11 @@ import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentCom
 import me.mykindos.betterpvp.core.utilities.model.display.playerlist.PlayerListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -112,14 +110,6 @@ public class GamerListener implements Listener {
         gamer.getPlayerList().clear();
         gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
         gamer.getPlayerList().add(PlayerListType.HEADER, header);
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        final Player player = event.getPlayer();
-        final Gamer gamer = this.manager.search().online(player).getGamer();
-        gamer.getBossBarOverlay().hide(player);
-        gamer.getBossBarQueue().hide(player);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
