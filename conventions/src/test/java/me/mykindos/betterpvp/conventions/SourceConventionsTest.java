@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Checks every source file against {@link SourceRule}. Breaks that already exist are counted per file and rule in
- * {@code source-baseline.tsv}, and only a count above its baseline fails. Run
+ * {@code source-baseline.tsv}, and any count that differs from its baseline fails. Run
  * {@code ./gradlew :conventions:test -PupdateBaseline} to rewrite the baseline after fixing old breaks.
  */
 class SourceConventionsTest {
@@ -41,20 +41,9 @@ class SourceConventionsTest {
             return;
         }
 
-        Map<String, Integer> baseline = readBaseline();
-        List<String> failures = new ArrayList<>();
-        found.forEach((key, lines) -> {
-            int allowed = baseline.getOrDefault(key, 0);
-            if (lines.size() > allowed) {
-                String[] parts = key.split("\t");
-                SourceRule rule = SourceRule.valueOf(parts[0]);
-                failures.add(parts[1] + " lines " + lines + ": " + rule.description() + " (" + lines.size()
-                        + " found, " + allowed + " allowed by the baseline)");
-            }
-        });
+        List<String> failures = SourceBaseline.compare(found, readBaseline());
         if (!failures.isEmpty()) {
-            fail("New convention breaks:\n" + String.join("\n", failures)
-                    + "\n\nFix them. For a genuine exception, add // conventions:allow RULE_NAME on that line.");
+            fail("Source convention breaks differ from the baseline:\n" + String.join("\n", failures));
         }
     }
 
