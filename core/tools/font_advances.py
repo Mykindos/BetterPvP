@@ -37,7 +37,9 @@ def main(client_jar, unifont_json, unifont_zip):
             put(ord(char), advance)
         for provider in json.loads(jar.read("assets/minecraft/font/include/default.json"))["providers"]:
             if provider["type"] == "bitmap":
-                read_bitmap(jar, provider, put)
+                namespace, path = provider["file"].split(":")
+                image = Image.open(io.BytesIO(jar.read(f"assets/{namespace}/textures/{path}")))
+                read_bitmap(image.convert("RGBA"), provider, put)
 
     unifont = json.loads(Path(unifont_json).read_text(encoding="utf-8"))["providers"]
     definition = next(p for p in unifont if p["hex_file"] == "minecraft:font/unifont.zip")
@@ -52,9 +54,7 @@ def main(client_jar, unifont_json, unifont_zip):
     print(f"{sum(filled)} glyphs -> {OUTPUT}")
 
 
-def read_bitmap(jar, provider, put):
-    namespace, path = provider["file"].split(":")
-    image = Image.open(io.BytesIO(jar.read(f"assets/{namespace}/textures/{path}"))).convert("RGBA")
+def read_bitmap(image, provider, put):
     alpha = image.getchannel("A").load()
     rows = provider["chars"]
     cell_w = image.width // len(rows[0])

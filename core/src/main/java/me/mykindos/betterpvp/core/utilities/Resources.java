@@ -24,6 +24,11 @@ public class Resources {
         public static final Key DEFAULT = Key.key("minecraft", "default");
 
         /**
+         * Text in themed menus and dialogs. Digits render in vanilla and missing glyphs fall back to {@link #DEFAULT}.
+         */
+        public static final Key UI = Key.key("betterpvp", "rpg");
+
+        /**
          * Used for invisible spacing in menus.
          */
         public static final Key SPACE = Key.key("space", "default");
