@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentCom
 import me.mykindos.betterpvp.core.utilities.model.display.playerlist.PlayerListType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -115,6 +116,10 @@ public class GamerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        final Gamer gamer = this.manager.search().online(player).getGamer();
+        gamer.getBossBarOverlay().hide(player);
+        gamer.getBossBarQueue().hide(player);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
