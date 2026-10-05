@@ -47,7 +47,7 @@ enum SourceRule {
 
     HARDCODED_PLAYER_TEXT("hardcoded player-facing text, use Translations.component") {
         private final Pattern pattern = Pattern.compile(
-                "\\bUtilMessage\\.(?:simpleMessage|message)\\(\\s*\\w+\\s*,\\s*\"[^\"]*\"\\s*,\\s*\"[A-Za-z<]");
+                "\\bUtilMessage\\.(?:simpleMessage|message)\\(\\s*\\w+\\s*,\\s*\"[^\"]*\"\\s*,\\s*\"\\s*[A-Za-z<]");
 
         @Override
         List<Integer> find(JavaText text) {
