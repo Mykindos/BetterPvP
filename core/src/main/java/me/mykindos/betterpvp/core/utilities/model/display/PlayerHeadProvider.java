@@ -20,9 +20,12 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -55,12 +58,16 @@ public class PlayerHeadProvider {
 
     private final Executor async;
     private final SkinDownloader downloader;
+    private final Ticker ticker;
 
     // Finished, ready-to-append head blocks keyed by (player, scale, top) so a change to either layout
-    // input renders a fresh head instead of returning a stale one. Expiry doubles as a skin-change refresh.
-    private final Cache<HeadKey, Component> cache;
+    // input renders a fresh head instead of returning a stale one. Each entry is refreshed once its
+    // refresh time passes, which picks up skin changes, and keeps being painted until the refresh lands.
+    private final Cache<HeadKey, CachedHead> cache = Caffeine.newBuilder().maximumSize(512).build();
     // Keys whose skin is mid-fetch, so a head rendered every tick kicks off exactly one load per layout.
     private final Set<HeadKey> inFlight = ConcurrentHashMap.newKeySet();
+    private final TextColor[] placeholderGrid;
+    private final Map<Layout, Component> placeholders = new ConcurrentHashMap<>();
 
     @Inject
     public PlayerHeadProvider(Core core) {
@@ -70,35 +77,38 @@ public class PlayerHeadProvider {
     PlayerHeadProvider(Executor async, SkinDownloader downloader, Ticker ticker) {
         this.async = async;
         this.downloader = downloader;
-        this.cache = Caffeine.newBuilder()
-                .maximumSize(512)
-                .expireAfterWrite(Duration.ofMinutes(5))
-                .ticker(ticker)
-                .build();
+        this.ticker = ticker;
+        try (InputStream in = PlayerHeadProvider.class.getResourceAsStream("/skins/mhf_question.png")) {
+            this.placeholderGrid = readGrid(ImageIO.read(Objects.requireNonNull(in, "bundled placeholder skin")));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
      * The placeholder head (the bundled MHF_Question skin) laid out like {@link #head(Player, int, int)}.
      */
     public Component placeholder(int scale, int top) {
-        return Component.empty();
+        return placeholders.computeIfAbsent(new Layout(scale, top), layout -> build(placeholderGrid, scale, top));
     }
 
     /**
-     * The player's head as a net-zero-advance component, or empty while the skin is still loading (the
-     * caller draws its frame without the head that tick and it pops in once ready).
+     * The player's head as a net-zero-advance component. Until the skin has loaded, or when the player
+     * has no skin or its download failed, this is the {@link #placeholder(int, int)} head.
      *
      * @param scale on-screen size multiplier per skin pixel (e.g. 4 &rarr; a 32px head)
      * @param top   vertical offset of the head's top row, as an {@code offset/down_N} font index
      */
     public Optional<Component> head(Player player, int scale, int top) {
         final HeadKey key = new HeadKey(player.getUniqueId(), scale, top);
-        final Component cached = cache.getIfPresent(key);
-        if (cached != null) {
-            return Optional.of(cached);
+        final CachedHead cached = cache.getIfPresent(key);
+        if (cached == null || ticker.read() >= cached.getRefreshAt()) {
+            load(player, key);
         }
-        load(player, key);
-        return Optional.empty();
+        if (cached == null || cached.getHead() == null) {
+            return Optional.of(placeholder(scale, top));
+        }
+        return Optional.of(cached.getHead());
     }
 
     private void load(Player player, HeadKey key) {
@@ -121,15 +131,25 @@ public class PlayerHeadProvider {
         async.execute(() -> {
             try {
                 final TextColor[] grid = readGrid(downloader.download(skin));
-                if (grid != null) {
-                    cache.put(key, build(grid, key.getScale(), key.getTop()));
+                if (grid == null) {
+                    retryLater(key);
+                } else {
+                    final long refreshAt = ticker.read() + Duration.ofMinutes(5).toNanos();
+                    cache.put(key, new CachedHead(build(grid, key.getScale(), key.getTop()), refreshAt));
                 }
             } catch (Exception e) {
                 log.warn("Failed to load skin head for {}", key.getPlayer(), e).submit();
+                retryLater(key);
             } finally {
                 inFlight.remove(key);
             }
         });
+    }
+
+    private void retryLater(HeadKey key) {
+        final CachedHead previous = cache.getIfPresent(key);
+        final long retryAt = ticker.read() + Duration.ofSeconds(30).toNanos();
+        cache.put(key, new CachedHead(previous == null ? null : previous.getHead(), retryAt));
     }
 
     private static BufferedImage download(URL skin) throws IOException {
@@ -142,7 +162,7 @@ public class PlayerHeadProvider {
     }
 
     /** Flatten the skin's head face + hat into one 8&times;8 colour grid. */
-    private TextColor[] readGrid(BufferedImage img) {
+    private static TextColor[] readGrid(BufferedImage img) {
         if (img == null) {
             return null;
         }
@@ -198,6 +218,19 @@ public class PlayerHeadProvider {
     @FunctionalInterface
     interface SkinDownloader {
         BufferedImage download(URL skin) throws IOException;
+    }
+
+    /** A rendered head, or null before the first successful load, and when it is next due a refresh. */
+    @Value
+    private static class CachedHead {
+        Component head;
+        long refreshAt;
+    }
+
+    @Value
+    private static class Layout {
+        int scale;
+        int top;
     }
 
     /** Cache identity for a rendered head: the same skin laid out at a different scale or top is a distinct entry. */
