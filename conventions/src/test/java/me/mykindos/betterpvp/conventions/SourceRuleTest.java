@@ -111,6 +111,15 @@ class SourceRuleTest {
     }
 
     @Test
+    void indentedMessageStartingWithMiniMessageTagIsHardcoded() {
+        assertEquals(List.of(2), lines(SourceRule.HARDCODED_PLAYER_TEXT, """
+                void tell(Player player) {
+                    UtilMessage.message(player, "Clans", "  <gray>Loaded");
+                }
+                """));
+    }
+
+    @Test
     void translatedMessageAndCommentedMessageAreFine() {
         assertEquals(List.of(), lines(SourceRule.HARDCODED_PLAYER_TEXT, """
                 void tell(Player player) {
