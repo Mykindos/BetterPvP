@@ -29,21 +29,17 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 class TranslationsTest {
 
-    private static final Set<String> LOCALES = Set.of(
-            "ar", "de", "en", "es", "fr", "ja", "ko", "ms", "nl", "pl", "ru", "zh");
-    private static final Pattern KEY_USE = Pattern.compile(
-            "\\bTranslations\\.(?:component|componentLines|rawComponentLines)\\(\\s*\"([^\"]+)\"");
-
     @Test
     void everyModuleShipsEveryLocale() throws IOException {
+        Set<String> expected = Set.of("ar", "de", "en", "es", "fr", "ja", "ko", "ms", "nl", "pl", "ru", "zh");
         List<String> failures = new ArrayList<>();
         for (Path dir : Codebase.translationDirs()) {
             Set<String> locales = bundles(dir).keySet();
-            if (!locales.equals(LOCALES)) {
-                Set<String> missing = new TreeSet<>(LOCALES);
+            if (!locales.equals(expected)) {
+                Set<String> missing = new TreeSet<>(expected);
                 missing.removeAll(locales);
                 Set<String> extra = new TreeSet<>(locales);
-                extra.removeAll(LOCALES);
+                extra.removeAll(expected);
                 failures.add(Codebase.relative(dir) + ": missing " + missing + ", unexpected " + extra);
             }
         }
@@ -76,10 +72,12 @@ class TranslationsTest {
         for (Path dir : Codebase.translationDirs()) {
             bundles(dir).values().forEach(known::addAll);
         }
+        Pattern keyUse = Pattern.compile(
+                "\\bTranslations\\.(?:component|componentLines|rawComponentLines)\\(\\s*\"([^\"]+)\"");
         List<String> failures = new ArrayList<>();
         for (Path file : Codebase.javaSources()) {
             JavaText text = new JavaText(Codebase.read(file));
-            Matcher matcher = KEY_USE.matcher(text.getSource());
+            Matcher matcher = keyUse.matcher(text.getSource());
             while (matcher.find()) {
                 String key = matcher.group(1);
                 if (text.inCode(matcher.start()) && !isDynamic(key) && !isKnown(key, known)) {

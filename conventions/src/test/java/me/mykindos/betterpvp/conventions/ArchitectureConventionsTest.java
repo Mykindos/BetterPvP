@@ -18,8 +18,6 @@ import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_
 class ArchitectureConventionsTest {
 
     private static final String LISTENER = "org.bukkit.event.Listener";
-    private static final String UPDATE_EVENT = "me.mykindos.betterpvp.core.framework.updater.UpdateEvent";
-    private static final String BPVP_LISTENER = "me.mykindos.betterpvp.core.listener.BPvPListener";
 
     @Test
     void noRecords() {
@@ -30,21 +28,24 @@ class ArchitectureConventionsTest {
 
     @Test
     void updateEventMethodsArePublic() {
-        check(methods().that().areAnnotatedWith(UPDATE_EVENT).should().haveModifier(JavaModifier.PUBLIC)
+        check(methods().that().areAnnotatedWith("me.mykindos.betterpvp.core.framework.updater.UpdateEvent")
+                .should().haveModifier(JavaModifier.PUBLIC)
                 .as("@UpdateEvent methods are public")
                 .because("UpdateEventExecutor finds them with getMethods(), which skips non-public methods"));
     }
 
     @Test
     void updateEventMethodsLiveInListeners() {
-        check(methods().that().areAnnotatedWith(UPDATE_EVENT).should().beDeclaredInClassesThat().implement(LISTENER)
+        check(methods().that().areAnnotatedWith("me.mykindos.betterpvp.core.framework.updater.UpdateEvent")
+                .should().beDeclaredInClassesThat().implement(LISTENER)
                 .as("@UpdateEvent methods live in Listener classes")
                 .because("only registered listeners are ticked"));
     }
 
     @Test
     void bpvpListenersAreListeners() {
-        check(classes().that().areAnnotatedWith(BPVP_LISTENER).should().implement(LISTENER)
+        check(classes().that().areAnnotatedWith("me.mykindos.betterpvp.core.listener.BPvPListener")
+                .should().implement(LISTENER)
                 .as("@BPvPListener classes implement Listener")
                 .because("the listener loader registers them with Bukkit and the update executor"));
     }
