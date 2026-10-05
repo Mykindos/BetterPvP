@@ -60,6 +60,8 @@ dependencies {
     testImplementation(libs.bundles.test)
     // Mapper is compileOnly for the plugin (it is a server dependency), but the schematic tests build real regions.
     testImplementation(libs.mapper)
+    // MockBukkit brings an older Paper API. Align Adventure with the server so tests can build sprite objects.
+    testImplementation(platform("net.kyori:adventure-bom:4.26.1"))
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
