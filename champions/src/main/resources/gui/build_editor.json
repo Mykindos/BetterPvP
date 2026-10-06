@@ -1,0 +1,487 @@
+{
+ "canvas": {
+  "width": 460,
+  "height": 264
+ },
+ "name": {
+  "key": "champions.menu.editor.title"
+ },
+ "state": {
+  "tabs": true,
+  "role": "",
+  "build": 0,
+  "name": "",
+  "slots": []
+ },
+ "actions": [
+  "pick",
+  "rename",
+  "reset",
+  "randomize",
+  "back"
+ ],
+ "components": {
+  "tile_row": {
+   "params": [
+    "tiles",
+    "slot",
+    "count"
+   ],
+   "elements": [
+    {
+     "switch": "{count}",
+     "cases": {
+      "1": [
+       {
+        "repeat": "tiles",
+        "as": "skill",
+        "max": 1,
+        "layout": {
+         "row": {
+          "x": 61,
+          "y": 0,
+          "cell": [
+           24,
+           24
+          ],
+          "gap": 0
+         }
+        },
+        "children": [
+         {
+          "button": "normal",
+          "selected": "{skill.equipped}",
+          "selected_style": "primary",
+          "width": 24,
+          "height": 24,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         },
+         {
+          "icon": "{skill.icon}",
+          "x": 4,
+          "y": 4,
+          "width": 16,
+          "height": 16,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         }
+        ]
+       }
+      ],
+      "2": [
+       {
+        "repeat": "tiles",
+        "as": "skill",
+        "max": 2,
+        "layout": {
+         "row": {
+          "x": 33,
+          "y": 0,
+          "cell": [
+           24,
+           24
+          ],
+          "gap": 32
+         }
+        },
+        "children": [
+         {
+          "button": "normal",
+          "selected": "{skill.equipped}",
+          "selected_style": "primary",
+          "width": 24,
+          "height": 24,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         },
+         {
+          "icon": "{skill.icon}",
+          "x": 4,
+          "y": 4,
+          "width": 16,
+          "height": 16,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         }
+        ]
+       }
+      ],
+      "3": [
+       {
+        "repeat": "tiles",
+        "as": "skill",
+        "max": 3,
+        "layout": {
+         "row": {
+          "x": 18,
+          "y": 0,
+          "cell": [
+           24,
+           24
+          ],
+          "gap": 19
+         }
+        },
+        "children": [
+         {
+          "button": "normal",
+          "selected": "{skill.equipped}",
+          "selected_style": "primary",
+          "width": 24,
+          "height": 24,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         },
+         {
+          "icon": "{skill.icon}",
+          "x": 4,
+          "y": 4,
+          "width": 16,
+          "height": 16,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         }
+        ]
+       }
+      ],
+      "4": [
+       {
+        "repeat": "tiles",
+        "as": "skill",
+        "max": 4,
+        "layout": {
+         "row": {
+          "x": 10,
+          "y": 0,
+          "cell": [
+           24,
+           24
+          ],
+          "gap": 10
+         }
+        },
+        "children": [
+         {
+          "button": "normal",
+          "selected": "{skill.equipped}",
+          "selected_style": "primary",
+          "width": 24,
+          "height": 24,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         },
+         {
+          "icon": "{skill.icon}",
+          "x": 4,
+          "y": 4,
+          "width": 16,
+          "height": 16,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         }
+        ]
+       }
+      ],
+      "5": [
+       {
+        "repeat": "tiles",
+        "as": "skill",
+        "max": 5,
+        "layout": {
+         "row": {
+          "x": 5,
+          "y": 0,
+          "cell": [
+           24,
+           24
+          ],
+          "gap": 4
+         }
+        },
+        "children": [
+         {
+          "button": "normal",
+          "selected": "{skill.equipped}",
+          "selected_style": "primary",
+          "width": 24,
+          "height": 24,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         },
+         {
+          "icon": "{skill.icon}",
+          "x": 4,
+          "y": 4,
+          "width": 16,
+          "height": 16,
+          "tooltip": "{skill.tip}",
+          "on_click": {
+           "call": "pick",
+           "args": {
+            "slot": "{slot}",
+            "skill": "{skill.id}"
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "elements": [
+  {
+   "box": "panel_header_tall",
+   "x": 0,
+   "y": 8,
+   "width": 460,
+   "height": 256
+  },
+  {
+   "custom": "core:text_icons",
+   "x": 9,
+   "y": 0,
+   "properties": {
+    "text": "{name}",
+    "style": "title",
+    "text_y": 18,
+    "gap": 8,
+    "spacing": 4,
+    "icons": [
+     {
+      "sprite": "button/rename",
+      "width": 22,
+      "height": 22,
+      "y": 10,
+      "tooltip": "champions.menu.editor.rename",
+      "action": "rename"
+     },
+     {
+      "sprite": "button/reset",
+      "width": 22,
+      "height": 22,
+      "y": 10,
+      "tooltip": "champions.menu.editor.reset",
+      "action": "reset"
+     },
+     {
+      "sprite": "button/random",
+      "width": 22,
+      "height": 22,
+      "y": 10,
+      "tooltip": "champions.menu.editor.randomize",
+      "action": "randomize"
+     }
+    ]
+   },
+   "assets": [
+    {
+     "icon": "button/rename",
+     "width": 22,
+     "height": 22
+    },
+    {
+     "icon": "button/reset",
+     "width": 22,
+     "height": 22
+    },
+    {
+     "icon": "button/random",
+     "width": 22,
+     "height": 22
+    }
+   ]
+  },
+  {
+   "repeat": "slots",
+   "as": "slot",
+   "max": 6,
+   "layout": {
+    "grid": {
+     "x": 8,
+     "y": 41,
+     "cell": [
+      146,
+      105
+     ],
+     "gap": 3,
+     "columns": 3
+    }
+   },
+   "children": [
+    {
+     "when": "{slot.enabled}",
+     "then": [
+      {
+       "box": "raised",
+       "width": 146,
+       "height": 105
+      },
+      {
+       "text": "{slot.label}",
+       "x": 6,
+       "y": 12,
+       "style": "heading"
+      },
+      {
+       "when": "{slot.icon}",
+       "then": [
+        {
+         "icon": "{slot.icon}",
+         "x": 108,
+         "y": 4,
+         "width": 32,
+         "height": 32,
+         "tooltip": "{slot.tip}"
+        }
+       ],
+       "else": [
+        {
+         "icon": "button/unknown",
+         "x": 108,
+         "y": 4,
+         "width": 32,
+         "height": 32
+        }
+       ]
+      },
+      {
+       "text": "{slot.equipped}",
+       "x": 6,
+       "y": 36,
+       "width": 134,
+       "wrap": true,
+       "max_lines": 1,
+       "style": "muted"
+      },
+      {
+       "when": "{slot.rows == 1}",
+       "then": [
+        {
+         "use": "tile_row",
+         "x": 0,
+         "y": 63,
+         "with": {
+          "tiles": "{slot.row1}",
+          "slot": "{slot.type}",
+          "count": "{slot.row1Count}"
+         }
+        }
+       ],
+       "else": [
+        {
+         "use": "tile_row",
+         "x": 0,
+         "y": 45,
+         "with": {
+          "tiles": "{slot.row1}",
+          "slot": "{slot.type}",
+          "count": "{slot.row1Count}"
+         }
+        },
+        {
+         "use": "tile_row",
+         "x": 0,
+         "y": 72,
+         "with": {
+          "tiles": "{slot.row2}",
+          "slot": "{slot.type}",
+          "count": "{slot.row2Count}"
+         }
+        }
+       ]
+      }
+     ],
+     "else": [
+      {
+       "box": "disabled",
+       "width": 146,
+       "height": 105
+      },
+      {
+       "text": "{slot.label}",
+       "x": 6,
+       "y": 12,
+       "style": "heading"
+      },
+      {
+       "text": {
+        "key": "champions.menu.editor.slot.empty"
+       },
+       "x": 6,
+       "y": 36,
+       "width": 134,
+       "wrap": true,
+       "max_lines": 3,
+       "style": "muted"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "exit": {
+  "label": {
+   "key": "champions.menu.screen.back"
+  },
+  "width": 80,
+  "on_click": "back"
+ }
+}

@@ -1,0 +1,6 @@
+{
+  "canvas": { "width": 460 },
+  "assets": [
+    { "icon": "button/hotbar", "width": 18, "height": 18 }
+  ]
+}

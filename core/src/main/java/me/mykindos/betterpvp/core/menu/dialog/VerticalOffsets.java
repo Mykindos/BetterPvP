@@ -14,7 +14,7 @@ public final class VerticalOffsets {
     /** Largest shift generated. A line is 9 px, so 0 to 8 reach every row. */
     public static final int MAX = 8;
 
-    private static final Set<Key> BASES = Set.of(Key.key("betterpvp", "rpg"), Key.key("betterpvp", "ui"));
+    private static final Set<Key> BASES = Set.of(Key.key("betterpvp", "rpg"), Key.key("betterpvp", "rpg_large"), Key.key("betterpvp", "ui"));
 
     private VerticalOffsets() {
     }

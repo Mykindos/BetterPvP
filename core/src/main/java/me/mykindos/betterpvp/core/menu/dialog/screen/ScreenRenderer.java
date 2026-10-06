@@ -6,7 +6,9 @@ import me.mykindos.betterpvp.core.menu.dialog.DialogCanvas;
 import me.mykindos.betterpvp.core.menu.dialog.DialogClick;
 import me.mykindos.betterpvp.core.menu.dialog.DialogField;
 import me.mykindos.betterpvp.core.menu.dialog.DialogScreen;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
@@ -89,17 +91,23 @@ final class ScreenRenderer {
     private static void render(Node node, RenderContext context) {
         switch (node) {
             case Node.Text text -> {
-                final CanvasElement element = context.text(text.getX(), text.getY(), context.styled(text.getText(), text.getStyle()),
-                        text.getAlign(), text.getWidth());
-                interact(element, context, text.getTooltip(), text.getOnClick(), null, null);
+                final Component styled = context.styled(text.getText(), text.getStyle());
+                final List<Component> lines = text.isWrap() && text.getWidth() > 0
+                        ? TextWrap.lines(styled, text.getWidth(), text.getMaxLines()) : List.of(styled);
+                for (int line = 0; line < lines.size(); line++) {
+                    final CanvasElement element = context.text(text.getX(), text.getY() + line * TextWrap.lineHeight(styled),
+                            lines.get(line), text.getAlign(), text.getWidth());
+                    interact(element, context, text.getTooltip(), text.getOnClick(), null, null);
+                }
             }
             case Node.Box box -> context.art(ScreenAssets.box(box.getStyle(), box.getWidth(), box.getHeight()), box.getX(), box.getY());
             case Node.Button button -> renderButton(button, context);
             case Node.Icon icon -> {
-                final String asset = ScreenAssets.sprite(icon.getSprite(), icon.getWidth(), icon.getHeight(), icon.getFrames(), icon.getFps());
+                final String sprite = Expressions.text(context.evaluate(icon.getSprite()));
+                final String asset = ScreenAssets.sprite(sprite, icon.getWidth(), icon.getHeight(), icon.getFrames(), icon.getFps());
                 // No shadow: its darkened colour loses the signature and would draw the whole strip.
-                final Component glyph = icon.getFrames() > 1
-                        ? context.glyph(asset).color(ANIMATION_SIGNATURE).shadowColor(ShadowColor.none())
+                final Component glyph = ScreenAssets.isFrames(asset) ? frames(context, asset, icon.getWidth())
+                        : icon.getFrames() > 1 ? context.glyph(asset).color(ANIMATION_SIGNATURE).shadowColor(ShadowColor.none())
                         : context.glyph(asset);
                 final CanvasElement element = context.getCanvas().place(context.getOriginX() + icon.getX(),
                         context.getOriginY() + icon.getY(), glyph, icon.getWidth() + 1, icon.getHeight());
@@ -144,6 +152,18 @@ final class ScreenRenderer {
                 type.render(custom, context.offset(custom.getX(), custom.getY()).restrict(allowed));
             }
         }
+    }
+
+    /** Every frame glyph of a frames: sprite, stacked at one spot by stepping back over each, which the shader shows one at a time. */
+    private static Component frames(RenderContext context, String asset, int width) {
+        final TextComponent.Builder stack = Component.text();
+        for (int part = 0; part < ScreenAssets.parts(asset); part++) {
+            if (part > 0) {
+                stack.append(Component.translatable("space." + -(width + 1)).font(Resources.Font.SPACE));
+            }
+            stack.append(context.glyph(asset, part).color(ANIMATION_SIGNATURE).shadowColor(ShadowColor.none()));
+        }
+        return stack.build();
     }
 
     private static void renderButton(Node.Button button, RenderContext context) {

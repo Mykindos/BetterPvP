@@ -29,6 +29,10 @@ public sealed interface Node permits Node.Text, Node.Box, Node.Button, Node.Icon
         @Builder.Default String style = "body";
         @Builder.Default Align align = Align.LEFT;
         int width;
+        /** Breaks the text onto further lines to stay within {@link #width}. */
+        boolean wrap;
+        /** The most lines wrapped text takes, the last cut with an ellipsis; 0 for no limit. */
+        int maxLines;
         @Nullable TextSpec tooltip;
         @Nullable ActionSpec onClick;
     }

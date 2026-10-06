@@ -46,9 +46,6 @@ command:
   runes:
     enabled: true
     requiredRank: ADMIN
-  promptbuild:
-    enabled: true
-    requiredRank: ADMIN
   sendskills:
     enabled: true
     requiredRank: PLAYER

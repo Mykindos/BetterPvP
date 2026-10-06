@@ -1,0 +1,677 @@
+{
+  "canvas": {
+    "width": 460
+  },
+  "assets": [
+    {
+      "icon": "menu/gui/classes/skills/adrenaline",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/agility",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/arctic_armour",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/axe_placeholder",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/backstab",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/barbed_arrows",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/barrage",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/battle_taunt",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/battlebind",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/biotic_quiver",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/blink",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/blizzard",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/block_toss",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/blood_barrier",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/blood_compass",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/blood_sphere",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/bloodlust",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/bloodshed",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/bloodthirst",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/blur",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/bow_placeholder",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/break_fall",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/bulls_charge",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/bulls_eye",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/cleanse",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/cleave",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/clone",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/colossus",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/combo_attack",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/concussion",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/crippling_blow",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/defensive_aura",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/defensive_stance",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/deflection",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/disengage",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/energy_pool",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/evade",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/excessive_force",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/explosive_arrow",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/farshot",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/fast_recovery",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/fire_blast",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/fissure",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/flash",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/flesh_hook",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/fortify",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/fortitude",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/frailty",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/glacial_blade",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/global_passive_placeholder",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/grasp",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/gravebind",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/heavy_arrows",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/hilt_smash",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/hold_position",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/holy_light",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/hunters_thrill",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/ice_prison",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/illusion",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/immolate",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/impotence",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/inferno",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/intimidation",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/kinetics",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/leap",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/leech",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/level_field",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/levitating_shot",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/lightning_orb",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/longshot",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/magma_blade",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/magnetic_axe",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/mark_of_the_wolf",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/marked_for_death",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/molten_shield",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/napalm_arrow",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/null_blade",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/overwhelm",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/passive_a_placeholder",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/passive_b_placeholder",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/pestilence",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/phantom_blade",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/precision",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/rally",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/recall",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/resilience",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/ride",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/riposte",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/rooting_axe",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/roped_arrow",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/rupture",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/sacrifice",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/seismic_slam",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/sever",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/sharpshooter",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/shield_smash",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/shocking_strikes",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/silencing_arrow",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/silencing_strikes",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/siphon",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/skullsplitter",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/slash",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/smoke_arrow",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/smoke_bomb",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/soul_bonds",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/soul_harvest",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/stampede",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/static_lazer",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/storm_sphere",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/swarm",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/swim",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/sword_placeholder",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/swordsmanship",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/takedown",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/tether_shot",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/thorns",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/threatening_shout",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/tormented_soil",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/toxic_arrow",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/tranquility",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/tri_shot",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/unstoppable_force",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/upheaval",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/vanguards_might",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/vengeance",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/viper_strikes",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/vitality_spores",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/void",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/whirlwind_sword",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/wind_burst",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/wind_dagger",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/wolfs_fury",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/wolfs_pounce",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "icon": "menu/gui/classes/skills/wreath",
+      "width": 16,
+      "height": 16
+    }
+  ]
+}

@@ -114,6 +114,8 @@ public final class ScreenParser {
                         .style(string(json, "style", "body"))
                         .align(Node.Align.valueOf(string(json, "align", "left").toUpperCase()))
                         .width(integer(json, "width"))
+                        .wrap(json.has("wrap") && json.get("wrap").getAsBoolean())
+                        .maxLines(integer(json, "max_lines"))
                         .tooltip(json.has("tooltip") ? text(json.get("tooltip")) : null)
                         .onClick(action(json.get("on_click")))
                         .build();

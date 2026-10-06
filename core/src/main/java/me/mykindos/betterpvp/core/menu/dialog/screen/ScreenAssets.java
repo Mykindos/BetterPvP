@@ -18,7 +18,9 @@ import java.util.function.BiFunction;
  *   <li>{@code backdrop:<style>:<w>x<h>:<y>} style art in the title, its top at canvas y</li>
  *   <li>{@code pressed:<style>:<w>x<h>} the style's pressed art</li>
  *   <li>{@code hover:<style>:<w>x<h>:<canvas width>:<x>:<y>:<body height>} hover art pinned at a canvas spot</li>
- *   <li>{@code sprite:<name>:<w>x<h>} and {@code anim:<name>:<w>x<h>:<frames>:<fps>} sprites</li>
+ *   <li>{@code sprite:<name>:<w>x<h>} and {@code anim:<name>:<w>x<h>:<frames>:<fps>} sprites, or
+ *   {@code frames:<name>:<w>x<h>:<frames>:<fps>} for a strip taller than {@link #MAX_GLYPH}, one glyph per frame. A name is a path under
+ *   {@code textures/gui/icons/}, or under {@code textures/} when the icons folder has no such file</li>
  * </ul>
  * Art wider than {@link #MAX_GLYPH} splits into equal glyphs keyed {@code <key>#<part>}. Every glyph of a namespace,
  * sorted by key, takes a code from U+E000 in the font {@code betterpvp:gui/<namespace>}.
@@ -59,9 +61,21 @@ public final class ScreenAssets {
     }
 
     public static String sprite(String name, int width, int height, int frames, int fps) {
-        return frames > 1
-                ? "anim:" + name + ":" + width + "x" + height + ":" + frames + ":" + fps
-                : "sprite:" + name + ":" + width + "x" + height;
+        if (frames <= 1) {
+            return "sprite:" + name + ":" + width + "x" + height;
+        }
+        // A strip taller than one glyph can hold draws each frame as its own glyph instead.
+        return (height * frames > MAX_GLYPH ? "frames:" : "anim:") + name + ":" + width + "x" + height + ":" + frames + ":" + fps;
+    }
+
+    /** Whether an asset draws each frame as its own glyph, all at one spot. */
+    public static boolean isFrames(String key) {
+        return key.startsWith("frames:");
+    }
+
+    /** Whether a sprite name holds a binding, so it is only known when the screen renders. */
+    public static boolean isTemplate(String name) {
+        return name.indexOf('{') >= 0;
     }
 
     /** Number of glyphs an asset splits into. Hover and animated art never split. */
@@ -69,12 +83,18 @@ public final class ScreenAssets {
         if (key.startsWith("hover:") || key.startsWith("anim:")) {
             return 1;
         }
+        if (isFrames(key)) {
+            return Integer.parseInt(key.split(":")[3]);
+        }
         return (width(key) + MAX_GLYPH - 1) / MAX_GLYPH;
     }
 
     /** Width of glyph {@code part} of an asset. */
     public static int partWidth(String key, int part) {
         final int width = width(key);
+        if (isFrames(key)) {
+            return width;
+        }
         final int parts = parts(key);
         final int each = (width + parts - 1) / parts;
         return Math.min(each, width - part * each);
@@ -201,8 +221,12 @@ public final class ScreenAssets {
                         }
                     }
                 }
-                case Node.Icon icon -> assets.add(sprite(icon.getSprite(), icon.getWidth(), icon.getHeight(),
-                        icon.getFrames(), icon.getFps()));
+                case Node.Icon icon -> {
+                    // A sprite named by a binding, such as skills/{skill.icon}, takes its art from an asset file.
+                    if (!isTemplate(icon.getSprite())) {
+                        assets.add(sprite(icon.getSprite(), icon.getWidth(), icon.getHeight(), icon.getFrames(), icon.getFps()));
+                    }
+                }
                 case Node.Group group -> {
                     for (int index = 0; index < group.getChildren().size(); index++) {
                         final int[] cell = cell(group, index);

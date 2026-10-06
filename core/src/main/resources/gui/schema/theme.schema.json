@@ -10,16 +10,19 @@
           "enum": [
             "disabled",
             "fill",
+            "fill_open",
             "header",
             "normal",
             "panel",
             "panel_header",
+            "panel_header_tall",
             "primary",
             "raised",
             "selected",
             "tab",
             "tab_selected",
             "track",
+            "track_open",
             "well"
           ]
         },

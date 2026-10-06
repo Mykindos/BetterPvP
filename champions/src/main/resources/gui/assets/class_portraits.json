@@ -1,0 +1,49 @@
+{
+  "canvas": {
+    "width": 460
+  },
+  "assets": [
+    {
+      "icon": "portraits/assassin",
+      "width": 128,
+      "height": 206,
+      "frames": 8,
+      "fps": 4
+    },
+    {
+      "icon": "portraits/brute",
+      "width": 128,
+      "height": 206,
+      "frames": 8,
+      "fps": 4
+    },
+    {
+      "icon": "portraits/knight",
+      "width": 128,
+      "height": 206,
+      "frames": 8,
+      "fps": 4
+    },
+    {
+      "icon": "portraits/mage",
+      "width": 128,
+      "height": 206,
+      "frames": 8,
+      "fps": 4
+    },
+    {
+      "icon": "portraits/ranger",
+      "width": 128,
+      "height": 206,
+      "frames": 8,
+      "fps": 4
+    },
+    {
+      "icon": "portraits/warlock",
+      "width": 128,
+      "height": 206,
+      "frames": 8,
+      "fps": 4
+    }
+  ]
+}

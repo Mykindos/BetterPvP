@@ -1,0 +1,23 @@
+{
+  "canvas": { "width": 300, "height": 70 },
+  "name": { "key": "champions.menu.rename.title" },
+  "state": {"name": "", "error": null},
+  "actions": ["save", "cancel"],
+  "elements": [
+    { "box": "panel_header_tall", "x": 0, "y": 8, "width": 300, "height": 62 },
+    { "text": { "key": "champions.menu.rename.title" }, "x": 9, "y": 18, "style": "title" },
+    {
+      "when": "{error}",
+      "then": [ { "text": "{error}", "x": 9, "y": 44, "width": 282, "wrap": true, "max_lines": 2, "style": "error" } ],
+      "else": [ { "text": { "key": "champions.menu.rename.hint" }, "x": 9, "y": 44, "width": 282, "wrap": true, "max_lines": 2, "style": "muted" } ]
+    }
+  ],
+  "fields": [
+    { "text_field": "name", "label": { "key": "champions.menu.rename.field" }, "width": 200, "max_length": 15 }
+  ],
+  "buttons": [
+    { "label": { "key": "champions.menu.rename.save" }, "width": 100, "on_click": "save" }
+  ],
+  "columns": 1,
+  "exit": { "label": { "key": "champions.menu.screen.back" }, "width": 80, "on_click": "cancel" }
+}

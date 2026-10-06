@@ -1,0 +1,137 @@
+{
+  "canvas": { "width": 460, "height": 264 },
+  "name": { "key": "champions.menu.classes.title" },
+  "state": {"tabs": true, "role": "", "roleName": "", "nameLarge": true, "summary": "", "selected": 1, "bow": false, "bowTip": "", "healthTip": "",
+            "stats": [], "traits": [], "builds": [], "extra": false, "extraIcon": "", "extraTip": ""},
+  "actions": ["role", "equip", "edit", "extra"],
+  "components": {
+    "stat_bar": {
+      "params": ["level", "tip"],
+      "elements": [
+        {
+          "switch": "{level}",
+          "cases": {
+            "1": [ { "button": "fill_open", "width": 29, "height": 7, "tooltip": "{tip}" },
+                   { "button": "track_open", "x": 29, "width": 115, "height": 7, "tooltip": "{tip}" } ],
+            "2": [ { "button": "fill_open", "width": 58, "height": 7, "tooltip": "{tip}" },
+                   { "button": "track_open", "x": 58, "width": 86, "height": 7, "tooltip": "{tip}" } ],
+            "3": [ { "button": "fill_open", "width": 86, "height": 7, "tooltip": "{tip}" },
+                   { "button": "track_open", "x": 86, "width": 58, "height": 7, "tooltip": "{tip}" } ],
+            "4": [ { "button": "fill_open", "width": 115, "height": 7, "tooltip": "{tip}" },
+                   { "button": "track_open", "x": 115, "width": 29, "height": 7, "tooltip": "{tip}" } ],
+            "5": [ { "button": "fill", "width": 144, "height": 7, "tooltip": "{tip}" } ]
+          },
+          "default": [ { "button": "track", "width": 144, "height": 7, "tooltip": "{tip}" } ]
+        }
+      ]
+    }
+  },
+  "elements": [
+    { "box": "panel_header_tall", "x": 0, "y": 8, "width": 460, "height": 256 },
+    {
+      "when": "{tabs}",
+      "then": [
+        { "text": { "key": "champions.menu.classes.title" }, "x": 9, "y": 18, "style": "title" },
+        {
+          "row": { "x": 62, "y": 14, "cell": ["auto", 16], "gap": 2 },
+          "children": [
+            { "button": "tab", "selected_style": "tab_selected", "selected": "{role == 'assassin'}", "width": "auto", "padding": 5, "height": 16,
+              "label": { "key": "core.role.assassin.name" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
+              "on_click": { "call": "role", "args": { "role": "assassin" } } },
+            { "button": "tab", "selected_style": "tab_selected", "selected": "{role == 'knight'}", "width": "auto", "padding": 5, "height": 16,
+              "label": { "key": "core.role.knight.name" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
+              "on_click": { "call": "role", "args": { "role": "knight" } } },
+            { "button": "tab", "selected_style": "tab_selected", "selected": "{role == 'brute'}", "width": "auto", "padding": 5, "height": 16,
+              "label": { "key": "core.role.brute.name" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
+              "on_click": { "call": "role", "args": { "role": "brute" } } },
+            { "button": "tab", "selected_style": "tab_selected", "selected": "{role == 'ranger'}", "width": "auto", "padding": 5, "height": 16,
+              "label": { "key": "core.role.ranger.name" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
+              "on_click": { "call": "role", "args": { "role": "ranger" } } },
+            { "button": "tab", "selected_style": "tab_selected", "selected": "{role == 'mage'}", "width": "auto", "padding": 5, "height": 16,
+              "label": { "key": "core.role.mage.name" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
+              "on_click": { "call": "role", "args": { "role": "mage" } } },
+            { "button": "tab", "selected_style": "tab_selected", "selected": "{role == 'warlock'}", "width": "auto", "padding": 5, "height": 16,
+              "label": { "key": "core.role.warlock.name" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
+              "on_click": { "call": "role", "args": { "role": "warlock" } } }
+          ]
+        }
+      ],
+      "else": [ { "text": { "key": "champions.menu.class.title" }, "x": 9, "y": 18, "style": "title" } ]
+    },
+
+    { "box": "raised", "x": 8, "y": 41, "width": 136, "height": 214 },
+    { "icon": "portraits/{role}", "x": 12, "y": 45, "width": 128, "height": 206, "frames": 8, "fps": 4 },
+
+    {
+      "when": "{nameLarge}",
+      "then": [ { "text": "{roleName}", "x": 152, "y": 44, "style": "heading" } ],
+      "else": [ { "text": "{roleName}", "x": 152, "y": 47, "style": "title" } ]
+    },
+    {
+      "when": "{bow}",
+      "then": [ { "icon": "button/bow", "x": 252, "y": 41, "width": 20, "height": 20, "tooltip": "{bowTip}" } ],
+      "else": [ { "icon": "button/bow_disabled", "x": 252, "y": 41, "width": 20, "height": 20,
+                  "tooltip": { "key": "champions.menu.class.bow.none" } } ]
+    },
+    { "icon": "button/heart", "x": 276, "y": 41, "width": 20, "height": 20, "tooltip": "{healthTip}" },
+    { "text": "{summary}", "x": 152, "y": 67, "width": 144, "wrap": true, "max_lines": 3, "style": "muted" },
+
+    {
+      "repeat": "stats", "as": "stat", "max": 3,
+      "layout": { "column": { "x": 152, "y": 100, "cell": [144, 28], "gap": 0 } },
+      "children": [
+        { "text": "{stat.name}", "x": 0, "y": 0, "style": "muted", "tooltip": "{stat.tip}" },
+        { "use": "stat_bar", "x": 0, "y": 11, "with": { "level": "{stat.level}", "tip": "{stat.tip}" } }
+      ]
+    },
+
+    { "text": { "key": "champions.menu.class.traits" }, "x": 152, "y": 184, "style": "muted" },
+    {
+      "repeat": "traits", "as": "trait", "max": 4,
+      "layout": { "row": { "x": 152, "y": 194, "cell": [24, 24], "gap": 4 } },
+      "children": [
+        {
+          "when": "{trait.icon}",
+          "then": [
+            { "box": "raised", "width": 24, "height": 24 },
+            { "icon": "{trait.icon}", "x": 4, "y": 4, "width": 16, "height": 16, "tooltip": "{trait.tip}" }
+          ],
+          "else": [ { "box": "well", "width": 24, "height": 24 } ]
+        }
+      ]
+    },
+
+    { "box": "well", "x": 302, "y": 41, "width": 150, "height": 214 },
+    {
+      "repeat": "builds", "as": "build", "max": 4,
+      "layout": { "column": { "x": 306, "y": 49, "cell": [142, 38], "gap": 7 } },
+      "children": [
+        { "button": "normal", "selected": "{build.id == selected}", "selected_style": "selected", "width": 142, "height": 38,
+          "hover": "light", "selected_hover": "light",
+          "on_click": { "set": { "selected": "{build.id}" } } },
+        { "text": "{build.name}", "x": 5, "y": 5 },
+        { "when": "{build.active}", "then": [
+          { "text": { "key": "champions.menu.class.active" }, "x": 0, "y": 5, "width": 137, "align": "right", "style": "muted" } ] },
+        {
+          "repeat": "build.skills", "as": "skill", "max": 6,
+          "layout": { "row": { "x": 5, "y": 18, "cell": [16, 16], "gap": 4 } },
+          "children": [
+            {
+              "when": "{skill.icon}",
+              "then": [ { "icon": "{skill.icon}", "width": 16, "height": 16, "tooltip": "{skill.tip}" } ],
+              "else": [ { "box": "well", "width": 16, "height": 16 } ]
+            }
+          ]
+        },
+        { "when": "{extra}", "then": [
+          { "icon": "{extraIcon}", "x": 123, "y": 17, "width": 18, "height": 18, "tooltip": "{extraTip}",
+            "on_click": { "call": "extra", "args": { "build": "{build.id}" } } } ] }
+      ]
+    },
+    { "button": "normal", "x": 306, "y": 229, "width": 69, "height": 20, "label": { "key": "champions.menu.class.equip" },
+      "hover": "light", "pressed": true, "on_click": "equip" },
+    { "button": "primary", "x": 379, "y": 229, "width": 69, "height": 20, "label": { "key": "champions.menu.class.edit" },
+      "label_style": "on_primary", "hover": "rim", "pressed": true, "on_click": "edit" }
+  ],
+  "exit": { "label": { "key": "champions.menu.screen.close" }, "width": 80 }
+}

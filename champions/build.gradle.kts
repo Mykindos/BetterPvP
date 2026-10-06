@@ -22,6 +22,11 @@ dependencies {
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)
+
+    testImplementation(libs.bundles.test)
+    testImplementation(project(":core"))
+    testImplementation("org.mockito:mockito-core:5.23.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 paperweight {

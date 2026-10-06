@@ -19,6 +19,10 @@ import java.util.UUID;
 @Data
 public class RoleBuild {
 
+    /** Skill points every build has to spend. */
+    public static final int MAX_POINTS = 12;
+
+
     private final long clientId;
     private final UUID clientUUID;
     private final Role role;
@@ -38,7 +42,7 @@ public class RoleBuild {
     private BuildSkill passiveA, passiveB, global;
     @Nullable
     private BuildSkill bow;
-    private int points = 12;
+    private int points = MAX_POINTS;
 
     public void addPoint() {
         points++;
@@ -112,7 +116,7 @@ public class RoleBuild {
         passiveB = null;
         global = null;
         bow = null;
-        points = 12;
+        points = MAX_POINTS;
 
     }
 

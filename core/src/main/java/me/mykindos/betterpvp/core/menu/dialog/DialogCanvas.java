@@ -29,6 +29,11 @@ public class DialogCanvas {
     private final int height;
     private final List<CanvasElement> elements = new ArrayList<>();
 
+    /** Width of the canvas in GUI pixels. */
+    public int getWidth() {
+        return width;
+    }
+
     public DialogCanvas(int width) {
         this(width, 0);
     }

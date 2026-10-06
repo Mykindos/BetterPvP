@@ -218,6 +218,14 @@ public class GuiScreens implements Listener {
         screens.put(screen.key(), screen);
     }
 
+    /**
+     * Whether a namespace's files declare a sprite at a size, so a screen can draw it by a bound name. Lets code fall
+     * back to another sprite when, for example, a skill has no icon in the pack yet.
+     */
+    public boolean hasSprite(String namespace, String sprite, int width, int height) {
+        return declared.getOrDefault(namespace, Set.of()).contains(ScreenAssets.sprite(sprite, width, height, 0, 0));
+    }
+
     @Nullable
     public ScreenDefinition definition(String key) {
         return screens.get(key);

@@ -2,12 +2,9 @@ package me.mykindos.betterpvp.champions.champions.npc;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
-import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
-import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
+import me.mykindos.betterpvp.champions.champions.builds.screen.SkillScreens;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeCause;
-import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -28,7 +25,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.Objects;
 import java.util.WeakHashMap;
 
 @BPvPListener
@@ -38,15 +34,13 @@ public class KitSelectorListener implements Listener {
     protected final WeakHashMap<Entity, KitSelector> selectors = new WeakHashMap<>();
     private final RoleManager roleManager;
     private final ItemFactory itemFactory;
-    private final BuildManager buildManager;
-    private final ChampionsSkillManager skillManager;
+    private final SkillScreens skillScreens;
 
     @Inject
-    private KitSelectorListener(RoleManager roleManager, ItemFactory itemFactory, BuildManager buildManager, ChampionsSkillManager skillManager) {
+    private KitSelectorListener(RoleManager roleManager, ItemFactory itemFactory, SkillScreens skillScreens) {
         this.roleManager = roleManager;
         this.itemFactory = itemFactory;
-        this.buildManager = buildManager;
-        this.skillManager = skillManager;
+        this.skillScreens = skillScreens;
     }
 
     @EventHandler
@@ -84,11 +78,7 @@ public class KitSelectorListener implements Listener {
         }
 
         if (selector.isEditor()) {
-            // Open editor
-            final GamerBuilds builds = buildManager.getObject(player.getUniqueId()).orElseThrow();
-
-            BuildMenu gui = selector.getBuildMenuFunction() == null ? null : selector.getBuildMenuFunction().apply(player);
-            Objects.requireNonNullElseGet(gui, () -> new BuildMenu(builds, role, this.buildManager, this.skillManager, null, null)).show(player);
+            skillScreens.openClass(player, role, selector.getBuildExtra());
         }
     }
 

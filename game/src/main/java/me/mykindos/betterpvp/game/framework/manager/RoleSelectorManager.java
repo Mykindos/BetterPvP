@@ -2,22 +2,20 @@ package me.mykindos.betterpvp.game.framework.manager;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
-import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
-import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
+import me.mykindos.betterpvp.champions.champions.builds.screen.BuildExtra;
+import me.mykindos.betterpvp.champions.champions.builds.screen.SkillScreens;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelector;
-import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayout;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
-import me.mykindos.betterpvp.game.gui.hotbar.ButtonBuildMenuHotbar;
+import me.mykindos.betterpvp.game.gui.hotbar.HotBarEditor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -39,14 +38,6 @@ public class RoleSelectorManager {
     private final Map<UUID, Role> selectedRoles = new HashMap<>();
     @Getter
     private final Multimap<MappedWorld, KitSelector> kitSelectors = ArrayListMultimap.create();
-    private final ChampionsSkillManager skillManager;
-    private final BuildManager buildManager;
-
-    @Inject
-    public RoleSelectorManager() {
-        this.buildManager = JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(BuildManager.class);
-        this.skillManager = JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(ChampionsSkillManager.class);
-    }
 
     public void selectRole(Player player, Role role) {
         if (role == null) {
@@ -84,12 +75,7 @@ public class RoleSelectorManager {
                 Location location = region.getLocation();
                 // Create the selector, make sure they can edit their hotbar
                 KitSelector selector = new KitSelector(role, false, true);
-                selector.setBuildMenuFunction(player -> {
-                    final GamerBuilds builds = buildManager.getObject(player.getUniqueId()).orElseThrow();
-                    return new BuildMenu(builds, role, buildManager, skillManager, null, (buildId, menu) -> {
-                        return new ButtonBuildMenuHotbar(inventoryProvider, hotBarLayoutManager, itemFactory, role, builds, buildId);
-                    }, null);
-                });
+                selector.setBuildExtra(hotbarExtra(role, inventoryProvider, hotBarLayoutManager, itemFactory));
 
                 // Spawn it and log it
                 selector.spawn(location);
@@ -101,6 +87,22 @@ public class RoleSelectorManager {
         kitSelectors.putAll(map, selectors);
 
         return selectors;
+    }
+
+    /**
+     * The hotbar button on each build of a kit selector's class screen. Saving the layout returns the player to that
+     * class screen.
+     */
+    private BuildExtra hotbarExtra(Role role, InventoryProvider inventoryProvider, HotBarLayoutManager hotBarLayoutManager,
+                                   ItemFactory itemFactory) {
+        return new BuildExtra("button/hotbar", "game.menu.hotbar.edit.name", (player, build) -> {
+            final HotBarLayout layout = Objects.requireNonNull(hotBarLayoutManager.getLayout(player, build));
+            new HotBarEditor(role, layout, hotBarLayoutManager, itemFactory, null, saved -> {
+                inventoryProvider.refreshInventory(saved);
+                JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(SkillScreens.class)
+                        .openClass(saved, role, hotbarExtra(role, inventoryProvider, hotBarLayoutManager, itemFactory));
+            }).show(player);
+        });
     }
 
     private List<PerspectiveRegion> findKitSelectorRegion(MappedWorld world, Role role) {

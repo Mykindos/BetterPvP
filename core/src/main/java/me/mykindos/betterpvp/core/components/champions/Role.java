@@ -15,7 +15,7 @@ public enum Role {
     ASSASSIN("Assassin", 36, TextColor.color(224, 112, 0),
             Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS,
             80, 100, 20, true),
-    KNIGHT("Knight", 50, TextColor.color(227, 227, 227),
+    KNIGHT("Knight", 50, TextColor.color(79, 143, 214),
             Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS,
             60, 40, 60, false),
     BRUTE("Brute", 50, TextColor.color(112, 255, 241),

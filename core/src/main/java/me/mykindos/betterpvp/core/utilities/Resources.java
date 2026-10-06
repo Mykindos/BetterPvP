@@ -28,6 +28,9 @@ public class Resources {
          */
         public static final Key UI = Key.key("betterpvp", "rpg");
 
+        /** The menu font at twice the size, for headings. Its glyph tops sit on the line top and grow down. */
+        public static final Key UI_LARGE = Key.key("betterpvp", "rpg_large");
+
         /**
          * Used for invisible spacing in menus.
          */

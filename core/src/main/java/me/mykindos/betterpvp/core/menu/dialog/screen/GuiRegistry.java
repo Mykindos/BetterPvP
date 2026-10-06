@@ -34,8 +34,10 @@ public class GuiRegistry {
         textStyle("core", "muted", text -> text.color(TextColor.color(0x4A4C51)).shadowColor(ShadowColor.none()));
         textStyle("core", "value", text -> text.color(TextColor.color(0x2A2C30)).shadowColor(ShadowColor.none()));
         textStyle("core", "title", text -> text.color(TextColor.color(0x2A2C30)).shadowColor(ShadowColor.none()));
+        textStyle("core", "heading", text -> text.font(Resources.Font.UI_LARGE).color(TextColor.color(0x2A2C30)).shadowColor(ShadowColor.none()));
         textStyle("core", "error", text -> text.color(TextColor.color(0xA61B1B)).shadowColor(ShadowColor.none()));
         textStyle("core", "on_primary", text -> text.color(TextColor.color(0xFFFFFF)).shadowColor(ShadowColor.none()));
+        elementType("core", "text_icons", new TextIconsElement());
 
         sound("core", "click", "minecraft:ui.button.click");
         sound("core", "open", "minecraft:item.book.page_turn");

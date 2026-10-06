@@ -28,7 +28,8 @@ public final class UtilFont {
     private static final int UNIFONT_FLAG = 0x80;
     private static final byte[] ADVANCES = loadAdvances("default_advances.bin");
     private static final Map<Key, byte[]> PACK_FONT_ADVANCES = Map.of(
-            Key.key("betterpvp", "rpg"), loadAdvances("rpg_advances.bin"));
+            Key.key("betterpvp", "rpg"), loadAdvances("rpg_advances.bin"),
+            Key.key("betterpvp", "rpg_large"), loadAdvances("rpg_large_advances.bin"));
 
     private UtilFont() {
     }

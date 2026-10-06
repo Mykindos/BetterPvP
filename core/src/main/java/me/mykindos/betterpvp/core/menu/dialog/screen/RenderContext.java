@@ -111,12 +111,15 @@ public class RenderContext {
     /** Places text at a canvas spot relative to this context, aligned in a box {@code width} wide. */
     public CanvasElement text(int x, int y, Component text, Node.Align align, int width) {
         final int drawn = UtilFont.componentWidth(text) - 1;
-        final int left = switch (align) {
+        final int left = Math.max(0, originX + switch (align) {
             case LEFT -> x;
             case CENTER -> x + (width - drawn) / 2;
             case RIGHT -> x + width - drawn;
-        };
-        return canvas.text(originX + left, originY + y, text);
+        });
+        // Text past the canvas edge, such as a long translation, is cut to fit rather than failing the whole screen.
+        final int room = canvas.getWidth() - left - 1;
+        final Component shown = drawn > room ? TextWrap.lines(text, room, 1).getFirst() : text;
+        return canvas.text(left, originY + y, shown);
     }
 
     /**
@@ -138,8 +141,13 @@ public class RenderContext {
 
     /** The single glyph of an asset that never splits, such as pressed or hover art. */
     public Component glyph(String asset) {
+        return glyph(asset, 0);
+    }
+
+    /** One glyph of an asset, such as a frame of a frames: sprite. */
+    public Component glyph(String asset, int part) {
         check(asset);
-        return assets.glyph(asset, 0);
+        return assets.glyph(asset, part);
     }
 
     private void check(String asset) {

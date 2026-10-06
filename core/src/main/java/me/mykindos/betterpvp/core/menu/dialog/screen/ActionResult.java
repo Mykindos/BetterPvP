@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -39,7 +41,8 @@ public class ActionResult {
 
     /** Opens a screen on top of this one. {@code screen} is {@code namespace:id}, or an id in this screen's namespace. */
     public static ActionResult open(String screen, Map<String, Object> state) {
-        return new ActionResult(Kind.OPEN, null, screen, Map.copyOf(state), null);
+        // State values can be null, such as a cleared error, which Map.copyOf rejects.
+        return new ActionResult(Kind.OPEN, null, screen, Collections.unmodifiableMap(new HashMap<>(state)), null);
     }
 
     public static ActionResult back() {

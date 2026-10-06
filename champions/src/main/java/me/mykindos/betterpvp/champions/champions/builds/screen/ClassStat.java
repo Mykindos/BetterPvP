@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.builds.menus;
+package me.mykindos.betterpvp.champions.champions.builds.screen;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

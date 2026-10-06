@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
 import me.mykindos.betterpvp.champions.item.component.storage.ArmorStorageComponentSerializer;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.champions.tips.ChampionsTipLoader;
+import me.mykindos.betterpvp.core.menu.dialog.screen.GuiScreens;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -88,6 +89,8 @@ public class Champions extends BPvPPlugin {
 
             var skillManager = injector.getInstance(ChampionsSkillManager.class);
             skillManager.loadSkills();
+
+            injector.getInstance(GuiScreens.class).load("champions", Champions.class);
 
             var championsTipManager = injector.getInstance(ChampionsTipLoader.class);
             championsTipManager.loadTips(PACKAGE);

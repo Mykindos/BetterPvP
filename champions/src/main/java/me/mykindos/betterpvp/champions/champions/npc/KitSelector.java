@@ -1,11 +1,10 @@
 package me.mykindos.betterpvp.champions.champions.npc;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
+import me.mykindos.betterpvp.champions.champions.builds.screen.BuildExtra;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -30,7 +29,7 @@ public final class KitSelector {
 
     private final Role role;
     @Setter
-    private Function<Player, BuildMenu> buildMenuFunction = null;
+    private BuildExtra buildExtra = null;
     private final boolean isEquip;
     private final boolean isEditor;
     private boolean spawned = false;
