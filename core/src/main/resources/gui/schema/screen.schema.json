@@ -168,7 +168,7 @@
         },
         {
           "type": "object", "required": ["icon", "width", "height"], "additionalProperties": false,
-          "description": "A sprite from Resourcepack/gui/sprites. With frames above 1 it loops on the client.",
+          "description": "An image from the pack's betterpvp:textures/gui/icons. With frames above 1 it loops on the client.",
           "properties": {
             "icon": { "$ref": "#/definitions/sprite" },
             "x": { "$ref": "#/definitions/position/x" }, "y": { "$ref": "#/definitions/position/y" },
