@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed {
 
@@ -55,7 +56,7 @@ public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed {
     @Override
     public @NotNull Component getTitle() {
         return Component.translatable("space.-8", NamedTextColor.WHITE).font(Resources.Font.SPACE)
-                .append(Component.text("<glyph:menu_select_one>").font(Resources.Font.NEXO))
+                .append(Glyphs.glyph("menu_select_one"))
                 .append(Component.translatable("space.8", NamedTextColor.WHITE).font(Resources.Font.SPACE));
     }
 

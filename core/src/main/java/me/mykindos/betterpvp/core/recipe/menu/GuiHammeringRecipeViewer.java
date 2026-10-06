@@ -27,7 +27,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
 
@@ -85,6 +86,6 @@ public class GuiHammeringRecipeViewer extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-48><glyph:menu_recipe_viewer_hammering>").font(NEXO);
+        return Glyphs.shift(-48).append(Glyphs.glyph("menu_recipe_viewer_hammering"));
     }
 }

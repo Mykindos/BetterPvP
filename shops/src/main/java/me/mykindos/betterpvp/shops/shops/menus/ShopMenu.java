@@ -22,7 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 @CustomLog
 @Getter
@@ -106,6 +107,6 @@ public class ShopMenu extends AbstractPagedGui<IShopItem> implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-13><glyph:menu_shop_browse>").font(NEXO);
+        return Glyphs.shift(-13).append(Glyphs.glyph("menu_shop_browse"));
     }
 }

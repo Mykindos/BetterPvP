@@ -38,7 +38,7 @@ public class ExplosiveResistanceComponent extends AbstractItemComponent implemen
         return List.of(
                 Component.text("Explosive Resistance", TextColor.color(212, 212, 212), TextDecoration.BOLD),
                 Component.empty()
-                        .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>꒒"))
+                        .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.GLYPH +"><white>꒒"))
                         .appendSpace()
                         .append(Component.text(resistance, TextColor.color(255, 153, 0)))
         );

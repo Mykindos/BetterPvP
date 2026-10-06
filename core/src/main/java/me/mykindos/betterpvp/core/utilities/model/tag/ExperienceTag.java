@@ -13,7 +13,7 @@ public class ExperienceTag implements Modifying {
         if (depth != 0) return Component.empty();
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(133, 255, 165)))
-                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>ꓨ"))
+                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.GLYPH +"><white>ꓨ"))
                 .build();
     }
 }

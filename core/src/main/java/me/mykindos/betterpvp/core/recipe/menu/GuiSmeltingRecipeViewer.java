@@ -34,7 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 public class GuiSmeltingRecipeViewer extends AbstractGui implements Windowed {
 
@@ -107,6 +108,6 @@ public class GuiSmeltingRecipeViewer extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-48><glyph:menu_recipe_viewer_smelting>").font(NEXO);
+        return Glyphs.shift(-48).append(Glyphs.glyph("menu_recipe_viewer_smelting"));
     }
 }

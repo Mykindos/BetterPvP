@@ -34,7 +34,7 @@ public class Resources {
         /**
          * Used for invisible spacing in menus.
          */
-        public static final Key SPACE = Key.key("space", "default");
+        public static final Key SPACE = Key.key("betterpvp", "space");
 
         /**
          * Makes every character in the string small caps.
@@ -58,9 +58,9 @@ public class Resources {
         public static final Key MENU = Key.key("betterpvp", "menu");
 
         /**
-         * Nexo
+         * Glyphs: icons and menu art drawn inside text. Write them with the Glyphs helper rather than by char.
          */
-        public static final Key NEXO = Key.key("betterpvp", "nexo");
+        public static final Key GLYPH = Key.key("betterpvp", "glyph");
 
         /**
          * 32x32 item sprite glyphs rendered above item names.

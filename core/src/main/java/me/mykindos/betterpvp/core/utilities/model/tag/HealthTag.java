@@ -14,7 +14,7 @@ public class HealthTag implements Modifying {
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(255, 0, 0)))
                 .appendSpace()
-                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>ꔃ"))
+                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.GLYPH +"><white>ꔃ"))
                 .build();
     }
 }

@@ -14,7 +14,7 @@ public class TimeTag implements Modifying {
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(0, 255, 30)))
                 .appendSpace()
-                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>ꑼ"))
+                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.GLYPH +"><white>ꑼ"))
                 .build();
     }
 }

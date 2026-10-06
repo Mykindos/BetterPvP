@@ -25,6 +25,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import static net.kyori.adventure.text.Component.empty;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 @BPvPListener
 @Singleton
@@ -66,7 +67,7 @@ public class ClansSidebarListener implements Listener {
                     // Clan
                     lineDrawable.drawLine(empty().append(Translations.component("clans.sidebar.clan-header").color(TextColor.color(0xFAB95B)).decorate(TextDecoration.BOLD)));
                     lineDrawable.drawLine(empty()
-                            .append(Component.text("<glyph:shield_icon_2>", NamedTextColor.GRAY))
+                            .append(Glyphs.glyph("shield_icon_2").color(NamedTextColor.GRAY))
                             .appendSpace()
                             .append(Translations.component("clans.sidebar.clan").color(TextColor.color(0xFAEB92)))
                             .appendSpace()
@@ -74,7 +75,7 @@ public class ClansSidebarListener implements Listener {
 
                     // Energy
                     lineDrawable.drawLine(empty()
-                            .append(Component.text("<glyph:hourglass_icon>", NamedTextColor.GRAY))
+                            .append(Glyphs.glyph("hourglass_icon").color(NamedTextColor.GRAY))
                             .appendSpace()
                             .append(Translations.component("clans.sidebar.energy").color(TextColor.color(0xFAEB92)))
                             .appendSpace()
@@ -86,7 +87,7 @@ public class ClansSidebarListener implements Listener {
                     final int coins = (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0);
                     final TextComponent coinsText = Component.text(UtilFormat.formatNumber(coins), NamedTextColor.GOLD);
                     return empty()
-                            .append(Component.text("<glyph:coins_icon>"))
+                            .append(Glyphs.glyph("coins_icon"))
                             .appendSpace()
                             .append(Translations.component("clans.sidebar.coins").color(TextColor.color(0xFAEB92)))
                             .appendSpace()

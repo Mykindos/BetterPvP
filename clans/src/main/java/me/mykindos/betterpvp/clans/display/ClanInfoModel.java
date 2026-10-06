@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.world.zone.Zones;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 /**
  * Presentation-neutral source of truth for the clan info readout. Both the scoreboard
@@ -39,10 +40,10 @@ public final class ClanInfoModel {
         final Component emoji;
         final Component territory;
         if (zone == null || zone.hasTag(Zones.WILDERNESS)) {
-            emoji = Component.text("<glyph:floating_island_icon>", NamedTextColor.WHITE);
+            emoji = Glyphs.glyph("floating_island_icon");
             territory = Translations.component("clans.sidebar.wilderness").color(NamedTextColor.GRAY);
         } else if (zone.hasTag(Zones.SAFE)) {
-            emoji = Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
+            emoji = Glyphs.glyph("shield_icon");
             territory = zone.getDisplayName().applyFallbackStyle(ClanRelation.SAFE.getPrimary());
         } else if (zone.hasTag(ClanZones.TERRITORY)) {
             final Clan self = clanManager.getClanByPlayer(player).orElse(null);
@@ -50,12 +51,12 @@ public final class ClanInfoModel {
             final ClanRelation relation = clanManager.getRelation(self, owner);
 
             emoji = switch (relation) {
-                case PILLAGE, ENEMY, NEUTRAL -> Component.text("<glyph:sword_icon>", NamedTextColor.WHITE);
-                case SAFE, SELF, ALLY, ALLY_TRUST -> Component.text("<glyph:shield_icon>", NamedTextColor.WHITE);
+                case PILLAGE, ENEMY, NEUTRAL -> Glyphs.glyph("sword_icon");
+                case SAFE, SELF, ALLY, ALLY_TRUST -> Glyphs.glyph("shield_icon");
             };
             territory = zone.getDisplayName().applyFallbackStyle(relation.getPrimary());
         } else {
-            emoji = Component.text("<glyph:floating_island_icon>", NamedTextColor.WHITE);
+            emoji = Glyphs.glyph("floating_island_icon");
             territory = zone.getDisplayName().applyFallbackStyle(NamedTextColor.GRAY);
         }
 

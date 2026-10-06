@@ -14,7 +14,7 @@ public class DamageTag implements Modifying {
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(255, 72, 0)))
                 .appendSpace()
-                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>꒘"))
+                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.GLYPH +"><white>꒘"))
                 .build();
     }
 }

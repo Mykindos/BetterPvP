@@ -37,7 +37,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 public class ArmorStorageEditAbility extends AbstractInteraction implements DisplayedInteraction {
 
@@ -113,7 +114,7 @@ public class ArmorStorageEditAbility extends AbstractInteraction implements Disp
 
         @Override
         public @NotNull Component getTitle() {
-            return Component.text("<shift:-8><glyph:menu_armor_storage>").font(NEXO);
+            return Glyphs.shift(-8).append(Glyphs.glyph("menu_armor_storage"));
         }
 
         private ItemProvider getPlaceholder(String itemModel) {

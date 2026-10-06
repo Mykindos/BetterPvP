@@ -27,7 +27,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 
@@ -55,7 +56,7 @@ public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-8><glyph:menu_waystone>").font(NEXO);
+        return Glyphs.shift(-8).append(Glyphs.glyph("menu_waystone"));
     }
 
     private void loadMenu() {

@@ -14,7 +14,7 @@ public class ResistanceTag implements Modifying {
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(87, 87, 87)))
                 .appendSpace()
-                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>ꓱ"))
+                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.GLYPH +"><white>ꓱ"))
                 .build();
     }
 }

@@ -12,7 +12,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 @CustomLog
 public class GuiCraftingTable extends AbstractCraftingGui implements Windowed {
@@ -41,6 +42,6 @@ public class GuiCraftingTable extends AbstractCraftingGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-48><glyph:menu_crafting_table>").font(NEXO);
+        return Glyphs.shift(-48).append(Glyphs.glyph("menu_crafting_table"));
     }
 }

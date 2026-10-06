@@ -14,7 +14,7 @@ public class ManaTag implements Modifying {
         return Component.text()
                 .append(current.colorIfAbsent(TextColor.color(48, 114, 255)))
                 .appendSpace()
-                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.NEXO +"><white>ꓮ"))
+                .append(MiniMessage.miniMessage().deserialize("<font:" + Resources.Font.GLYPH +"><white>ꓮ"))
                 .build();
     }
 }

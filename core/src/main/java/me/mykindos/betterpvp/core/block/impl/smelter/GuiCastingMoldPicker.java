@@ -41,7 +41,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 @CustomLog
 public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
@@ -99,7 +100,7 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-48><glyph:menu_smelter_casting_mold_picker>").font(NEXO);
+        return Glyphs.shift(-48).append(Glyphs.glyph("menu_smelter_casting_mold_picker"));
     }
 
     private class GuiDefaultMolds extends AbstractScrollGui<ItemInstance> {

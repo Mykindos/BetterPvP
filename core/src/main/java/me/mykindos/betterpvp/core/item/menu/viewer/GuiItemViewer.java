@@ -50,7 +50,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 @CustomLog
 public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> implements Windowed {
@@ -257,7 +258,7 @@ public class GuiItemViewer extends AbstractPagedGui<GuiItemViewer.CachedEntry> i
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-48><glyph:menu_recipe_viewer>").font(NEXO);
+        return Glyphs.shift(-48).append(Glyphs.glyph("menu_recipe_viewer"));
     }
 
     private class CustomOnlyButton extends AbstractItem implements CooldownButton {

@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 /**
  * Button that shows a description and wiki entries.
@@ -100,7 +101,7 @@ public class InfoTabButton extends AbstractItem {
 
 //        builder.lore(Component.empty());
 //        final TextComponent header = Component.empty()
-//                .append(Component.text("<glyph:book_icon>").font(Resources.Font.NEXO))
+//                .append(Glyphs.glyph("book_icon"))
 //                .appendSpace()
 //                .append(Component.text("Relevant articles:", TextColor.color(191, 191, 191)));
 //        if (!started) builder.displayName(header);
@@ -115,7 +116,7 @@ public class InfoTabButton extends AbstractItem {
 //        }
 
 //        builder.action(ClickActions.ALL, Component.empty()
-//                .append(Component.text("<glyph:magnifying_glass_icon>").font(Resources.Font.NEXO))
+//                .append(Glyphs.glyph("magnifying_glass_icon"))
 //                .append(Component.text("View Articles")));
         return builder.build();
     }
@@ -135,11 +136,11 @@ public class InfoTabButton extends AbstractItem {
             URL url = wikiEntries.get(wikiEntry);
             String prefix = wikiEntry.isEmpty() ? "" : wikiEntry + ": ";
             UtilMessage.message(player, Component.empty()
-                    .append(Component.text("<glyph:book_open_icon_shadowed>").font(Resources.Font.NEXO))
+                    .append(Glyphs.glyph("book_open_icon_shadowed"))
                     .appendSpace()
                     .append(Component.text(prefix, NamedTextColor.WHITE))
                     .append(Component.text(url.toString(), TextColor.color(255, 225, 33), TextDecoration.UNDERLINED)
-                            .hoverEvent(HoverEvent.showText(Component.text("<glyph:check_icon>").font(Resources.Font.NEXO)))
+                            .hoverEvent(HoverEvent.showText(Glyphs.glyph("check_icon")))
                             .clickEvent(ClickEvent.openUrl(url))));
         }
         UtilMessage.message(player, Component.empty());

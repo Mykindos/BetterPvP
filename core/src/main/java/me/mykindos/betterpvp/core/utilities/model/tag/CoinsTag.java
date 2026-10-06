@@ -13,7 +13,7 @@ public class CoinsTag implements Modifying {
     public static @NotNull Component of(@NotNull Component amount) {
         return Component.text()
                 .append(amount.colorIfAbsent(TextColor.color(255, 183, 0)))
-                .append(Component.text("ꓯ", NamedTextColor.WHITE).font(Resources.Font.NEXO))
+                .append(Component.text("ꓯ", NamedTextColor.WHITE).font(Resources.Font.GLYPH))
                 .build();
     }
 

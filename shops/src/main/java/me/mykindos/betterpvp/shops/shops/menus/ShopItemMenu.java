@@ -15,7 +15,8 @@ import me.mykindos.betterpvp.shops.shops.menus.buttons.direction.DisabledPageBut
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 @Getter
 public class ShopItemMenu extends AbstractGui implements Windowed {
@@ -54,7 +55,7 @@ public class ShopItemMenu extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-13><glyph:menu_shop_buy_sell>").font(NEXO);
+        return Glyphs.shift(-13).append(Glyphs.glyph("menu_shop_buy_sell"));
     }
 
     public void notifyOpenWindows() {

@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 @CustomLog
 public class GuiWorkbench extends AbstractTabGui implements Windowed {
@@ -99,8 +100,8 @@ public class GuiWorkbench extends AbstractTabGui implements Windowed {
 
     private Component getCurrentTitle() {
         return switch (this.getCurrentTab()) {
-            case 0 -> Component.text("<shift:-48><glyph:menu_workbench>").font(NEXO);
-            case 1 -> Component.text("<shift:-48><glyph:menu_quick_craft_viewer>").font(NEXO);
+            case 0 -> Glyphs.shift(-48).append(Glyphs.glyph("menu_workbench"));
+            case 1 -> Glyphs.shift(-48).append(Glyphs.glyph("menu_quick_craft_viewer"));
             default -> throw new IllegalStateException("Unexpected value: " + this.getCurrentTab());
         };
     }

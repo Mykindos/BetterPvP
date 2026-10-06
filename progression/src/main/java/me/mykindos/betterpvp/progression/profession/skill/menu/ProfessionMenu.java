@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 public abstract class ProfessionMenu extends AbstractScrollGui<Item> implements Windowed {
 
@@ -188,7 +189,7 @@ public abstract class ProfessionMenu extends AbstractScrollGui<Item> implements 
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-24><glyph:l_skilltree_gui_" + profession.toLowerCase() + ">", NamedTextColor.WHITE);
+        return Glyphs.shift(-24).append(Glyphs.glyph("l_skilltree_gui_" + profession.toLowerCase()));
     }
 
 }

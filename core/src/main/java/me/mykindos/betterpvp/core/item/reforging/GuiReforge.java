@@ -31,7 +31,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.GLYPH;
+import me.mykindos.betterpvp.core.resourcepack.Glyphs;
 
 /**
  * GUI for reforging items to augment their statistics.
@@ -151,7 +152,7 @@ public class GuiReforge extends AbstractGui implements Windowed {
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-8><glyph:menu_reforge>").font(NEXO);
+        return Glyphs.shift(-8).append(Glyphs.glyph("menu_reforge"));
     }
 
     @Override
