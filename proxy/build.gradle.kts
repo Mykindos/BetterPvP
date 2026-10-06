@@ -14,4 +14,5 @@ dependencies {
     implementation(libs.jackson.annotations)
     implementation(libs.jackson.databind)
     implementation("org.tomlj:tomlj:1.1.1")
+    implementation(libs.postgres)
 }

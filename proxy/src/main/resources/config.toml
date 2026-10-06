@@ -1,2 +1,12 @@
 orchestration_base_url = "http://127.0.0.1:8085/"
 orchestration_request_timeout_ms = 3000
+
+# Resource packs. The proxy reads the newest release of a channel from the resource_pack_release table, which the
+# pack server writes, and sends its packs to every player. Backends behind this proxy set core.resourcepack.enabled
+# to false.
+[resourcepack]
+enabled = false
+channel = "production"
+database_url = "jdbc:postgresql://127.0.0.1:5432/betterpvp"
+database_user = ""
+database_password = ""
