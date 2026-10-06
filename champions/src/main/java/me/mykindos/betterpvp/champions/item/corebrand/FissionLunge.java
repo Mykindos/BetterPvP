@@ -124,7 +124,7 @@ public class FissionLunge extends AbstractInteraction implements DisplayedIntera
 
         effectManager.addEffect(player, player, EffectTypes.NO_FALL, "Fission", 9999, 3000, true, true, UtilBlock::isGrounded);
 
-        new SoundEffect("emaginationfallendefender", "custom.spell.sfeproj_launch", 2F).play(player.getLocation());
+        new SoundEffect("betterpvp", "mob.fallen_defender.sfeproj_launch", 2F).play(player.getLocation());
         new SoundEffect(Sound.ENTITY_BEE_HURT, 0F).play(player.getLocation());
 
         if (itemStack != null) {

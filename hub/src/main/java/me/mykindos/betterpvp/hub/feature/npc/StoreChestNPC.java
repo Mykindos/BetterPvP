@@ -74,7 +74,7 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
         getModeledEntity().getModel("chest_shadow").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0.2, 0.7, false);
 
         new SoundEffect(Sound.BLOCK_CHEST_LOCKED, 0.7f, 1f).play(runner);
-        new SoundEffect("littleroom_piratepack", "littleroom.piratepack.captain_chest_item", 0f, 1f).play(runner);
+        new SoundEffect("betterpvp", "prop.loot_chest.captain_chest_item", 0f, 1f).play(runner);
         UtilServer.runTaskLater(hub, () -> {
             new SoundEffect(Sound.BLOCK_ENDER_CHEST_OPEN, 0f, 1f).play(runner);
         }, 15L);

@@ -163,7 +163,7 @@ public class CascadeAbility extends AbstractInteraction implements Listener, Dis
         data.setLastAction(System.currentTimeMillis());
         data.setTicks(0);
 
-        new SoundEffect("emaginationfallendefender", "custom.spell.unsheath", 2F).play(player.getLocation());
+        new SoundEffect("betterpvp", "mob.fallen_defender.unsheath", 2F).play(player.getLocation());
         playTrail(UtilPlayer.getMidpoint(player), true);
     }
 
@@ -176,7 +176,7 @@ public class CascadeAbility extends AbstractInteraction implements Listener, Dis
         data.setFuel(0);
         UtilPlayer.clearWarningEffect(player);
 
-        new SoundEffect("emaginationfallendefender", "custom.spell.sheath", 2F).play(player.getLocation());
+        new SoundEffect("betterpvp", "mob.fallen_defender.sheath", 2F).play(player.getLocation());
         playTrail(UtilPlayer.getMidpoint(player), false);
     }
 
@@ -222,7 +222,7 @@ public class CascadeAbility extends AbstractInteraction implements Listener, Dis
      */
     private void playHitEffect(Entity target) {
         final Location at = target.getLocation().add(0, 1, 0);
-        new SoundEffect("emaginationfallendefender", "custom.spell.sfeproj_hit", 2F).play(at);
+        new SoundEffect("betterpvp", "mob.fallen_defender.sfeproj_hit", 2F).play(at);
         new SoundEffect(Sound.BLOCK_CONDUIT_DEACTIVATE, 2F).play(at);
 
         Particle.DUST.builder()
@@ -291,7 +291,7 @@ public class CascadeAbility extends AbstractInteraction implements Listener, Dis
         playTimer(player, data);
 
         if (System.currentTimeMillis() >= data.getNextTickSound()) {
-            new SoundEffect("emaginationfallendefender", "custom.spell.fftick", 1F).play(player.getLocation());
+            new SoundEffect("betterpvp", "mob.fallen_defender.fftick", 1F).play(player.getLocation());
             // Pseudo-random 2-5 tick gap so the burn never settles into a metronome
             data.setNextTickSound(System.currentTimeMillis() + (long) ((2 + Math.random() * 3) * 50));
         }
@@ -354,7 +354,7 @@ public class CascadeAbility extends AbstractInteraction implements Listener, Dis
         final Key dormant = corebrand.getDormantModel();
         if (desired == CorebrandData.State.CHARGED) {
             modelOverrideService.set(player, dormant, corebrand.getChargedModel());
-            new SoundEffect("emaginationfallenheroes", "custom.spell.soulfirechannel", 1F).play(player.getLocation());
+            new SoundEffect("betterpvp", "mob.fallen_hero.soulfirechannel", 1F).play(player.getLocation());
         } else {
             modelOverrideService.clear(player, dormant);
         }

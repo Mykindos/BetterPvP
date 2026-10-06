@@ -282,7 +282,7 @@ public class CannonProp extends ModeledProp implements SoundProvider {
         }
 
         final Location location = bone.get().getLocation();
-        final SoundEffect crackle = new SoundEffect("littleroom_cannon", "littleroom.cannon.fuse", 1f, 1.3f);
+        final SoundEffect crackle = new SoundEffect("betterpvp", "prop.cannon.fuse", 1f, 1.3f);
         final ParticleBuilder flame = Particle.SMALL_FLAME.builder()
                 .location(location)
                 .count(0) // For directional particles, count must be 0

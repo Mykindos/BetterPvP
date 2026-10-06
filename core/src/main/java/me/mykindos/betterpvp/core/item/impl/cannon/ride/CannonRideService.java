@@ -241,7 +241,7 @@ public class CannonRideService {
         // The rider is airborne from here on, and a body in the sky gives nothing away about the cannon it came from.
         ride.getMannequin().reveal();
 
-        play(ride, player, new SoundEffect("littleroom_cannon", "littleroom.cannon.fire", 1f, 2f), from);
+        play(ride, player, new SoundEffect("betterpvp", "prop.cannon.fire", 1f, 2f), from);
         spawn(ride, player, Particle.EXPLOSION_EMITTER.builder().location(from).extra(0));
     }
 

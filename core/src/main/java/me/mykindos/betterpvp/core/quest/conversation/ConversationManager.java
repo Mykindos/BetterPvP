@@ -472,7 +472,7 @@ public class ConversationManager {
         session.setShownCharCount(shownChars);
         final Player player = session.getGamer().getPlayer();
         if (player != null) {
-            new SoundEffect("betterpvp", "conversation.typing", 1.0f, 0.4f).play(player);
+            new SoundEffect("betterpvp", "ui.conversation.typing", 1.0f, 0.4f).play(player);
         }
     }
 }

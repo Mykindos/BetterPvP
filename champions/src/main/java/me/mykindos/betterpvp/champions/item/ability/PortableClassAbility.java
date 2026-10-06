@@ -160,7 +160,7 @@ public class PortableClassAbility extends AbstractInteraction implements Listene
                 final double secondsPassed = ticks / 20.0;
                 if (secondsPassed >= castTime) {
                     player.setFallDistance(-10);
-                    new SoundEffect("emaginationfallenheroes", "custom.spell.soulfirecast", 2f, 1).play(player.getLocation());
+                    new SoundEffect("betterpvp", "mob.fallen_hero.soulfirecast", 2f, 1).play(player.getLocation());
                     equip(player, itemInstance);
                     tasks.remove(player);
                     cancel();

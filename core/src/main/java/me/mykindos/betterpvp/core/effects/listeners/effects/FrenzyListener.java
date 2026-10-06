@@ -164,7 +164,7 @@ public class FrenzyListener implements Listener {
     }
 
     private void playTeleport(LivingEntity damagee, LivingEntity damager) {
-        new SoundEffect("littleroom_kurrot", "littleroom.kurrot.ranged_slash_swing1", 2f, 1.8f).play(damagee.getLocation());
+        new SoundEffect("betterpvp", "mob.kurrot.ranged_slash_swing1", 2f, 1.8f).play(damagee.getLocation());
 
         Particle.CLOUD.builder()
                 .location(damager.getLocation())
@@ -176,7 +176,6 @@ public class FrenzyListener implements Listener {
     }
 
     private void playDamage(LivingEntity damagee, LivingEntity damager) {
-        new SoundEffect("littleroom_halloween2", "littleroom.scarecrow.slash", 2f, 1.5f).play(damagee.getLocation());
         new SoundEffect(Sound.BLOCK_STONE_BREAK, 0.8f, 1f).play(damagee.getLocation());
 
         Particle.BLOCK_CRUMBLE.builder()

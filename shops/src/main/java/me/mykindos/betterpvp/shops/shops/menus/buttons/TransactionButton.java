@@ -71,7 +71,7 @@ public class TransactionButton extends ControlItem<ShopItemMenu> {
             UtilServer.callEvent(buyEvent);
 
             if (!buyEvent.isCancelled()) {
-                new SoundEffect("betterpvp", "shop.buy").play(player);
+                new SoundEffect("betterpvp", "ui.shop.buy").play(player);
                 new SoundEffect("betterpvp", "game.domination.gem_pickup", 2, 0.05f).play(player);
             }
         } else {
@@ -81,7 +81,7 @@ public class TransactionButton extends ControlItem<ShopItemMenu> {
             UtilServer.callEvent(sellEvent);
 
             if (!sellEvent.isCancelled()) {
-                new SoundEffect("betterpvp", "shop.sell").play(player);
+                new SoundEffect("betterpvp", "ui.shop.sell").play(player);
                 new SoundEffect("betterpvp", "game.domination.gem_pickup", 2, 0.05f).play(player);
             }
         }

@@ -92,7 +92,7 @@ public class GatewayTeleportBehavior implements SceneBehavior {
         // cues
         showTitle(gamer, continentName);
         freeze(player);
-        new SoundEffect("emewoods1", "custom.enchantedwoods1.cast_cue", 0.4f, 1f).play(player, player);
+        new SoundEffect("betterpvp", "mob.enchanted_woods.cast_cue", 0.4f, 1f).play(player, player);
 
         // delayed teleport
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {

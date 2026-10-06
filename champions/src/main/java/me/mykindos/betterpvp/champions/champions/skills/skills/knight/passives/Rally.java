@@ -191,7 +191,7 @@ public class Rally extends Skill implements CooldownToggleSkill, Listener, BuffS
      * to the edge of the radius so everyone can read how far the aura reaches.
      */
     private void pulse(Location center, double radius, Collection<Player> receivers) {
-        new SoundEffect("littleroom_goblin_pack_vol2", "littleroom.goblinpackvol2.shaman_doppelganger", 1f, 0.5f).play(center);
+        new SoundEffect("betterpvp", "mob.goblin.shaman_doppelganger", 1f, 0.5f).play(center);
 
         Particle.DUST_PILLAR.builder()
                 .location(center.clone().add(0, 0.2, 0))
@@ -244,7 +244,7 @@ public class Rally extends Skill implements CooldownToggleSkill, Listener, BuffS
         event.setKnockback(false);
 
         final Location location = damagee.getLocation().add(0, 1, 0);
-        new SoundEffect("emaginationfallenknights", "custom.spell.swordclash", 1f).play(location);
+        new SoundEffect("betterpvp", "mob.fallen_knight.swordclash", 1f).play(location);
         Particle.ENCHANTED_HIT.builder()
                 .location(location)
                 .offset(0.4, 0.4, 0.4)

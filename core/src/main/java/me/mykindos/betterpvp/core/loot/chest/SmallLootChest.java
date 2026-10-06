@@ -9,6 +9,6 @@ public final class SmallLootChest extends LootChest {
     }
 
     public SmallLootChest(String mythicMobName) {
-        super(mythicMobName, new SoundEffect("betterpvp", "chest.drop-item"), 15, 4);
+        super(mythicMobName, new SoundEffect("betterpvp", "prop.loot_chest.drop_item"), 15, 4);
     }
 }

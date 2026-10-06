@@ -120,7 +120,7 @@ public class SellAllMenu extends AbstractGui implements Windowed {
         }
 
         if (success) {
-            new SoundEffect("betterpvp", "shop.sell").play(player);
+            new SoundEffect("betterpvp", "ui.shop.sell").play(player);
             new SoundEffect("betterpvp", "game.domination.gem_pickup", 2, 0.05f).play(player);
         }
     }

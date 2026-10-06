@@ -143,7 +143,6 @@ public class BattoDoInteraction extends AbstractInteraction implements Displayed
 
             // FX
             UtilServer.repeatTask(JavaPlugin.getPlugin(Champions.class), run -> {
-                new SoundEffect("betterpvp", "item.hinokami_katana.swing", 1.2f, 1.2f).play(actor.getLocation());
                 new SoundEffect(Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2f, 1f).play(center);
                 new SoundEffect(Sound.ITEM_TRIDENT_RETURN, 2f, 2).play(center);
                 return true;

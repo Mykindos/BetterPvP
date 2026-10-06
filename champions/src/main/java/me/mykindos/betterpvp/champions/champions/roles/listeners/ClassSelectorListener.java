@@ -88,7 +88,7 @@ public class ClassSelectorListener implements Listener {
     }
 
     private void triggerClassSelector(@NotNull Player player, Block blockUnder) {
-        new SoundEffect("emaginationfallenheroes", "custom.spell.soulfirecast", 2f, 1).play(blockUnder.getLocation());
+        new SoundEffect("betterpvp", "mob.fallen_hero.soulfirecast", 2f, 1).play(blockUnder.getLocation());
         new BukkitRunnable() {
             int ticks = 0;
 

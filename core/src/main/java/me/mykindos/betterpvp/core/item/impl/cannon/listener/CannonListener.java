@@ -104,7 +104,7 @@ public class CannonListener implements Listener {
     public void onReload(final CannonReloadEvent event) {
         final CannonProp cannon = event.getCannon();
         final Location location = cannon.getLocation();
-        new SoundEffect("littleroom_cannon", "littleroom.cannon.closehatch").play(location);
+        new SoundEffect("betterpvp", "prop.cannon.closehatch").play(location);
 
         cannon.setAmmo(event.getAmmo());
         if (cannon.getCycle() != null) {
@@ -126,8 +126,8 @@ public class CannonListener implements Listener {
     public void onCannonShoot(final CannonShootEvent event) {
         final CannonProp cannon = event.getCannon();
         final Location location = cannon.getLocation();
-        new SoundEffect("littleroom_cannon", "littleroom.cannon.fire", 1f, 2f).play(location);
-        new SoundEffect("littleroom_cannon", "littleroom.cannon.ringing", 1f, 1.1f).play(location);
+        new SoundEffect("betterpvp", "prop.cannon.fire", 1f, 2f).play(location);
+        new SoundEffect("betterpvp", "prop.cannon.ringing", 1f, 1.1f).play(location);
 
         final ActiveModel model = cannon.getActiveModel();
         if (model != null) {
@@ -137,7 +137,7 @@ public class CannonListener implements Listener {
         }
 
         UtilServer.runTaskLater(core, () ->
-                new SoundEffect("littleroom_cannon", "littleroom.cannon.openhatch").play(location), 2L);
+                new SoundEffect("betterpvp", "prop.cannon.openhatch").play(location), 2L);
 
         final Location muzzle = cannon.getMuzzle().add(cannon.getLocation().getDirection().multiply(2));
         Particle.EXPLOSION_EMITTER.builder().location(muzzle).extra(0).receivers(60).spawn();

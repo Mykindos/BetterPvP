@@ -63,7 +63,7 @@ public class TrainerNPC extends ModeledNPC implements HubNPC {
 
         getModeledEntity().getModel("dummy").orElseThrow().getAnimationHandler().playAnimation("hit", 0, 0, 1, false);
 
-        new SoundEffect("emaginationfallenreaper", "custom.spell.rslash", 1f, 10f).play(runner);
+        new SoundEffect("betterpvp", "mob.fallen_reaper.rslash", 1f, 10f).play(runner);
         new SoundEffect(Sound.ENTITY_ENDERMAN_TELEPORT, 1.2f, 10f).play(runner);
         runner.teleport(ffaSpawnpoint);
         Particle.SWEEP_ATTACK.builder()

@@ -42,7 +42,7 @@ public class AttunerScriptBehavior extends ModelEngineScriptBehavior {
             }
 
             if (ticks == 6) { // last
-                new SoundEffect("embandits1", "custom.embandit1.slashhita", 2f, 0.2f).play(location);
+                new SoundEffect("betterpvp", "mob.bandit.slashhita", 2f, 0.2f).play(location);
             }
             return true;
         }, 10, 1L);
