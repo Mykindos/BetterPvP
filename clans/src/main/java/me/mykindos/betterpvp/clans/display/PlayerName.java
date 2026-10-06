@@ -171,17 +171,15 @@ public class PlayerName implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onKick(final ClanKickMemberEvent event) {
-        if (event.getTarget().getGamer().isOnline()) {
-            Player player = event.getTarget().getGamer().getPlayer();
-            if(player == null) return;
-            UtilServer.runTaskLater(clans, () -> {
-                this.broadcastChange(event.getPlayer());
+        Player player = event.getClanMember().getPlayer();
+        if (player == null) return;
+        UtilServer.runTaskLater(clans, () -> {
+            this.broadcastChange(event.getPlayer());
 
-                for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
-                    this.sendChange(onlinePlayer, player);
-                }
-            }, 2L);
-        }
+            for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
+                this.sendChange(onlinePlayer, player);
+            }
+        }, 2L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

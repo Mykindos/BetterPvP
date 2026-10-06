@@ -17,6 +17,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 @CustomLog
@@ -61,6 +62,14 @@ public class CommandLoader extends Loader {
         try {
             Command command = (Command) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(command);
+            String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
+            String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
+
+            boolean enabled = plugin.getConfig().getOrSaveBoolean(enabledPath, true);
+            Rank rank = Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase());
+
+            command.setEnabled(enabled);
+            command.setRequiredRank(rank);
 
             // The Bukkit command registration takes a plain string and is not per-viewer, so resolve the
             // description's translation key to English server-side here.
@@ -70,15 +79,6 @@ public class CommandLoader extends Loader {
                     description, "", command.getAliases());
             plugin.getInjector().injectMembers(commandWrapper);
             Bukkit.getCommandMap().register(command.getName(), commandWrapper);
-
-            String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
-            String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
-
-            boolean enabled = plugin.getConfig().getOrSaveBoolean(enabledPath, true);
-            Rank rank = Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase());
-
-            command.setEnabled(enabled);
-            command.setRequiredRank(rank);
 
             tempCommands.add(command);
             commandManager.addObject(command.getName().toLowerCase(), command);
@@ -97,6 +97,9 @@ public class CommandLoader extends Loader {
             String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
             command.setEnabled(plugin.getConfig().getOrSaveBoolean(enabledPath, true));
             command.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase()));
+
+            Objects.requireNonNull(Bukkit.getCommandMap().getCommand(command.getName()))
+                    .setPermission(command.getRequiredRank().getPermission());
 
             loadSubCommandsConfig(command, "command." + command.getName().toLowerCase() + ".");
 

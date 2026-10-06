@@ -145,11 +145,12 @@ public class ClansCombatListener implements Listener {
 
     @EventHandler
     public void onMemberKickClan(ClanKickMemberEvent event) {
-        final Gamer gamer = event.getTarget().getGamer();
-        if (gamer.isInCombat()) {
-            UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.combat.cannot-kick", Component.text(event.getTarget().getName(), NamedTextColor.YELLOW));
-            event.setCancelled(true);
-        }
+        clientManager.search().online(event.getClanMember().getUuid()).ifPresent(target -> {
+            if (target.getGamer().isInCombat()) {
+                UtilMessage.message(event.getPlayer(), "core.prefix.clans", "clans.combat.cannot-kick", Component.text(target.getName(), NamedTextColor.YELLOW));
+                event.setCancelled(true);
+            }
+        });
     }
 
     @EventHandler

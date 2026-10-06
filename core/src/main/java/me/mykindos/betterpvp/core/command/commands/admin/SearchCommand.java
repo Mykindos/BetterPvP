@@ -32,7 +32,7 @@ import java.util.UUID;
 public class SearchCommand extends Command {
     @Override
     public String getName() {
-        return "search";
+        return "legacysearch";
     }
 
     @Override
