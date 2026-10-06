@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.clans.clans.zone.ClanZones;
-import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
@@ -1366,10 +1365,6 @@ public class ClanManager extends Manager<Long, Clan> {
      * @throws CommandSyntaxException if this {@link Player#getChunk() chunk} is invalid for the {@link Player origin} to unclaim
      */
     public void canUnclaimOtherThrow(@NotNull final Player origin, @NotNull final Clan locationClan) throws CommandSyntaxException {
-        if (locationClan.isAdmin()) {
-            throw ClanArgumentException.CANNOT_UNCLAIM_FROM_CLAN.create();
-        }
-
         if (locationClan.getTerritory().size() <= getMaximumClaimsForClan(locationClan)) {
             throw ClanArgumentException.CLAN_ABLE_TO_RETAIN_TERRITORY.create(locationClan);
         }

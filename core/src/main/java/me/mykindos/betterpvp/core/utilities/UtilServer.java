@@ -26,7 +26,7 @@ public class UtilServer {
      * @param event The event to call
      */
     public static <T extends Event> T callEvent(T event) {
-        if (!event.isAsynchronous() && !Bukkit.getServer().isPrimaryThread()) {
+        if (!event.isAsynchronous() && !Bukkit.isPrimaryThread()) {
             log.error("Event {} is not async and is not on the primary thread", event.getEventName()).submit();
         }
         Bukkit.getPluginManager().callEvent(event);

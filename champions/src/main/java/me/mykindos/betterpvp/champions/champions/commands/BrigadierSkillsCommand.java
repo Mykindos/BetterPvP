@@ -19,6 +19,9 @@ import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.Component;
+import me.mykindos.betterpvp.core.locale.Translations;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -74,10 +77,10 @@ public class BrigadierSkillsCommand extends BrigadierCommand {
                     if (gamerBuildsOptional.isPresent()) {
                         final GamerBuilds builds = gamerBuildsOptional.get();
 
-                        final Role role = roleManager.getRole(player);
-                        final RoleBuild build = builds.getActiveBuilds().get(role.getName());
+                        final Role role = roleManager.getRole(player).orElse(null);
+                        final RoleBuild build = role == null ? null : builds.getActiveBuilds().get(role.getName());
                         if (build != null) {
-                            UtilMessage.message(player, "Skills", UtilMessage.deserialize("Your Build:").appendNewline().append(build.getBuildComponent()));
+                            UtilMessage.message(player, "core.prefix.skills", Translations.component("champions.command.skills.your-build").appendNewline().append(build.getBuildComponent()));
                         }
                     }
                     return Command.SINGLE_SUCCESS;
@@ -88,14 +91,14 @@ public class BrigadierSkillsCommand extends BrigadierCommand {
                             final CommandSender sender = context.getSource().getSender();
                             final Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(target.getUniqueId().toString());
                             if (gamerBuildsOptional.isEmpty()) {
-                                UtilMessage.message(sender, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have any builds", target.getName()));
+                                UtilMessage.message(sender, "core.prefix.skills", "champions.command.skills.no-builds", Component.text(target.getName(), NamedTextColor.YELLOW));
                                 return Command.SINGLE_SUCCESS;
                             }
                             final GamerBuilds builds = gamerBuildsOptional.get();
-                            final Role role = roleManager.getRole(target);
-                            final RoleBuild build = builds.getActiveBuilds().get(role.getName());
+                            final Role role = roleManager.getRole(target).orElse(null);
+                            final RoleBuild build = role == null ? null : builds.getActiveBuilds().get(role.getName());
                             if (build != null) {
-                                UtilMessage.message(sender, "Skills", UtilMessage.deserialize("<yellow>%s</yellow>'s Build:", target.getName()).appendNewline().append(build.getBuildComponent()));
+                                UtilMessage.message(sender, "core.prefix.skills", Translations.component("champions.command.skills.target-build", Component.text(target.getName(), NamedTextColor.YELLOW)).appendNewline().append(build.getBuildComponent()));
                                 return Command.SINGLE_SUCCESS;
                             }
                             return Command.SINGLE_SUCCESS;

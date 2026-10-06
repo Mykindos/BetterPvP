@@ -70,9 +70,6 @@ clan:
   core:
     requiredRank: PLAYER
     enabled: true
-  setsafe:
-    requiredRank: ADMIN
-    enabled: true
   bank:
     requiredRank: PLAYER
     enabled: true

@@ -73,10 +73,9 @@ public class BrigadierLeaveSubCommand extends BrigadierClanSubCommand {
                     final Clan executorClan = getClanByExecutor(context);
 
                     final Optional<ClanMember> leaderOptional = executorClan.getLeader();
-                    //skip leader check if sender is administrating, there is no leader, or this is an admin clan
+                    //skip leader check if sender is administrating or there is no leader
                     if (!senderIsAdministrating(context.getSource())
-                            && leaderOptional.isPresent()
-                            && !executorClan.isAdmin()) {
+                            && leaderOptional.isPresent()) {
                         final ClanMember leader = leaderOptional.get();
                         if (leader.equals(executorClan.getMember(executor.getUniqueId()))) {
                             throw ClanArgumentException.LEADER_CANNOT_LEAVE.create();
