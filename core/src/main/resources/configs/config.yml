@@ -31,7 +31,10 @@ core:
     discord-webhook: ''
   pepper: ''
   resourcepack:
+    # Send the packs from this server. Off behind a proxy that sends them itself.
     enabled: true
+    # The pack server channel this server serves: staging or production.
+    channel: staging
 pvp:
   attackCooldown:
     enabled: false
@@ -56,13 +59,6 @@ hunger:
 discord:
   chatWebhook: ''
   invite: https://discord.gg/Q4XvxH7
-resourcepack:
-  enabled: false
-  force: false
-  sha: 972f72a7b2c8cca7ce2ad8087ddf0a256b146700
-  url: https://betterpvp.net/latestpack.zip
-  filepath: pack.zip
-  selfhost: false
 weather:
   enabled: false
 items:

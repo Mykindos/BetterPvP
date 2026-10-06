@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.content.manifest.ManifestPublisher;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
-import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
+import me.mykindos.betterpvp.core.resourcepack.ResourcePackService;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
@@ -66,7 +66,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
         private TipManager tipManager;
 
         @Inject
-        private ResourcePackHandler resourcePackHandler;
+        private ResourcePackService resourcePackService;
 
         @Inject
         private SchematicService schematicService;
@@ -96,7 +96,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
             commandLoader.reload(core.getClass().getPackageName());
             tipManager.reloadTips(core);
-            resourcePackHandler.reload();
+            resourcePackService.reload();
             ruleManager.reload(core);
             schematicService.clearCache();
 
