@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeBootstrap;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
+import me.mykindos.betterpvp.core.menu.dialog.screen.GuiScreens;
 import me.mykindos.betterpvp.core.inventory.InvUI;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemLoader;
@@ -121,6 +122,8 @@ public class Core extends BPvPPlugin {
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);
+
+        injector.getInstance(GuiScreens.class).load("core", Core.class);
 
         var coreCommandLoader = injector.getInstance(CoreCommandLoader.class);
         coreCommandLoader.loadCommands(PACKAGE);

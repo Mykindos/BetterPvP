@@ -1,0 +1,58 @@
+{
+  "canvas": { "width": 300, "height": 160 },
+  "name": "Shop",
+  "state": { "tab": "items", "items": [], "coins": 0, "error": null },
+  "actions": ["buy"],
+  "components": {
+    "price_tag": {
+      "params": ["amount"],
+      "elements": [
+        { "box": "tag", "x": 0, "y": 0, "width": 40, "height": 12 },
+        { "text": "{amount}", "x": 4, "y": 2, "style": "value" }
+      ]
+    }
+  },
+  "backdrop": [
+    { "box": "panel", "x": 0, "y": 0, "width": 300, "height": 160 }
+  ],
+  "elements": [
+    { "text": "Shop", "x": 0, "y": 4, "width": 300, "align": "center", "style": "title" },
+    {
+      "column": { "x": 8, "y": 24, "cell": [64, 18], "gap": 4 },
+      "children": [
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'items'}", "width": 64, "height": 18,
+          "label": "Items", "hover": "rim", "on_click": { "set": { "tab": "items" } } },
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'perks'}", "width": 64, "height": 18,
+          "label": "Perks", "hover": "rim", "on_click": { "set": { "tab": "perks" } } }
+      ]
+    },
+    {
+      "switch": "{tab}",
+      "cases": {
+        "items": [
+          {
+            "repeat": "items", "max": 4,
+            "layout": { "grid": { "x": 84, "y": 24, "cell": [100, 24], "gap": 4, "columns": 2 } },
+            "children": [
+              { "button": "steel", "width": 100, "height": 24, "label": "{item.name}", "hover": "rim", "pressed": true,
+                "on_click": { "call": "buy", "args": { "id": "{item.id}" } } },
+              { "use": "price_tag", "x": 56, "y": 6, "with": { "amount": "{item.price}" } }
+            ]
+          }
+        ],
+        "perks": [
+          { "icon": "coin_spin", "x": 84, "y": 24, "width": 16, "height": 16, "frames": 8, "fps": 10 }
+        ]
+      }
+    },
+    {
+      "when": "{error}",
+      "then": [ { "text": "{error}", "x": 84, "y": 140, "style": "error" } ]
+    },
+    {
+      "custom": "test:meter", "x": 200, "y": 130, "width": 80, "height": 12,
+      "assets": [ { "box": "meter_fill", "x": 0, "y": 0, "width": 80, "height": 12 } ]
+    }
+  ],
+  "exit": { "label": "Close", "width": 80 }
+}

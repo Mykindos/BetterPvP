@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://betterpvp.net/schema/gui/components.schema.json",
+  "title": "BetterPvP GUI components",
+  "description": "Components shared by every screen of a namespace (gui/components/*.json). Use one with {\"use\": \"name\"}.",
+  "type": "object",
+  "required": ["components"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "components": { "type": "object", "additionalProperties": { "$ref": "screen.schema.json#/definitions/component" } }
+  }
+}
