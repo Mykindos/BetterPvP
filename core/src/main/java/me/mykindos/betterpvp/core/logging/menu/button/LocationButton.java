@@ -40,7 +40,6 @@ public class LocationButton extends AbstractItem implements PreviousableButton {
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
             .action(ClickActions.LEFT, Translations.component("core.menu.log.button.location.send.action"))
             .material(Material.GRASS_BLOCK)
-            .customModelData(0)
             .lore(Component.text(UtilWorld.locationToString(location, true, false)));
 
         if (location.getWorld() != null) {

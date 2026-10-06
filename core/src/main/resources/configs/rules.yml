@@ -7,7 +7,6 @@ hacking:
       - Any form of hack client/mod
       - That gives an unfair advantage
     material: DIAMOND_AXE
-    customModelData: 1
   xray:
     key: X-Ray
     punishment:
@@ -16,7 +15,6 @@ hacking:
     description:
       - Using X-ray mod or texture pack
     material: DIAMOND_ORE
-    customModelData: 1
   autoclicking:
     key: Autoclicking
     punishment:
@@ -27,7 +25,6 @@ hacking:
       - Using a mod or macro to gain
       - an unfair advantage in pvp
     material: DIAMOND_SWORD
-    customModelData: 1
   unapprovedmods:
     key: Unapproved Mods
     punishment:
@@ -37,7 +34,6 @@ hacking:
       - Using a mod that's unapproved
       - for use on the network
     material: DIAMOND_BLOCK
-    customModelData: 1
 gameplay:
   warpointevasion:
     key: Warpoint Evasion
@@ -52,7 +48,6 @@ gameplay:
       - or otherwise using mechanics
       - to deny a kill to an enemy
     material: WIND_CHARGE
-    customModelData: 1
   bugexploit:
     key: Bug Exploitation
     punishment:
@@ -63,7 +58,6 @@ gameplay:
       - flaw, or fault in the design of
       - the game or code
     material: DAMAGED_ANVIL
-    customModelData: 1
   inappropriateclanname:
     key: Inappropriate Clan Name
     punishment:
@@ -75,7 +69,6 @@ gameplay:
       - A Clan name that is inappropriate
       - i.e. A filtered word in name
     material: NAME_TAG
-    customModelData: 1
   itemduplication:
     key: Item Duplication
     punishment:
@@ -84,7 +77,6 @@ gameplay:
     description:
       - Obtaining and using duplicated items
     material: TNT_MINECART
-    customModelData: 1
   lagmachines:
     key: Lag Machines
     punishment:
@@ -98,7 +90,6 @@ gameplay:
       - intentionally trying or succeeding
       - in causing a server crash
     material: REDSTONE
-    customModelData: 1
   dominanceavoiding:
     key: Dominance Avoiding
     punishment:
@@ -111,7 +102,6 @@ gameplay:
       - Leaving or joining different clans
       - to avoid being pillaged or cannoned
     material: REDSTONE_TORCH
-    customModelData: 1
   ratingboosting:
     key: Rating Boosting
     punishment:
@@ -123,7 +113,6 @@ gameplay:
       - Kill an ally/friend over and over
       - to boost rating in a specific kit
     material: GOLD_NUGGET
-    customModelData: 1
   itemavoiding:
     key: Item Avoiding/Gear Avoiding
     punishment:
@@ -137,7 +126,6 @@ gameplay:
       - i.e. giving loot to allies, logging off with gear
       - Donating gear and valuables to other clans
     material: GOLD_BLOCK
-    customModelData: 1
   trucing:
     key: Trucing
     punishment:
@@ -157,7 +145,6 @@ gameplay:
       - run into your truces to avoid getting
       - ganked that is gaining an advantage
     material: SHIELD
-    customModelData: 0
   trolling:
     key: Team Trolling
     punishment:
@@ -174,7 +161,6 @@ gameplay:
       - i.e. Constantly using ice prison
       - on teammates
     material: SKELETON_SKULL
-    customModelData: 0
   offensivebuildings:
     key: Offensive Buildings
     punishment:
@@ -187,7 +173,6 @@ gameplay:
       - Building inapropriate symbols or models
       - in wildnerness or clan territory
     material: DIRT
-    customModelData: 1
   grief:
     key: Griefing
     punishment:
@@ -200,7 +185,6 @@ gameplay:
       - and/or creating unsightly builds
       - in wilderness
     material: COBBLESTONE
-    customModelData: 1
   afking:
     key: AFKing
     punishment:
@@ -208,7 +192,6 @@ gameplay:
     description:
       - Going AFK during a champions game
     material: BELL
-    customModelData: 1
   winboosting:
     key: Win Boosting
     punishment:
@@ -219,7 +202,6 @@ gameplay:
       - or putting an alt on the opposite team
       - to boost your win count / rating
     material: CREEPER_HEAD
-    customModelData: 1
 chat:
   inappropriate:
     key: Inappropriate Chat
@@ -233,7 +215,6 @@ chat:
       - Talking about inappropriate topics in chat
       - i.e. sexual innuendos, calling other players pedophiles
     material: BAMBOO_SIGN
-    customModelData: 1
   abuse:
     key: Verbal Abuse
     punishment:
@@ -244,7 +225,6 @@ chat:
     description:
       - Excessively abusing a player
     material: WRITABLE_BOOK
-    customModelData: 1
   deaththreats:
     key: Death Threats
     punishment:
@@ -257,7 +237,6 @@ chat:
       - to kill or cause to be killed
       - another person
     material: BONE
-    customModelData: 1
   discrimination:
     key: Discrimination
     punishment:
@@ -270,7 +249,6 @@ chat:
       - towards someone based off of their ethnicity,
       - race, religion, sex, gender, or disablilty
     material: ENDER_EYE
-    customModelData: 1
   doxing:
     key: Doxing
     punishment:
@@ -282,7 +260,6 @@ chat:
       - other sensitive information
       - Do not post addresses in chat
     material: OAK_SIGN
-    customModelData: 1
   spam:
     key: Spamming
     punishment:
@@ -297,7 +274,6 @@ chat:
       - Sending the same or similar message
       - more than twice
     material: JUNGLE_SIGN
-    customModelData: 1
   filterbypass:
     key: Filter Bypass
     punishment:
@@ -314,7 +290,6 @@ chat:
       - for another rule if
       - applicable
     material: ANVIL
-    customModelData: 1
 
 other:
   ddos:
@@ -325,7 +300,6 @@ other:
     description:
       - DDOSing another player or the server
     material: BLAZE_ROD
-    customModelData: 1
   hackerassistance:
     key: Cheater Assistance
     punishment:
@@ -337,7 +311,6 @@ other:
       - i.e. giving sets to the cheater
       - receiving sets from the cheater
     material: STONE_SWORD
-    customModelData: 1
   hackerassociation:
     key: Cheater Association
     punishment:
@@ -350,7 +323,6 @@ other:
       - you make a completely new clan on alt accounts and
       - invite a currently banned player
     material: DIAMOND_SWORD
-    customModelData: 1
   adminharrassment:
     key: Admin Harrassment
     punishment:
@@ -360,7 +332,6 @@ other:
       - about resolved issues
       - Spamming /a
     material: LECTERN
-    customModelData: 1
   banevasion:
     key: Ban Evasion
     punishment:
@@ -371,7 +342,6 @@ other:
       - by using an alternate
       - account
     material: REDSTONE_BLOCK
-    customModelData: 1
   warning:
     key: Warning
     punishment:
@@ -382,4 +352,3 @@ other:
       - apply notes and warnings
       - in punishment history
     material: PAPER
-    customModelData: 1

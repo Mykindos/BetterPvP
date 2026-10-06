@@ -93,10 +93,7 @@ public class PacketHatController {
 
             if (helmet != null && !helmet.getType().isAir()) {
                 final ItemStack view = itemFactory.fromItemStack(helmet).orElseThrow().getView().get();
-                Integer model = itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData()
-                        ? itemStack.getItemMeta().getCustomModelData()
-                        : null;
-                itemStack = UtilItem.convertType(view, itemStack.getType(), model);
+                itemStack = UtilItem.convertType(view, itemStack.getType(), itemStack.getData(DataComponentTypes.ITEM_MODEL));
             } else {
                 final ItemMeta meta = itemStack.getItemMeta();
                 meta.displayName(Component.text("No helmet")

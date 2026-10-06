@@ -33,7 +33,6 @@ public class RevokeMenu extends AbstractGui implements Windowed {
                 .displayName(Translations.component("core.menu.revoke.button.appeal.name"))
                 .lore(Translations.component("core.menu.revoke.button.appeal.lore.1"))
                 .material(Material.HOPPER)
-                .customModelData(1)
                 .build();
 
         Consumer<Click> appealClick = (click) -> {
@@ -54,7 +53,6 @@ public class RevokeMenu extends AbstractGui implements Windowed {
                 .displayName(Translations.component("core.menu.revoke.button.incorrect.name"))
                 .lore(Translations.component("core.menu.revoke.button.incorrect.lore.1"))
                 .material(Material.REDSTONE_BLOCK)
-                .customModelData(1)
                 .build();
 
         Consumer<Click> incorrectClick = (click) -> {

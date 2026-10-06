@@ -24,7 +24,7 @@ public enum ClientStat implements IClientStat {
     REGENERATION_EFFECT_FROM_OTHERS(StatValueType.DOUBLE, "Healing received from others by regeneration", "Healing by regeneration from other sources"),
     REGENERATION_EFFECT_SELF(StatValueType.DOUBLE, "Healing self with regeneration", "Healing yourself with the regeneration effect"),
 
-    TIME_PLAYED(StatValueType.DURATION, "Time Played", Material.CLOCK, 0, false, "Time spent playing"),
+    TIME_PLAYED(StatValueType.DURATION, "Time Played", Material.CLOCK, false, "Time spent playing"),
 
     //items
     ANVIL_SWING(StatValueType.LONG, "Anvil Swings", "Number of times you Swung on an anvil"),
@@ -142,7 +142,6 @@ public enum ClientStat implements IClientStat {
     @Nullable
     private final CompositeStat compositeStat;
     private final Material material;
-    private final int customModelData;
     private final boolean glowing;
 
 
@@ -150,21 +149,20 @@ public enum ClientStat implements IClientStat {
         this(type, name, null, description);
     }
 
-    ClientStat(StatValueType type, String name, Material material, int customModelData, boolean glowing, String... description) {
-        this(type, name, material, customModelData, glowing, null, description);
+    ClientStat(StatValueType type, String name, Material material, boolean glowing, String... description) {
+        this(type, name, material, glowing, null, description);
     }
 
     ClientStat(StatValueType type, String name, Set<IStat> compositeStats, String... description) {
-        this(type, name, Material.BOOK, 0, false, compositeStats, description);
+        this(type, name, Material.BOOK, false, compositeStats, description);
     }
 
-    ClientStat(StatValueType type, String name, Material material, int customModelData, boolean glowing, Set<IStat> compositeStats, String... description) {
+    ClientStat(StatValueType type, String name, Material material, boolean glowing, Set<IStat> compositeStats, String... description) {
         this.statValueType = type;
         this.name = name;
         this.description = description;
         this.compositeStat = compositeStats != null ? new CompositeStat(getStatType(), compositeStats) : null;
         this.material = material;
-        this.customModelData = customModelData;
         this.glowing = glowing;
     }
 

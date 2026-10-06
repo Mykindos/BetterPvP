@@ -29,7 +29,6 @@ public class RuleMenu extends AbstractGui implements Windowed {
         ItemProvider hackingProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.rules.button.hacking.name"))
                 .material(Material.IRON_SWORD)
-                .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -42,7 +41,6 @@ public class RuleMenu extends AbstractGui implements Windowed {
         ItemProvider gameplayProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.rules.button.gameplay.name"))
                 .material(Material.ANVIL)
-                .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -55,7 +53,6 @@ public class RuleMenu extends AbstractGui implements Windowed {
         ItemProvider chatProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.rules.button.chat.name"))
                 .material(Material.WRITABLE_BOOK)
-                .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -68,7 +65,6 @@ public class RuleMenu extends AbstractGui implements Windowed {
         ItemProvider otherProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.rules.button.other.name"))
                 .material(Material.PAPER)
-                .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();

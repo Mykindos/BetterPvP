@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -46,13 +47,12 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilItem {
 
-    public static ItemStack convertType(@NotNull ItemStack itemStackIn, @NotNull Material to, @Nullable Integer toModel) {
+    public static ItemStack convertType(@NotNull ItemStack itemStackIn, @NotNull Material to, @Nullable Key toModel) {
         ItemStack itemStack = itemStackIn.clone();
         if (itemStack.getItemMeta() != null) {
             final ItemMeta metaCopy = itemStack.getItemMeta().clone();
             itemStack.setType(to);
             final ItemMeta meta = itemStack.getItemMeta();
-            meta.setCustomModelData(toModel);
             itemStack.setData(DataComponentTypes.ITEM_NAME, itemStackIn.getData(DataComponentTypes.ITEM_NAME));
 
             if (!metaCopy.hasDisplayName()) {
@@ -76,6 +76,12 @@ public class UtilItem {
             }
 
             itemStack.setItemMeta(meta);
+            itemStack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA);
+            if (toModel == null) {
+                itemStack.resetData(DataComponentTypes.ITEM_MODEL);
+            } else {
+                itemStack.setData(DataComponentTypes.ITEM_MODEL, toModel);
+            }
         }
         return itemStack;
     }
@@ -282,26 +288,6 @@ public class UtilItem {
         return -1;
     }
 
-    /**
-     * Create a simple ItemStack with a specific model
-     * @param material The material
-     * @param customModelData The model ID
-     * @return The ItemStack
-     */
-    public static ItemStack createItemStack(Material material, int amount, int customModelData) {
-        var itemStack = new ItemStack(material, amount);
-        if(customModelData > 0) {
-            var itemMeta = itemStack.getItemMeta();
-            itemMeta.setCustomModelData(customModelData);
-            itemStack.setItemMeta(itemMeta);
-        }
-
-        return itemStack;
-    }
-
-    public static ItemStack createItemStack(Material material, int customModelData) {
-        return createItemStack(material, 1, customModelData);
-    }
 
     // Create a function to remove TextDecoration.ITALIC from List<Component>
     public static List<Component> removeItalic(List<Component> components) {

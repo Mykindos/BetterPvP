@@ -17,10 +17,9 @@ public class StringFilterButton<G extends Gui> extends FilterButton<G, StringCon
      * @param title the title of this button
      * @param numToShow the number of options to show at once
      * @param displayMaterial the material of the item
-     * @param customModelData the custom model data of the item
      */
-    public StringFilterButton(String title, int numToShow, Material displayMaterial, int customModelData) {
-        this(title, new ArrayList<>(List.of("All")), numToShow, displayMaterial, customModelData);
+    public StringFilterButton(String title, int numToShow, Material displayMaterial) {
+        this(title, new ArrayList<>(List.of("All")), numToShow, displayMaterial);
     }
 
     /**
@@ -30,10 +29,9 @@ public class StringFilterButton<G extends Gui> extends FilterButton<G, StringCon
      * @param contexts the list of contexts to use
      * @param numToShow the number of options to show at once
      * @param displayMaterial the material of the item
-     * @param customModelData the custom model data of the item
      */
-    public StringFilterButton(String title, List<String> contexts, int numToShow, Material displayMaterial, int customModelData) {
-        super(title, contexts.stream().map(StringContext::new).toList(), numToShow, displayMaterial, customModelData);
+    public StringFilterButton(String title, List<String> contexts, int numToShow, Material displayMaterial) {
+        super(title, contexts.stream().map(StringContext::new).toList(), numToShow, displayMaterial);
     }
 
 

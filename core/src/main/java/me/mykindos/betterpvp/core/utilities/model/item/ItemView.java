@@ -227,8 +227,6 @@ public class ItemView implements ItemProvider {
 
     public record EnchantmentEntry(Enchantment enchantment, int level) { }
 
-    public record Texture(int customModelData, Material material) { }
-
 
 
     public static class ItemViewBuilder {

@@ -125,7 +125,6 @@ public interface IAchievement {
     default ItemProvider getItemProvider(final StatContainer container, StatFilterType type, @Nullable("When type is ALL") Period period) {
         return ItemView.builder()
                 .material(getMaterial(container, type, period))
-                .customModelData(getCustomModelData(container, type, period))
                 .displayName(getDisplayName(container, type, period))
                 .lore(getLore(container, type, period))
                 .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
@@ -168,16 +167,6 @@ public interface IAchievement {
     default Material getMaterial(final StatContainer container, StatFilterType type, Period period) {
         return Material.PAPER;
     }
-    /**
-     * gets the custom model data for the itemprovider
-     * @param container
-     * @param period
-     * @return
-     */
-    default int getCustomModelData(final StatContainer container, StatFilterType type, Period period) {
-        return 0;
-    }
-
     /**
      * A helper method, to easily add a description to the lore
      * without duplicating adding the progress and completion component

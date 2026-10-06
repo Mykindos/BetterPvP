@@ -50,7 +50,6 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
     /**
      * The custom model data value of the {@link ItemStack}.
      */
-    protected int customModelData;
     /**
      * The unbreakable state of the {@link ItemStack}.
      */
@@ -149,10 +148,6 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
             // damage
             if (itemMeta instanceof Damageable)
                 ((Damageable) itemMeta).setDamage(damage);
-            
-            // custom model data
-            if (customModelData != 0)
-                itemMeta.setCustomModelData(customModelData);
             
             // unbreakable
             if (unbreakable != null)
@@ -279,27 +274,6 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
     @Contract("_ -> this")
     public @NotNull S setDamage(int damage) {
         this.damage = damage;
-        return (S) this;
-    }
-    
-    /**
-     * Gets the custom model data value.
-     *
-     * @return The custom model data value
-     */
-    public int getCustomModelData() {
-        return customModelData;
-    }
-    
-    /**
-     * Sets the custom model data value.
-     *
-     * @param customModelData The custom model data value
-     * @return The builder instance
-     */
-    @Contract("_ -> this")
-    public @NotNull S setCustomModelData(int customModelData) {
-        this.customModelData = customModelData;
         return (S) this;
     }
     

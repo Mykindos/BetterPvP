@@ -26,14 +26,12 @@ public class Rule {
     private final List<KeyValue<IPunishmentType, Long>> offensePunishment = new ArrayList<>();
     private final List<String> description;
     private final Material material;
-    private final int customModelData;
 
-    public Rule(String key, List<String> punishments, String category, List<String> description, Material material, int customModelData) {
+    public Rule(String key, List<String> punishments, String category, List<String> description, Material material) {
         this.key = key;
         this.category = category;
         this.description = description;
         this.material = material;
-        this.customModelData = customModelData;
         parsePunishments(punishments);
     }
 
@@ -66,7 +64,6 @@ public class Rule {
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
                 .displayName(Component.text(this.getKey()))
                 .material(this.getMaterial())
-                .customModelData(this.getCustomModelData())
                 .lore(this.getDescription().stream()
                         .map(UtilMessage::deserialize).toList())
                 .flag(ItemFlag.HIDE_ATTRIBUTES)

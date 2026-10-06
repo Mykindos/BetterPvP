@@ -269,7 +269,6 @@ public class Punishment {
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
                 .displayName(Component.text(rule.getKey(), NamedTextColor.RED))
                 .material(rule.getMaterial())
-                .customModelData(rule.getCustomModelData())
                 .glow(isActive())
                 .lore(lore)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.world.logger;
 import com.google.gson.Gson;
 import lombok.Builder;
 import lombok.Data;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 @Data
@@ -118,8 +120,8 @@ public class WorldLog {
             ItemMeta itemMeta = itemStack.getItemMeta();
             if (itemMeta != null) {
 
-                if (itemMeta.hasCustomModelData()) {
-                    this.metadata.put("CustomModelData", String.valueOf(itemMeta.getCustomModelData()));
+                if (itemStack.hasData(DataComponentTypes.ITEM_MODEL)) {
+                    this.metadata.put("ItemModel", Objects.requireNonNull(itemStack.getData(DataComponentTypes.ITEM_MODEL)).asString());
                 }
 
                 CraftPersistentDataContainer persistentData = (CraftPersistentDataContainer) itemMeta.getPersistentDataContainer();

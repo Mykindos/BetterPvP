@@ -41,7 +41,6 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         ItemProvider hackingProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.punishment.button.hacking.name"))
                 .material(Material.IRON_SWORD)
-                .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -54,7 +53,6 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         ItemProvider gameplayProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.punishment.button.gameplay.name"))
                 .material(Material.ANVIL)
-                .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -67,7 +65,6 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         ItemProvider chatProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.punishment.button.chat.name"))
                 .material(Material.WRITABLE_BOOK)
-                .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -80,7 +77,6 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         ItemProvider otherProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.punishment.button.other.name"))
                 .material(Material.PAPER)
-                .customModelData(0)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)
                 .build();
@@ -104,7 +100,6 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         ItemProvider historyProvider = ItemView.builder()
                 .displayName(Translations.component("core.menu.punishment.button.history.name"))
                 .material(Material.ENCHANTING_TABLE)
-                .customModelData(1)
                 .lore(Translations.component("core.menu.punishment.button.history.lore.1").color(NamedTextColor.WHITE))
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .hideAdditionalTooltip(true)

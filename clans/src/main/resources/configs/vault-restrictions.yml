@@ -2,7 +2,7 @@
 # Format:
 #   <arbitrary name>:
 #     type: <MATERIAL NAME | FULLY QUALIFIED CLASS NAME>
-#     model: <INTEGER> (if not present, all models are blacklisted | can only be present if type is MATERIAL NAME)
+#     model: <ITEM MODEL KEY, e.g. betterpvp:item/mjolnir> (if not present, all models are blacklisted | can only be present if type is MATERIAL NAME)
 #     allowed: <INTEGER AT LEAST 1> (if not present, the item is blacklisted | cannot be present if allowed is set to a list | -1 to allow infinite amounts)
 #       - <CLAN_PERK_NAME:INTEGER> (cannot be present if allowed is set to a static number)
 restrictions:

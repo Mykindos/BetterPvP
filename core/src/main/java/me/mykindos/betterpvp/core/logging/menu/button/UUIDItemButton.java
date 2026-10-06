@@ -31,7 +31,6 @@ public class UUIDItemButton extends LogRepositoryButton {
         return ItemView.builder()
                 .displayName(Component.text(uuid))
                 .material(Material.IRON_SWORD)
-                .customModelData(0)
                 .lore(lore)
                 .build();
     }

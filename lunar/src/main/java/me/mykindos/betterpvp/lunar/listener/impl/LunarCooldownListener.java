@@ -54,7 +54,6 @@ public class LunarCooldownListener implements Listener {
         if (!item.getType().equals(Material.AIR)) {
             builder.icon(ItemStackIcon.builder()
                     .itemName(item.getType().name())
-                    .customModelData(item.hasItemMeta() && item.getItemMeta().hasCustomModelData() ? item.getItemMeta().getCustomModelData() : 0)
                     .build());
         } else {
             builder.icon(ItemStackIcon.builder()

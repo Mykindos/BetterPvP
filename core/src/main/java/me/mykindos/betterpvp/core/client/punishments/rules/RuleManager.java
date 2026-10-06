@@ -19,7 +19,7 @@ public class RuleManager extends Manager<String, Rule> {
         ExtendedYamlConfiguration config = core.getConfig("rules");
 
         //used for custom punishments (manual time apply) or punishments with an unknown or removed rule
-        addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "CUSTOM", List.of("Internal use only"), Material.PAPER, 1));
+        addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "CUSTOM", List.of("Internal use only"), Material.PAPER));
 
         Set<String> categories = config.getKeys(false);
         for (String category : categories) {
@@ -38,10 +38,9 @@ public class RuleManager extends Manager<String, Rule> {
                 if (material == null) {
                     material = Material.DEBUG_STICK;
                 }
-                int customModelData = config.getInt(getPath(category, key, "customModelData"));
 
                 log.info("Loading rule: {}", keyValue).submit();
-                addObject(keyValue.toLowerCase().replace(' ', '_'), new Rule(keyValue, punishments, category, description, material, customModelData));
+                addObject(keyValue.toLowerCase().replace(' ', '_'), new Rule(keyValue, punishments, category, description, material));
             }
         }
         log.info("Loaded {} Rules", getObjects().size()).submit();

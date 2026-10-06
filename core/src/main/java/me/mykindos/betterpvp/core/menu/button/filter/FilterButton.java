@@ -43,7 +43,6 @@ public class FilterButton<G extends Gui, T extends IFilterContext<T>> extends Co
     private final int numToShow;
     private final String title;
     private final Material displayMaterial;
-    private final int customModelData;
 
     /**
      * Create a String filter button, that goes through
@@ -52,14 +51,12 @@ public class FilterButton<G extends Gui, T extends IFilterContext<T>> extends Co
      * @param contexts the list of contexts to use
      * @param numToShow the number of options to show at once
      * @param displayMaterial the material of the item
-     * @param customModelData the custom model data of the item
      */
-    public FilterButton(String title, List<T> contexts, int numToShow, Material displayMaterial, int customModelData) {
+    public FilterButton(String title, List<T> contexts, int numToShow, Material displayMaterial) {
         this.title = title;
         this.contexts = new ArrayList<>(contexts);
         this.numToShow = numToShow;
         this.displayMaterial = displayMaterial;
-        this.customModelData = customModelData;
         this.selected = 0;
         this.selectedFilter = contexts.getFirst();
         this.contexts.sort(null);
@@ -164,7 +161,6 @@ public class FilterButton<G extends Gui, T extends IFilterContext<T>> extends Co
         return ItemView.builder()
                 .displayName(Component.text(title, NamedTextColor.WHITE, TextDecoration.BOLD))
                 .material(displayMaterial)
-                .customModelData(customModelData)
                 .lore(lore)
                 .build();
     }

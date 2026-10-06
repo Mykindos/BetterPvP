@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,8 @@ public final class RestrictionParser {
             if (material == null) {
                 throw new IllegalArgumentException("Invalid material type: " + typeStr);
             }
-            Integer model = section.getObject("model", Integer.class, null);
+            final String modelStr = section.getString("model");
+            final Key model = modelStr == null ? null : Key.key(modelStr);
         
             return createTypeRestriction(section, material, model);
         }
@@ -54,7 +56,7 @@ public final class RestrictionParser {
         throw new IllegalArgumentException("Invalid restriction configuration: " + section.getCurrentPath());
     }
 
-    private TypeRestriction createTypeRestriction(ConfigurationSection section, Material material, Integer model) {
+    private TypeRestriction createTypeRestriction(ConfigurationSection section, Material material, Key model) {
         if (!section.contains("allowed")) {
             return new TypeRestriction(0, material, model);
         }

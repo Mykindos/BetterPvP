@@ -46,8 +46,9 @@ public class ItemInfoCommand extends Command {
             UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.name", Objects.requireNonNull(itemMeta.displayName()));
         }
 
-        if (itemMeta.hasCustomModelData()) {
-            UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.model_data", itemMeta.getCustomModelData());
+        if (itemInMainHand.hasData(DataComponentTypes.ITEM_MODEL)) {
+            UtilMessage.message(player, "core.prefix.command", "core.command.iteminfo.item_model",
+                    Component.text(Objects.requireNonNull(itemInMainHand.getData(DataComponentTypes.ITEM_MODEL)).asString()));
         }
 
         if (itemInMainHand.hasData(DataComponentTypes.MAX_DAMAGE)) {

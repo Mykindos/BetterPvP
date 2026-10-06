@@ -77,15 +77,8 @@ public class HotbarListener implements Listener {
         }
 
         final ItemStack item = Objects.requireNonNull(event.getItem());
-        if (!item.hasItemMeta() || !item.getItemMeta().hasCustomModelData()) {
-            return;
-        }
-
-        final int customModelData = item.getItemMeta().getCustomModelData();
-        switch (customModelData) {
-            case 700:
-                new ServerSelectorMenu(networkPlayerCountService, queueStatusRegistry, orchestrationGateway).show(event.getPlayer());
-                break;
+        if (item.getPersistentDataContainer().has(HubInventoryService.SERVER_SELECTOR)) {
+            new ServerSelectorMenu(networkPlayerCountService, queueStatusRegistry, orchestrationGateway).show(event.getPlayer());
         }
     }
 

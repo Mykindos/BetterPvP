@@ -43,7 +43,6 @@ public class PlayerItemButton extends LogRepositoryButton {
         return ItemView.builder()
                 .displayName(Component.text(name))
                 .material(Material.PLAYER_HEAD)
-                .customModelData(0)
                 .lore(lore)
                 .build();
     }

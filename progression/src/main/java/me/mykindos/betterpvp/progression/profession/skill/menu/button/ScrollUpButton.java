@@ -20,7 +20,6 @@ public class ScrollUpButton extends ScrollItem {
     @Override
     public ItemProvider getItemProvider(ScrollGui<?> gui) {
         final ItemView.ItemViewBuilder builder = ItemView.of(new ItemStack(Material.BARRIER)).toBuilder();
-        builder.customModelData(1);
         builder.displayName(Translations.component("progression.menu.scroll.up"));
         builder.itemModel(Resources.ItemModel.INVISIBLE);
         builder.action(ClickActions.LEFT_SHIFT, Translations.component("progression.menu.scroll.up-5"));

@@ -57,7 +57,6 @@ public class OfflineMessage implements Describable {
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(Component.text(action.getTitle(), NamedTextColor.WHITE))
                 .material(action.getMaterial())
-                .customModelData(action.getCustomModelData())
                 .lore(lore)
                 .build();
         return Description.builder()
@@ -67,21 +66,19 @@ public class OfflineMessage implements Describable {
 
     @Getter
     public enum Action {
-        CLAN_DISBAND("Disband", Material.TNT, 0),
-        CLAN_KICK("Kick", Material.PURPLE_BED, 0),
-        CLAN_PILLAGE("Pillage", Material.GOAT_HORN, 0),
-        PUNISHMENT("Punishment", Material.ANVIL, 0),
-        OFFLINE_DEATH("Offline Death", Material.BONE, 0),
-        OTHER("Other", Material.PAPER, 0);
+        CLAN_DISBAND("Disband", Material.TNT),
+        CLAN_KICK("Kick", Material.PURPLE_BED),
+        CLAN_PILLAGE("Pillage", Material.GOAT_HORN),
+        PUNISHMENT("Punishment", Material.ANVIL),
+        OFFLINE_DEATH("Offline Death", Material.BONE),
+        OTHER("Other", Material.PAPER);
 
         private final String title;
         private final Material material;
-        private final int customModelData;
 
-        Action(String title, Material material, int customModelData) {
+        Action(String title, Material material) {
             this.title = title;
             this.material = material;
-            this.customModelData = customModelData;
         }
 
         public static Action fromString(String name) {

@@ -11,13 +11,17 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Objects;
 
 @Singleton
 public class HubInventoryService {
+
+    public static final NamespacedKey SERVER_SELECTOR = new NamespacedKey("betterpvp", "server_selector");
 
     private final RoleManager roleManager;
     private final ItemFactory itemFactory;
@@ -33,10 +37,10 @@ public class HubInventoryService {
 
         final ItemStack quickPlay = ItemView.builder()
                 .material(Material.COMPASS)
-                .customModelData(700)
                 .displayName(Component.text("Server Select", NamedTextColor.GREEN))
                 .build()
                 .get();
+        quickPlay.editPersistentDataContainer(pdc -> pdc.set(SERVER_SELECTOR, PersistentDataType.BOOLEAN, true));
         player.getInventory().setItem(4, quickPlay);
         player.updateInventory();
     }

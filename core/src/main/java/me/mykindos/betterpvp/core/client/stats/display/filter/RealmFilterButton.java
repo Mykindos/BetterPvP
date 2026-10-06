@@ -18,10 +18,9 @@ public class RealmFilterButton extends FilterButton<IAbstractStatMenu, RealmCont
      * @param contexts        the list of contexts to use
      * @param numToShow       the number of options to show at once
      * @param displayMaterial the material of the item
-     * @param customModelData the custom model data of the item
      */
     public RealmFilterButton(@NotNull RealmContext currentContext, List<RealmContext> contexts) {
-        super("Realm", contexts, 9, Material.ANVIL, 0);
+        super("Realm", contexts, 9, Material.ANVIL);
         this.setSelectedFilter(currentContext);
         setRefresh(this::onChangeSeason);
     }

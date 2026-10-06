@@ -61,26 +61,6 @@ public class UtilInventory {
         return required <= 0;
     }
 
-    public static boolean contains(Player player, Material item, int required, int customModelData) {
-        for (int i : player.getInventory().all(item).keySet()) {
-            if (required <= 0) {
-                return true;
-            }
-
-            ItemStack stack = player.getInventory().getItem(i);
-            if (stack != null && stack.getAmount() > 0) {
-                ItemMeta itemMeta = stack.getItemMeta();
-                if (itemMeta == null) continue;
-                if (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() == customModelData) {
-                    required -= stack.getAmount();
-                }
-
-            }
-        }
-
-        return required <= 0;
-    }
-
     public static boolean contains(Player player, String namespacedKey, int required) {
         int count = 0;
         for (ItemStack item : player.getInventory().getContents()) {

@@ -72,7 +72,6 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
             }
         });
         ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.BARRIER)
-                .customModelData(1)
                 .displayName(Translations.component("progression.menu.info.level-title", Component.text(profession)).color(NamedTextColor.BLUE))
                 .itemModel(Resources.ItemModel.INVISIBLE)
                 .lore(progressBarFinal)
