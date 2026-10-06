@@ -68,6 +68,8 @@ import java.util.OptionalDouble;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Drives all block-break sessions. Lifecycle:
@@ -144,7 +146,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
      * true break behaviour lives behind the main-thread-only smart factory, so the netty vanilla estimate
      * ({@link #estimatesInstantVanilla}) never guesses for them and they take the cache/tick path instead.
      */
-    private static final java.util.Set<Material> CARRIER_MATERIALS = java.util.EnumSet.of(Material.BARRIER, Material.NOTE_BLOCK);
+    private static final Set<Material> CARRIER_MATERIALS = EnumSet.of(Material.BARRIER, Material.NOTE_BLOCK);
 
     @Inject
     public BlockBreakProgressServiceImpl(BlockBreakResolver resolver, SmartBlockFactory smartBlockFactory) {

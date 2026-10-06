@@ -24,8 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @BPvPListener
 public class PackReleaseListener implements Listener {
 
-    private static final String CHANNEL = "resource_pack_published";
-
     private final Database database;
     private final ResourcePackService service;
     private final AtomicBoolean started = new AtomicBoolean(false);
@@ -52,7 +50,7 @@ public class PackReleaseListener implements Listener {
             try (Connection connection = dataSource.getConnection()) {
                 final PGConnection pgConnection = connection.unwrap(PGConnection.class);
                 try (Statement statement = connection.createStatement()) {
-                    statement.execute("LISTEN " + CHANNEL);
+                    statement.execute("LISTEN resource_pack_published");
                 }
                 service.reload();
                 while (!connection.isClosed()) {

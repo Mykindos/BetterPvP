@@ -14,9 +14,6 @@ import java.util.Optional;
 @Singleton
 public class DatabasePackReleaseStore implements PackReleaseStore {
 
-    private static final String LATEST =
-            "select manifest::text as manifest from resource_pack_release where channel = ? order by id desc limit 1";
-
     private final Database database;
     private final Gson gson = new Gson();
 
@@ -27,7 +24,8 @@ public class DatabasePackReleaseStore implements PackReleaseStore {
 
     @Override
     public Optional<PackRelease> latest(String channel) {
-        final Record record = database.getDslContext().fetchOne(LATEST, channel);
+        final Record record = database.getDslContext().fetchOne(
+                "select manifest::text as manifest from resource_pack_release where channel = ? order by id desc limit 1", channel);
         if (record == null) {
             return Optional.empty();
         }
