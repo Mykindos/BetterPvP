@@ -71,17 +71,67 @@ final class DialogCompiler {
             }
             onLine.sort(Comparator.comparingInt(index -> elements.get(index).getX()));
 
+            final List<Integer> reaching = reaching(elements, clicks, line);
             int cursor = 0;
             for (int index : onLine) {
                 final CanvasElement element = elements.get(index);
-                appendSpace(body, element.getX() - cursor);
+                appendGap(body, cursor, element.getX(), elements, reaching, clicks);
                 final Component content = element == pressed ? element.getPressed() : element.getContent();
                 body.append(interactive(shift(content, element.getY() % LINE_HEIGHT), element, clicks.apply(index)));
                 cursor = element.getX() + element.getWidth();
             }
-            appendSpace(body, canvas.getWidth() - cursor);
+            appendGap(body, cursor, canvas.getWidth(), elements, reaching, clicks);
         }
         return body.build();
+    }
+
+    /** Clickable elements that start on an earlier line and reach down into {@code line}. */
+    private static List<Integer> reaching(List<CanvasElement> elements, IntFunction<Key> clicks, int line) {
+        final List<Integer> reaching = new ArrayList<>();
+        for (int index = 0; index < elements.size(); index++) {
+            final CanvasElement element = elements.get(index);
+            if (element.getY() / LINE_HEIGHT < line && element.getY() + element.getHeight() > line * LINE_HEIGHT
+                    && clicks.apply(index) != null) {
+                reaching.add(index);
+            }
+        }
+        return reaching;
+    }
+
+    /**
+     * Space from {@code from} to {@code to}. The client resolves a click to the last clickable text under the mouse,
+     * line by line, so blank space on a line would take the click from the lower part of an element above. Where an
+     * element from an earlier line reaches into the gap, the space carries that element's click.
+     */
+    private static void appendGap(TextComponent.Builder body, int from, int to, List<CanvasElement> elements,
+                                  List<Integer> reaching, IntFunction<Key> clicks) {
+        int cursor = from;
+        while (cursor < to) {
+            Integer cover = null;
+            int next = to;
+            for (int index : reaching) {
+                final CanvasElement element = elements.get(index);
+                final int right = element.getX() + element.getWidth();
+                if (element.getX() <= cursor && right > cursor) {
+                    cover = index;
+                    next = Math.min(right, to);
+                    break;
+                }
+                if (element.getX() > cursor) {
+                    next = Math.min(next, element.getX());
+                }
+            }
+            if (cover == null) {
+                appendSpace(body, next - cursor);
+            } else {
+                body.append(Component.translatable("space." + (next - cursor)).font(Resources.Font.SPACE)
+                        .clickEvent(ClickEvent.custom(clicks.apply(cover), BinaryTagHolder.binaryTagHolder("{}"))));
+            }
+            cursor = next;
+        }
+        if (cursor > to) {
+            appendSpace(body, to - cursor);
+        }
     }
 
     /** Number of text lines the body needs so every element fits inside it. */

@@ -115,6 +115,35 @@ class DialogCompilerTest {
     }
 
     @Test
+    @DisplayName("space on lower lines carries the click of a taller element above, so the client finds it last")
+    void spaceBelowTallElementKeepsItsClick() {
+        final DialogCanvas canvas = new DialogCanvas(200);
+        final CanvasElement button = canvas.art(40, 4, '\uE004', 100, 20).onClick((player, inputs) -> { });
+        final Key key = Key.key("betterpvp", "dialog/1/0");
+
+        final List<Component> children = DialogCompiler.body(canvas, index -> index == 0 ? key : null).children();
+        int line = 0;
+        int advance = 0;
+        final int[] covered = new int[3];
+        for (Component child : children) {
+            if (isNewline(child)) {
+                line++;
+                advance = 0;
+                continue;
+            }
+            final int width = UtilFont.componentWidth(child);
+            if (line > 0 && child.clickEvent() != null) {
+                assertEquals(40, advance);
+                covered[line] += width;
+            }
+            advance += width;
+        }
+
+        assertEquals(button.getWidth(), covered[1]);
+        assertEquals(button.getWidth(), covered[2]);
+    }
+
+    @Test
     @DisplayName("AC4: the body has enough lines for the lowest element to fit inside it")
     void ac4_bodyFitsTallestElement() {
         final DialogCanvas canvas = new DialogCanvas(200);
