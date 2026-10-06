@@ -49,7 +49,7 @@ public final class UtilFont {
 
     /** Pixel advance of a string in the given font. Fonts without a table measure as the default font. */
     public static int textWidth(String text, Key font) {
-        return (textHalfWidth(text, false, advancesFor(font)) + 1) / 2;
+        return Math.floorDiv(textHalfWidth(text, false, advancesFor(font)) + 1, 2);
     }
 
     /**
@@ -61,7 +61,7 @@ public final class UtilFont {
      * otherwise their text isn't present to measure.
      */
     public static int componentWidth(Component component) {
-        return (componentHalfWidth(component, false, Resources.Font.DEFAULT) + 1) / 2;
+        return Math.floorDiv(componentHalfWidth(component, false, Resources.Font.DEFAULT) + 1, 2);
     }
 
     // Measured in half pixels so bold unifont glyphs stay exact until the final round-up.

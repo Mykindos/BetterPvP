@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://betterpvp.net/schema/gui/theme.schema.json",
+  "title": "Theme names",
+  "description": "Written by Resourcepack/tools/gui/build_gui.py --schema-out. Lists the styles, hover styles and sprites the pack can draw.",
+  "definitions": {
+    "style": {
+      "anyOf": [
+        {
+          "enum": [
+            "gold",
+            "panel",
+            "steel",
+            "tab",
+            "tab_selected"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "hoverStyle": {
+      "anyOf": [
+        {
+          "enum": [
+            "rim"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "sprite": {
+      "anyOf": [
+        {
+          "enum": [
+            "coin_spin"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  }
+}

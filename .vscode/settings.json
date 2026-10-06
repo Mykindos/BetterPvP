@@ -1,0 +1,16 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["**/src/main/resources/gui/*.json"],
+      "url": "./core/src/main/resources/gui/schema/screen.schema.json"
+    },
+    {
+      "fileMatch": ["**/src/main/resources/gui/components/*.json"],
+      "url": "./core/src/main/resources/gui/schema/components.schema.json"
+    },
+    {
+      "fileMatch": ["**/src/main/resources/gui/assets/*.json"],
+      "url": "./core/src/main/resources/gui/schema/assets.schema.json"
+    }
+  ]
+}

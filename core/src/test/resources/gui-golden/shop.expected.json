@@ -1,0 +1,19 @@
+{
+  "glyphs": [
+    "anim:coin_spin:16x16:8:10",
+    "backdrop:panel:300x160:0#0",
+    "backdrop:panel:300x160:0#1",
+    "box:meter_fill:80x12",
+    "box:steel:100x24",
+    "box:tab:64x18",
+    "box:tab_selected:64x18",
+    "box:tag:40x12",
+    "hover:rim:100x24:300:188:24",
+    "hover:rim:100x24:300:188:52",
+    "hover:rim:100x24:300:84:24",
+    "hover:rim:100x24:300:84:52",
+    "hover:rim:64x18:300:8:24",
+    "hover:rim:64x18:300:8:46",
+    "pressed:steel:100x24"
+  ]
+}
