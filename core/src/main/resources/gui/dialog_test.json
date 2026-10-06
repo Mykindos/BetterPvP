@@ -1,58 +1,58 @@
 {
   "$schema": "schema/screen.schema.json",
-  "canvas": { "width": 440, "height": 205 },
+  "canvas": { "width": 442, "height": 189 },
   "name": { "key": "core.dialog.test.name" },
   "state": { "tab": "overview", "clicks": 0, "rewards": [], "picked": null },
   "elements": [
-    { "box": "panel_header", "x": 0, "y": 0, "width": 440, "height": 205 },
-    { "text": { "key": "core.dialog.test.name" }, "x": 10, "y": 12, "style": "title" },
+    { "box": "panel_header", "x": 0, "y": 5, "width": 442, "height": 184 },
+    { "text": { "key": "core.dialog.test.name" }, "x": 9, "y": 13, "style": "title" },
     {
-      "row": { "x": 120, "y": 9, "cell": [70, 14], "gap": 4 },
+      "row": { "x": 67, "y": 9, "cell": ["auto", 16], "gap": 1 },
       "children": [
-        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'overview'}", "width": 70, "height": 14,
-          "label": { "key": "core.dialog.test.tab.1" }, "selected_label_style": "on_primary",
-          "tooltip": { "key": "core.dialog.test.tab.tooltip" }, "on_click": { "set": { "tab": "overview" } } },
-        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'details'}", "width": 70, "height": 14,
-          "label": { "key": "core.dialog.test.tab.2" }, "selected_label_style": "on_primary",
-          "tooltip": { "key": "core.dialog.test.tab.tooltip" }, "on_click": { "set": { "tab": "details" } } },
-        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'rewards'}", "width": 70, "height": 14,
-          "label": { "key": "core.dialog.test.tab.3" }, "selected_label_style": "on_primary",
-          "tooltip": { "key": "core.dialog.test.tab.tooltip" }, "on_click": { "set": { "tab": "rewards" } } }
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'overview'}", "width": "auto", "padding": 5,
+          "height": 16, "label": { "key": "core.dialog.test.tab.1" }, "selected_label_style": "on_primary", "hover": "light",
+          "on_click": { "set": { "tab": "overview" } } },
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'details'}", "width": "auto", "padding": 5,
+          "height": 16, "label": { "key": "core.dialog.test.tab.2" }, "selected_label_style": "on_primary", "hover": "light",
+          "on_click": { "set": { "tab": "details" } } },
+        { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'rewards'}", "width": "auto", "padding": 5,
+          "height": 16, "label": { "key": "core.dialog.test.tab.3" }, "selected_label_style": "on_primary", "hover": "light",
+          "on_click": { "set": { "tab": "rewards" } } }
       ]
     },
-    { "box": "well", "x": 8, "y": 36, "width": 258, "height": 161 },
-    { "box": "raised", "x": 274, "y": 36, "width": 158, "height": 161 },
+    { "box": "well", "x": 8, "y": 35, "width": 260, "height": 146 },
+    { "box": "raised", "x": 274, "y": 35, "width": 160, "height": 146 },
     {
       "switch": "{tab}",
       "cases": {
         "overview": [
-          { "text": { "key": "core.dialog.test.tab.1" }, "x": 16, "y": 45, "style": "title" },
-          { "text": { "key": "core.dialog.test.description.1" }, "x": 16, "y": 63, "style": "muted" },
-          { "text": { "key": "core.dialog.test.clicks", "args": ["{clicks}"] }, "x": 16, "y": 81 }
+          { "text": { "key": "core.dialog.test.tab.1" }, "x": 15, "y": 44, "style": "title" },
+          { "text": { "key": "core.dialog.test.description.1" }, "x": 15, "y": 62, "style": "muted" },
+          { "text": { "key": "core.dialog.test.clicks", "args": ["{clicks}"] }, "x": 15, "y": 80 }
         ],
         "details": [
-          { "text": { "key": "core.dialog.test.tab.2" }, "x": 16, "y": 45, "style": "title" },
-          { "text": { "key": "core.dialog.test.description.2" }, "x": 16, "y": 63, "style": "muted" },
-          { "icon": "coin_spin", "x": 16, "y": 81, "width": 16, "height": 16, "frames": 8, "fps": 10 }
+          { "text": { "key": "core.dialog.test.tab.2" }, "x": 15, "y": 44, "style": "title" },
+          { "text": { "key": "core.dialog.test.description.2" }, "x": 15, "y": 62, "style": "muted" },
+          { "icon": "coin_spin", "x": 15, "y": 80, "width": 16, "height": 16, "frames": 8, "fps": 10 }
         ],
         "rewards": [
-          { "text": { "key": "core.dialog.test.tab.3" }, "x": 16, "y": 45, "style": "title" },
+          { "text": { "key": "core.dialog.test.tab.3" }, "x": 15, "y": 44, "style": "title" },
           {
             "repeat": "rewards", "max": 4,
-            "layout": { "grid": { "x": 16, "y": 63, "cell": [118, 18], "gap": 4, "columns": 2 } },
+            "layout": { "grid": { "x": 15, "y": 63, "cell": [118, 20], "gap": 2, "columns": 2 } },
             "children": [
-              { "button": "normal", "width": 118, "height": 18, "label": "{item}", "hover": "rim", "pressed": true,
+              { "button": "normal", "width": 118, "height": 20, "label": "{item}", "hover": "light", "pressed": true,
                 "on_click": { "set": { "picked": "{item}" } } }
             ]
           },
-          { "text": { "key": "core.dialog.test.description.3" }, "x": 16, "y": 108, "style": "muted" }
+          { "text": { "key": "core.dialog.test.description.3" }, "x": 15, "y": 108, "style": "muted" }
         ]
       }
     },
-    { "when": "{picked && tab == 'rewards'}", "then": [ { "text": "{picked}", "x": 16, "y": 126, "style": "value" } ] },
-    { "button": "normal", "x": 282, "y": 153, "width": 142, "height": 16, "label": { "key": "core.dialog.test.tab.2" },
-      "hover": "rim", "pressed": true, "on_click": { "set": { "tab": "details" } } },
-    { "button": "primary", "x": 282, "y": 171, "width": 142, "height": 18, "label": { "key": "core.dialog.test.confirm" },
+    { "when": "{picked && tab == 'rewards'}", "then": [ { "text": "{picked}", "x": 15, "y": 126, "style": "value" } ] },
+    { "button": "normal", "x": 281, "y": 132, "width": 146, "height": 20, "label": { "key": "core.dialog.test.tab.2" },
+      "hover": "light", "pressed": true, "on_click": { "set": { "tab": "details" } } },
+    { "button": "primary", "x": 281, "y": 154, "width": 146, "height": 20, "label": { "key": "core.dialog.test.confirm" },
       "label_style": "on_primary", "hover": "rim", "pressed": true, "on_click": { "set": { "clicks": "{clicks + 1}" } } }
   ],
   "exit": { "label": { "key": "core.dialog.test.close" }, "tooltip": { "key": "core.dialog.test.close.tooltip" }, "width": 150 }

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.menu.dialog.screen;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,11 +36,14 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
@@ -55,12 +61,18 @@ public class GuiScreens implements Listener {
     private static final Pattern SCREEN_FILE = Pattern.compile("gui/[^/]+\\.json");
     private static final Pattern COMPONENT_FILE = Pattern.compile("gui/components/[^/]+\\.json");
     private static final Pattern ASSET_FILE = Pattern.compile("gui/assets/[^/]+\\.json");
+    private static final Pattern TRANSLATION_FILE = Pattern.compile("translations/[^/]+_([a-z]+)\\.properties");
+    private static final String DEFAULT_LANGUAGE = "en";
 
     private final GuiRegistry registry;
     private final DialogSessions sessions;
     private final Map<String, ScreenDefinition> screens = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> declared = new ConcurrentHashMap<>();
     private final Map<String, AssetTable> tables = new ConcurrentHashMap<>();
+    /** Each namespace's translations by language, which auto width buttons are sized by. */
+    private final Map<String, Map<String, Map<String, String>>> translations = new ConcurrentHashMap<>();
+    /** Screens whose auto width buttons resolve differently per language: key, then language. */
+    private final Map<String, Map<String, ScreenDefinition>> localized = new ConcurrentHashMap<>();
     private final Map<UUID, Deque<Frame>> stacks = new ConcurrentHashMap<>();
 
     @Inject
@@ -76,25 +88,81 @@ public class GuiScreens implements Listener {
      */
     public void load(String namespace, Map<String, String> files) {
         final Set<String> assets = new HashSet<>();
+        translations.put(namespace, translationTables(files));
+        final Set<String> languages = new TreeSet<>(translations.get(namespace).keySet());
+        languages.addAll(translations.getOrDefault("core", Map.of()).keySet());
+        languages.add(DEFAULT_LANGUAGE);
+        final AutoWidths widths = widths(namespace, DEFAULT_LANGUAGE);
         files.forEach((path, json) -> {
             if (COMPONENT_FILE.matcher(path).matches()) {
-                guard(path, () -> ScreenParser.components(namespace, path, json)
+                guard(path, () -> ScreenParser.components(namespace, path, resolve(widths, json))
                         .forEach((name, component) -> registry.component(namespace, name, component)));
             }
         });
         files.forEach((path, json) -> {
             if (ASSET_FILE.matcher(path).matches()) {
-                guard(path, () -> assets.addAll(ScreenAssets.collect(ScreenParser.assets(namespace, path, json), this::component)));
+                guard(path, () -> assets.addAll(ScreenAssets.collect(ScreenParser.assets(namespace, path, resolve(widths, json)), this::component)));
             } else if (SCREEN_FILE.matcher(path).matches()) {
                 guard(path, () -> {
-                    final ScreenDefinition screen = ScreenParser.screen(namespace, path, json);
+                    final ScreenDefinition screen = ScreenParser.screen(namespace, path, resolve(widths, json));
                     assets.addAll(ScreenAssets.collect(screen, this::component));
                     screens.put(screen.key(), screen);
+                    if (json.contains("\"auto\"")) {
+                        final Map<String, ScreenDefinition> variants = new HashMap<>();
+                        for (String language : languages) {
+                            final ScreenDefinition variant = ScreenParser.screen(namespace, path, resolve(widths(namespace, language), json));
+                            assets.addAll(ScreenAssets.collect(variant, this::component));
+                            variants.put(language, variant);
+                        }
+                        localized.put(screen.key(), variants);
+                    }
                 });
             }
         });
         declared.put(namespace, assets);
         tables.put(namespace, new AssetTable(namespace, assets));
+    }
+
+    private static String resolve(AutoWidths widths, String json) {
+        final JsonElement tree = JsonParser.parseString(json);
+        widths.resolve(tree);
+        return tree.toString();
+    }
+
+    private AutoWidths widths(String namespace, String language) {
+        final Map<String, Map<String, String>> own = translations.getOrDefault(namespace, Map.of());
+        final Map<String, Map<String, String>> core = translations.getOrDefault("core", Map.of());
+        final List<Map<String, String>> tables = new ArrayList<>();
+        for (String lookup : List.of(language, DEFAULT_LANGUAGE)) {
+            tables.add(own.getOrDefault(lookup, Map.of()));
+            tables.add(core.getOrDefault(lookup, Map.of()));
+        }
+        return new AutoWidths(tables);
+    }
+
+    /** The screen as drawn for this player's language, which differs when auto width buttons size to its text. */
+    private ScreenDefinition forPlayer(ScreenDefinition screen, Player player) {
+        final Map<String, ScreenDefinition> variants = localized.get(screen.key());
+        return variants == null ? screen : variants.getOrDefault(player.locale().getLanguage(), screen);
+    }
+
+    private static Map<String, Map<String, String>> translationTables(Map<String, String> files) {
+        final Map<String, Map<String, String>> tables = new HashMap<>();
+        files.forEach((path, content) -> {
+            final Matcher matcher = TRANSLATION_FILE.matcher(path);
+            if (matcher.matches()) {
+                final Properties properties = new Properties();
+                try {
+                    properties.load(new StringReader(content));
+                } catch (IOException e) {
+                    throw new IllegalStateException("Could not read " + path, e);
+                }
+                final Map<String, String> table = new HashMap<>();
+                properties.forEach((key, value) -> table.put(key.toString(), value.toString()));
+                tables.put(matcher.group(1), table);
+            }
+        });
+        return tables;
     }
 
     /** A broken file is logged and skipped, so one typo never stops the plugin from enabling. */
@@ -114,19 +182,24 @@ public class GuiScreens implements Listener {
             final Path root = Path.of(location);
             if (Files.isDirectory(root)) {
                 // Run from a build folder, where classes and resources sit in separate directories.
-                final URL folder = owner.getClassLoader().getResource("gui");
-                if (folder != null) {
-                    final Path gui = Path.of(folder.toURI());
-                    try (Stream<Path> paths = Files.walk(gui)) {
-                        for (Path path : paths.filter(path -> path.toString().endsWith(".json")).toList()) {
-                            files.put("gui/" + gui.relativize(path).toString().replace('\\', '/'), Files.readString(path));
+                for (String resource : List.of("gui", "translations")) {
+                    final URL folder = owner.getClassLoader().getResource(resource);
+                    if (folder == null) {
+                        continue;
+                    }
+                    final Path base = Path.of(folder.toURI());
+                    try (Stream<Path> paths = Files.walk(base)) {
+                        for (Path path : paths.filter(path -> path.toString().endsWith(".json")
+                                || path.toString().endsWith(".properties")).toList()) {
+                            files.put(resource + "/" + base.relativize(path).toString().replace('\\', '/'), Files.readString(path));
                         }
                     }
                 }
             } else {
                 try (JarFile jar = new JarFile(root.toFile())) {
                     for (JarEntry entry : Collections.list(jar.entries())) {
-                        if (entry.getName().startsWith("gui/") && entry.getName().endsWith(".json")) {
+                        if ((entry.getName().startsWith("gui/") && entry.getName().endsWith(".json"))
+                                || (entry.getName().startsWith("translations/") && entry.getName().endsWith(".properties"))) {
                             try (InputStream input = jar.getInputStream(entry)) {
                                 files.put(entry.getName(), new String(input.readAllBytes(), StandardCharsets.UTF_8));
                             }
@@ -158,6 +231,11 @@ public class GuiScreens implements Listener {
                 problems.add(screen.key() + ": " + problem);
             }
         }
+        localized.forEach((key, variants) -> variants.forEach((language, screen) -> {
+            for (String problem : validate(screen)) {
+                problems.add(key + " (" + language + "): " + problem);
+            }
+        }));
         return problems;
     }
 
@@ -184,6 +262,10 @@ public class GuiScreens implements Listener {
                 problems.add("art " + asset + " is a frame strip taller than " + ScreenAssets.MAX_GLYPH + " px");
             }
         }
+        if (screen.getCanvasHeight() > ScreenAssets.CANVAS_MAX_HEIGHT) {
+            problems.add("the canvas is " + screen.getCanvasHeight() + " px tall, which scrolls at GUI scale 4 on a 1080p screen. "
+                    + "Keep it within " + ScreenAssets.CANVAS_MAX_HEIGHT + " px");
+        }
         if (!screen.getBackdrop().isEmpty() && screen.getCanvasHeight() > ScreenAssets.BACKDROP_MAX_HEIGHT) {
             problems.add("the canvas is " + screen.getCanvasHeight() + " px tall with a backdrop, which only lines up up to "
                     + ScreenAssets.BACKDROP_MAX_HEIGHT + " px. Draw the art as box elements in the canvas instead");
@@ -197,7 +279,7 @@ public class GuiScreens implements Listener {
         if (screen == null) {
             throw new IllegalArgumentException("No screen " + key);
         }
-        open(player, screen, state, bindings);
+        open(player, forPlayer(screen, player), state, bindings);
     }
 
     /** Opens a screen, replacing whatever screens the player has open. */
@@ -338,7 +420,7 @@ public class GuiScreens implements Listener {
                 if (next == null) {
                     throw new IllegalStateException(frame.screen.key() + " opens " + key + ", which is not loaded");
                 }
-                stack.push(frame(next, result.getState(), frame.bindings));
+                stack.push(frame(forPlayer(next, player), result.getState(), frame.bindings));
                 playSound(player, next, "open");
                 render(player);
             }

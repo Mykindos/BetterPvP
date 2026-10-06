@@ -26,10 +26,17 @@ import java.util.List;
 public class DialogCanvas {
 
     private final int width;
+    private final int height;
     private final List<CanvasElement> elements = new ArrayList<>();
 
     public DialogCanvas(int width) {
+        this(width, 0);
+    }
+
+    /** A canvas whose body is at least {@code height} px tall, so the body's size does not depend on what it shows. */
+    public DialogCanvas(int width, int height) {
         this.width = width;
+        this.height = height;
     }
 
     /**

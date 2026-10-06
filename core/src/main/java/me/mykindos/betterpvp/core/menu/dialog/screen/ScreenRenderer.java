@@ -36,7 +36,7 @@ final class ScreenRenderer {
     static DialogScreen render(Player player, ScreenDefinition screen, ScreenState state, GuiRegistry registry,
                                AssetTable assets, BiFunction<ActionSpec, Function<String, Object>, DialogClick> clicks) {
         final DialogCanvas backdrop = new DialogCanvas(screen.getCanvasWidth());
-        final DialogCanvas canvas = new DialogCanvas(screen.getCanvasWidth());
+        final DialogCanvas canvas = new DialogCanvas(screen.getCanvasWidth(), screen.getCanvasHeight());
         final Function<String, Object> lookup = state::get;
 
         final RenderContext backdropContext = new RenderContext(player, screen, backdrop, 0, 0, lookup, registry, assets, clicks, null);
@@ -155,7 +155,8 @@ final class ScreenRenderer {
             throw new IllegalArgumentException("A button is at most " + ScreenAssets.MAX_GLYPH + " px wide");
         }
         final Component hover = button.getHover() == null ? null : context.glyph(ScreenAssets.hover(button.getHover(), width, height,
-                context.getScreen().getCanvasWidth(), context.getOriginX() + button.getX(), context.getOriginY() + button.getY()));
+                context.getScreen().getCanvasWidth(), context.getScreen().getCanvasHeight(),
+                context.getOriginX() + button.getX(), context.getOriginY() + button.getY()));
         final Component pressed = button.isPressed() ? context.glyph(ScreenAssets.pressed(style, width, height)) : null;
 
         final CanvasElement art = context.art(ScreenAssets.box(style, width, height), button.getX(), button.getY()).getFirst();

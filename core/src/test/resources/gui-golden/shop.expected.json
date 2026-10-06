@@ -8,12 +8,12 @@
     "box:tab:64x18",
     "box:tab_selected:64x18",
     "box:tag:40x12",
-    "hover:rim:100x24:300:188:24",
-    "hover:rim:100x24:300:188:52",
-    "hover:rim:100x24:300:84:24",
-    "hover:rim:100x24:300:84:52",
-    "hover:rim:64x18:300:8:24",
-    "hover:rim:64x18:300:8:46",
+    "hover:rim:100x24:300:188:24:170",
+    "hover:rim:100x24:300:188:52:170",
+    "hover:rim:100x24:300:84:24:170",
+    "hover:rim:100x24:300:84:52:170",
+    "hover:rim:64x18:300:8:24:170",
+    "hover:rim:64x18:300:8:46:170",
     "pressed:steel:100x24"
   ]
 }

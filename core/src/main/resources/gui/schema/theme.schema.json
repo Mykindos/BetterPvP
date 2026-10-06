@@ -32,6 +32,7 @@
       "anyOf": [
         {
           "enum": [
+            "light",
             "rim"
           ]
         },

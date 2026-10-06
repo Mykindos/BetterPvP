@@ -134,9 +134,9 @@ final class DialogCompiler {
         }
     }
 
-    /** Number of text lines the body needs so every element fits inside it. */
+    /** Number of text lines the body needs so every element, and the canvas height it was made with, fits inside it. */
     static int lines(DialogCanvas canvas) {
-        int bottom = LINE_HEIGHT;
+        int bottom = Math.max(LINE_HEIGHT, canvas.getHeight());
         for (CanvasElement element : canvas.getElements()) {
             bottom = Math.max(bottom, element.getY() + element.getHeight());
         }

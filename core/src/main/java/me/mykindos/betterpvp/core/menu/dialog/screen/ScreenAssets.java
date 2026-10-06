@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
  *   <li>{@code box:<style>:<w>x<h>} style art in the body</li>
  *   <li>{@code backdrop:<style>:<w>x<h>:<y>} style art in the title, its top at canvas y</li>
  *   <li>{@code pressed:<style>:<w>x<h>} the style's pressed art</li>
- *   <li>{@code hover:<style>:<w>x<h>:<canvas width>:<x>:<y>} hover art pinned at a canvas spot</li>
+ *   <li>{@code hover:<style>:<w>x<h>:<canvas width>:<x>:<y>:<body height>} hover art pinned at a canvas spot</li>
  *   <li>{@code sprite:<name>:<w>x<h>} and {@code anim:<name>:<w>x<h>:<frames>:<fps>} sprites</li>
  * </ul>
  * Art wider than {@link #MAX_GLYPH} splits into equal glyphs keyed {@code <key>#<part>}. Every glyph of a namespace,
@@ -31,6 +31,11 @@ public final class ScreenAssets {
      * at 1080p) leaves this much canvas height.
      */
     public static final int BACKDROP_MAX_HEIGHT = 174;
+    /**
+     * The body never starts above the 33 px header and must end above the 33 px footer, so on a 270 px screen a canvas
+     * taller than this scrolls, and hover art cannot follow a scrolled body.
+     */
+    public static final int CANVAS_MAX_HEIGHT = 189;
     public static final int FIRST_CODE = 0xE000;
     public static final int LAST_CODE = 0xF8FF;
 
@@ -49,8 +54,13 @@ public final class ScreenAssets {
         return "pressed:" + style + ":" + width + "x" + height;
     }
 
-    public static String hover(String style, int width, int height, int canvasWidth, int x, int y) {
-        return "hover:" + style + ":" + width + "x" + height + ":" + canvasWidth + ":" + x + ":" + y;
+    public static String hover(String style, int width, int height, int canvasWidth, int canvasHeight, int x, int y) {
+        return "hover:" + style + ":" + width + "x" + height + ":" + canvasWidth + ":" + x + ":" + y + ":" + bodyHeight(canvasHeight);
+    }
+
+    /** Height the client gives a body canvas this tall: whole 9 px lines plus 4 px of padding above and below. */
+    public static int bodyHeight(int canvasHeight) {
+        return 9 * ((Math.max(9, canvasHeight) + 8) / 9) + 8;
     }
 
     public static String sprite(String name, int width, int height, int frames, int fps) {
@@ -191,7 +201,7 @@ public final class ScreenAssets {
                     }
                     if (button.getHover() != null) {
                         assets.add(hover(button.getHover(), button.getWidth(), button.getHeight(), screen.getCanvasWidth(),
-                                originX + button.getX(), originY + button.getY()));
+                                screen.getCanvasHeight(), originX + button.getX(), originY + button.getY()));
                     }
                 }
                 case Node.Icon icon -> assets.add(sprite(icon.getSprite(), icon.getWidth(), icon.getHeight(),

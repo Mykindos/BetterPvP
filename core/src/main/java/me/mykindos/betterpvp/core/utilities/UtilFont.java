@@ -35,7 +35,7 @@ public final class UtilFont {
 
     /** Pixel advance of a single default-font glyph (glyph width + 1px spacing). */
     public static int charWidth(char c) {
-        return ADVANCES[c] & ~UNIFONT_FLAG;
+        return ADVANCES[c] & 0xFF & ~UNIFONT_FLAG;
     }
 
     /** Pixel advance of a string in the default font (sum of each glyph's advance). */
@@ -101,7 +101,7 @@ public final class UtilFont {
                 width += (6 + (bold ? 1 : 0)) * 2; // missing-glyph box
                 continue;
             }
-            final int entry = advances[codePoint];
+            final int entry = advances[codePoint] & 0xFF;
             width += (entry & ~UNIFONT_FLAG) * 2;
             if (bold) {
                 width += (entry & UNIFONT_FLAG) != 0 ? 1 : 2;
