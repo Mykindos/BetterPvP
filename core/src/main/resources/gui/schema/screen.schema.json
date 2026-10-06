@@ -104,9 +104,9 @@
       ]
     },
     "textStyle": {
-      "description": "A registered text style. Core has body, muted, value, title, error and on_gold. Plugins can add more.",
+      "description": "A registered text style. Core has body, muted, value, title, error and on_primary. Plugins can add more.",
       "anyOf": [
-        { "enum": ["body", "muted", "value", "title", "error", "on_gold"] },
+        { "enum": ["body", "muted", "value", "title", "error", "on_primary"] },
         { "type": "string" }
       ]
     },
@@ -160,6 +160,7 @@
             "label_style": { "$ref": "#/definitions/textStyle" },
             "selected": { "$ref": "#/definitions/binding", "description": "When true, draws selected_style instead." },
             "selected_style": { "$ref": "#/definitions/style" },
+            "selected_label_style": { "$ref": "#/definitions/textStyle", "description": "Label style while selected." },
             "hover": { "$ref": "#/definitions/hoverStyle", "description": "Hover art the pack pins over this button. Replaces the tooltip." },
             "pressed": { "type": "boolean", "description": "Shows the style's pressed art for a moment after a click." },
             "tooltip": { "$ref": "#/definitions/text" },

@@ -8,11 +8,18 @@
       "anyOf": [
         {
           "enum": [
-            "gold",
+            "disabled",
+            "fill",
+            "header",
+            "normal",
             "panel",
-            "steel",
+            "primary",
+            "raised",
+            "selected",
             "tab",
-            "tab_selected"
+            "tab_selected",
+            "track",
+            "well"
           ]
         },
         {

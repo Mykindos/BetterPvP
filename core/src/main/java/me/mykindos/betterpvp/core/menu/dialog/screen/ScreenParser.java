@@ -134,6 +134,7 @@ public final class ScreenParser {
                         .selected(string(json, "selected", null))
                         .label(json.has("label") ? text(json.get("label")) : null)
                         .labelStyle(string(json, "label_style", "body"))
+                        .selectedLabelStyle(string(json, "selected_label_style", null))
                         .hover(string(json, "hover", null))
                         .pressed(json.has("pressed") && json.get("pressed").getAsBoolean())
                         .tooltip(json.has("tooltip") ? text(json.get("tooltip")) : null)

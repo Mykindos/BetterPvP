@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.menu.dialog.DialogCanvas;
 import me.mykindos.betterpvp.core.menu.dialog.DialogClick;
 import me.mykindos.betterpvp.core.menu.dialog.DialogField;
 import me.mykindos.betterpvp.core.menu.dialog.DialogScreen;
-import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -162,7 +161,8 @@ final class ScreenRenderer {
         final CanvasElement art = context.art(ScreenAssets.box(style, width, height), button.getX(), button.getY()).getFirst();
         interact(art, context, button.getTooltip(), button.getOnClick(), hover, pressed);
         if (button.getLabel() != null) {
-            final Component label = context.styled(button.getLabel(), button.getLabelStyle());
+            final String labelStyle = selected && button.getSelectedLabelStyle() != null ? button.getSelectedLabelStyle() : button.getLabelStyle();
+            final Component label = context.styled(button.getLabel(), labelStyle);
             // Centred on the 7 px cap height, which leaves room for a shadow below.
             final CanvasElement text = context.text(button.getX(), button.getY() + (height - 7) / 2, label, Node.Align.CENTER, width);
             interact(text, context, button.getTooltip(), button.getOnClick(), hover, null);
@@ -206,7 +206,7 @@ final class ScreenRenderer {
 
     private static DialogButton nativeButton(ScreenDefinition.NativeButton button, RenderContext context, ActionSpec action) {
         return DialogButton.builder()
-                .label(context.text(button.getLabel()).font(Resources.Font.UI))
+                .label(context.styled(button.getLabel(), "body"))
                 .tooltip(button.getTooltip() == null ? null : context.text(button.getTooltip()))
                 .width(button.getWidth())
                 .click(context.click(action))

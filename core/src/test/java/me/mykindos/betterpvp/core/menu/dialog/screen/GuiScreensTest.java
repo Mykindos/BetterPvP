@@ -108,10 +108,10 @@ class GuiScreensTest {
     void undeclaredArt() {
         final ScreenDefinition screen = ScreenDefinition.builder().namespace("golden").id("coded")
                 .canvasWidth(300).canvasHeight(100)
-                .element(Node.Box.builder().style("gold").width(50).height(20).build())
+                .element(Node.Box.builder().style("primary").width(50).height(20).build())
                 .build();
 
-        assertTrue(screens.validate(screen).stream().anyMatch(problem -> problem.contains("box:gold:50x20")));
+        assertTrue(screens.validate(screen).stream().anyMatch(problem -> problem.contains("box:primary:50x20")));
     }
 
     @Test

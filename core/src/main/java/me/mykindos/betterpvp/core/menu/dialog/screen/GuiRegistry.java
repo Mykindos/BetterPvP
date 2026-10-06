@@ -30,12 +30,12 @@ public class GuiRegistry {
     private final Map<String, BiFunction<Object, List<Object>, Object>> formatters = new HashMap<>();
 
     public GuiRegistry() {
-        textStyle("core", "body", text -> text.color(TextColor.color(0xEEF0F5)));
-        textStyle("core", "muted", text -> text.color(TextColor.color(0xA3AABD)));
-        textStyle("core", "value", text -> text.color(TextColor.color(0xFFFFFF)));
-        textStyle("core", "title", text -> text.color(TextColor.color(0xFFD36B)).shadowColor(ShadowColor.shadowColor(0xFF3A2A10)));
-        textStyle("core", "error", text -> text.color(TextColor.color(0xE5484D)));
-        textStyle("core", "on_gold", text -> text.color(TextColor.color(0x2A1606)).shadowColor(ShadowColor.none()));
+        textStyle("core", "body", text -> text.color(TextColor.color(0x2A2C30)).shadowColor(ShadowColor.none()));
+        textStyle("core", "muted", text -> text.color(TextColor.color(0x4A4C51)).shadowColor(ShadowColor.none()));
+        textStyle("core", "value", text -> text.color(TextColor.color(0x2A2C30)).shadowColor(ShadowColor.none()));
+        textStyle("core", "title", text -> text.color(TextColor.color(0x2A2C30)).shadowColor(ShadowColor.none()));
+        textStyle("core", "error", text -> text.color(TextColor.color(0xA61B1B)).shadowColor(ShadowColor.none()));
+        textStyle("core", "on_primary", text -> text.color(TextColor.color(0xFFFFFF)).shadowColor(ShadowColor.none()));
 
         sound("core", "click", "minecraft:ui.button.click");
         sound("core", "open", "minecraft:item.book.page_turn");

@@ -403,6 +403,9 @@ public class GuiScreens implements Listener {
                 }
                 case Node.Button button -> {
                     style(button.getLabelStyle());
+                    if (button.getSelectedLabelStyle() != null) {
+                        style(button.getSelectedLabelStyle());
+                    }
                     action(button.getOnClick());
                     if (button.getWidth() > ScreenAssets.MAX_GLYPH) {
                         problems.add("button " + button.getStyle() + " is wider than " + ScreenAssets.MAX_GLYPH + " px");
