@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.menu.dialog.screen;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.ShadowColor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ public class AssetTable {
             throw new IllegalArgumentException("Asset " + asset + " is not declared in namespace " + namespace
                     + ". Add it to a screen, component or asset file so the pack generates it.");
         }
-        return Component.text(code).font(font);
+        // Art never casts the text shadow, which would draw a dark copy one pixel down and right.
+        return Component.text(code).font(font).shadowColor(ShadowColor.none());
     }
 }

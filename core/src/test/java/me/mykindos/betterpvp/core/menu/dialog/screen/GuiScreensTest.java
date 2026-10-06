@@ -115,6 +115,17 @@ class GuiScreensTest {
     }
 
     @Test
+    @DisplayName("a backdrop on a canvas taller than the backdrop limit is reported")
+    void tallBackdrop() {
+        final ScreenDefinition screen = ScreenDefinition.builder().namespace("golden").id("tall")
+                .canvasWidth(300).canvasHeight(ScreenAssets.BACKDROP_MAX_HEIGHT + 1)
+                .backdrop(List.of(Node.Box.builder().style("panel").width(300).height(ScreenAssets.BACKDROP_MAX_HEIGHT + 1).build()))
+                .build();
+
+        assertTrue(screens.validate(screen).stream().anyMatch(problem -> problem.contains("with a backdrop")));
+    }
+
+    @Test
     @DisplayName("a set action changes state and re-renders the other case")
     void setActionSwitchesCase() {
         screens.open(player, "golden:shop", Map.of(), Map.of("buy", context -> ActionResult.none()));

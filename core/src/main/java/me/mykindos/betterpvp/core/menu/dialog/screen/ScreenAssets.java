@@ -26,6 +26,11 @@ import java.util.function.BiFunction;
 public final class ScreenAssets {
 
     public static final int MAX_GLYPH = 256;
+    /**
+     * Backdrop art lines up with the canvas only while the body starts 63 px down, which on a 270 px screen (GUI scale 4
+     * at 1080p) leaves this much canvas height.
+     */
+    public static final int BACKDROP_MAX_HEIGHT = 174;
     public static final int FIRST_CODE = 0xE000;
     public static final int LAST_CODE = 0xF8FF;
 

@@ -11,7 +11,7 @@
     "id": { "type": "string", "description": "Screen id. Defaults to the file name. Opened as <namespace>:<id>." },
     "canvas": {
       "type": "object",
-      "description": "Canvas size in GUI pixels. Keep it within 300 x 170 so the dialog fits a 480 x 270 screen (GUI scale 4 at 1080p).",
+      "description": "Canvas size in GUI pixels. Up to 440 x 205 fits a 480 x 270 screen (GUI scale 4 at 1080p) with the art drawn as box elements. A screen with a backdrop stays within 174 px tall.",
       "required": ["width", "height"],
       "additionalProperties": false,
       "properties": {

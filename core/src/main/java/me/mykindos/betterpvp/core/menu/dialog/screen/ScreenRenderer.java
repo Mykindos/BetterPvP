@@ -206,7 +206,7 @@ final class ScreenRenderer {
 
     private static DialogButton nativeButton(ScreenDefinition.NativeButton button, RenderContext context, ActionSpec action) {
         return DialogButton.builder()
-                .label(context.styled(button.getLabel(), "body"))
+                .label(context.styled(button.getLabel(), "on_primary"))
                 .tooltip(button.getTooltip() == null ? null : context.text(button.getTooltip()))
                 .width(button.getWidth())
                 .click(context.click(action))
