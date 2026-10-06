@@ -154,7 +154,8 @@ final class ScreenRenderer {
         if (ScreenAssets.parts(ScreenAssets.box(style, width, height)) > 1) {
             throw new IllegalArgumentException("A button is at most " + ScreenAssets.MAX_GLYPH + " px wide");
         }
-        final Component hover = button.getHover() == null ? null : context.glyph(ScreenAssets.hover(button.getHover(), width, height,
+        final String hoverStyle = selected && button.getSelectedHover() != null ? button.getSelectedHover() : button.getHover();
+        final Component hover = hoverStyle == null ? null : context.glyph(ScreenAssets.hover(hoverStyle, width, height,
                 context.getScreen().getCanvasWidth(), context.getScreen().getCanvasHeight(),
                 context.getOriginX() + button.getX(), context.getOriginY() + button.getY()));
         final Component pressed = button.isPressed() ? context.glyph(ScreenAssets.pressed(style, width, height)) : null;

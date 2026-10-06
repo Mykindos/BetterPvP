@@ -10,13 +10,13 @@
       "row": { "x": 67, "y": 9, "cell": ["auto", 16], "gap": 1 },
       "children": [
         { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'overview'}", "width": "auto", "padding": 5,
-          "height": 16, "label": { "key": "core.dialog.test.tab.1" }, "selected_label_style": "on_primary", "hover": "light",
+          "height": 16, "label": { "key": "core.dialog.test.tab.1" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
           "on_click": { "set": { "tab": "overview" } } },
         { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'details'}", "width": "auto", "padding": 5,
-          "height": 16, "label": { "key": "core.dialog.test.tab.2" }, "selected_label_style": "on_primary", "hover": "light",
+          "height": 16, "label": { "key": "core.dialog.test.tab.2" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
           "on_click": { "set": { "tab": "details" } } },
         { "button": "tab", "selected_style": "tab_selected", "selected": "{tab == 'rewards'}", "width": "auto", "padding": 5,
-          "height": 16, "label": { "key": "core.dialog.test.tab.3" }, "selected_label_style": "on_primary", "hover": "light",
+          "height": 16, "label": { "key": "core.dialog.test.tab.3" }, "selected_label_style": "on_primary", "hover": "light", "selected_hover": "rim",
           "on_click": { "set": { "tab": "rewards" } } }
       ]
     },

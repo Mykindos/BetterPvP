@@ -31,11 +31,6 @@ public final class ScreenAssets {
      * at 1080p) leaves this much canvas height.
      */
     public static final int BACKDROP_MAX_HEIGHT = 174;
-    /**
-     * The body never starts above the 33 px header and must end above the 33 px footer, so on a 270 px screen a canvas
-     * taller than this scrolls, and hover art cannot follow a scrolled body.
-     */
-    public static final int CANVAS_MAX_HEIGHT = 189;
     public static final int FIRST_CODE = 0xE000;
     public static final int LAST_CODE = 0xF8FF;
 
@@ -199,9 +194,11 @@ public final class ScreenAssets {
                             assets.add(pressed(button.getSelectedStyle(), button.getWidth(), button.getHeight()));
                         }
                     }
-                    if (button.getHover() != null) {
-                        assets.add(hover(button.getHover(), button.getWidth(), button.getHeight(), screen.getCanvasWidth(),
-                                screen.getCanvasHeight(), originX + button.getX(), originY + button.getY()));
+                    for (String hoverStyle : new String[]{button.getHover(), button.getSelectedHover()}) {
+                        if (hoverStyle != null) {
+                            assets.add(hover(hoverStyle, button.getWidth(), button.getHeight(), screen.getCanvasWidth(),
+                                    screen.getCanvasHeight(), originX + button.getX(), originY + button.getY()));
+                        }
                     }
                 }
                 case Node.Icon icon -> assets.add(sprite(icon.getSprite(), icon.getWidth(), icon.getHeight(),

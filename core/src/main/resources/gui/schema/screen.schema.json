@@ -11,7 +11,7 @@
     "id": { "type": "string", "description": "Screen id. Defaults to the file name. Opened as <namespace>:<id>." },
     "canvas": {
       "type": "object",
-      "description": "Canvas size in GUI pixels. Up to 460 x 189 fits a 480 x 270 screen (GUI scale 4 at 1080p) without scrolling, with the art drawn as box elements. A screen with a backdrop stays within 174 px tall.",
+      "description": "Canvas size in GUI pixels. Up to 460 x 189 fits a 480 x 270 screen (GUI scale 4 at 1080p) without scrolling, with the art drawn as box elements. Taller canvases scroll on small screens, where hover art drifts. A screen with a backdrop stays within 174 px tall.",
       "required": ["width", "height"],
       "additionalProperties": false,
       "properties": {
@@ -166,6 +166,7 @@
             "selected_style": { "$ref": "#/definitions/style" },
             "selected_label_style": { "$ref": "#/definitions/textStyle", "description": "Label style while selected." },
             "hover": { "$ref": "#/definitions/hoverStyle", "description": "Hover art the pack pins over this button. Replaces the tooltip." },
+            "selected_hover": { "$ref": "#/definitions/hoverStyle", "description": "Hover art while selected." },
             "pressed": { "type": "boolean", "description": "Shows the style's pressed art for a moment after a click." },
             "tooltip": { "$ref": "#/definitions/text" },
             "on_click": { "$ref": "#/definitions/action" }

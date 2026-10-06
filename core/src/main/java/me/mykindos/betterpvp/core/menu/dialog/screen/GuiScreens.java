@@ -262,10 +262,6 @@ public class GuiScreens implements Listener {
                 problems.add("art " + asset + " is a frame strip taller than " + ScreenAssets.MAX_GLYPH + " px");
             }
         }
-        if (screen.getCanvasHeight() > ScreenAssets.CANVAS_MAX_HEIGHT) {
-            problems.add("the canvas is " + screen.getCanvasHeight() + " px tall, which scrolls at GUI scale 4 on a 1080p screen. "
-                    + "Keep it within " + ScreenAssets.CANVAS_MAX_HEIGHT + " px");
-        }
         if (!screen.getBackdrop().isEmpty() && screen.getCanvasHeight() > ScreenAssets.BACKDROP_MAX_HEIGHT) {
             problems.add("the canvas is " + screen.getCanvasHeight() + " px tall with a backdrop, which only lines up up to "
                     + ScreenAssets.BACKDROP_MAX_HEIGHT + " px. Draw the art as box elements in the canvas instead");

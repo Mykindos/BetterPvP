@@ -72,12 +72,15 @@ final class DialogCompiler {
             onLine.sort(Comparator.comparingInt(index -> elements.get(index).getX()));
 
             final List<Integer> reaching = reaching(elements, clicks, line);
+            // The pressed art shows without hover art, which would otherwise keep drawing over it.
+            final Component pressedHover = pressed == null ? null : pressed.getHover();
             int cursor = 0;
             for (int index : onLine) {
                 final CanvasElement element = elements.get(index);
                 appendGap(body, cursor, element.getX(), elements, reaching, clicks);
                 final Component content = element == pressed ? element.getPressed() : element.getContent();
-                body.append(interactive(shift(content, element.getY() % LINE_HEIGHT), element, clicks.apply(index)));
+                body.append(interactive(shift(content, element.getY() % LINE_HEIGHT), element, clicks.apply(index),
+                        pressedHover != null && element.getHover() == pressedHover));
                 cursor = element.getX() + element.getWidth();
             }
             appendGap(body, cursor, canvas.getWidth(), elements, reaching, clicks);
@@ -174,10 +177,13 @@ final class DialogCompiler {
         }
     }
 
-    private static Component interactive(Component content, CanvasElement element, Key click) {
+    private static Component interactive(Component content, CanvasElement element, Key click, boolean pressed) {
         Component result = content;
         if (click != null) {
             result = result.clickEvent(ClickEvent.custom(click, BinaryTagHolder.binaryTagHolder("{}")));
+        }
+        if (pressed) {
+            return result;
         }
         if (element.getHover() != null) {
             result = result.hoverEvent(hoverArt(element.getHover()));

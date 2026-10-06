@@ -46,7 +46,7 @@ public sealed interface Node permits Node.Text, Node.Box, Node.Button, Node.Icon
 
     /**
      * A clickable box with a centred label. {@code selected} is a binding that swaps the art to {@code selectedStyle}
-     * and the label to {@code selectedLabelStyle}.
+     * the label to {@code selectedLabelStyle} and the hover art to {@code selectedHover}.
      * {@code hover} names the hover style the pack draws over it, {@code pressed} shows the style's pressed art for a
      * moment after a click.
      */
@@ -64,6 +64,7 @@ public sealed interface Node permits Node.Text, Node.Box, Node.Button, Node.Icon
         @Builder.Default String labelStyle = "body";
         @Nullable String selectedLabelStyle;
         @Nullable String hover;
+        @Nullable String selectedHover;
         boolean pressed;
         @Nullable TextSpec tooltip;
         @Nullable ActionSpec onClick;
