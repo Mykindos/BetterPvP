@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
 import me.mykindos.betterpvp.core.item.component.impl.TooltipSpriteComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.impl.DurakHandle;
@@ -37,7 +36,7 @@ import java.util.List;
 @Singleton
 @EqualsAndHashCode(callSuper = true)
 @ItemKey("champions:mjolnir")
-public class Mjolnir extends WeaponItem implements Reloadable, NexoItem {
+public class Mjolnir extends WeaponItem implements Reloadable {
 
     private transient boolean registered;
     @EqualsAndHashCode.Exclude
@@ -77,11 +76,6 @@ public class Mjolnir extends WeaponItem implements Reloadable, NexoItem {
         heavensplitter.setAirTime(config.getConfig("heavensplitter.air-time", 3.0, Double.class));
         heavensplitter.setVelocity(config.getConfig("heavensplitter.velocity", 1.0, Double.class));
         heavensplitter.setImpactVelocity(config.getConfig("heavensplitter.impact-velocity", 1.0, Double.class));
-    }
-
-    @Override
-    public @NotNull String getId() {
-        return "mjolnir";
     }
 
     @Inject

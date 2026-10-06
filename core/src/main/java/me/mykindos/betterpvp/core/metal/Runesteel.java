@@ -13,6 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
 
 import java.util.Map;
+import org.bukkit.Material;
 
 public class Runesteel {
 
@@ -28,7 +29,7 @@ public class Runesteel {
     public static class OreBlock extends MetalBlock {
         @Inject
         public OreBlock() {
-            super("runeblood_ore", "Runeblood Ore", "runeblood_stone_ore");
+            super("runeblood_ore", "Runeblood Ore", "runeblood_stone_ore", 3, Material.STONE, Material.DIAMOND_PICKAXE);
         }
     }
 
@@ -89,7 +90,7 @@ public class Runesteel {
     public static class Block extends MetalBlock {
         @Inject
         public Block() {
-            super("runesteel_block", "Steel Block", "runesteel_block");
+            super("runesteel_block", "Steel Block", "runesteel_block", 5, Material.IRON_BLOCK, Material.IRON_PICKAXE);
         }
     }
 

@@ -29,9 +29,7 @@ public class SmartBlockChunkListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChunkLoad(ChunkLoadEvent event) {
-        // we have to delay this by 1 tick because entities in this world have not loaded yet,
-        // which won't allow our SmartBlockFactory to pick up on blocks marked by base entities (nexo)
-        // and properly load them
+        // Entities load a tick after the chunk, and furniture is found through its display entity
         UtilServer.runTaskLater(plugin, () -> dataManager.loadChunk(event.getChunk()), 1L);
     }
     

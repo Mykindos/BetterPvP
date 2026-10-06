@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import org.bukkit.Color;
+import org.bukkit.Material;
 
 public class Steel {
 
@@ -29,7 +30,7 @@ public class Steel {
     public static class Block extends MetalBlock {
         @Inject
         public Block() {
-            super("steel_block", "Steel Block", "steel_block");
+            super("steel_block", "Steel Block", "steel_block", 5, Material.IRON_BLOCK, Material.IRON_PICKAXE);
         }
     }
 

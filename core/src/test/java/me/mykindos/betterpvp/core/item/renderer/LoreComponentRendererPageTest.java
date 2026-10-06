@@ -31,7 +31,7 @@ class LoreComponentRendererPageTest {
 
     @BeforeEach
     void setUp() {
-        // Compatibility (TEXTURE_PROVIDER) reads Bukkit.getPluginManager() at class-init; keep it server-free.
+        // Keep the renderer server-free: anything reaching for Bukkit gets a mock plugin manager.
         bukkit = mockStatic(Bukkit.class);
         bukkit.when(Bukkit::getPluginManager).thenReturn(mock(PluginManager.class));
     }

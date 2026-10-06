@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.impl.anvil.operation.AnvilOperationResolver;
-import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -25,9 +24,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
+import me.mykindos.betterpvp.core.block.custom.FurnitureBlock;
+import me.mykindos.betterpvp.core.block.custom.FurnitureShape;
+import net.kyori.adventure.key.Key;
+import org.bukkit.Material;
+import org.joml.Vector3f;
 
 @Singleton
-public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData> {
+public class Anvil extends SmartBlock implements FurnitureBlock, DataHolder<AnvilData> {
+
+    private static final FurnitureShape SHAPE = FurnitureShape.builder()
+            .model(Key.key("betterpvp", "furniture/blacksmith_v2_anvil"))
+            .scale(new Vector3f(0.5f, 0.5f, 0.5f))
+            .barriers(FurnitureShape.offsets("0,0,0"))
+            .hardness(5)
+            .sounds(Material.STONE)
+            .build();
 
     private final ItemFactory itemFactory;
     private final ClientManager clientManager;
@@ -154,7 +166,12 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
     }
 
     @Override
-    public @NotNull String getId() {
+    public @NotNull String getBlockId() {
         return "blacksmith_v2_anvil";
+    }
+
+    @Override
+    public @NotNull FurnitureShape getShape() {
+        return SHAPE;
     }
 } 

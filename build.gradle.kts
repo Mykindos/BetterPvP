@@ -67,8 +67,6 @@ subprojects {
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.spongepowered.org/maven/")
         maven("https://repo.opencollab.dev/maven-releases/")
-        maven("https://repo.nexomc.com/releases")
-        maven("https://repo.nexomc.com/snapshots")
         maven("https://mvn.lib.co.nz/public")
         maven("https://jitpack.io")
         maven("https://repo.viaversion.com")
@@ -78,7 +76,6 @@ subprojects {
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.polar.top/repository/polar/")
         maven("https://mvn.lib.co.nz/public/")
-        maven("https://repo.oraxen.com/releases")
         maven {
           url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true

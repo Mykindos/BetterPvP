@@ -88,8 +88,8 @@ public interface SmartBlockFactory {
     boolean breakBlock(Player player, SmartBlockInstance instance);
 
     /**
-     * Implementation-supplied break-override defaults for this instance — typically
-     * pulled from the underlying provider (e.g. Nexo's {@code Breakable}). Used as the
+     * Implementation-supplied break-override defaults for this instance,
+     * such as the hardness a furniture or custom note block declares. Used as the
      * per-field fallback in {@link SmartBlockOverrides#resolve} when the
      * {@link SmartBlock}'s own override leaves a field absent.
      * <p>
@@ -104,7 +104,7 @@ public interface SmartBlockFactory {
 
     /**
      * Render a per-tick break-progress indicator for a player who is mining {@code block}.
-     * Provider-specific factories (Nexo, Oraxen) push a subtitle progress bar; vanilla
+     * Furniture pushes a subtitle progress bar; vanilla
      * relies on the destruction-stage overlay from {@code WrapperPlayServerBlockBreakAnimation}
      * and implements this as a no-op.
      *

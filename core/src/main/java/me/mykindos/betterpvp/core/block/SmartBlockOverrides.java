@@ -23,7 +23,7 @@ public final class SmartBlockOverrides {
      * <ol>
      *   <li>The {@link SmartBlock}'s {@link SmartBlock#getBreakOverride} return value wins where set.</li>
      *   <li>Absent fields fall back to provider defaults supplied by the factory via
-     *       {@link SmartBlockFactory#getBreakOverrideDefaults} (e.g. Nexo's {@code Breakable}).</li>
+     *       {@link SmartBlockFactory#getBreakOverrideDefaults}.</li>
      *   <li>Anything still absent stays absent — callers fall through to vanilla.</li>
      * </ol>
      * Returns {@link SmartBlockBreakOverride#empty()} when the block isn't a smart block.

@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
-import me.mykindos.betterpvp.core.item.adapter.nexo.NexoItem;
 import me.mykindos.betterpvp.core.item.component.impl.DescriptionComponent;
 import me.mykindos.betterpvp.core.item.impl.CharcoalItem;
 import me.mykindos.betterpvp.core.item.impl.CutStone;
@@ -19,17 +18,21 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import me.mykindos.betterpvp.core.block.custom.PlacesBlock;
 
 @Singleton
 @ItemKey("core:smelter")
-public class SmelterItem extends BaseItem implements NexoItem {
+public class SmelterItem extends BaseItem implements PlacesBlock {
 
     private static final ItemStack model;
     private transient boolean registered;
 
     static {
         model = ItemStack.of(Material.PAPER);
-        model.editMeta(meta -> meta.setMaxStackSize(1));
+        model.editMeta(meta -> {
+            meta.setMaxStackSize(1);
+            meta.setItemModel(new NamespacedKey("betterpvp", "furniture/blacksmith_v2_furnace"));
+        });
     }
 
     @Inject
@@ -39,13 +42,8 @@ public class SmelterItem extends BaseItem implements NexoItem {
     }
 
     @Override
-    public @NotNull String getId() {
+    public @NotNull String getBlockId() {
         return "blacksmith_v2_furnace";
-    }
-
-    @Override
-    public boolean isFurniture() {
-        return true;
     }
 
     @Inject

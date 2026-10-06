@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.ItemKey;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import org.bukkit.Material;
 
 public class FissureQuartz {
 
@@ -20,7 +21,7 @@ public class FissureQuartz {
     public static class Ore extends MetalBlock {
         @Inject
         public Ore() {
-            super("fissure_quartz_ore", "Fissure Quartz Ore", "fissure_quartz_stone_ore");
+            super("fissure_quartz_ore", "Fissure Quartz Ore", "fissure_quartz_stone_ore", 3, Material.STONE, Material.IRON_PICKAXE);
         }
     }
 
@@ -37,7 +38,7 @@ public class FissureQuartz {
     public static class DeepslateOre extends MetalBlock {
         @Inject
         public DeepslateOre() {
-            super("fissure_quartz_deepslate_ore", "Fissure Quartz Deepslate Ore", "fissure_quartz_deepslate_ore");
+            super("fissure_quartz_deepslate_ore", "Fissure Quartz Deepslate Ore", "fissure_quartz_deepslate_ore", 4.5, Material.DEEPSLATE, Material.IRON_PICKAXE);
         }
     }
 

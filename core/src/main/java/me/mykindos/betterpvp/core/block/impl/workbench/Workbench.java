@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
-import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
@@ -27,9 +26,22 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.jetbrains.annotations.NotNull;
+import me.mykindos.betterpvp.core.block.custom.FurnitureBlock;
+import me.mykindos.betterpvp.core.block.custom.FurnitureShape;
+import net.kyori.adventure.key.Key;
+import org.bukkit.Material;
+import org.joml.Vector3f;
 
 @Singleton
-public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHolder<WorkbenchData> {
+public class Workbench extends SmartBlock implements Listener, FurnitureBlock, DataHolder<WorkbenchData> {
+
+    private static final FurnitureShape SHAPE = FurnitureShape.builder()
+            .model(Key.key("betterpvp", "furniture/crafting_table"))
+            .scale(new Vector3f(0.5f, 0.5f, 0.5f))
+            .barriers(FurnitureShape.offsets("0,0..1,0", "1,0..1,0"))
+            .hardness(2.5)
+            .sounds(Material.OAK_PLANKS)
+            .build();
 
     private final CraftingManager craftingManager;
     private final ItemFactory itemFactory;
@@ -123,7 +135,12 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
     }
 
     @Override
-    public @NotNull String getId() {
+    public @NotNull String getBlockId() {
         return "workbench";
+    }
+
+    @Override
+    public @NotNull FurnitureShape getShape() {
+        return SHAPE;
     }
 }

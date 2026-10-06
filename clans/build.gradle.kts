@@ -22,7 +22,6 @@ dependencies {
     compileOnly(project(":shops"))
     compileOnly(libs.mapper)
     compileOnly(libs.packetevents)
-    compileOnly(libs.nexo)
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)

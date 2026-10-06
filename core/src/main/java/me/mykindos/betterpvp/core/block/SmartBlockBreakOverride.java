@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 /**
  * Composite of break-related overrides a {@link SmartBlock} can supply to the
  * block-break framework. All fields are optional — a missing value means
- * "delegate to the underlying block's defaults" (Nexo {@code Breakable} or
+ * "delegate to the underlying block's defaults" (the smart block factory's or
  * vanilla, depending on what's present).
  *
  * <p>Field semantics:

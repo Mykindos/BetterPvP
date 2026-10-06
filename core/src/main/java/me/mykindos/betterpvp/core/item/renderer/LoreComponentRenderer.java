@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.item.renderer;
 
-import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
 import me.mykindos.betterpvp.core.item.component.impl.purity.ItemPurity;
@@ -46,9 +45,8 @@ public class LoreComponentRenderer implements ItemLoreRenderer {
                 .map(line -> line.decoration(TextDecoration.ITALIC, false))
                 .collect(Collectors.toCollection(ArrayList::new)); // Mutable list to allow removing the last element
 
-        // Purity ONLY if NEXO is available AND item is attuned
         final Optional<PurityComponent> purityComponent = item.getComponent(PurityComponent.class);
-        if (Compatibility.TEXTURE_PROVIDER && purityComponent.isPresent() && purityComponent.get().isAttuned()) {
+        if (purityComponent.isPresent() && purityComponent.get().isAttuned()) {
             final ItemPurity purity = purityComponent.get().getPurity();
             components.addFirst(purity.createLoreComponent());
         }
@@ -91,11 +89,8 @@ public class LoreComponentRenderer implements ItemLoreRenderer {
                     .decoration(TextDecoration.ITALIC, false));
         }
 
-        // Rarity ONLY if NEXO is available
-        if (Compatibility.TEXTURE_PROVIDER) {
-            components.add(Component.text(item.getRarity().getGlyph(), NamedTextColor.WHITE)
-                    .font(Key.key("betterpvp", "tags")).decoration(TextDecoration.ITALIC, false));
-        }
+        components.add(Component.text(item.getRarity().getGlyph(), NamedTextColor.WHITE)
+                .font(Key.key("betterpvp", "tags")).decoration(TextDecoration.ITALIC, false));
 
         return components;
     }

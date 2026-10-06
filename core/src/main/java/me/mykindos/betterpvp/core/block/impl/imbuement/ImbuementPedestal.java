@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
-import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -27,9 +26,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
+import me.mykindos.betterpvp.core.block.custom.FurnitureBlock;
+import me.mykindos.betterpvp.core.block.custom.FurnitureShape;
+import net.kyori.adventure.key.Key;
+import org.bukkit.Material;
+import org.bukkit.util.Vector;
 
 @Singleton
-public class ImbuementPedestal extends SmartBlock implements NexoBlock, DataHolder<ImbuementPedestalData> {
+public class ImbuementPedestal extends SmartBlock implements FurnitureBlock, DataHolder<ImbuementPedestalData> {
+
+    private static final FurnitureShape SHAPE = FurnitureShape.builder()
+            .model(Key.key("betterpvp", "furniture/brazier_stone_short_purple"))
+            .barriers(FurnitureShape.offsets("0,0..1,0"))
+            .light(new Vector(0, 2, 0), 15)
+            .hardness(5)
+            .sounds(Material.STONE)
+            .build();
 
     private final ItemFactory itemFactory;
     private final ImbuementRecipeRegistry imbuementRecipeRegistry;
@@ -183,7 +195,12 @@ public class ImbuementPedestal extends SmartBlock implements NexoBlock, DataHold
 
 
     @Override
-    public @NotNull String getId() {
+    public @NotNull String getBlockId() {
         return "imbuement_pedestal";
+    }
+
+    @Override
+    public @NotNull FurnitureShape getShape() {
+        return SHAPE;
     }
 } 

@@ -140,15 +140,11 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
     private enum InstantDecision { INSTANT, NOT_INSTANT, UNBREAKABLE }
 
     /**
-     * Vanilla blocks Nexo/Oraxen reuse as custom-block carriers. Their true break
-     * behaviour lives behind the main-thread-only smart factory, so the netty
-     * vanilla estimate ({@link #estimatesInstantVanilla}) must never guess for
-     * them — they fall back to the cache/tick path instead.
+     * Vanilla blocks that carry custom blocks: barriers for furniture and note blocks for custom note blocks. Their
+     * true break behaviour lives behind the main-thread-only smart factory, so the netty vanilla estimate
+     * ({@link #estimatesInstantVanilla}) never guesses for them and they take the cache/tick path instead.
      */
-    private static final java.util.Set<Material> NEXO_CARRIER_MATERIALS = java.util.EnumSet.of(
-            Material.BARRIER, Material.NOTE_BLOCK, Material.MUSHROOM_STEM,
-            Material.BROWN_MUSHROOM_BLOCK, Material.RED_MUSHROOM_BLOCK,
-            Material.TRIPWIRE, Material.CHORUS_PLANT, Material.CHORUS_FLOWER);
+    private static final java.util.Set<Material> CARRIER_MATERIALS = java.util.EnumSet.of(Material.BARRIER, Material.NOTE_BLOCK);
 
     @Inject
     public BlockBreakProgressServiceImpl(BlockBreakResolver resolver, SmartBlockFactory smartBlockFactory) {
@@ -571,7 +567,7 @@ public class BlockBreakProgressServiceImpl implements BlockBreakProgressService,
      * concurrent write); it does not catch internally.
      */
     private boolean estimatesInstantVanilla(Player player, Block block, Material blockType, ItemStack held) {
-        if (NEXO_CARRIER_MATERIALS.contains(blockType)) return false;
+        if (CARRIER_MATERIALS.contains(blockType)) return false;
 
         final float hardness = blockType.getHardness();
         if (hardness < 0f) return false; // unbreakable (bedrock, etc.)

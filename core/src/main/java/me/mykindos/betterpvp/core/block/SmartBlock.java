@@ -26,14 +26,14 @@ public abstract class SmartBlock {
      * <p>Resolution order in {@code DefaultBlockBreakResolver}:
      * <ol>
      *   <li>Fields supplied here win.</li>
-     *   <li>If this {@code SmartBlock} also implements {@code NexoBlock}, fields absent
-     *       here are filled from Nexo's {@code Breakable} (hardness, multipliers).</li>
+     *   <li>Fields absent here are filled from the factory's defaults, such as the hardness of a
+     *       furniture or custom note block.</li>
      *   <li>Anything still absent falls back to vanilla / global rules.</li>
      * </ol>
      *
      * <p>Subclasses should typically override this method via the builder, e.g.
      * {@code return SmartBlockBreakOverride.builder().hardness(5.0).build();} — and rely
-     * on the merge with Nexo defaults for everything else.
+     * on the merge with the factory's defaults for everything else.
      */
     public @NotNull SmartBlockBreakOverride getBreakOverride(@NotNull SmartBlockInstance instance,
                                                               @NotNull Player player,
