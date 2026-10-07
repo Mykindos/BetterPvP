@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.block.custom;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockBreakOverride;
@@ -63,13 +64,13 @@ public class PackSmartBlockFactory implements SmartBlockFactory {
     private final SmartBlockDataManager dataManager;
     private final NoteBlockStates states;
     private final ItemRegistry itemRegistry;
-    private final ItemFactory itemFactory;
+    private final Provider<ItemFactory> itemFactory;
     private final ClientManager clientManager;
     private final Set<Block> breaking = new HashSet<>();
 
     @Inject
     public PackSmartBlockFactory(SmartBlockRegistry registry, SmartBlockDataManager dataManager, NoteBlockStates states,
-                                 ItemRegistry itemRegistry, ItemFactory itemFactory, ClientManager clientManager) {
+                                 ItemRegistry itemRegistry, Provider<ItemFactory> itemFactory, ClientManager clientManager) {
         this.registry = registry;
         this.dataManager = dataManager;
         this.states = states;
@@ -335,7 +336,7 @@ public class PackSmartBlockFactory implements SmartBlockFactory {
         itemRegistry.getItems().values().stream()
                 .filter(item -> item instanceof PlacesBlock places && places.getBlockId().equals(blockId))
                 .findFirst()
-                .map(item -> itemFactory.create((BaseItem) item).createItemStack())
+                .map(item -> itemFactory.get().create((BaseItem) item).createItemStack())
                 .ifPresent(stack -> block.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), stack));
     }
 
