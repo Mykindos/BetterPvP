@@ -17,7 +17,7 @@ public class SmartBlockModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(SmartBlockFactory.class).to(PackSmartBlockFactory.class);
-        bind(SmartBlockInteractionService.class).to(PackSmartBlockInteractionService.class).asEagerSingleton();
+        bind(SmartBlockInteractionService.class).to(PackSmartBlockInteractionService.class);
         requireBinding(SmartBlockInteractionService.class);
         requireBinding(SmartBlockFactory.class);
         requireBinding(SmartBlockDataStorage.class);

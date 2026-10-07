@@ -2,14 +2,13 @@ package me.mykindos.betterpvp.core.block.custom;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockInteractEvent;
 import me.mykindos.betterpvp.core.block.SmartBlockInteractionService;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import org.bukkit.Bukkit;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -38,6 +37,7 @@ import java.util.Optional;
  * them, and custom note blocks never change state, play or move.
  */
 @Singleton
+@BPvPListener
 public class PackSmartBlockInteractionService implements SmartBlockInteractionService, Listener {
 
     private final PackSmartBlockFactory factory;
@@ -45,11 +45,10 @@ public class PackSmartBlockInteractionService implements SmartBlockInteractionSe
     private final ItemFactory itemFactory;
 
     @Inject
-    public PackSmartBlockInteractionService(Core core, PackSmartBlockFactory factory, NoteBlockStates states, ItemFactory itemFactory) {
+    public PackSmartBlockInteractionService(PackSmartBlockFactory factory, NoteBlockStates states, ItemFactory itemFactory) {
         this.factory = factory;
         this.states = states;
         this.itemFactory = itemFactory;
-        Bukkit.getPluginManager().registerEvents(this, core);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
