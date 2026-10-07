@@ -65,12 +65,13 @@ public class FurnitureShape {
     }
 
     /**
-     * An offset turned to a furniture yaw, which is always a multiple of 90 degrees.
+     * An offset turned to a furniture yaw, which is always a multiple of 90 degrees. Offsets count z the other way
+     * round from the world, so +z sits on the side the furniture faces away from.
      */
     public static Vector rotate(Vector offset, float yaw) {
         final int quarter = Math.floorMod(Math.round(yaw / 90f), 4);
         final int x = offset.getBlockX();
-        final int z = offset.getBlockZ();
+        final int z = -offset.getBlockZ();
         return switch (quarter) {
             case 1 -> new Vector(-z, offset.getBlockY(), x);
             case 2 -> new Vector(-x, offset.getBlockY(), -z);

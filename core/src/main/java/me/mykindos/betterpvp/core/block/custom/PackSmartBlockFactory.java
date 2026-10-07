@@ -245,7 +245,7 @@ public class PackSmartBlockFactory implements SmartBlockFactory {
         }
         final ItemStack model = ItemStack.of(Material.PAPER);
         model.editMeta(meta -> meta.setItemModel(new NamespacedKey(shape.getModel().namespace(), shape.getModel().value())));
-        final Location at = target.getLocation().toCenterLocation();
+        final Location at = target.getLocation().add(0.5, 0, 0.5);
         at.setYaw(yaw);
         // FIXED renders like a floor item frame: the models' fixed display stands them up again
         at.setPitch(-90f);
