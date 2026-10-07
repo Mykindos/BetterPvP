@@ -19,7 +19,7 @@ dependencies:
       load: BEFORE
       required: false
       join-classpath: true
-    Nexo:
+    FastAsyncWorldEdit:
       load: BEFORE
       required: false
       join-classpath: true
