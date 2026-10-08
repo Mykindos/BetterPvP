@@ -25,7 +25,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 import java.util.List;
@@ -36,16 +35,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.mentions;
-import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.text;
-import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.told;
+import static me.mykindos.betterpvp.clans.testing.Messages.mentions;
+import static me.mykindos.betterpvp.clans.testing.Messages.sent;
+import static me.mykindos.betterpvp.clans.testing.Messages.text;
+import static me.mykindos.betterpvp.clans.testing.Messages.told;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -93,12 +92,6 @@ class SettlerCommandsTest {
         return settler;
     }
 
-    private List<Component> sent() {
-        final ArgumentCaptor<Component> captor = ArgumentCaptor.forClass(Component.class);
-        verify(player, atLeast(1)).sendMessage(captor.capture());
-        return captor.getAllValues();
-    }
-
     @Test
     void ac26_eachCommandShowsItsUsageWithTheSettlersPrefix() {
         new SettlerCommand().execute(player, null);
@@ -108,7 +101,7 @@ class SettlerCommandsTest {
         assertTrue(told(player, "clans.command.settler.usage"));
         assertTrue(told(player, "clans.command.settler.list.usage"));
         assertTrue(told(player, "clans.command.settler.dismiss.usage"));
-        assertTrue(sent().stream().allMatch(message -> mentions(message, "clans.prefix.settler")));
+        assertTrue(sent(player).stream().allMatch(message -> mentions(message, "clans.prefix.settler")));
         verify(commands, never()).withCamp(any(), any(), any());
     }
 
@@ -123,7 +116,7 @@ class SettlerCommandsTest {
         real.withCamp(player, "Nobody", ran::set);
 
         assertTrue(told(player, "clans.command.settler.no_clan"));
-        assertTrue(text(sent().getFirst()).contains("Nobody"));
+        assertTrue(text(sent(player).getFirst()).contains("Nobody"));
         assertNull(ran.get());
         verify(store, never()).load(CLAN);
     }
@@ -161,7 +154,7 @@ class SettlerCommandsTest {
 
         new SettlerListSubCommand(commands, service).execute(player, null, "Wolves");
 
-        final List<Component> sent = sent();
+        final List<Component> sent = sent(player);
         assertEquals(3, sent.size());
         assertTrue(mentions(sent.get(0), "clans.command.settler.list.header"));
         final String header = text(sent.get(0));
@@ -225,7 +218,7 @@ class SettlerCommandsTest {
         dismiss.execute(player, null, "Wolves", "ff");
 
         verify(service, never()).remove(any(), any(), any());
-        assertEquals(2, sent().stream().filter(message -> mentions(message, "clans.command.settler.not_found")).count());
+        assertEquals(2, sent(player).stream().filter(message -> mentions(message, "clans.command.settler.not_found")).count());
     }
 
     @Test

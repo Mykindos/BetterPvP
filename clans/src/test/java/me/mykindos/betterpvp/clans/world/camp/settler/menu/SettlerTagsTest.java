@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static me.mykindos.betterpvp.clans.testing.Messages.text;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,7 +50,7 @@ class SettlerTagsTest {
         final Component line = SettlerTags.line(List.of(SettlerTags.rarity(SettlerRarity.RARE),
                 SettlerTags.role(CampProfessions.MASON).orElseThrow()));
 
-        assertEquals(" ", MenuProbe.text(line));
+        assertEquals(" ", text(line));
     }
 
     private static void assertTag(Component tag, String glyph) {

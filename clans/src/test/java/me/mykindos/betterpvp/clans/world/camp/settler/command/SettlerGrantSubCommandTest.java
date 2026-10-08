@@ -12,22 +12,21 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.mentions;
-import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.text;
-import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.told;
+import static me.mykindos.betterpvp.clans.testing.Messages.mentions;
+import static me.mykindos.betterpvp.clans.testing.Messages.sent;
+import static me.mykindos.betterpvp.clans.testing.Messages.text;
+import static me.mykindos.betterpvp.clans.testing.Messages.told;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,12 +60,6 @@ class SettlerGrantSubCommandTest {
 
     private SettlerGrantSubCommand command() {
         return new SettlerGrantSubCommand(commands, grants);
-    }
-
-    private List<Component> sent() {
-        final ArgumentCaptor<Component> captor = ArgumentCaptor.forClass(Component.class);
-        verify(player, atLeast(1)).sendMessage(captor.capture());
-        return captor.getAllValues();
     }
 
     @Test
@@ -109,10 +102,10 @@ class SettlerGrantSubCommandTest {
         command().execute(player, null, "Wolves", "rare");
 
         assertTrue(told(player, "clans.command.settler.granted"));
-        final String granted = text(sent().getFirst());
+        final String granted = text(sent(player).getFirst());
         assertTrue(granted.contains("Tamsin Reed") && granted.contains("Wolves"));
-        assertTrue(text(sent().get(1)).contains("line Tamsin Reed"));
-        assertTrue(sent().stream().allMatch(message -> mentions(message, "clans.prefix.settler")));
+        assertTrue(text(sent(player).get(1)).contains("line Tamsin Reed"));
+        assertTrue(sent(player).stream().allMatch(message -> mentions(message, "clans.prefix.settler")));
     }
 
     @Test
@@ -120,7 +113,7 @@ class SettlerGrantSubCommandTest {
         command().execute(player, null, "Wolves", "mythic", "builder");
 
         assertTrue(told(player, "clans.command.settler.unknown_rarity"));
-        assertTrue(text(sent().getFirst()).contains("mythic"));
+        assertTrue(text(sent(player).getFirst()).contains("mythic"));
         verify(grants, never()).grant(any(), any());
         verify(commands, never()).withCamp(any(), any(), any());
     }
@@ -130,7 +123,7 @@ class SettlerGrantSubCommandTest {
         command().execute(player, null, "Wolves", "rare", "ghost");
 
         assertTrue(told(player, "clans.command.settler.unknown_profession"));
-        assertTrue(text(sent().getFirst()).contains("ghost"));
+        assertTrue(text(sent(player).getFirst()).contains("ghost"));
         verify(commands, never()).withCamp(any(), any(), any());
     }
 
@@ -141,7 +134,7 @@ class SettlerGrantSubCommandTest {
         command().execute(player, null, "Wolves", "rare");
 
         assertTrue(told(player, "core.settler.population_full"));
-        assertTrue(sent().stream().noneMatch(message -> mentions(message, "clans.command.settler.granted")));
+        assertTrue(sent(player).stream().noneMatch(message -> mentions(message, "clans.command.settler.granted")));
     }
 
     @Test

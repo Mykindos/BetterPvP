@@ -5,17 +5,12 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.UnsafeValues;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 import java.lang.reflect.Constructor;
@@ -25,10 +20,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.atLeast;
+import static me.mykindos.betterpvp.clans.testing.Messages.mentions;
+import static me.mykindos.betterpvp.clans.testing.Messages.text;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /** Reads the items a menu holds and clicks them, without opening a window. */
@@ -88,38 +83,6 @@ public final class MenuProbe {
         return view.getLore().stream().anyMatch(line -> mentions(line, key));
     }
 
-    public static boolean mentions(Component component, String key) {
-        if (component instanceof TranslatableComponent translatable) {
-            if (translatable.key().equals(key)) {
-                return true;
-            }
-            for (TranslationArgument argument : translatable.arguments()) {
-                if (mentions(argument.asComponent(), key)) {
-                    return true;
-                }
-            }
-        }
-        return component.children().stream().anyMatch(child -> mentions(child, key));
-    }
-
-    /** The literal text of {@code component} and everything in it, translation arguments included. */
-    public static String text(Component component) {
-        final StringBuilder builder = new StringBuilder();
-        collect(component, builder);
-        return builder.toString();
-    }
-
-    private static void collect(Component component, StringBuilder builder) {
-        if (component instanceof TextComponent text) {
-            builder.append(text.content());
-        }
-        if (component instanceof TranslatableComponent translatable) {
-            builder.append('[').append(translatable.key()).append(']');
-            translatable.arguments().forEach(argument -> collect(argument.asComponent(), builder));
-        }
-        component.children().forEach(child -> collect(child, builder));
-    }
-
     public static String loreText(ItemView view) {
         final StringBuilder builder = new StringBuilder();
         view.getLore().forEach(line -> builder.append(text(line)).append('\n'));
@@ -155,16 +118,5 @@ public final class MenuProbe {
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException(exception);
         }
-    }
-
-    /** Whether any message sent to {@code player} mentions translation key {@code key}. */
-    public static boolean told(Player player, String key) {
-        final ArgumentCaptor<Component> captor = ArgumentCaptor.forClass(Component.class);
-        try {
-            verify(player, atLeast(1)).sendMessage(captor.capture());
-        } catch (AssertionError none) {
-            return false;
-        }
-        return captor.getAllValues().stream().anyMatch(message -> mentions(message, key));
     }
 }
