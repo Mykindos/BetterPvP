@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,13 +26,13 @@ class PlacedStructureTest {
     }
 
     @Test
-    void aStructureWithNoJobShowsItsCondition() {
+    void ac21_aStructureWithNoJobShowsItsCondition() {
         assertEquals(StructureStatus.ACTIVE, structure(StructureCondition.ACTIVE).status(0));
         assertEquals(StructureStatus.NEEDS_REPAIR, structure(StructureCondition.NEEDS_REPAIR).status(0));
     }
 
     @Test
-    void aBuildRisesThenWaitsToBeClaimed() {
+    void ac21_aBuildRisesThenWaitsToBeClaimed() {
         final PlacedStructure built = structure(StructureCondition.UNDER_CONSTRUCTION);
         built.setJob(job(JobKind.BUILD));
 
@@ -40,7 +41,7 @@ class PlacedStructureTest {
     }
 
     @Test
-    void advancingLeavesItStandingButNotUsable() {
+    void ac21_advancingLeavesItStandingButNotUsable() {
         final PlacedStructure advancing = structure(StructureCondition.ACTIVE);
         advancing.setJob(job(JobKind.ADVANCE));
 
@@ -49,7 +50,7 @@ class PlacedStructureTest {
     }
 
     @Test
-    void aRepairShowsWhatIsBeingRepaired() {
+    void ac21_aRepairShowsWhatIsBeingRepaired() {
         final PlacedStructure broken = structure(StructureCondition.DISABLED);
         broken.setJob(job(JobKind.REPAIR));
 
@@ -57,7 +58,7 @@ class PlacedStructureTest {
     }
 
     @Test
-    void aHeldJobIsPausedEvenOnceItsTimeIsUp() {
+    void ac21_aHeldJobIsPausedEvenOnceItsTimeIsUp() {
         final PlacedStructure built = structure(StructureCondition.UNDER_CONSTRUCTION);
         built.setJob(job(JobKind.BUILD));
         built.getJob().hold("siege", 0);
@@ -66,14 +67,14 @@ class PlacedStructureTest {
     }
 
     @Test
-    void aStructurePutAwayIsNotPlacedWhateverElseIsGoingOn() {
+    void ac21_aStructurePutAwayIsNotPlacedWhateverElseIsGoingOn() {
         final PlacedStructure stored = structure(StructureCondition.NOT_PLACED);
 
         assertEquals(StructureStatus.NOT_PLACED, stored.status(0));
     }
 
     @Test
-    void aHoldingSurvivesBeingWrittenDownAndReadBack() throws Exception {
+    void ac25_aHoldingSurvivesBeingWrittenDownAndReadBack() throws Exception {
         final Holding holding = new Holding();
         final PlacedStructure hall = structure(StructureCondition.UNDER_CONSTRUCTION);
         final Job job = Job.start(JobKind.BUILD, Duration.ofMinutes(10),
@@ -89,6 +90,30 @@ class PlacedStructureTest {
         assertEquals(holding, read);
         assertTrue(read.find(hall.getId()).orElseThrow().getJob().isHeld());
         assertEquals(40, read.getStructures().getFirst().getJob().getSpent().get("wood"));
+    }
+
+    @Test
+    void ac25_aMoveJobKeepsItsPacePositionAndPicksThroughARoundTrip() throws Exception {
+        final Holding holding = new Holding();
+        final PlacedStructure hall = structure(StructureCondition.ACTIVE);
+        hall.setStage(1);
+        hall.getUpgrades().put(0, "lantern");
+        final Job job = Job.start(JobKind.MOVE, Duration.ofMinutes(10), ResourceCost.of(Map.of("wood", 2)), 1, 0);
+        job.setRate(2.0, MINUTE);
+        job.setTarget(new StructurePosition(30, 64, 5, 3));
+        hall.setJob(job);
+        holding.getStructures().add(hall);
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final PlacedStructure read = mapper.readValue(mapper.writeValueAsString(holding), Holding.class)
+                .getStructures().getFirst();
+
+        assertEquals(hall.getPosition(), read.getPosition());
+        assertEquals(1, read.getStage());
+        assertEquals(StructureCondition.ACTIVE, read.getCondition());
+        assertEquals(Optional.of("lantern"), read.upgradeAt(0));
+        assertEquals(new StructurePosition(30, 64, 5, 3), read.getJob().getTarget());
+        assertEquals(job.progress(4 * MINUTE), read.getJob().progress(4 * MINUTE), 1e-9);
     }
 
     @Test

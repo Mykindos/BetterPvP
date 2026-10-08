@@ -397,6 +397,16 @@ public class ConstructionService {
         return type.costUpTo(structure.getStage()).share(share);
     }
 
+    /** Knocks a standing structure out until it is repaired, on the site's own behalf. */
+    public @NotNull ConstructionResult disable(@NotNull World world, @NotNull UUID id) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /** Whether {@code player} may use the features of {@code structure} on {@code site}. */
+    public boolean canUse(@NotNull Player player, @NotNull SiteKey site, @NotNull PlacedStructure structure) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
     /** Applies job rules and announces any status that changed, for every structure on one site. */
     public void refresh(@NotNull Worksite worksite) {
         for (PlacedStructure structure : worksite.holding.getStructures()) {

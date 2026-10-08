@@ -80,6 +80,11 @@ public class CampConstruction implements ConstructionSite {
         return permissions.allows(player, site.getOwnerId(), action);
     }
 
+    @Override
+    public boolean isMember(@NotNull Player player, @NotNull SiteKey site) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
     /** Tier N needs a Great Hall at its Nth stage. Stages count from zero, tiers from one. */
     @Override
     public @NotNull Optional<Component> blocked(@NotNull SiteKey site, @NotNull Holding holding,

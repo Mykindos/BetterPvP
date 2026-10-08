@@ -60,28 +60,28 @@ class FitCheckTest {
     }
 
     @Test
-    void itFitsInsideABuildZone() {
+    void ac4_itFitsInsideABuildZone() {
         assertTrue(fitCheck.problem(world, holding, type(null), at(2), null).isEmpty());
     }
 
     @Test
-    void itMustNotHangOutsideTheBuildZones() {
+    void ac4_itMustNotHangOutsideTheBuildZones() {
         assertFalse(fitCheck.problem(world, holding, type(null), at(9), null).isEmpty());
     }
 
     @Test
-    void itMayStraddleTwoBuildZones() {
+    void ac4_itMayStraddleTwoBuildZones() {
         assertTrue(fitCheck.problem(world, holding, type(null), at(4), null).isEmpty());
     }
 
     @Test
-    void aTaggedStructureNeedsItsTagUnderEveryColumn() {
+    void ac4_aTaggedStructureNeedsItsTagUnderEveryColumn() {
         assertTrue(fitCheck.problem(world, holding, type("near_water"), at(2), null).isEmpty());
         assertFalse(fitCheck.problem(world, holding, type("near_water"), at(4), null).isEmpty());
     }
 
     @Test
-    void itMustKeepItsDistanceFromAnotherStructureUnlessItIsThatStructure() {
+    void ac4_itMustKeepItsDistanceFromAnotherStructureUnlessItIsThatStructure() {
         final PlacedStructure other = standingAt(9);
 
         assertFalse(fitCheck.problem(world, holding, type(null), at(3), null).isEmpty(),
@@ -92,7 +92,7 @@ class FitCheckTest {
     }
 
     @Test
-    void clashesAreTheColumnsOutsideTheZonesOrTooCloseToAnotherStructure() {
+    void ac4_clashesAreTheColumnsOutsideTheZonesOrTooCloseToAnotherStructure() {
         assertTrue(fitCheck.clashes(world, holding, type(null), at(2), null).isEmpty());
         assertEquals(LongSet.of(Footprint.pack(10, 0)), fitCheck.clashes(world, holding, type(null), at(9), null));
 
