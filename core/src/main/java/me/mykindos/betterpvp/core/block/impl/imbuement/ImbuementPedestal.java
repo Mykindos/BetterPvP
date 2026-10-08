@@ -31,12 +31,14 @@ import me.mykindos.betterpvp.core.block.custom.FurnitureShape;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
+import org.joml.Vector3f;
 
 @Singleton
 public class ImbuementPedestal extends SmartBlock implements FurnitureBlock, DataHolder<ImbuementPedestalData> {
 
     private static final FurnitureShape SHAPE = FurnitureShape.builder()
             .model(Key.key("betterpvp", "furniture/brazier_stone_short_purple"))
+            .scale(new Vector3f(0.5f, 0.5f, 0.5f))
             .barriers(FurnitureShape.offsets("0,0..1,0"))
             .light(new Vector(0, 2, 0), 15)
             .hardness(5)
