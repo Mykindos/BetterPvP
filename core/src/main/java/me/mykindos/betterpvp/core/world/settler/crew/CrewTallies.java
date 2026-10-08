@@ -152,10 +152,11 @@ public class CrewTallies implements Listener {
     }
 
     /** The job a structure is being tallied for, which stays set once it finishes so it is not tallied again. */
-    @Getter
     private static final class Tracked {
         private Job job;
+        @Getter
         private CrewTally running;
+        @Getter
         private CrewTally last;
     }
 }

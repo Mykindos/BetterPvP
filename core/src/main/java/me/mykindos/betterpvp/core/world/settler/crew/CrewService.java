@@ -99,17 +99,18 @@ public class CrewService implements Listener {
     /** Puts {@code settlerId} on the crew of the job running on {@code structureId}, if the crew has room for it. */
     public @NotNull SettlerResult enlist(@NotNull Worksite worksite, @NotNull UUID structureId,
                                          @NotNull UUID settlerId) {
-        final SettlerSite site = settlers.site(worksite.getKey()).orElse(null);
-        if (site == null) {
+        final SiteKey key = worksite.getKey();
+        final SettlerSite site = settlers.site(key).orElse(null);
+        final Roster roster = settlers.roster(key).orElse(null);
+        if (site == null || roster == null) {
             return SettlerResult.refused("core.settler.not_loaded");
         }
-        final SiteKey key = worksite.getKey();
         final PlacedStructure structure = worksite.getHolding().find(structureId).orElse(null);
         final Job job = structure == null ? null : structure.getJob();
         if (job == null || job.isDone(tracker.now())) {
             return SettlerResult.refused("core.settler.crew.no_job");
         }
-        final Settler settler = settlers.roster(key).flatMap(roster -> roster.find(settlerId)).orElse(null);
+        final Settler settler = roster.find(settlerId).orElse(null);
         if (settler == null) {
             return SettlerResult.refused("core.settler.not_found");
         }
