@@ -1,16 +1,19 @@
 package me.mykindos.betterpvp.core.scene.mob;
 
+import com.ticxo.modelengine.api.animation.property.IAnimationProperty;
 import me.mykindos.betterpvp.core.scene.mob.MobFixture.TestMob;
 import me.mykindos.betterpvp.core.scene.mob.ai.AIControl;
 import me.mykindos.betterpvp.core.scene.mob.ai.AIController;
 import me.mykindos.betterpvp.core.scene.mob.ai.FakeComponent;
 import me.mykindos.betterpvp.core.scene.mob.ai.component.RetaliateComponent;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationProviders;
+import me.mykindos.betterpvp.core.scene.mob.animation.MobAnimation;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -224,5 +229,35 @@ class MobAICertificationTest {
 
         verify(fixture.pathfinder).moveTo(any(Location.class), eq(1.7));
         assertEquals(1, mob.registrations);
+    }
+
+    @Test
+    void ac7_stoppingAHeldClipBlendsItOutOverAFifthOfASecond() {
+        final TestMob mob = fixture.spawn("knight", created -> {
+            created.setAnimation(MobAnimation.IDLE, "idle");
+            created.setAnimation(MobAnimation.WALK, "walk");
+        });
+        final IAnimationProperty walk = mock(IAnimationProperty.class);
+        when(fixture.handler.getAnimation("walk")).thenReturn(walk);
+        mob.getAnimations().play(MobAnimation.WALK);
+
+        mob.getAnimations().play(MobAnimation.IDLE);
+
+        final InOrder order = inOrder(walk, fixture.handler);
+        order.verify(walk).setLerpOutTime(0.2);
+        order.verify(fixture.handler).stopAnimation("walk");
+    }
+
+    @Test
+    void ac7_aHeldClipThatIsNoLongerPlayingIsStillStopped() {
+        final TestMob mob = fixture.spawn("knight", created -> {
+            created.setAnimation(MobAnimation.IDLE, "idle");
+            created.setAnimation(MobAnimation.WALK, "walk");
+        });
+        mob.getAnimations().play(MobAnimation.WALK);
+
+        assertDoesNotThrow(() -> mob.getAnimations().play(MobAnimation.IDLE));
+
+        verify(fixture.handler).stopAnimation("walk");
     }
 }
