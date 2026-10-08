@@ -119,6 +119,7 @@ class SettlerGrantsTest {
 
         @Override
         public void changed(SiteKey site) {
+            // Granting writes nothing these tests read back.
         }
 
         @Override

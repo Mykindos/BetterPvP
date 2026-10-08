@@ -151,29 +151,43 @@ public class CampRecruitment implements Listener {
         final Random random = ThreadLocalRandom.current();
         final boolean left = camp.getArrivals().removeIf(candidate -> candidate.isExpired(now));
 
+        final boolean sent = sendMilestones(key, camp, random);
+        final long scheduled = camp.getNextArrivalAt();
+        scheduleBoats(key, camp, now, random, dockWorking);
+        if (left || sent || camp.getNextArrivalAt() != scheduled) {
+            store.changed(key.getOwnerId());
+        }
+    }
+
+    /** Sends each milestone settler the clan's level has reached and the camp has not had yet. */
+    private boolean sendMilestones(@NotNull SiteKey key, @NotNull Camp camp, @NotNull Random random) {
         final long level = clanManager.getClanById(key.getOwnerId()).map(Clan::getLevel).orElse(0L);
         boolean sent = false;
         for (Map.Entry<Integer, RecruitConfig.Milestone> milestone : config.getMilestones().entrySet()) {
             if (milestone.getKey() <= level && camp.getMilestones().add(milestone.getKey())) {
                 sent = true;
-                final String profession = milestone.getValue().getProfession();
                 camp.getArrivals().add(new SettlerCandidate(roll(milestone.getValue().getRarity(),
-                        RecruitConfig.ANY.equals(profession) ? config.getArrivalOdds().profession(random)
-                                : SettlerOdds.NONE.equals(profession) ? null : profession,
-                        "milestone", random), 0, 0));
+                        milestoneProfession(milestone.getValue().getProfession(), random), "milestone", random), 0, 0));
             }
         }
         if (sent) {
             UtilServer.callEvent(new SettlerBoatEvent(key, true));
         }
+        return sent;
+    }
 
-        final long scheduled = camp.getNextArrivalAt();
+    private @Nullable String milestoneProfession(@NotNull String profession, @NotNull Random random) {
+        if (RecruitConfig.ANY.equals(profession)) {
+            return config.getArrivalOdds().profession(random);
+        }
+        return SettlerOdds.NONE.equals(profession) ? null : profession;
+    }
+
+    /** Lands every boat due while the Dock works, and keeps the next one in the future. */
+    private void scheduleBoats(@NotNull SiteKey key, @NotNull Camp camp, long now, @NotNull Random random,
+                               boolean dockWorking) {
         final long interval = interval(key);
-        if (camp.getNextArrivalAt() == 0 || !dockWorking) {
-            if (camp.getNextArrivalAt() == 0 || now >= camp.getNextArrivalAt()) {
-                camp.setNextArrivalAt(now + interval);
-            }
-        } else {
+        if (camp.getNextArrivalAt() != 0 && dockWorking) {
             int boats = 0;
             while (now >= camp.getNextArrivalAt() && boats++ < MAX_BOATS) {
                 final long leaves = camp.getNextArrivalAt() + config.getArrivalWait().toMillis();
@@ -183,12 +197,9 @@ public class CampRecruitment implements Listener {
                 }
                 camp.setNextArrivalAt(camp.getNextArrivalAt() + interval);
             }
-            if (now >= camp.getNextArrivalAt()) {
-                camp.setNextArrivalAt(now + interval);
-            }
         }
-        if (left || sent || camp.getNextArrivalAt() != scheduled) {
-            store.changed(key.getOwnerId());
+        if (camp.getNextArrivalAt() == 0 || now >= camp.getNextArrivalAt()) {
+            camp.setNextArrivalAt(now + interval);
         }
     }
 
