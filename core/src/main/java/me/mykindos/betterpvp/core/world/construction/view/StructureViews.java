@@ -158,25 +158,38 @@ public class StructureViews implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND || block == null) {
             return;
         }
+        final StructureView view = viewAt(block);
+        if (view == null || view.getStructure() == null) {
+            return;
+        }
+        final PlacedStructure structure = view.getStructure();
+        final StructureStatus status = structure.status(tracker.now());
+        if (status == StructureStatus.READY_TO_CLAIM
+                || structure.getCondition() == StructureCondition.UNDER_CONSTRUCTION) {
+            event.setCancelled(true);
+            return;
+        }
+        view.pieceAt(block.getX(), block.getY(), block.getZ())
+                .ifPresent(id -> usePiece(event, block.getWorld(), structure, status, id));
+    }
+
+    /** The structure whose build or upgrade piece stands on {@code block}, if one is shown there. */
+    public @NotNull Optional<PlacedStructure> structureAt(@NotNull Block block) {
+        return Optional.ofNullable(viewAt(block)).map(StructureView::getStructure);
+    }
+
+    private @Nullable StructureView viewAt(@NotNull Block block) {
         final Loaded loaded = worlds.get(block.getWorld().getName());
         if (loaded == null) {
-            return;
+            return null;
         }
         for (StructureView view : loaded.views.values()) {
-            final PlacedStructure structure = view.getStructure();
-            final Optional<String> upgrade = view.pieceAt(block.getX(), block.getY(), block.getZ());
-            if (structure == null || (upgrade.isEmpty() && !view.covers(block.getX(), block.getY(), block.getZ()))) {
-                continue;
+            if (view.getStructure() != null && (view.covers(block.getX(), block.getY(), block.getZ())
+                    || view.pieceAt(block.getX(), block.getY(), block.getZ()).isPresent())) {
+                return view;
             }
-            final StructureStatus status = structure.status(tracker.now());
-            if (status == StructureStatus.READY_TO_CLAIM
-                    || structure.getCondition() == StructureCondition.UNDER_CONSTRUCTION) {
-                event.setCancelled(true);
-                return;
-            }
-            upgrade.ifPresent(id -> usePiece(event, block.getWorld(), structure, status, id));
-            return;
         }
+        return null;
     }
 
     private void usePiece(@NotNull PlayerInteractEvent event, @NotNull World world, @NotNull PlacedStructure structure,
