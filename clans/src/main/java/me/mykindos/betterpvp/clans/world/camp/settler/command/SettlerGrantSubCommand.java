@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerTemplate;
+import me.mykindos.betterpvp.core.world.settler.recruit.SettlerGrants;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
@@ -49,6 +50,10 @@ public class SettlerGrantSubCommand extends Command {
         this.service = service;
         this.generator = generator;
         this.config = config;
+    }
+
+    public SettlerGrantSubCommand(@NotNull SettlerCommands commands, @NotNull SettlerGrants grants) {
+        throw new UnsupportedOperationException("#2363 AC28");
     }
 
     @Override
