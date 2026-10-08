@@ -79,7 +79,8 @@ public class FarmMenu extends AbstractGui implements Windowed {
                 if (!allowed) {
                     return;
                 }
-                final SettlerResult result = menus.getSettlers().assign(key, farmer.getId(), CampGrounds.FARM);
+                final SettlerResult result = menus.getSettlers()
+                        .assign(click.getPlayer(), key, farmer.getId(), CampGrounds.FARM);
                 if (!result.isSuccess() && result.getReason() != null) {
                     menus.getCards().tell(click.getPlayer(), result.getReason());
                 }

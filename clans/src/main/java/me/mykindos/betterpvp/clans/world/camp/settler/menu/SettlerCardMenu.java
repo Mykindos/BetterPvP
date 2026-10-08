@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.settler.Profession;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
+import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.settler.Trait;
 import me.mykindos.betterpvp.core.world.settler.WorkplaceKind;
@@ -152,12 +153,13 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
             view.lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
         }
         setItem(29, new SimpleItem(view.build(), click -> {
-            if (!allowed || !cards.allows(click.getPlayer(), site, SettlerAction.ASSIGN)) {
+            if (!allowed) {
                 return;
             }
-            cards.after(click.getPlayer(), site, settler.getId(), working
-                    ? cards.getService().unassign(site, settler.getId())
-                    : cards.getService().assign(site, settler.getId(), profession.getWorkplace()), previous);
+            final Player player = click.getPlayer();
+            cards.after(player, site, settler.getId(), working
+                    ? cards.getService().unassign(player, site, settler.getId())
+                    : cards.getService().assign(player, site, settler.getId(), profession.getWorkplace()), previous);
         }));
     }
 
@@ -176,16 +178,18 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
             view.lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
         }
         setItem(33, new SimpleItem(view.build(), click -> {
-            if (!allowed || !click.getClickType().isShiftClick()
-                    || !cards.allows(click.getPlayer(), site, SettlerAction.DISMISS)) {
+            if (!allowed || !click.getClickType().isShiftClick()) {
                 return;
             }
             final Player player = click.getPlayer();
-            if (cards.getService().dismiss(site, settler.getId()).isSuccess()) {
-                player.closeInventory();
-                cards.tell(player, Translations.component("clans.settler.card.dismissed",
-                        Component.text(settler.getName(), settler.getRarity().getColor())).color(NamedTextColor.GREEN));
+            final SettlerResult result = cards.getService().dismiss(player, site, settler.getId());
+            if (!result.isSuccess()) {
+                cards.after(player, site, settler.getId(), result, previous);
+                return;
             }
+            player.closeInventory();
+            cards.tell(player, Translations.component("clans.settler.card.dismissed",
+                    Component.text(settler.getName(), settler.getRarity().getColor())).color(NamedTextColor.GREEN));
         }));
     }
 

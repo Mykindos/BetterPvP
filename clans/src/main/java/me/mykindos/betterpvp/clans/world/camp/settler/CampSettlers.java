@@ -126,6 +126,20 @@ public class CampSettlers implements SettlerSite {
         return permissions.allows(player, site.getOwnerId(), action);
     }
 
+    /** A Builder's assignment is the id of the structure it builds, and it stays while it is on that unfinished job. */
+    @Override
+    public boolean jobRunning(@NotNull SiteKey site, @NotNull Settler settler) {
+        if (settler.getAssignment() == null || !settler.hasProfession(CampProfessions.BUILDER)) {
+            return false;
+        }
+        final long now = System.currentTimeMillis();
+        return structureId(settler.getAssignment())
+                .flatMap(holding(site)::find)
+                .map(PlacedStructure::getJob)
+                .filter(job -> !job.isDone(now) && job.getStaff().contains(settler.getId()))
+                .isPresent();
+    }
+
     /** Its profession's look, or the default one while that look's model or skin is not installed. */
     @Override
     public @NotNull SettlerLook look(@NotNull SiteKey site, @NotNull Settler settler) {
@@ -157,13 +171,8 @@ public class CampSettlers implements SettlerSite {
             });
         }
 
-        final UUID structureId;
-        try {
-            structureId = UUID.fromString(workplace);
-        } catch (IllegalArgumentException exception) {
-            return Optional.empty();
-        }
-        return holding(site).find(structureId).map(structure -> standOn(world, structure, WORK_POINT));
+        return structureId(workplace).flatMap(holding(site)::find)
+                .map(structure -> standOn(world, structure, WORK_POINT));
     }
 
     @Override
@@ -230,6 +239,14 @@ public class CampSettlers implements SettlerSite {
     private @NotNull Location standOn(@NotNull World world, @NotNull PlacedStructure structure, @NotNull String point) {
         return shapes.point(world, structure, point)
                 .orElseGet(() -> structure.getPosition().toLocation(world).add(0.5, 1, 0.5));
+    }
+
+    private static @NotNull Optional<UUID> structureId(@NotNull String assignment) {
+        try {
+            return Optional.of(UUID.fromString(assignment));
+        } catch (IllegalArgumentException exception) {
+            return Optional.empty();
+        }
     }
 
     private @NotNull Holding holding(@NotNull SiteKey site) {

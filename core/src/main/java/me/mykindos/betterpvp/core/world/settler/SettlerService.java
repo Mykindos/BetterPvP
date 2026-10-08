@@ -73,6 +73,9 @@ public class SettlerService {
         if (roster == null) {
             return SettlerResult.refused("core.settler.not_loaded");
         }
+        if (roster.find(settler.getId()).isPresent()) {
+            return SettlerResult.refused("core.settler.already_granted");
+        }
         final int cap = site.populationCap(key);
         if (roster.size() >= cap) {
             return SettlerResult.refused("core.settler.population_full", Component.text(cap));
@@ -89,8 +92,13 @@ public class SettlerService {
         return SettlerResult.done(settler);
     }
 
-    /** Sends a settler away for good. */
+    /** Sends a settler away for good, unless it is on a job that is still running. */
     public @NotNull SettlerResult dismiss(@NotNull SiteKey key, @NotNull UUID settlerId) {
+        final SettlerSite site = sites.get(key.getSiteId());
+        final Settler settler = roster(key).flatMap(roster -> roster.find(settlerId)).orElse(null);
+        if (settler != null && site.jobRunning(key, settler)) {
+            return SettlerResult.refused("core.settler.job_running");
+        }
         return remove(key, settlerId, SettlerLeaveReason.DISMISSED);
     }
 
@@ -99,7 +107,10 @@ public class SettlerService {
                                          @NotNull SettlerLeaveReason reason) {
         final SettlerSite site = sites.get(key.getSiteId());
         final Roster roster = site == null ? null : site.roster(key).orElse(null);
-        final Settler settler = roster == null ? null : roster.find(settlerId).orElse(null);
+        if (roster == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final Settler settler = roster.find(settlerId).orElse(null);
         if (settler == null) {
             return SettlerResult.refused("core.settler.not_found");
         }
@@ -121,7 +132,10 @@ public class SettlerService {
     public @NotNull SettlerResult assign(@NotNull SiteKey key, @NotNull UUID settlerId, @NotNull String workplace) {
         final SettlerSite site = sites.get(key.getSiteId());
         final Roster roster = site == null ? null : site.roster(key).orElse(null);
-        final Settler settler = roster == null ? null : roster.find(settlerId).orElse(null);
+        if (roster == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final Settler settler = roster.find(settlerId).orElse(null);
         if (settler == null) {
             return SettlerResult.refused("core.settler.not_found");
         }
@@ -135,6 +149,10 @@ public class SettlerService {
         }
         if (settler.getState() == SettlerState.STRIKING || settler.getState() == SettlerState.LEAVING) {
             return SettlerResult.refused("core.settler.will_not_work");
+        }
+        if (settler.getAssignment() != null && !settler.getAssignment().equals(workplace)
+                && site.jobRunning(key, settler)) {
+            return SettlerResult.refused("core.settler.job_running");
         }
         if (settler.getAssignment() == null) {
             final OptionalInt cap = site.workingCap(key, profession.getId());
@@ -157,24 +175,37 @@ public class SettlerService {
     /** {@link #assign(SiteKey, UUID, String)} for {@code player}, if the site allows them to. */
     public @NotNull SettlerResult assign(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID settlerId,
                                          @NotNull String workplace) {
-        throw new UnsupportedOperationException("not implemented");
+        return allows(player, key, SettlerAction.ASSIGN) ? assign(key, settlerId, workplace) : notAllowed();
     }
 
     /** {@link #unassign(SiteKey, UUID)} for {@code player}, if the site allows them to. */
     public @NotNull SettlerResult unassign(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID settlerId) {
-        throw new UnsupportedOperationException("not implemented");
+        return allows(player, key, SettlerAction.ASSIGN) ? unassign(key, settlerId) : notAllowed();
     }
 
     /** {@link #dismiss(SiteKey, UUID)} for {@code player}, if the site allows them to. */
     public @NotNull SettlerResult dismiss(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID settlerId) {
-        throw new UnsupportedOperationException("not implemented");
+        return allows(player, key, SettlerAction.DISMISS) ? dismiss(key, settlerId) : notAllowed();
+    }
+
+    /** Whether {@code player} may take {@code action} at {@code key}. Unknown sites are left to refuse as not loaded. */
+    private boolean allows(@NotNull Player player, @NotNull SiteKey key, @NotNull SettlerAction action) {
+        final SettlerSite site = sites.get(key.getSiteId());
+        return site == null || site.allows(player, key, action);
+    }
+
+    private static @NotNull SettlerResult notAllowed() {
+        return SettlerResult.refused("core.settler.not_allowed");
     }
 
     /** Takes a settler off whatever it works at, leaving it idle. */
     public @NotNull SettlerResult unassign(@NotNull SiteKey key, @NotNull UUID settlerId) {
         final SettlerSite site = sites.get(key.getSiteId());
         final Roster roster = site == null ? null : site.roster(key).orElse(null);
-        final Settler settler = roster == null ? null : roster.find(settlerId).orElse(null);
+        if (roster == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final Settler settler = roster.find(settlerId).orElse(null);
         if (settler == null) {
             return SettlerResult.refused("core.settler.not_found");
         }
@@ -182,6 +213,9 @@ public class SettlerService {
         final String previous = settler.getAssignment();
         if (previous == null) {
             return SettlerResult.done(settler);
+        }
+        if (site.jobRunning(key, settler)) {
+            return SettlerResult.refused("core.settler.job_running");
         }
         settler.setAssignment(null);
         if (settler.getState() == SettlerState.WORKING) {
