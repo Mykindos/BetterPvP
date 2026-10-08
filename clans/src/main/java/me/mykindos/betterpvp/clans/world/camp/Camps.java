@@ -85,8 +85,13 @@ public class Camps implements Listener, SiteOwnership {
     /** Whether {@code player} belongs to the clan whose camp {@code world} is. */
     public boolean isMember(@NotNull Player player, @NotNull World world) {
         final OptionalLong clan = clanOf(world);
-        return clan.isPresent() && clanManager.getClanByPlayer(player)
-                .map(own -> own.getId() == clan.getAsLong())
+        return clan.isPresent() && isMember(player, clan.getAsLong());
+    }
+
+    /** Whether {@code player} belongs to clan {@code clanId}. */
+    public boolean isMember(@NotNull Player player, long clanId) {
+        return clanManager.getClanByPlayer(player)
+                .map(own -> own.getId() == clanId)
                 .orElse(false);
     }
 

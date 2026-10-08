@@ -17,7 +17,7 @@ class JobTest {
     }
 
     @Test
-    void progressRunsInRealTime() {
+    void ac6_progressRunsInRealTime() {
         final Job job = tenMinuteBuild(0);
 
         assertEquals(0.0, job.progress(0), 1e-9);
@@ -27,7 +27,7 @@ class JobTest {
     }
 
     @Test
-    void holdingItStopsTheClockAndReleasingItCarriesOn() {
+    void ac7_holdingItStopsTheClockAndReleasingItCarriesOn() {
         final Job job = tenMinuteBuild(0);
 
         job.hold("siege", 2 * MINUTE);
@@ -40,7 +40,7 @@ class JobTest {
     }
 
     @Test
-    void itRunsOnlyOnceEveryHoldIsGone() {
+    void ac7_itRunsOnlyOnceEveryHoldIsGone() {
         final Job job = tenMinuteBuild(0);
         job.hold("siege", MINUTE);
         job.hold("staffing", MINUTE);
@@ -52,7 +52,7 @@ class JobTest {
     }
 
     @Test
-    void aNewRateOnlyAppliesFromWhenItWasSet() {
+    void ac7_aNewRateOnlyAppliesFromWhenItWasSet() {
         final Job job = tenMinuteBuild(0);
 
         job.setRate(2.0, 4 * MINUTE);

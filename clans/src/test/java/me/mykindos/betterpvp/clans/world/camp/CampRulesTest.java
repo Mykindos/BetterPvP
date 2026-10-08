@@ -71,7 +71,7 @@ class CampRulesTest {
         permissions = new CampPermissions(clanManager, store, config);
         construction = new CampConstruction(store, resources, permissions,
                 new ResourceOverflow(store, resources, config), mock(CrewRule.class), mock(SalvageBin.class),
-                mock(ConstructionService.class), mock(RankLockbox.class));
+                mock(ConstructionService.class), mock(RankLockbox.class), mock(Camps.class));
     }
 
     @Test

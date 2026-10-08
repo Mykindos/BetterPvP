@@ -26,6 +26,9 @@ public interface ConstructionSite {
     /** Whether {@code player} may take {@code action} on {@code site}. */
     boolean allows(@NotNull Player player, @NotNull SiteKey site, @NotNull ConstructionAction action);
 
+    /** Whether {@code player} belongs to {@code site}, so may use its structures that are not public. */
+    boolean isMember(@NotNull Player player, @NotNull SiteKey site);
+
     /**
      * Why {@code type} cannot be taken to {@code stage} here, beyond the structures it requires, or empty if nothing
      * stands in the way. This is where a site's own gates go, such as a tier needing a particular hall.

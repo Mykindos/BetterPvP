@@ -26,6 +26,8 @@ public class PlacedStructure {
     private StructurePosition position;
     private StructureCondition condition;
     private @Nullable Job job;
+    /** When it was last knocked out, which is when one that repairs itself starts doing so. */
+    private @Nullable Long disabledAt;
     /** What its containers hold, by {@link StructureStorage} slot. Null when they are all empty. */
     private @Nullable Map<String, List<String>> storage;
     /** The upgrade picked at each stage, by stage. A stage missing from it has not been picked from. */

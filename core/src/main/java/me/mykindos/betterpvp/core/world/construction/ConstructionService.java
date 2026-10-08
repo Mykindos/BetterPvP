@@ -140,6 +140,9 @@ public class ConstructionService {
             if (job == null) {
                 return ConstructionResult.refused("core.construction.nothing_to_cancel");
             }
+            if (job.isDone(clock.getAsLong())) {
+                return ConstructionResult.refused("core.construction.cancel_finished");
+            }
 
             worksite.site.ledger().refund(worksite.key, job.getSpent());
             if (job.getKind() == JobKind.BUILD) {
@@ -163,7 +166,7 @@ public class ConstructionService {
                         ? StructureCondition.NEEDS_REPAIR : StructureCondition.ACTIVE);
                 case ADVANCE -> structure.setStage(job.getTargetStage());
                 case MOVE -> structure.setPosition(job.getTarget());
-                case REPAIR -> structure.setCondition(StructureCondition.ACTIVE);
+                case REPAIR -> repaired(structure);
                 case FIT_UPGRADE -> {
                 }
             }
@@ -290,7 +293,7 @@ public class ConstructionService {
         }
 
         if (type.getRepairTime().isZero()) {
-            structure.setCondition(StructureCondition.ACTIVE);
+            repaired(structure);
         } else {
             structure.setJob(Job.start(JobKind.REPAIR, type.getRepairTime(), type.getRepairCost(),
                     structure.getStage(), clock.getAsLong()));
@@ -397,10 +400,39 @@ public class ConstructionService {
         return type.costUpTo(structure.getStage()).share(share);
     }
 
+    /**
+     * Knocks a working structure out until it is repaired, on the site's own behalf. One whose type repairs itself
+     * comes back once its repair time has passed.
+     */
+    public @NotNull ConstructionResult disable(@NotNull World world, @NotNull UUID id) {
+        return act(null, world, id, ConstructionAction.REPAIR, (worksite, structure, type) -> {
+            if (structure.getCondition() != StructureCondition.ACTIVE) {
+                return ConstructionResult.refused("core.construction.disable_needs_active");
+            }
+            structure.setCondition(StructureCondition.DISABLED);
+            structure.setDisabledAt(clock.getAsLong());
+            return changed(worksite, structure);
+        });
+    }
+
+    /** Whether {@code player} may use the features of {@code structure} on {@code site}: anyone if it is public. */
+    public boolean canUse(@NotNull Player player, @NotNull SiteKey site, @NotNull PlacedStructure structure) {
+        final boolean open = catalogue.find(structure.getType())
+                .map(type -> type.getFlags().isPublicUse())
+                .orElse(false);
+        if (open) {
+            return true;
+        }
+        final ConstructionSite owner = sites.get(site.getSiteId());
+        return owner != null && owner.isMember(player, site);
+    }
+
     /** Applies job rules and announces any status that changed, for every structure on one site. */
     public void refresh(@NotNull Worksite worksite) {
         for (PlacedStructure structure : worksite.holding.getStructures()) {
-            if (applyRules(worksite, structure)) {
+            final boolean ruled = applyRules(worksite, structure);
+            final boolean repaired = repairedItself(structure);
+            if (ruled || repaired) {
                 worksite.site.changed(worksite.key);
             }
             publish(worksite, structure);
@@ -565,6 +597,26 @@ public class ConstructionService {
             changed = true;
         }
         return changed;
+    }
+
+    private boolean repairedItself(@NotNull PlacedStructure structure) {
+        final Long disabledAt = structure.getDisabledAt();
+        if (structure.getCondition() != StructureCondition.DISABLED || disabledAt == null
+                || structure.getJob() != null) {
+            return false;
+        }
+        final Optional<StructureType> type = catalogue.find(structure.getType());
+        if (type.isEmpty() || !type.get().getFlags().isSelfRepairing()
+                || clock.getAsLong() - disabledAt < type.get().getRepairTime().toMillis()) {
+            return false;
+        }
+        repaired(structure);
+        return true;
+    }
+
+    private static void repaired(@NotNull PlacedStructure structure) {
+        structure.setCondition(StructureCondition.ACTIVE);
+        structure.setDisabledAt(null);
     }
 
     private void publish(@NotNull Worksite worksite, @NotNull PlacedStructure structure) {

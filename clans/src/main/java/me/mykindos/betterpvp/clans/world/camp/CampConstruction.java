@@ -43,14 +43,16 @@ public class CampConstruction implements ConstructionSite {
     private final CrewRule crews;
     private final SalvageBin salvageBin;
     private final RankLockbox lockbox;
+    private final Camps camps;
 
     @Inject
     public CampConstruction(@NotNull CampStore store, @NotNull CampResources resources,
                             @NotNull CampPermissions permissions,
                             @NotNull ResourceOverflow overflow, @NotNull CrewRule crews,
                             @NotNull SalvageBin salvageBin, @NotNull ConstructionService service,
-                            @NotNull RankLockbox lockbox) {
+                            @NotNull RankLockbox lockbox, @NotNull Camps camps) {
         this.store = store;
+        this.camps = camps;
         this.lockbox = lockbox;
         this.resources = resources;
         this.permissions = permissions;
@@ -78,6 +80,11 @@ public class CampConstruction implements ConstructionSite {
     @Override
     public boolean allows(@NotNull Player player, @NotNull SiteKey site, @NotNull ConstructionAction action) {
         return permissions.allows(player, site.getOwnerId(), action);
+    }
+
+    @Override
+    public boolean isMember(@NotNull Player player, @NotNull SiteKey site) {
+        return camps.isMember(player, site.getOwnerId());
     }
 
     /** Tier N needs a Great Hall at its Nth stage. Stages count from zero, tiers from one. */
