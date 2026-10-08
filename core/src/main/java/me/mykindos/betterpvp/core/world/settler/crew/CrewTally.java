@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.world.settler.crew;
 
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
@@ -125,13 +124,14 @@ public class CrewTally {
     }
 
     /** One Builder's part in a job. */
-    @Data
     public static class Share {
         /** How much of the job it did, from 0 to 1. */
+        @Getter
         private double work;
         /** Speed it brought that the job could not use, times how long, in milliseconds. */
         private double wastedSpeedMillis;
         /** How long it was on the crew while the job ran. */
+        @Getter
         private long millis;
 
         /** The Speed it brought that the job could not use, on average over the time it worked. */

@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CrewTallyTest {
@@ -37,7 +38,7 @@ class CrewTallyTest {
     }
 
     @Test
-    void progressIsSplitByWhatEachAddsToTheCrew() {
+    void ac24_progressIsSplitByWhatEachAddsToTheCrew() {
         final CrewTally tally = new CrewTally(structure, job, 0);
         tally.sample(crew(), LIMITS, 0.25, false, MINUTE);
 
@@ -48,7 +49,7 @@ class CrewTallyTest {
     }
 
     @Test
-    void wastedSpeedAveragesOverTheTimeWorked() {
+    void ac25_wastedSpeedAveragesOverTheTimeWorked() {
         final CrewTally tally = new CrewTally(structure, job, 0);
         tally.sample(crew(), LIMITS, 0.25, false, MINUTE);
         tally.sample(crew(), LIMITS, 0.5, false, 2 * MINUTE);
@@ -60,7 +61,7 @@ class CrewTallyTest {
     }
 
     @Test
-    void timeHeldCountsForNothing() {
+    void ac26_timeHeldCountsForNothing() {
         final CrewTally tally = new CrewTally(structure, job, 0);
         tally.sample(crew(), LIMITS, 0.25, false, MINUTE);
         tally.sample(crew(), LIMITS, 0.25, true, 5 * MINUTE);
@@ -70,7 +71,7 @@ class CrewTallyTest {
     }
 
     @Test
-    void progressAfterTheCrewIsLetGoGoesToThoseWhoWorked() {
+    void ac27_progressAfterTheCrewIsLetGoGoesToThoseWhoWorked() {
         final CrewTally tally = new CrewTally(structure, job, 0);
         tally.sample(crew(), LIMITS, 0.25, false, MINUTE);
         assertFalse(tally.isFinished());
@@ -82,7 +83,7 @@ class CrewTallyTest {
     }
 
     @Test
-    void onlyProgressAfterTheTallyStartsIsCounted() {
+    void ac23_onlyProgressAfterTheTallyStartsIsCounted() {
         final CrewTally tally = new CrewTally(structure, job, 5 * MINUTE);
         tally.finish(crew(), LIMITS, 1.0, 10 * MINUTE);
 
@@ -90,5 +91,39 @@ class CrewTallyTest {
         assertEquals(JobKind.ADVANCE, tally.getKind());
         assertEquals(1, tally.getTargetStage());
         assertEquals("workshop", tally.getStructureType());
+        assertEquals(structure.getId(), tally.getStructure());
+        assertNull(tally.getUpgrade());
+    }
+
+    @Test
+    void ac23_aTallyRecordsTheUpgradeItIsFitting() {
+        final Job fitting = Job.start(JobKind.FIT_UPGRADE, Duration.ofMinutes(5), ResourceCost.NONE, 0, 0);
+        fitting.setUpgrade("lantern");
+        final CrewTally tally = new CrewTally(structure, fitting, 0);
+
+        assertEquals(JobKind.FIT_UPGRADE, tally.getKind());
+        assertEquals("lantern", tally.getUpgrade());
+    }
+
+    @Test
+    void ac24_sharesOfTheCountedWorkAddUpToOne() {
+        final CrewTally tally = new CrewTally(structure, job, 0);
+        tally.sample(crew(), LIMITS, 0.1, false, MINUTE);
+        tally.sample(Map.of(fast, crew().get(fast)), LIMITS, 0.3, false, 2 * MINUTE);
+
+        assertEquals(1.0, tally.shareOf(fast) + tally.shareOf(slow), 1e-9);
+        assertEquals(0.0, tally.shareOf(UUID.randomUUID()));
+    }
+
+    @Test
+    void ac25_aCompatibleBonusIsNeverWastedInATally() {
+        final Map<UUID, BuilderStats> paired = new LinkedHashMap<>();
+        paired.put(fast, new BuilderStats(2, 1.0, 0.5, "mason", Set.of("carpenter")));
+        paired.put(slow, new BuilderStats(2, 1.0, 0.5, "carpenter", Set.of("mason")));
+        final CrewTally tally = new CrewTally(structure, job, 0);
+        tally.sample(paired, LIMITS, 0.2, false, MINUTE);
+
+        assertEquals(0.0, tally.getShares().get(fast).wastedSpeed(), 1e-9);
+        assertEquals(0.0, tally.getShares().get(slow).wastedSpeed(), 1e-9);
     }
 }

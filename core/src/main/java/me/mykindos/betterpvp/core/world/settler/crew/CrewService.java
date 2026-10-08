@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
+import me.mykindos.betterpvp.core.world.settler.SettlerAssignedEvent;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
@@ -37,11 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Puts Builders on crews and lets them go. A Builder joins a job that is still running and stays on it until it ends,
- * which is when the job is finished, cancelled or its structure is gone. A Builder's assignment is the id of the
- * structure it works on.
+ * which is when the job is finished, cancelled or its structure is gone, or until it is taken off. A Builder's
+ * assignment is the id of the structure it works on, and it is on that job's crew only while it stays assigned there.
  */
 @BPvPListener
 @Singleton
@@ -99,17 +101,18 @@ public class CrewService implements Listener {
     /** Puts {@code settlerId} on the crew of the job running on {@code structureId}, if the crew has room for it. */
     public @NotNull SettlerResult enlist(@NotNull Worksite worksite, @NotNull UUID structureId,
                                          @NotNull UUID settlerId) {
-        final SettlerSite site = settlers.site(worksite.getKey()).orElse(null);
-        if (site == null) {
+        final SiteKey key = worksite.getKey();
+        final SettlerSite site = settlers.site(key).orElse(null);
+        final Roster roster = settlers.roster(key).orElse(null);
+        if (site == null || roster == null) {
             return SettlerResult.refused("core.settler.not_loaded");
         }
-        final SiteKey key = worksite.getKey();
         final PlacedStructure structure = worksite.getHolding().find(structureId).orElse(null);
         final Job job = structure == null ? null : structure.getJob();
         if (job == null || job.isDone(tracker.now())) {
             return SettlerResult.refused("core.settler.crew.no_job");
         }
-        final Settler settler = settlers.roster(key).flatMap(roster -> roster.find(settlerId)).orElse(null);
+        final Settler settler = roster.find(settlerId).orElse(null);
         if (settler == null) {
             return SettlerResult.refused("core.settler.not_found");
         }
@@ -145,6 +148,25 @@ public class CrewService implements Listener {
         return assigned;
     }
 
+    /**
+     * A Builder taken off or moved from a structure leaves that job's crew at once, which may pause the job. A job whose
+     * time is up keeps its crew until it is let go, so everyone who saw it through is credited.
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onAssigned(@NotNull SettlerAssignedEvent event) {
+        final UUID structureId = event.getPrevious() == null ? null : parse(event.getPrevious()).orElse(null);
+        if (structureId == null) {
+            return;
+        }
+        worksites(event.getSite(), worksite -> worksite.getHolding().find(structureId)
+                .map(PlacedStructure::getJob)
+                .filter(job -> !job.isDone(tracker.now()) && job.getStaff().remove(event.getSettler().getId()))
+                .ifPresent(job -> {
+                    worksite.getSite().changed(worksite.getKey());
+                    tracker.refresh(worksite);
+                }));
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onStatusChange(@NotNull StructureStatusChangeEvent event) {
         release(event.getSite());
@@ -167,10 +189,15 @@ public class CrewService implements Listener {
     }
 
     private void release(@NotNull SiteKey key) {
+        worksites(key, worksite -> release(key, worksite.getHolding()));
+    }
+
+    /** Runs {@code action} on the worksite of each open instance of {@code key}. */
+    private void worksites(@NotNull SiteKey key, @NotNull Consumer<Worksite> action) {
         for (SiteInstance instance : instances.forKey(key)) {
             final World world = Bukkit.getWorld(instance.getWorldName());
             if (world != null) {
-                sites.worksite(world).ifPresent(worksite -> release(key, worksite.getHolding()));
+                sites.worksite(world).ifPresent(action);
             }
         }
     }
