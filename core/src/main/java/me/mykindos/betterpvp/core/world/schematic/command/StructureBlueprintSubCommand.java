@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
@@ -48,8 +49,8 @@ public class StructureBlueprintSubCommand extends Command {
 
         final Optional<StructureType> type = catalogue.find(args[0]);
         if (type.isEmpty()) {
-            UtilMessage.message(player, prefix, Translations.component("core.construction.command.blueprint.unknown",
-                    Component.text(args[0])).color(NamedTextColor.RED));
+            UtilMessage.message(player, prefix, ConstructionResult.reason("core.construction.command.blueprint.unknown",
+                    Component.text(args[0])));
             return;
         }
         player.getInventory().addItem(blueprints.blueprintFor(type.get()));

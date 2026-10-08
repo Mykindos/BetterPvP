@@ -89,7 +89,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         } else {
             setItem(13, new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
-                    .displayName(Translations.component("core.construction.missing_structure").color(NamedTextColor.RED))
+                    .displayName(ConstructionResult.reason("core.construction.missing_structure"))
                     .build()));
         }
         setItem(31, new BackButton(returnTo != null ? returnTo : new PlacedStructuresMenu(menus, camp, back)));
@@ -117,7 +117,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         if (type.hasStage(next)) {
             final StructureStage stage = type.stage(next);
             final Component problem = busy || structure.getCondition() != StructureCondition.ACTIVE
-                    ? Translations.component("core.construction.advance_needs_idle") : unaffordable(stage.getCost());
+                    ? ConstructionResult.reason("core.construction.advance_needs_idle") : unaffordable(stage.getCost());
             buttons.add(button(Material.EXPERIENCE_BOTTLE, ConstructionAction.ADVANCE, null,
                     Translations.component("clans.camp.menu.structures.action.advance", type.stageName(next)),
                     List.of(costLine(stage.getCost()), timeLine(stage.getBuildTime())),
@@ -127,7 +127,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
 
         final StructureCondition condition = structure.getCondition();
         if (condition == StructureCondition.DISABLED || condition == StructureCondition.NEEDS_REPAIR) {
-            final Component problem = busy ? Translations.component("core.construction.already_working")
+            final Component problem = busy ? ConstructionResult.reason("core.construction.already_working")
                     : unaffordable(type.getRepairCost());
             buttons.add(button(Material.ANVIL, ConstructionAction.REPAIR, null,
                     Translations.component("clans.camp.menu.structures.action.repair"),
@@ -151,7 +151,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         }
 
         if (type.getFlags().isMovable()) {
-            buttons.add(move(type, busy ? Translations.component("core.construction.busy")
+            buttons.add(move(type, busy ? ConstructionResult.reason("core.construction.busy")
                     : unaffordable(type.getMoveCost())));
         }
 
@@ -166,8 +166,8 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
 
         if (type.getFlags().isDemolishable()) {
             final Component problem = !condition.isStanding()
-                    ? Translations.component("core.construction.demolish_needs_standing")
-                    : busy ? Translations.component("core.construction.busy") : null;
+                    ? ConstructionResult.reason("core.construction.demolish_needs_standing")
+                    : busy ? ConstructionResult.reason("core.construction.busy") : null;
             final ResourceCost refund = menus.getSites().demolishRefund(camp, structure, type);
             buttons.add(button(Material.TNT, ConstructionAction.DEMOLISH, confirming,
                     Translations.component("clans.camp.menu.structures.action.demolish"),
@@ -232,9 +232,9 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         final Optional<QueuedAction> waiting = queue.queued(camp);
         final Component blocked;
         if (!menus.getPermissions().allows(viewer, camp.getOwnerId(), action)) {
-            blocked = Translations.component("clans.settler.card.not_allowed");
+            blocked = ConstructionResult.reason("clans.settler.card.not_allowed");
         } else {
-            blocked = waiting.map(queued -> Translations.component("clans.camp.upgrade.build_queue.full",
+            blocked = waiting.map(queued -> ConstructionResult.reason("clans.camp.upgrade.build_queue.full",
                     queue.describe(queued))).orElse(null);
         }
         final QueuedAction preview = new QueuedAction(id, type.getId(), action, viewer.getUniqueId());
@@ -261,7 +261,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
     private @NotNull SimpleItem rush(@NotNull PlacedStructure structure, @NotNull CampStructure type, long price) {
         final RushOrder rush = menus.getRushOrder();
         final Component blocked = worksite == null
-                ? Translations.component("clans.camp.menu.structures.not_in_camp")
+                ? ConstructionResult.reason("clans.camp.menu.structures.not_in_camp")
                 : rush.problem(viewer, camp, structure).orElse(null);
         final ItemView.ItemViewBuilder view = view(Material.CLOCK,
                 Translations.component("clans.camp.upgrade.rush_order.button"),
@@ -313,17 +313,17 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
 
     private @Nullable Component blocked(@NotNull ConstructionAction action, @Nullable Component problem) {
         if (worksite == null) {
-            return Translations.component("clans.camp.menu.structures.not_in_camp");
+            return ConstructionResult.reason("clans.camp.menu.structures.not_in_camp");
         }
         if (!menus.getPermissions().allows(viewer, camp.getOwnerId(), action)) {
-            return Translations.component("clans.settler.card.not_allowed");
+            return ConstructionResult.reason("clans.settler.card.not_allowed");
         }
         return problem;
     }
 
     private @Nullable Component unaffordable(@NotNull ResourceCost cost) {
         return menus.getResources().canAfford(camp, cost) ? null
-                : Translations.component("core.construction.cannot_afford");
+                : ConstructionResult.reason("core.construction.cannot_afford");
     }
 
     private static @NotNull ItemView.ItemViewBuilder view(@NotNull Material icon, @NotNull Component name,
@@ -336,7 +336,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         details.forEach(line -> view.lore(line.colorIfAbsent(NamedTextColor.GRAY)));
         if (blocked != null) {
             view.lore(Component.empty());
-            view.lore(blocked.color(NamedTextColor.RED));
+            view.lore(blocked);
         }
         return view;
     }

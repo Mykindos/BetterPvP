@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ChatHint;
+import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.FitCheck;
 import me.mykindos.betterpvp.core.world.construction.Holding;
@@ -142,23 +143,23 @@ public class SurveyorsTable implements Listener {
                 .filter(found -> found.getKey().equals(camp))
                 .orElse(null);
         if (worksite == null) {
-            tell(player, Translations.component("clans.camp.menu.structures.not_in_camp").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("clans.camp.menu.structures.not_in_camp"));
             return false;
         }
         final PlacedStructure structure = worksite.getHolding().find(id).orElse(null);
         final CampStructure type = structure == null ? null : type(structure).orElse(null);
         if (structure == null || type == null) {
-            tell(player, Translations.component("core.construction.missing_structure").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("core.construction.missing_structure"));
             return false;
         }
         final int next = structure.getStage() + 1;
         if (!type.hasStage(next)) {
-            tell(player, Translations.component("core.construction.max_stage").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("core.construction.max_stage"));
             return false;
         }
         final Optional<Schematic> schematic = schematics.load(type.stage(next).getSchematic());
         if (schematic.isEmpty()) {
-            tell(player, Translations.component("core.construction.no_build").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("core.construction.no_build"));
             return false;
         }
 

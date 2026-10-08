@@ -221,8 +221,7 @@ public class BlueprintSessions implements Listener {
         final Optional<Component> problem;
         if (anchor == null) {
             session.preview.hide();
-            problem = Optional.of(Translations.component("core.construction.blueprint.look_at_ground")
-                    .color(NamedTextColor.RED));
+            problem = Optional.of(ConstructionResult.reason("core.construction.blueprint.look_at_ground"));
         } else {
             problem = session.moving == null
                     ? checks.problem(player, player.getWorld(), type.get(), anchor, session.quarterTurns)
@@ -233,7 +232,7 @@ public class BlueprintSessions implements Listener {
 
         if (problem.isPresent()) {
             hud(session, type.get().getDisplayName().color(NamedTextColor.RED),
-                    Translations.component("core.construction.blueprint.cannot_place").color(NamedTextColor.RED),
+                    ConstructionResult.reason("core.construction.blueprint.cannot_place"),
                     problem.get());
             return;
         }
