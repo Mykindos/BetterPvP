@@ -44,6 +44,11 @@ public interface SettlerSite {
 
     @NotNull SettlerLook look(@NotNull SiteKey site, @NotNull Settler settler);
 
+    /** Whether {@code settler} is on a job at {@code site} that is still running. */
+    default boolean jobRunning(@NotNull SiteKey site, @NotNull Settler settler) {
+        return false;
+    }
+
     /** Where settlers of {@code site} appear and wander around when they have nowhere to be. */
     default @NotNull Optional<Location> home(@NotNull SiteKey site, @NotNull World world, @NotNull RegionIndex regions) {
         return Optional.empty();

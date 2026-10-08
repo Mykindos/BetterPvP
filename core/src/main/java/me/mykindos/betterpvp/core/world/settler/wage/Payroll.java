@@ -65,7 +65,7 @@ public class Payroll implements Listener {
     /** Coins an hour {@code settler} costs as it is now, or 0 if it is not paid. */
     public double hourly(@NotNull SiteKey key, @NotNull Settler settler) {
         final SettlerSite site = settlers.site(key).orElse(null);
-        if (site == null || settler.getState() == SettlerState.LEAVING) {
+        if (site == null) {
             return 0;
         }
         final boolean working = settler.getState() == SettlerState.WORKING

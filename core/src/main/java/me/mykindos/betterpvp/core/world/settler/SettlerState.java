@@ -7,7 +7,5 @@ public enum SettlerState {
     /** Assigned to a workplace. */
     WORKING,
     /** Refuses to work until paid. */
-    STRIKING,
-    /** On the way out, and gone once its site next saves. */
-    LEAVING
+    STRIKING
 }

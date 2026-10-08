@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
+import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -62,7 +63,7 @@ public class SettlerDismissSubCommand extends Command {
                 return;
             }
 
-            final SettlerResult result = service.dismiss(key, matches.getFirst().getId());
+            final SettlerResult result = service.remove(key, matches.getFirst().getId(), SettlerLeaveReason.DISMISSED);
             if (!result.isSuccess()) {
                 SettlerCommands.send(player, Objects.requireNonNull(result.getReason()));
                 return;

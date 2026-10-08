@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.ToolRack;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
+import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -70,6 +71,7 @@ public class CampSettlers implements SettlerSite {
     private final CampMorale morale;
     private final ToolRack toolRack;
     private final WagePolicy wagePolicy;
+    private final ConstructionService construction;
 
     @Inject
     public CampSettlers(@NotNull CampStore store, @NotNull SettlerConfig config, @NotNull SettlerService service,
@@ -79,7 +81,7 @@ public class CampSettlers implements SettlerSite {
                         @NotNull CampMorale morale,
                         @NotNull CampProfessions professions,
                         @NotNull CampTraits traits, @NotNull ToolRack toolRack,
-                        @NotNull WagePolicy wagePolicy) {
+                        @NotNull WagePolicy wagePolicy, @NotNull ConstructionService construction) {
         this.store = store;
         this.config = config;
         this.permissions = permissions;
@@ -91,6 +93,7 @@ public class CampSettlers implements SettlerSite {
         this.morale = morale;
         this.toolRack = toolRack;
         this.wagePolicy = wagePolicy;
+        this.construction = construction;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -126,6 +129,23 @@ public class CampSettlers implements SettlerSite {
         return permissions.allows(player, site.getOwnerId(), action);
     }
 
+    /**
+     * A Builder's assignment is the id of the structure it builds. It stays while it is on that job's crew and the job is
+     * unfinished and not paused.
+     */
+    @Override
+    public boolean jobRunning(@NotNull SiteKey site, @NotNull Settler settler) {
+        if (settler.getAssignment() == null || !settler.hasProfession(CampProfessions.BUILDER)) {
+            return false;
+        }
+        final long now = construction.now();
+        return structureId(settler.getAssignment())
+                .flatMap(holding(site)::find)
+                .map(PlacedStructure::getJob)
+                .filter(job -> !job.isDone(now) && !job.isHeld() && job.getStaff().contains(settler.getId()))
+                .isPresent();
+    }
+
     /** Its profession's look, or the default one while that look's model or skin is not installed. */
     @Override
     public @NotNull SettlerLook look(@NotNull SiteKey site, @NotNull Settler settler) {
@@ -157,13 +177,8 @@ public class CampSettlers implements SettlerSite {
             });
         }
 
-        final UUID structureId;
-        try {
-            structureId = UUID.fromString(workplace);
-        } catch (IllegalArgumentException exception) {
-            return Optional.empty();
-        }
-        return holding(site).find(structureId).map(structure -> standOn(world, structure, WORK_POINT));
+        return structureId(workplace).flatMap(holding(site)::find)
+                .map(structure -> standOn(world, structure, WORK_POINT));
     }
 
     @Override
@@ -230,6 +245,14 @@ public class CampSettlers implements SettlerSite {
     private @NotNull Location standOn(@NotNull World world, @NotNull PlacedStructure structure, @NotNull String point) {
         return shapes.point(world, structure, point)
                 .orElseGet(() -> structure.getPosition().toLocation(world).add(0.5, 1, 0.5));
+    }
+
+    private static @NotNull Optional<UUID> structureId(@NotNull String assignment) {
+        try {
+            return Optional.of(UUID.fromString(assignment));
+        } catch (IllegalArgumentException exception) {
+            return Optional.empty();
+        }
     }
 
     private @NotNull Holding holding(@NotNull SiteKey site) {

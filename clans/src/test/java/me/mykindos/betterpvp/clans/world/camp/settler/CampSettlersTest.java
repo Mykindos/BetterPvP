@@ -12,7 +12,11 @@ import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.ToolRack;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
+import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.Job;
+import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
+import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
@@ -28,13 +32,16 @@ import org.bukkit.World;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -52,6 +59,8 @@ class CampSettlersTest {
     private final StructureShapes shapes = mock(StructureShapes.class);
     private final World world = mock(World.class);
     private final RegionIndex regions = mock(RegionIndex.class);
+    private final ConstructionService construction = mock(ConstructionService.class);
+    private final AtomicLong now = new AtomicLong(1_000);
     private CampSettlers settlers;
 
     @BeforeEach
@@ -63,12 +72,13 @@ class CampSettlersTest {
         when(config.workingCap(CampProfessions.BUILDER)).thenReturn(Optional.of(
                 new SettlerConfig.WorkingCap(List.of(2, 3, 4), Map.of(CampStructures.WORKSHOP, 1))));
         when(config.workingCap(CampProfessions.FARMER)).thenReturn(Optional.empty());
+        when(construction.now()).thenAnswer(invocation -> now.get());
         settlers = new CampSettlers(store, config, service, mock(CampPermissions.class), shapes,
                 mock(SettlerCards.class), mock(CampBuilders.class), mock(CampResources.class),
                 mock(CampWageFund.class), mock(CampMorale.class),
                 new CampProfessions(new ProfessionRegistry()),
                 new CampTraits(new TraitRegistry()), new ToolRack(new CampUpgrades(store)),
-                mock(WagePolicy.class));
+                mock(WagePolicy.class), construction);
     }
 
     private PlacedStructure place(String type, int stage, StructureCondition condition) {
@@ -101,6 +111,63 @@ class CampSettlersTest {
         assertEquals(marked, settlers.workplace(SITE, world, regions, workshop.getId().toString()).orElseThrow());
         assertTrue(settlers.workplace(SITE, world, regions, UUID.randomUUID().toString()).isEmpty());
         assertTrue(settlers.workplace(SITE, world, regions, "nowhere").isEmpty());
+    }
+
+    private Settler builderOn(PlacedStructure structure) {
+        final Settler builder = new Settler();
+        builder.setId(UUID.randomUUID());
+        builder.setProfession(CampProfessions.BUILDER);
+        builder.setAssignment(structure.getId().toString());
+        structure.getJob().getStaff().add(builder.getId());
+        return builder;
+    }
+
+    private PlacedStructure underConstruction() {
+        final PlacedStructure structure = place(CampStructures.WORKSHOP, 0, StructureCondition.UNDER_CONSTRUCTION);
+        structure.setJob(Job.start(JobKind.BUILD, Duration.ofMinutes(10), ResourceCost.NONE, 0, 0));
+        return structure;
+    }
+
+    @Test
+    void aBuilderIsLockedWhileItsJobRunsByTheConstructionClock() {
+        final PlacedStructure structure = underConstruction();
+        final Settler builder = builderOn(structure);
+
+        assertTrue(settlers.jobRunning(SITE, builder));
+
+        now.set(Duration.ofMinutes(11).toMillis());
+        assertFalse(settlers.jobRunning(SITE, builder), "a finished job no longer holds its crew");
+    }
+
+    @Test
+    void aBuilderOnAPausedJobCanBeTakenOff() {
+        final PlacedStructure structure = underConstruction();
+        final Settler builder = builderOn(structure);
+
+        structure.getJob().hold("crew", now.get());
+        assertFalse(settlers.jobRunning(SITE, builder));
+
+        structure.getJob().release("crew", now.get());
+        assertTrue(settlers.jobRunning(SITE, builder));
+    }
+
+    @Test
+    void onlyABuilderOnTheCrewIsLocked() {
+        final PlacedStructure structure = underConstruction();
+        final Settler builder = builderOn(structure);
+        structure.getJob().getStaff().clear();
+        assertFalse(settlers.jobRunning(SITE, builder), "not on the crew");
+
+        final Settler idle = new Settler();
+        idle.setId(UUID.randomUUID());
+        idle.setProfession(CampProfessions.BUILDER);
+        assertFalse(settlers.jobRunning(SITE, idle), "no assignment");
+
+        final Settler farmer = new Settler();
+        farmer.setId(UUID.randomUUID());
+        farmer.setProfession(CampProfessions.FARMER);
+        farmer.setAssignment("farm");
+        assertFalse(settlers.jobRunning(SITE, farmer), "not a Builder");
     }
 
     @Test
