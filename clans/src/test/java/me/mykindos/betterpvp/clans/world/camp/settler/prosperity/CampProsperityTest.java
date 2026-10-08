@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
-import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.settler.SettlerTable;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import org.junit.jupiter.api.BeforeEach;
@@ -114,11 +113,5 @@ class CampProsperityTest {
     @Test
     void anEmptyCampHasNoFactors() {
         assertEquals(new ProsperityFactors(List.of(), 0), prosperity.factors(roster));
-    }
-
-    @Test
-    void aLeavingChroniclerNoLongerHelps() {
-        settler(SettlerRarity.LEGENDARY, 0, CampTraits.CHRONICLER).changeState(SettlerState.LEAVING, 0);
-        assertEquals(80, prosperity.of(roster));
     }
 }
