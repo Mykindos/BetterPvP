@@ -16,8 +16,8 @@ import org.bukkit.event.entity.EntityRemoveEvent;
  * Tears a {@link SceneMob} out of the scene registry when its backing entity is removed by anything
  * other than the framework (death, another plugin, ...). Without this, a killed mob would linger
  * forever in the registry - still ticked, still holding references to its target and threat table.
- * A chunk-managed mob is never torn out here. It ends only when it is removed, and the
- * materialization controller spawns its body again.
+ * A chunk-managed mob is torn out only when its body dies. For any other cause the materialization
+ * controller spawns its body again.
  */
 @BPvPListener
 @Singleton
@@ -49,7 +49,8 @@ public class MobLifecycleListener implements Listener {
     public void onRemove(EntityRemoveEvent event) {
         final SceneMob mob = registry.getObject(event.getEntity(), SceneMob.class);
         // isDespawning skips the removal our own remove() causes.
-        if (mob != null && mob.isRegistered() && !mob.isDespawning() && !mob.isChunkManaged()) {
+        if (mob != null && mob.isRegistered() && !mob.isDespawning()
+                && (!mob.isChunkManaged() || event.getCause() == EntityRemoveEvent.Cause.DEATH)) {
             mob.remove();
         }
     }

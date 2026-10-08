@@ -148,8 +148,8 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this.disposition = disposition;
         // Created here (not in onInit) so subclasses can tune it fluently in their constructor via
         // getSounds(); it reads the shared soundProviders map at play time, so setSound order is free.
+        // It is attached in onInit, because every despawn clears the behaviours.
         this.sounds = new MobSoundBehavior(this, soundProviders);
-        addBehavior(this.sounds);
     }
 
     /**
@@ -231,6 +231,7 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this.navigator = new Navigator(this);
         this.animations = new AnimationController(this, animationProviders);
         this.homeAnchor = getEntity().getLocation();
+        addBehavior(sounds);
         registerComponents();
         orders = new OrderToSpotComponent(this, clock).speed(orderSpeed);
         attending = new AttendComponent(this, clock);

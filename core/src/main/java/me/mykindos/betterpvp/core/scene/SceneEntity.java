@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.utilities.model.Ticked;
 import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,11 +39,6 @@ public abstract class SceneEntity extends SceneObject implements Ticked {
     public void addBehavior(SceneBehavior behavior) {
         behaviors.add(behavior);
         behavior.start();
-    }
-
-    /** The attached behaviours. */
-    public List<SceneBehavior> getBehaviors() {
-        return Collections.unmodifiableList(behaviors);
     }
 
     /**
