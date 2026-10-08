@@ -289,8 +289,8 @@ final class StructureView {
         return blocks;
     }
 
-    private static @NotNull Component label(@NotNull StructureType type, @NotNull PlacedStructure structure,
-                                            @NotNull StructureStatus status, long now) {
+    static @NotNull Component label(@NotNull StructureType type, @NotNull PlacedStructure structure,
+                                    @NotNull StructureStatus status, long now) {
         final Component state = switch (status) {
             case UNDER_CONSTRUCTION -> timed(isBuilding(structure) ? "building" : "moving", structure, now);
             case ADVANCING -> timed("advancing", structure, now);
