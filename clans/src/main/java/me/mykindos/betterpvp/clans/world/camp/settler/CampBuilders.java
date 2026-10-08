@@ -102,14 +102,21 @@ public class CampBuilders {
         return Math.min(1, frugal + patcher);
     }
 
-    /** The speed the strongest Foreman on the crew gives everyone else. Only one Foreman counts. */
+    /**
+     * The speed the strongest Foreman on the crew gives everyone else, the first listed among equals. Only that Foreman
+     * counts, so it gets nothing from another.
+     */
     private double foreman(@NotNull Settler settler, @NotNull List<Settler> crew) {
-        return crew.stream()
-                .filter(member -> !member.getId().equals(settler.getId()))
-                .filter(member -> member.hasTrait(CampTraits.FOREMAN))
-                .mapToDouble(member -> number(CampTraits.FOREMAN, "crew-speed", 0.10) * strength(member))
-                .max()
-                .orElse(0);
+        Settler strongest = null;
+        for (Settler member : crew) {
+            if (member.hasTrait(CampTraits.FOREMAN) && (strongest == null || strength(member) > strength(strongest))) {
+                strongest = member;
+            }
+        }
+        if (strongest == null || strongest.getId().equals(settler.getId())) {
+            return 0;
+        }
+        return number(CampTraits.FOREMAN, "crew-speed", 0.10) * strength(strongest);
     }
 
     /** Whether most of what {@code job} cost was {@code resource}. A tie is no one resource. */
