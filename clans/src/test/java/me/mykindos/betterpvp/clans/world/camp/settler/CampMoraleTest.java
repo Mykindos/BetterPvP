@@ -34,7 +34,6 @@ class CampMoraleTest {
     private final SettlerConfig config = mock(SettlerConfig.class);
     private final Roster roster = new Roster();
     private int food;
-    private int boost;
     private CampMorale morale;
 
     @BeforeEach
@@ -45,8 +44,7 @@ class CampMoraleTest {
                 SettlerRarity.COMMON, new RarityNumbers(1, 1, 1, 0.3),
                 SettlerRarity.LEGENDARY, new RarityNumbers(3, 2, 2.2, 0.05)), List.of(), List.of(), Map.of()));
         final FoodSource granary = site -> food;
-        final MoraleBoost bell = site -> boost;
-        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary), Set.of(bell));
+        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary), Set.of());
     }
 
     private Settler settler(String profession, SettlerRarity rarity, String... traits) {
