@@ -38,7 +38,7 @@ public class StructureBlueprintItem extends BaseItem {
         addSerializableComponent(new StructureBlueprintComponent(""));
     }
 
-    private static @NotNull Component name(@NotNull StructureCatalogue catalogue, @NotNull ItemInstance item) {
+    static @NotNull Component name(@NotNull StructureCatalogue catalogue, @NotNull ItemInstance item) {
         final Optional<StructureBlueprintComponent> component = item.getComponent(StructureBlueprintComponent.class);
         final Component structure = component
                 .flatMap(found -> catalogue.find(found.getStructure()))
