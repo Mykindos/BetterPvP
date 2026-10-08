@@ -10,10 +10,10 @@ import org.jetbrains.annotations.NotNull;
 
 /** Owns the scene objects standing in for structures. They come from holdings, never from a command. */
 @Singleton
-public class ConstructionPropFactory extends SceneObjectFactory {
+class ConstructionPropFactory extends SceneObjectFactory {
 
     @Inject
-    public ConstructionPropFactory(@NotNull SceneObjectRegistry registry) {
+    ConstructionPropFactory(@NotNull SceneObjectRegistry registry) {
         super("construction", registry);
     }
 

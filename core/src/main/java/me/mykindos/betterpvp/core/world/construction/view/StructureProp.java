@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  * The label is its body, so it comes and goes with the chunk it floats in. The blocks of the building itself are not
  * part of it: those are drawn into the world whether anyone is near or not.
  */
-public final class StructureProp extends Prop implements Actor {
+final class StructureProp extends Prop implements Actor {
 
     private final SceneObjectRegistry registry;
     private final BoundingBox area;
