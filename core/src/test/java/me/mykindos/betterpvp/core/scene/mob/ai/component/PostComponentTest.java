@@ -127,6 +127,26 @@ class PostComponentTest {
     }
 
     @Test
+    void withoutAPostItAsksAgainAfterEachRest() {
+        post.set(null);
+        final TestMob mob = mob();
+        mob.tick();
+        assertEquals(1, asked.get());
+
+        post.set(fixture.at(20, 64, 0));
+        fixture.advance(999);
+        tick(mob, 3);
+        assertEquals(1, asked.get(), "still resting, so not asking yet");
+        verify(fixture.pathfinder, never()).moveTo(any(Location.class), anyDouble());
+
+        fixture.advance(1002);
+        mob.tick();
+
+        assertEquals(2, asked.get());
+        verify(fixture.pathfinder).moveTo(eq(fixture.at(20, 64, 0)), anyDouble());
+    }
+
+    @Test
     void ac29_onArrivalItStopsHoldsWorkAndStaysUntilReplanned() {
         final TestMob mob = mob();
         hasPath(true);

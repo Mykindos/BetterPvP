@@ -2,11 +2,13 @@ package me.mykindos.betterpvp.core.scene.mob;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.destroystokyo.paper.entity.ai.MobGoals;
+import com.github.retrooper.packetevents.PacketEvents;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.animation.handler.AnimationHandler;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
+import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationProvider;
 import me.mykindos.betterpvp.core.scene.mob.animation.MobAnimation;
 import me.mykindos.betterpvp.core.scene.mob.sound.MobSound;
@@ -23,6 +25,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.util.BoundingBox;
 import org.mockito.MockedStatic;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -214,6 +217,17 @@ public final class MobFixture implements AutoCloseable {
         final TestMob mob = new TestMob(components, clock());
         mob.setModelId(modelId);
         return mob;
+    }
+
+    /** A real scene registry, built with PacketEvents stubbed out. */
+    public static SceneObjectRegistry registry() {
+        try (MockedStatic<PacketEvents> ignored = mockStatic(PacketEvents.class, RETURNS_DEEP_STUBS)) {
+            final Constructor<SceneObjectRegistry> constructor = SceneObjectRegistry.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     /** Ticks {@code mob} {@code times} times. */

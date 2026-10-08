@@ -54,7 +54,7 @@ public class WanderComponent implements AIComponent {
         this(mob, System::currentTimeMillis);
     }
 
-    WanderComponent(SceneMob mob, LongSupplier clock) {
+    public WanderComponent(SceneMob mob, LongSupplier clock) {
         this.mob = mob;
         this.clock = clock;
     }
@@ -154,17 +154,22 @@ public class WanderComponent implements AIComponent {
                     home.getZ() + Math.sin(angle) * distance));
         }
 
-        // Scanned upward so the lowest floor wins, never a ceiling above it.
+        // The floor nearest home's height wins, the lower one on a tie, so neither a roof nor a cave is picked.
         for (int attempt = 0; attempt < 8; attempt++) {
             final double angle = random.nextDouble(Math.PI * 2.0);
             final double distance = minRadius + random.nextDouble() * Math.max(0, wanderRadius - minRadius);
             final int x = home.getBlockX() + (int) Math.round(Math.cos(angle) * distance);
             final int z = home.getBlockZ() + (int) Math.round(Math.sin(angle) * distance);
+            Integer feet = null;
             for (int y = home.getBlockY() - 6; y <= home.getBlockY() + 3; y++) {
                 final Block floor = home.getWorld().getBlockAt(x, y, z);
-                if (floor.isSolid() && isOpen(floor.getRelative(0, 1, 0)) && isOpen(floor.getRelative(0, 2, 0))) {
-                    return Optional.of(new Location(home.getWorld(), x + 0.5, y + 1, z + 0.5));
+                if (floor.isSolid() && isOpen(floor.getRelative(0, 1, 0)) && isOpen(floor.getRelative(0, 2, 0))
+                        && (feet == null || Math.abs(y + 1 - home.getBlockY()) < Math.abs(feet - home.getBlockY()))) {
+                    feet = y + 1;
                 }
+            }
+            if (feet != null) {
+                return Optional.of(new Location(home.getWorld(), x + 0.5, feet, z + 0.5));
             }
         }
         return Optional.empty();

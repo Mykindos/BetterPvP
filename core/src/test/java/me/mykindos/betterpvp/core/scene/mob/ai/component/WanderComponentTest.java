@@ -43,6 +43,7 @@ class WanderComponentTest {
     private int floorY = Integer.MIN_VALUE;
     private int ceilingY = Integer.MIN_VALUE;
     private final Map<Integer, Material> liquids = new HashMap<>();
+    private final Set<Integer> solids = new HashSet<>();
 
     @AfterEach
     void close() {
@@ -82,7 +83,7 @@ class WanderComponentTest {
         when(fixture.pathfinder.getCurrentPath()).thenReturn(path ? mock(Pathfinder.PathResult.class) : null);
     }
 
-    /** Blocks are solid at {@link #floorY} and {@link #ceilingY}, liquid at {@link #liquids} and air everywhere else. */
+    /** Blocks are solid at {@link #floorY}, {@link #ceilingY} and {@link #solids}, liquid at {@link #liquids} and air everywhere else. */
     private void stubBlocks() {
         when(fixture.world.getBlockAt(anyInt(), anyInt(), anyInt())).thenAnswer(invocation ->
                 block(invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2)));
@@ -94,7 +95,7 @@ class WanderComponentTest {
 
     private Block block(int x, int y, int z) {
         blockQueries.add(new int[]{x, y, z});
-        final boolean solid = y == floorY || y == ceilingY;
+        final boolean solid = y == floorY || y == ceilingY || solids.contains(y);
         final Material liquid = liquids.get(y);
         final Block block = mock(Block.class);
         when(block.getX()).thenReturn(x);
@@ -331,6 +332,20 @@ class WanderComponentTest {
         mob.tick();
 
         assertEquals(62.0, lastTrip().getY(), 0.01);
+    }
+
+    @Test
+    void withARoofAboveAndACaveBelowItPicksTheFloorNearestHomesHeight() {
+        solids.add(58);
+        solids.add(62);
+        solids.add(66);
+        stubBlocks();
+        final TestMob mob = mob(created -> new WanderComponent(created, fixture.clock()).rest(1000, 2000).checkFloor(3));
+        fixture.watcher();
+
+        mob.tick();
+
+        assertEquals(63.0, lastTrip().getY(), 0.01);
     }
 
     @Test

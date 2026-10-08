@@ -19,6 +19,7 @@ public class OrderToSpotComponent implements AIComponent {
     private final SceneMob mob;
     private final LongSupplier clock;
 
+    private double speed = 1.0;
     private long minRestMillis = 5_000L;
     private long maxRestMillis = 15_000L;
 
@@ -34,6 +35,12 @@ public class OrderToSpotComponent implements AIComponent {
     public OrderToSpotComponent(SceneMob mob, LongSupplier clock) {
         this.mob = mob;
         this.clock = clock;
+    }
+
+    /** Pathfinding speed multiplier used on the way to the spot. */
+    public OrderToSpotComponent speed(double speed) {
+        this.speed = speed;
+        return this;
     }
 
     /** How long the mob rests at the spot, between {@code minMillis} and {@code maxMillis}. */
@@ -71,7 +78,7 @@ public class OrderToSpotComponent implements AIComponent {
         if (resting) {
             mob.stopMoving();
         } else {
-            mob.travelTo(destination, 1.0, this::rest);
+            mob.travelTo(destination, speed, this::rest);
         }
     }
 

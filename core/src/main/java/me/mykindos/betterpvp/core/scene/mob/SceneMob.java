@@ -125,6 +125,8 @@ public class SceneMob extends NPC implements HasModeledEntity {
     private Location homeAnchor;
     /** The follow range the body gets while the AI runs, so the pathfinder can plan trips this long. */
     @Setter private double pathRange = 48.0;
+    /** Pathfinding speed multiplier used on the way to a spot it is {@link #orderTo ordered to}. */
+    @Setter private double orderSpeed = 1.0;
 
     // Activation-gate state. The proximity check is sampled (not every tick) to keep it cheap.
     private boolean active = true;
@@ -139,15 +141,15 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this(factory, entityType, disposition, System::currentTimeMillis);
     }
 
-    SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition, LongSupplier clock) {
+    protected SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition, LongSupplier clock) {
         super(factory);
         this.clock = clock;
         this.entityType = entityType;
         this.disposition = disposition;
         // Created here (not in onInit) so subclasses can tune it fluently in their constructor via
         // getSounds(); it reads the shared soundProviders map at play time, so setSound order is free.
+        // It is attached in onInit, because every despawn clears the behaviours.
         this.sounds = new MobSoundBehavior(this, soundProviders);
-        addBehavior(this.sounds);
     }
 
     /**
@@ -229,8 +231,9 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this.navigator = new Navigator(this);
         this.animations = new AnimationController(this, animationProviders);
         this.homeAnchor = getEntity().getLocation();
+        addBehavior(sounds);
         registerComponents();
-        orders = new OrderToSpotComponent(this, clock);
+        orders = new OrderToSpotComponent(this, clock).speed(orderSpeed);
         attending = new AttendComponent(this, clock);
         ai.addFirst(orders);
         ai.addFirst(attending);
