@@ -39,8 +39,8 @@ public class ThreatTable {
         return threat.getOrDefault(entity.getUniqueId(), 0.0);
     }
 
-    public void remove(LivingEntity entity) {
-        threat.remove(entity.getUniqueId());
+    public void remove(UUID source) {
+        threat.remove(source);
     }
 
     public void clear() {
