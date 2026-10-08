@@ -25,13 +25,11 @@ import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
-import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
-import me.mykindos.betterpvp.core.world.settler.TraitRegistry;
 import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.Bukkit;
@@ -89,8 +87,7 @@ class CampSettlersTest {
         when(store.cached(CLAN)).thenReturn(Optional.of(camp));
         when(construction.now()).thenAnswer(invocation -> now.get());
         settlers = new CampSettlers(store, config, service, permissions, shapes, cards, builders, resources,
-                mock(CampWageFund.class), mock(CampMorale.class), new CampProfessions(new ProfessionRegistry()),
-                new CampTraits(new TraitRegistry()), new ToolRack(new CampUpgrades(store)),
+                mock(CampWageFund.class), mock(CampMorale.class), new ToolRack(new CampUpgrades(store)),
                 mock(WagePolicy.class), construction);
     }
 
