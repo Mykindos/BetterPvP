@@ -10,7 +10,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
 /** The body of one settler. Its look and routine are put on it each time it materializes. */
 @Getter
@@ -23,6 +26,12 @@ public class SettlerNPC extends ModeledNPC {
     public SettlerNPC(@NotNull SceneObjectFactory factory, @NotNull UUID settlerId) {
         super(factory);
         this.settlerId = settlerId;
+    }
+
+    SettlerNPC(@NotNull SceneObjectFactory factory, @NotNull UUID settlerId,
+               @NotNull Supplier<Optional<Location>> post, @NotNull LongSupplier clock) {
+        super(factory);
+        throw new UnsupportedOperationException("Not implemented yet, see #2368");
     }
 
     /** Sends it to its new workplace, or off to wander, straight away. */
