@@ -61,6 +61,9 @@ public class PlacedStructure {
             if (job.isDone(now)) {
                 return StructureStatus.READY_TO_CLAIM;
             }
+            if (condition == StructureCondition.DISABLED) {
+                return StructureStatus.DISABLED;
+            }
             return switch (job.getKind()) {
                 case BUILD, MOVE -> StructureStatus.UNDER_CONSTRUCTION;
                 case ADVANCE -> StructureStatus.ADVANCING;

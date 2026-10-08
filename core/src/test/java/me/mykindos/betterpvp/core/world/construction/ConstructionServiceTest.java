@@ -605,6 +605,68 @@ class ConstructionServiceTest {
     }
 
     @Test
+    void ac1_aDisabledStructureStaysDisabledThroughAnAdvanceMoveOrUpgradeAndItsClaim() {
+        final PlacedStructure advancing = finished("hall");
+        final PlacedStructure moving = finished("shed");
+        final PlacedStructure upgrading = finished("hall");
+        service.advance(player, world, advancing.getId());
+        service.move(player, world, moving.getId(), new Location(world, 30, 64, 5), 0);
+        service.upgrade(player, world, upgrading.getId(), "bell");
+        final List<PlacedStructure> busy = List.of(advancing, moving, upgrading);
+        events.clear();
+
+        for (PlacedStructure structure : busy) {
+            assertTrue(service.disable(world, structure.getId()).isSuccess());
+            assertEquals(StructureStatus.DISABLED, structure.status(now.get()));
+            assertFalse(structure.status(now.get()).isUsable());
+        }
+        assertEquals(3, events.stream().filter(event -> event instanceof StructureStatusChangeEvent change
+                && change.getTo() == StructureStatus.DISABLED).count());
+
+        now.addAndGet(5 * MINUTE);
+        for (PlacedStructure structure : busy) {
+            assertTrue(service.claim(player, world, structure.getId()).isSuccess());
+            assertEquals(StructureCondition.DISABLED, structure.getCondition());
+            assertEquals(StructureStatus.DISABLED, structure.status(now.get()));
+        }
+        assertEquals(1, advancing.getStage());
+        assertEquals(new StructurePosition(30, 64, 5, 0), moving.getPosition());
+        assertTrue(upgrading.hasUpgrade("bell"));
+    }
+
+    @Test
+    void ac2_anAdvanceOrUpgradeLeavesSelfRepairAlone() {
+        final PlacedStructure advancing = finished("well");
+        final PlacedStructure upgrading = finished("well");
+        service.advance(player, world, advancing.getId());
+        service.upgrade(player, world, upgrading.getId(), "bell");
+        service.disable(world, advancing.getId());
+        service.disable(world, upgrading.getId());
+
+        now.addAndGet(4 * MINUTE);
+        tracker.refresh(sites.worksite(world).orElseThrow());
+
+        assertEquals(StructureCondition.ACTIVE, advancing.getCondition());
+        assertEquals(StructureCondition.ACTIVE, upgrading.getCondition());
+        assertEquals(JobKind.ADVANCE, advancing.getJob().getKind(), "the advance carries on");
+        assertEquals(JobKind.FIT_UPGRADE, upgrading.getJob().getKind(), "the upgrade carries on");
+    }
+
+    @Test
+    void ac2_aRunningRepairStopsSelfRepair() {
+        final PlacedStructure well = finished("well");
+        site.rules.add(rule("siege", () -> true, 1.0));
+        service.disable(world, well.getId());
+        service.repair(player, world, well.getId());
+
+        now.addAndGet(60 * MINUTE);
+        tracker.refresh(sites.worksite(world).orElseThrow());
+
+        assertEquals(StructureCondition.DISABLED, well.getCondition());
+        assertEquals(JobKind.REPAIR, well.getJob().getKind());
+    }
+
+    @Test
     void ac16_anInstantUpgradeIsFittedAtOnceAndTakesItsStagesPick() {
         final PlacedStructure hall = finished("hall");
 

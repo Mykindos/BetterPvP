@@ -190,6 +190,7 @@ public class BlueprintSessions implements Listener {
                 && Objects.equals(existing.moving, held.getMoving())) {
             return Optional.of(existing);
         }
+        end(player);
 
         final Optional<StructureType> type = catalogue.find(held.getStructure());
         if (type.isEmpty()) {
@@ -203,7 +204,6 @@ public class BlueprintSessions implements Listener {
         if (schematic.isEmpty()) {
             return Optional.empty();
         }
-        end(player);
         final int facing = BlockTransform.quarterTurnsBetween(schematic.get().getAnchorYaw(), player.getLocation().getYaw());
         final Session session = new Session(held.getStructure(), held.getMoving(),
                 previews.open(player, schematic.get()), clientManager.search().online(player).getGamer(), facing);

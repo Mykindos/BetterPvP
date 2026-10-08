@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.world.construction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -55,6 +57,25 @@ class PlacedStructureTest {
         broken.setJob(job(JobKind.REPAIR));
 
         assertEquals(StructureStatus.DISABLED, broken.status(MINUTE));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = JobKind.class, names = {"ADVANCE", "MOVE", "FIT_UPGRADE"})
+    void ac1_aDisabledStructureIsDisabledWhileAnyJobButARepairRuns(JobKind kind) {
+        final PlacedStructure disabled = structure(StructureCondition.DISABLED);
+        disabled.setJob(job(kind));
+
+        assertEquals(StructureStatus.DISABLED, disabled.status(MINUTE));
+        assertFalse(disabled.status(MINUTE).isUsable());
+        assertEquals(StructureStatus.READY_TO_CLAIM, disabled.status(10 * MINUTE), "the finished job can still be claimed");
+    }
+
+    @Test
+    void ac1_aStructurePutAwayIsNotPlacedEvenWithAJobOnIt() {
+        final PlacedStructure stored = structure(StructureCondition.NOT_PLACED);
+        stored.setJob(job(JobKind.MOVE));
+
+        assertEquals(StructureStatus.NOT_PLACED, stored.status(MINUTE));
     }
 
     @Test
