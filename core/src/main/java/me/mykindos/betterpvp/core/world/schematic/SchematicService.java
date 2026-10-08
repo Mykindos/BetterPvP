@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Loads and caches {@link Schematic}s from the module's {@code schematics/} data folder, resolving the
@@ -32,6 +33,7 @@ public class SchematicService {
     private final File folder;
     private final Map<String, SchematicFormat> formatsByExtension = new HashMap<>();
     private final Map<String, Schematic> cache = new ConcurrentHashMap<>();
+    private final AtomicLong generation = new AtomicLong();
 
     @Inject
     public SchematicService(@NotNull Core core) {
@@ -138,6 +140,7 @@ public class SchematicService {
 
         cache.remove(name.toLowerCase(Locale.ROOT));
         cache.remove(fileName.toLowerCase(Locale.ROOT));
+        generation.incrementAndGet();
         return Optional.of(file);
     }
 
@@ -156,9 +159,18 @@ public class SchematicService {
     }
 
     /**
+     * Goes up whenever a cached schematic is dropped or saved over, so anything worked out from one is worked out
+     * again.
+     */
+    public long generation() {
+        return generation.get();
+    }
+
+    /**
      * Drops all cached schematics so the next {@link #load(String)} re-reads from disk.
      */
     public void clearCache() {
         cache.clear();
+        generation.incrementAndGet();
     }
 }
