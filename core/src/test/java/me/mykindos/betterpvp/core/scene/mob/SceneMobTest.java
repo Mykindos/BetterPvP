@@ -456,6 +456,58 @@ class SceneMobTest {
     }
 
     @Test
+    void ac33_attendingDuringAnOrderPausesItAndTheOrderResumesAfter() {
+        final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
+        final TestMob mob = fixture.spawn(created -> created.getAi().add(walking));
+        fixture.watcher();
+        when(fixture.pathfinder.getCurrentPath()).thenReturn(mock(Pathfinder.PathResult.class));
+        mob.tick();
+        mob.orderTo(fixture.at(20, 64, 20));
+        mob.tick();
+        final ArgumentCaptor<Location> sent = ArgumentCaptor.forClass(Location.class);
+        verify(fixture.pathfinder).moveTo(sent.capture(), anyDouble());
+        final Player player = fixture.player(fixture.at(3, 64, 0));
+
+        mob.attend(player);
+        mob.tick();
+        fixture.advance(3000);
+        tick(mob, 2);
+        verify(fixture.body, atLeastOnce()).lookAt(player.getEyeLocation());
+        verify(fixture.pathfinder, times(1)).moveTo(any(Location.class), anyDouble());
+
+        fixture.advance(1001);
+        tick(mob, 2);
+
+        verify(fixture.pathfinder, times(2)).moveTo(eq(sent.getValue()), anyDouble());
+        assertFalse(walking.isRunning());
+    }
+
+    @Test
+    void ac33_anOrderGivenWhileAttendingWaitsForTheAttentionToEnd() {
+        final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
+        final TestMob mob = fixture.spawn(created -> created.getAi().add(walking));
+        fixture.watcher();
+        mob.tick();
+        final Player player = fixture.player(fixture.at(3, 64, 0));
+
+        mob.attend(player);
+        mob.tick();
+        mob.orderTo(fixture.at(20, 64, 20));
+        tick(mob, 2);
+        verify(fixture.pathfinder, never()).moveTo(any(Location.class), anyDouble());
+        verify(fixture.body, atLeastOnce()).lookAt(player.getEyeLocation());
+
+        fixture.advance(4001);
+        tick(mob, 2);
+
+        final ArgumentCaptor<Location> sent = ArgumentCaptor.forClass(Location.class);
+        verify(fixture.pathfinder).moveTo(sent.capture(), anyDouble());
+        final double distance = Math.hypot(sent.getValue().getX() - 20, sent.getValue().getZ() - 20);
+        assertTrue(distance >= 1 && distance <= 3, "sent " + distance + " from the spot");
+        assertFalse(walking.isRunning());
+    }
+
+    @Test
     void ac34_replanningStopsRunningComponentsSoEachDecidesAgainNextTick() {
         final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
         final FakeComponent thinking = new FakeComponent("thinking");

@@ -4,6 +4,7 @@ import com.destroystokyo.paper.entity.ai.MobGoals;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.scene.HasModeledEntity;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.LongSupplier;
 
 /**
  * Base class for code-driven custom mobs. It is an {@link NPC} (a non-playable character) whose
@@ -84,6 +86,8 @@ public class SceneMob extends NPC implements HasModeledEntity {
     /** ModelEngine clip name that signals the mob is dying; while it plays the mob is treated as dead. */
     private static final String DEATH_CLIP = "death";
 
+    @Getter(AccessLevel.NONE) private final LongSupplier clock;
+
     /** Vanilla entity used to host this mob in the world (spawned by the factory before init). */
     private final EntityType entityType;
 
@@ -127,7 +131,12 @@ public class SceneMob extends NPC implements HasModeledEntity {
     private int activationCheckCounter = 0;
 
     public SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition) {
+        this(factory, entityType, disposition, System::currentTimeMillis);
+    }
+
+    SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition, LongSupplier clock) {
         super(factory);
+        this.clock = clock;
         this.entityType = entityType;
         this.disposition = disposition;
         // Created here (not in onInit) so subclasses can tune it fluently in their constructor via

@@ -13,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static me.mykindos.betterpvp.core.scene.mob.MobFixture.tick;
@@ -39,6 +41,8 @@ class WanderComponentTest {
     private final MobFixture fixture = new MobFixture();
     private final List<int[]> blockQueries = new ArrayList<>();
     private int floorY = Integer.MIN_VALUE;
+    private int ceilingY = Integer.MIN_VALUE;
+    private final Map<Integer, Material> liquids = new HashMap<>();
 
     @AfterEach
     void close() {
@@ -78,7 +82,7 @@ class WanderComponentTest {
         when(fixture.pathfinder.getCurrentPath()).thenReturn(path ? mock(Pathfinder.PathResult.class) : null);
     }
 
-    /** Blocks are solid at {@link #floorY} and air everywhere else. */
+    /** Blocks are solid at {@link #floorY} and {@link #ceilingY}, liquid at {@link #liquids} and air everywhere else. */
     private void stubBlocks() {
         when(fixture.world.getBlockAt(anyInt(), anyInt(), anyInt())).thenAnswer(invocation ->
                 block(invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2)));
@@ -90,14 +94,16 @@ class WanderComponentTest {
 
     private Block block(int x, int y, int z) {
         blockQueries.add(new int[]{x, y, z});
-        final boolean solid = y == floorY;
+        final boolean solid = y == floorY || y == ceilingY;
+        final Material liquid = liquids.get(y);
         final Block block = mock(Block.class);
         when(block.getX()).thenReturn(x);
         when(block.getY()).thenReturn(y);
         when(block.getZ()).thenReturn(z);
         when(block.getWorld()).thenReturn(fixture.world);
         when(block.getLocation()).thenReturn(new Location(fixture.world, x, y, z));
-        when(block.getType()).thenReturn(solid ? Material.STONE : Material.AIR);
+        when(block.getType()).thenReturn(solid ? Material.STONE : liquid != null ? liquid : Material.AIR);
+        when(block.isLiquid()).thenReturn(liquid != null);
         when(block.isSolid()).thenReturn(solid);
         when(block.isPassable()).thenReturn(!solid);
         when(block.isEmpty()).thenReturn(!solid);
@@ -312,5 +318,46 @@ class WanderComponentTest {
         final Location point = lastTrip();
         assertEquals(64.0, point.getY());
         verify(fixture.pathfinder).moveTo(point, 0.8);
+    }
+
+    @Test
+    void ac30_aRoomsCeilingIsNeverPicked() {
+        floorY = 61;
+        ceilingY = 65;
+        stubBlocks();
+        final TestMob mob = mob(created -> new WanderComponent(created, fixture.clock()).rest(1000, 2000).checkFloor(3));
+        fixture.watcher();
+
+        mob.tick();
+
+        assertEquals(62.0, lastTrip().getY(), 0.01);
+    }
+
+    @Test
+    void ac30_aSpotUnderWaterIsNeverPicked() {
+        floorY = 61;
+        liquids.put(62, Material.WATER);
+        liquids.put(63, Material.WATER);
+        stubBlocks();
+        final TestMob mob = mob(created -> new WanderComponent(created, fixture.clock()).rest(1000, 2000).checkFloor(3));
+        fixture.watcher();
+
+        mob.tick();
+
+        verify(fixture.pathfinder, never()).moveTo(any(Location.class), anyDouble());
+    }
+
+    @Test
+    void ac30_aSpotUnderLavaIsNeverPicked() {
+        floorY = 61;
+        liquids.put(62, Material.LAVA);
+        liquids.put(63, Material.LAVA);
+        stubBlocks();
+        final TestMob mob = mob(created -> new WanderComponent(created, fixture.clock()).rest(1000, 2000).checkFloor(3));
+        fixture.watcher();
+
+        mob.tick();
+
+        verify(fixture.pathfinder, never()).moveTo(any(Location.class), anyDouble());
     }
 }
