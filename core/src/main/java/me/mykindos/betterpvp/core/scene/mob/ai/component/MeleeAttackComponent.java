@@ -120,7 +120,7 @@ public class MeleeAttackComponent implements AIComponent {
 
     @Override
     public EnumSet<AIControl> getControls() {
-        return EnumSet.of(AIControl.MOVE, AIControl.LOOK);
+        return EnumSet.of(AIControl.MOVE);
     }
 
     @Override
