@@ -201,7 +201,7 @@ public class AnimationController {
             return;
         }
         for (ActiveModel model : modeledEntity.getModels().values()) {
-            ModelEngineHelper.stopAnimation(model, animationId);
+            ModelEngineHelper.stopAnimation(model, animationId, BLEND_SECONDS);
         }
     }
 

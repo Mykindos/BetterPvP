@@ -114,13 +114,17 @@ public class ModelEngineHelper {
     }
 
     /**
-     * Gracefully stops a clip, playing its lerp-out so it fades rather than popping off. No-op if the
-     * clip is not currently playing. Use this when swapping looping clips so the outgoing and incoming
+     * Gracefully stops a clip, blending it out over {@code lerpOut} seconds so it fades rather than popping off.
+     * No-op if the clip is not currently playing. Use this when swapping looping clips so the outgoing and incoming
      * clips crossfade instead of stacking.
      */
-    public static void stopAnimation(ActiveModel model, String animationId) {
+    public static void stopAnimation(ActiveModel model, String animationId, double lerpOut) {
         final AnimationHandler animationHandler = model.getAnimationHandler();
         Preconditions.checkNotNull(animationHandler, "Animation handler cannot be null");
+        final IAnimationProperty playing = animationHandler.getAnimation(animationId);
+        if (playing != null) {
+            playing.setLerpOutTime(lerpOut);
+        }
         animationHandler.stopAnimation(animationId);
     }
 
