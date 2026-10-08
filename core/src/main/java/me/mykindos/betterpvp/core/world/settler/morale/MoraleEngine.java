@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
-import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -70,9 +69,6 @@ public class MoraleEngine implements Listener {
         final long now = clock.getAsLong();
         final List<Settler> leaving = new ArrayList<>();
         for (Settler settler : roster.getSettlers()) {
-            if (settler.getState() == SettlerState.LEAVING) {
-                continue;
-            }
             settler.setMorale(Math.clamp(model.morale(key, settler, roster, now), -100, 100));
             if (settler.getMorale() >= model.leaveBelow() || !model.mayLeave(settler)) {
                 settler.setUnhappySince(0);

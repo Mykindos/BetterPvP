@@ -119,7 +119,6 @@ public class SettlerService {
         roster.getSettlers().remove(settler);
         roster.getDepartures().removeIf(departure -> now - departure.getAt() > DEPARTURES_KEPT_MILLIS);
         roster.getDepartures().add(new SettlerDeparture(settler.getName(), settler.getRarity(), reason, now));
-        settler.changeState(SettlerState.LEAVING, now);
         site.changed(key);
         UtilServer.callEvent(new SettlerLeftEvent(key, settler, reason));
         return SettlerResult.done(settler);
@@ -147,7 +146,7 @@ public class SettlerService {
         if (profession.getWorkplaceKind() == WorkplaceKind.WORKPLACE && !workplace.equals(profession.getWorkplace())) {
             return SettlerResult.refused("core.settler.wrong_workplace");
         }
-        if (settler.getState() == SettlerState.STRIKING || settler.getState() == SettlerState.LEAVING) {
+        if (settler.getState() == SettlerState.STRIKING) {
             return SettlerResult.refused("core.settler.will_not_work");
         }
         if (settler.getAssignment() != null && !settler.getAssignment().equals(workplace)

@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
-import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -40,7 +39,7 @@ public class CampWideTraits {
     }
 
     private static boolean counts(@NotNull Settler settler, @NotNull String trait) {
-        return settler.hasTrait(trait) && settler.getState() != SettlerState.LEAVING;
+        return settler.hasTrait(trait);
     }
 
     private double strength(@NotNull Settler settler) {
