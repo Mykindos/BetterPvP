@@ -139,7 +139,7 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this(factory, entityType, disposition, System::currentTimeMillis);
     }
 
-    SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition, LongSupplier clock) {
+    protected SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition, LongSupplier clock) {
         super(factory);
         this.clock = clock;
         this.entityType = entityType;

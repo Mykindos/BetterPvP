@@ -54,7 +54,7 @@ public class WanderComponent implements AIComponent {
         this(mob, System::currentTimeMillis);
     }
 
-    WanderComponent(SceneMob mob, LongSupplier clock) {
+    public WanderComponent(SceneMob mob, LongSupplier clock) {
         this.mob = mob;
         this.clock = clock;
     }

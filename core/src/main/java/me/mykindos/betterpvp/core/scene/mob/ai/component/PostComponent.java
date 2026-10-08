@@ -38,7 +38,7 @@ public class PostComponent implements AIComponent {
         this(mob, post, System::currentTimeMillis);
     }
 
-    PostComponent(SceneMob mob, Supplier<Optional<Location>> post, LongSupplier clock) {
+    public PostComponent(SceneMob mob, Supplier<Optional<Location>> post, LongSupplier clock) {
         this.mob = mob;
         this.post = post;
         this.clock = clock;
