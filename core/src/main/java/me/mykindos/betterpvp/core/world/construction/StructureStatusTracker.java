@@ -12,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.LongSupplier;
 
 /**
- * Keeps structure status moving with time: applies job rules, lets self-repairing structures come back, and announces
- * every status change with a {@link StructureStatusChangeEvent}.
+ * Keeps structure status moving with time: applies job rules, lets self-repairing structures come back unless a repair
+ * job is on them, and announces every status change with a {@link StructureStatusChangeEvent}.
  */
 @Singleton
 public class StructureStatusTracker {
@@ -104,8 +104,9 @@ public class StructureStatusTracker {
 
     private boolean repairedItself(@NotNull PlacedStructure structure) {
         final Long disabledAt = structure.getDisabledAt();
+        final Job job = structure.getJob();
         if (structure.getCondition() != StructureCondition.DISABLED || disabledAt == null
-                || structure.getJob() != null) {
+                || (job != null && job.getKind() == JobKind.REPAIR)) {
             return false;
         }
         final Optional<StructureType> type = catalogue.find(structure.getType());
