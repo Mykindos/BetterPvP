@@ -26,18 +26,13 @@ public class SettlerNPC extends SceneMob {
     private final Supplier<Optional<Location>> post;
     private final LongSupplier clock;
 
-    public SettlerNPC(@NotNull SceneObjectFactory factory, @NotNull UUID settlerId,
-                      @NotNull Supplier<Optional<Location>> post) {
-        this(factory, settlerId, post, System::currentTimeMillis);
-    }
-
     SettlerNPC(@NotNull SceneObjectFactory factory, @NotNull UUID settlerId,
                @NotNull Supplier<Optional<Location>> post, @NotNull LongSupplier clock) {
         super(factory, EntityType.PIG, Disposition.NEUTRAL, clock);
         this.settlerId = settlerId;
         this.post = post;
         this.clock = clock;
-        setDamageTint(null);
+        setOrderSpeed(0.6);
     }
 
     @Override

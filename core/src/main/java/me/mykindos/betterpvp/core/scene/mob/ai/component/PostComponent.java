@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 /**
  * Walks the mob to its post and holds WORK there until it is replanned. The post is asked for only when the component
  * decides where to go: on its first start, after a rest, and after a replan or an interrupted trip. When the trip
- * gives up, the mob rests and then asks again.
+ * gives up, the mob rests and then asks again. While there is no post it asks again after each rest.
  */
 public class PostComponent implements AIComponent {
 
@@ -50,7 +50,10 @@ public class PostComponent implements AIComponent {
         return this;
     }
 
-    /** How long the mob rests after a trip gives up, between {@code minMillis} and {@code maxMillis}. */
+    /**
+     * How long the mob rests after a trip gives up, or before it asks again when it has no post, between
+     * {@code minMillis} and {@code maxMillis}.
+     */
     public PostComponent rest(long minMillis, long maxMillis) {
         this.minRestMillis = minMillis;
         this.maxRestMillis = maxMillis;
@@ -64,12 +67,17 @@ public class PostComponent implements AIComponent {
 
     @Override
     public boolean canStart() {
-        if (phase == Phase.RESTING && clock.getAsLong() >= restUntil) {
+        if ((phase == Phase.RESTING || phase == Phase.NO_POST) && clock.getAsLong() >= restUntil) {
             phase = Phase.UNDECIDED;
         }
         if (phase == Phase.UNDECIDED) {
             destination = post.get().orElse(null);
-            phase = destination == null ? Phase.NO_POST : Phase.TRAVELLING;
+            if (destination == null) {
+                phase = Phase.NO_POST;
+                restUntil = restEnd();
+            } else {
+                phase = Phase.TRAVELLING;
+            }
         }
         return phase != Phase.NO_POST;
     }
@@ -101,7 +109,11 @@ public class PostComponent implements AIComponent {
     private void giveUp() {
         phase = Phase.RESTING;
         mob.stopMoving();
-        restUntil = clock.getAsLong() + ThreadLocalRandom.current().nextLong(minRestMillis, maxRestMillis + 1);
+        restUntil = restEnd();
+    }
+
+    private long restEnd() {
+        return clock.getAsLong() + ThreadLocalRandom.current().nextLong(minRestMillis, maxRestMillis + 1);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.scene.mob.ai;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,11 @@ public class AIController {
     private final List<AIComponent> components = new ArrayList<>();
     private final Set<AIComponent> running = new HashSet<>();
     private final Map<AIControl, AIComponent> controlOwners = new EnumMap<>(AIControl.class);
+
+    /** The registered components, highest priority first. */
+    public List<AIComponent> getComponents() {
+        return Collections.unmodifiableList(components);
+    }
 
     /** Appends a component at the lowest priority - it runs only when nothing above it claims its controls. */
     public void add(AIComponent component) {

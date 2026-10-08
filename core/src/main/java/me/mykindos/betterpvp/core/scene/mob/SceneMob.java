@@ -125,6 +125,8 @@ public class SceneMob extends NPC implements HasModeledEntity {
     private Location homeAnchor;
     /** The follow range the body gets while the AI runs, so the pathfinder can plan trips this long. */
     @Setter private double pathRange = 48.0;
+    /** Pathfinding speed multiplier used on the way to a spot it is {@link #orderTo ordered to}. */
+    @Setter private double orderSpeed = 1.0;
 
     // Activation-gate state. The proximity check is sampled (not every tick) to keep it cheap.
     private boolean active = true;
@@ -230,7 +232,7 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this.animations = new AnimationController(this, animationProviders);
         this.homeAnchor = getEntity().getLocation();
         registerComponents();
-        orders = new OrderToSpotComponent(this, clock);
+        orders = new OrderToSpotComponent(this, clock).speed(orderSpeed);
         attending = new AttendComponent(this, clock);
         ai.addFirst(orders);
         ai.addFirst(attending);

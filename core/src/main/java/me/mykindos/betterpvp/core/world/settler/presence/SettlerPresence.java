@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
+import me.mykindos.betterpvp.core.world.settler.wage.SettlerStrikeEvent;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -52,10 +53,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.LongSupplier;
 
 /**
  * Puts every settler of a loaded site in its world and keeps them current: a body appears when a settler joins and
- * goes when it leaves, and heads off to its new workplace when its assignment changes.
+ * goes when it leaves, and heads off to its new workplace when its assignment changes or it starts or ends a strike.
  * <p>
  * The module that owns a kind of site binds {@link #content()} to that site's worlds.
  */
@@ -68,16 +70,23 @@ public class SettlerPresence implements Listener {
     private final ProfessionRegistry professions;
     private final SiteInstances instances;
     private final SettlerFactory factory;
+    private final LongSupplier clock;
     private final Map<String, Loaded> worlds = new HashMap<>();
     private final Set<String> missingModels = new HashSet<>();
 
     @Inject
     public SettlerPresence(@NotNull SettlerService service, @NotNull ProfessionRegistry professions,
                            @NotNull SiteInstances instances, @NotNull SettlerFactory factory) {
+        this(service, professions, instances, factory, System::currentTimeMillis);
+    }
+
+    SettlerPresence(@NotNull SettlerService service, @NotNull ProfessionRegistry professions,
+                    @NotNull SiteInstances instances, @NotNull SettlerFactory factory, @NotNull LongSupplier clock) {
         this.service = service;
         this.professions = professions;
         this.instances = instances;
         this.factory = factory;
+        this.clock = clock;
     }
 
     /** Content showing the settlers of whatever site a world belongs to. */
@@ -123,12 +132,12 @@ public class SettlerPresence implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAssigned(@NotNull SettlerAssignedEvent event) {
-        forSite(event.getSite(), (world, loaded) -> {
-            final SettlerNPC body = loaded.bodies.get(event.getSettler().getId());
-            if (body != null && body.isMaterialized()) {
-                body.replan();
-            }
-        });
+        replan(event.getSite(), event.getSettler());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onStrike(@NotNull SettlerStrikeEvent event) {
+        event.getSettlers().forEach(settler -> replan(event.getSite(), settler));
     }
 
     /** Sends every settler of {@code site} standing in {@code world} to gather near {@code spot} for a moment. */
@@ -151,7 +160,8 @@ public class SettlerPresence implements Listener {
         final Set<UUID> present = new HashSet<>();
         for (Settler settler : roster.getSettlers()) {
             present.add(settler.getId());
-            if (!loaded.bodies.containsKey(settler.getId())) {
+            final SettlerNPC body = loaded.bodies.get(settler.getId());
+            if (body == null || !body.isRegistered()) {
                 loaded.bodies.put(settler.getId(), spawn(world, loaded, site, settler));
             }
         }
@@ -169,7 +179,7 @@ public class SettlerPresence implements Listener {
         final Location home = site.home(loaded.key, world, loaded.regions).orElseGet(world::getSpawnLocation);
         final SettlerNPC npc = new SettlerNPC(factory, settler.getId(), () -> current(loaded.key, settler.getId())
                 .filter(found -> found.getState() == SettlerState.WORKING && found.getAssignment() != null)
-                .flatMap(found -> site.workplace(loaded.key, world, loaded.regions, found.getAssignment())));
+                .flatMap(found -> site.workplace(loaded.key, world, loaded.regions, found.getAssignment())), clock);
         npc.addDecorator(object -> dress(npc, loaded, site));
         npc.setInteractionHandler(player -> current(loaded.key, npc.getSettlerId()).ifPresent(found -> {
             npc.attend(player);
@@ -216,6 +226,7 @@ public class SettlerPresence implements Listener {
         final ActiveModel model = ModelEngineAPI.createActiveModel(look.getModel());
         model.setScale(look.getSize());
         model.setHitboxScale(1.5);
+        model.setCanHurt(false);
         ModelEngineHelper.bind(npc.getEntity()).addModel(model, true);
         if (look.getSkin() != null && ModelEngineAPI.getBlueprint(look.getSkin()) != null) {
             ModelEngineHelper.remapModel(model, ModelEngineAPI.getBlueprint(look.getSkin()));
@@ -230,6 +241,15 @@ public class SettlerPresence implements Listener {
         return professions.find(settler.getProfession())
                 .map(profession -> Translations.component(profession.getKey()).color(NamedTextColor.YELLOW))
                 .orElseGet(Component::empty);
+    }
+
+    private void replan(@NotNull SiteKey site, @NotNull Settler settler) {
+        forSite(site, (world, loaded) -> {
+            final SettlerNPC body = loaded.bodies.get(settler.getId());
+            if (body != null && body.isMaterialized()) {
+                body.replan();
+            }
+        });
     }
 
     private @NotNull Optional<Settler> current(@NotNull SiteKey key, @NotNull UUID settlerId) {
