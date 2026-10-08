@@ -3,21 +3,18 @@ package me.mykindos.betterpvp.core.world.settler.presence;
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.generator.blueprint.ModelBlueprint;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
-import me.mykindos.betterpvp.core.scene.behavior.AmbientParticleBehavior;
 import me.mykindos.betterpvp.core.scene.behavior.BoneTagAnchor;
-import me.mykindos.betterpvp.core.scene.behavior.ScriptEffectBehavior;
 import me.mykindos.betterpvp.core.scene.behavior.TagBehavior;
 import me.mykindos.betterpvp.core.scene.mob.MobFixture;
 import me.mykindos.betterpvp.core.scene.mob.SceneMob;
 import me.mykindos.betterpvp.core.scene.mob.animation.MobAnimation;
+import me.mykindos.betterpvp.core.scene.mob.listener.MobCombatListener;
 import me.mykindos.betterpvp.core.utilities.ModelEngineHelper;
 import me.mykindos.betterpvp.core.world.content.SceneSpawn;
-import me.mykindos.betterpvp.core.world.content.WorldContentScope;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
-import me.mykindos.betterpvp.core.world.settler.Profession;
-import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAssignedEvent;
@@ -26,15 +23,12 @@ import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeftEvent;
 import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
-import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
-import me.mykindos.betterpvp.core.world.site.SiteInstance;
-import me.mykindos.betterpvp.core.world.site.SiteInstances;
+import me.mykindos.betterpvp.core.world.settler.wage.SettlerStrikeEvent;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -44,26 +38,22 @@ import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedConstruction;
+import org.mockito.InOrder;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -72,10 +62,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,113 +71,56 @@ import static org.mockito.Mockito.when;
 
 class SettlerPresenceTest {
 
-    private static final String WORLD = "camp_world";
-    private static final String MODEL = "settler_builder";
+    private static final String MODEL = SettlerFixture.MODEL;
 
-    private final MobFixture fixture = new MobFixture();
-    private final MockedStatic<TagBehavior> tags = mockStatic(TagBehavior.class);
-    private final MockedStatic<BoneTagAnchor> boneTags = mockStatic(BoneTagAnchor.class);
-    private final MockedStatic<ModelEngineHelper> helper = mockStatic(ModelEngineHelper.class, Mockito.CALLS_REAL_METHODS);
-    private final MockedConstruction<ScriptEffectBehavior> scripts = mockConstruction(ScriptEffectBehavior.class);
-    private final List<List<?>> particles = new ArrayList<>();
-    private final MockedConstruction<AmbientParticleBehavior> particleBehaviors = mockConstruction(
-            AmbientParticleBehavior.class, (created, context) -> particles.add(context.arguments()));
-
-    private final ProfessionRegistry professions = new ProfessionRegistry();
-    private final SettlerService service = new SettlerService(professions);
-    private final SettlerSite site = mock(SettlerSite.class);
-    private final SiteInstances instances = mock(SiteInstances.class);
-    private final SettlerFactory factory = new SettlerFactory(mock(SceneObjectRegistry.class));
-    private final WorldContentScope scope = mock(WorldContentScope.class);
-    private final RegionIndex regions = mock(RegionIndex.class);
-    private final Roster roster = new Roster();
-    private final SiteKey key = SiteKey.of("camp", 7);
-    private final List<SceneSpawn> spawns = new ArrayList<>();
-    private final Map<String, Location> workplaces = new HashMap<>();
-
-    private SettlerLook look = new SettlerLook(MODEL, null, "idle", "walk", "work", 1.2);
-    private SettlerPresence presence;
-
-    @BeforeEach
-    void setUp() {
-        professions.register(Profession.construction("builder", "settler.profession.builder", List.of()));
-        service.register("camp", site);
-        when(site.roster(key)).thenReturn(Optional.of(roster));
-        when(site.look(eq(key), any(Settler.class))).thenAnswer(invocation -> look);
-        when(site.home(eq(key), any(World.class), any(RegionIndex.class))).thenReturn(Optional.of(fixture.position()));
-        when(site.workplace(eq(key), any(World.class), any(RegionIndex.class), anyString()))
-                .thenAnswer(invocation -> Optional.ofNullable(workplaces.get(invocation.<String>getArgument(3))));
-
-        final SiteInstance instance = new SiteInstance(UUID.randomUUID(), key, WORLD, SiteInstance.State.READY);
-        when(instances.byWorld(WORLD)).thenReturn(Optional.of(instance));
-        when(instances.forKey(key)).thenReturn(List.of(instance));
-        when(fixture.world.getName()).thenReturn(WORLD);
-        when(fixture.world.getSpawnLocation()).thenReturn(fixture.at(100, 70, 100));
-        fixture.bukkit.when(() -> Bukkit.getWorld(WORLD)).thenReturn(fixture.world);
-        FakeGround.floorAt(fixture.world, 63);
-
-        doAnswer(invocation -> spawns.add(invocation.getArgument(0))).when(scope).add(any(SceneSpawn.class));
-        presence = new SettlerPresence(service, professions, instances, factory);
-    }
+    private final SettlerFixture settlers = new SettlerFixture();
+    private final MobFixture fixture = settlers.fixture;
+    private final MockedStatic<TagBehavior> tags = settlers.tags;
+    private final MockedStatic<BoneTagAnchor> boneTags = settlers.boneTags;
+    private final MockedStatic<ModelEngineHelper> helper = settlers.helper;
+    private final List<List<?>> particles = settlers.particles;
+    private final SettlerSite site = settlers.site;
+    private final Roster roster = settlers.roster;
+    private final SiteKey key = settlers.key;
+    private final List<SceneSpawn> spawns = settlers.spawns;
+    private final Map<String, Location> workplaces = settlers.workplaces;
+    private final SettlerPresence presence = settlers.presence;
 
     @AfterEach
     void close() {
-        particleBehaviors.close();
-        scripts.close();
-        helper.close();
-        boneTags.close();
-        tags.close();
-        fixture.close();
+        settlers.close();
     }
 
     private Settler settler(SettlerRarity rarity, String profession, SettlerState state, String assignment) {
-        final Settler settler = new Settler();
-        settler.setId(UUID.randomUUID());
-        settler.setName("Aldric Tanner");
-        settler.setRarity(rarity);
-        settler.setProfession(profession);
-        settler.setState(state);
-        settler.setAssignment(assignment);
-        roster.getSettlers().add(settler);
-        return settler;
+        return settlers.settler(rarity, profession, state, assignment);
     }
 
     private Settler idle() {
-        return settler(SettlerRarity.COMMON, null, SettlerState.IDLE, null);
+        return settlers.idle();
     }
 
     private Settler working(String workplace, Location at) {
-        workplaces.put(workplace, at);
-        return settler(SettlerRarity.COMMON, "builder", SettlerState.WORKING, workplace);
+        return settlers.working(workplace, at);
     }
 
     private void install() {
-        presence.content().install(fixture.world, regions, scope);
+        settlers.install();
     }
 
     private void modelInstalled() {
-        fixture.modelEngine.when(() -> ModelEngineAPI.getBlueprint(MODEL)).thenReturn(mock(ModelBlueprint.class));
+        settlers.modelInstalled();
     }
 
     private SettlerNPC npc(Settler settler) {
-        return spawns.stream()
-                .map(spawn -> (SettlerNPC) spawn.getObject())
-                .filter(npc -> npc.getSettlerId().equals(settler.getId()))
-                .findFirst().orElseThrow();
+        return settlers.npc(settler);
     }
 
     private SceneSpawn spawnOf(Settler settler) {
-        return spawns.stream()
-                .filter(spawn -> ((SettlerNPC) spawn.getObject()).getSettlerId().equals(settler.getId()))
-                .findFirst().orElseThrow();
+        return settlers.spawnOf(settler);
     }
 
-    /** Spawns the settler's body on a fresh mocked mob at its anchor, as a chunk load would. */
     private Mob materialize(Settler settler) {
-        final SettlerNPC npc = npc(settler);
-        npc.configureMaterialization(spawnOf(settler).getAnchor(), anchor -> fixture.newBody());
-        npc.materialize();
-        return (Mob) npc.getEntity();
+        return settlers.materialize(settler);
     }
 
     private static Pathfinder pathfinder(Mob body) {
@@ -310,15 +241,25 @@ class SettlerPresenceTest {
     }
 
     @Test
-    void ac3_itsModelNeverFlashesHurt() {
+    void ac3_itsModelNeverFlashesHurt() throws ReflectiveOperationException {
         modelInstalled();
         final Settler settler = idle();
         install();
+        final Mob body = materialize(settler);
+        final Constructor<MobCombatListener> constructor = MobCombatListener.class.getDeclaredConstructor(SceneObjectRegistry.class);
+        constructor.setAccessible(true);
+        final MobCombatListener combat = constructor.newInstance(settlers.registry);
+        final Player attacker = fixture.player(fixture.position().add(1, 0, 0));
+        final DamageEvent hit = mock(DamageEvent.class);
+        when(hit.getDamagee()).thenReturn(body);
+        when(hit.getDamager()).thenReturn(attacker);
+        when(hit.getDamage()).thenReturn(4.0);
 
-        final SceneMob mob = assertInstanceOf(SceneMob.class, npc(settler));
-        materialize(settler);
+        combat.onDamage(hit);
 
-        assertNull(mob.getDamageTint());
+        final InOrder order = inOrder(fixture.model, fixture.modeled);
+        order.verify(fixture.model).setCanHurt(false);
+        order.verify(fixture.modeled).markHurt();
         verify(fixture.model, never()).setCanHurt(true);
     }
 
@@ -342,7 +283,7 @@ class SettlerPresenceTest {
         final ModelBlueprint skin = mock(ModelBlueprint.class);
         fixture.modelEngine.when(() -> ModelEngineAPI.getBlueprint("skin_rare")).thenReturn(skin);
         helper.when(() -> ModelEngineHelper.remapModel(any(), any())).thenAnswer(invocation -> null);
-        look = new SettlerLook(MODEL, "skin_rare", "idle", "walk", "work", 1.0);
+        settlers.look = new SettlerLook(MODEL, "skin_rare", "idle", "walk", "work", 1.0);
         final Settler settler = idle();
         install();
 
@@ -355,7 +296,7 @@ class SettlerPresenceTest {
     void ac4_aSkinThatIsNotInstalledIsSkipped() {
         modelInstalled();
         helper.when(() -> ModelEngineHelper.remapModel(any(), any())).thenAnswer(invocation -> null);
-        look = new SettlerLook(MODEL, "skin_missing", "idle", "walk", "work", 1.0);
+        settlers.look = new SettlerLook(MODEL, "skin_missing", "idle", "walk", "work", 1.0);
         final Settler settler = idle();
         install();
 
@@ -378,7 +319,7 @@ class SettlerPresenceTest {
     @Test
     void ac5_theLooksClipsAreTheSettlersIdleWalkAndWorkClips() {
         modelInstalled();
-        look = new SettlerLook(MODEL, null, "farmer_idle", "farmer_walk", "farmer_hoe", 1.0);
+        settlers.look = new SettlerLook(MODEL, null, "farmer_idle", "farmer_walk", "farmer_hoe", 1.0);
         final Settler settler = idle();
         install();
 
@@ -522,6 +463,39 @@ class SettlerPresenceTest {
     }
 
     @Test
+    void ac1_theCheckGivesABodyBackToASettlerWhoseBodyWasUnregistered() {
+        final Settler settler = idle();
+        install();
+        final SettlerNPC first = npc(settler);
+        first.remove();
+
+        presence.tick();
+        presence.tick();
+
+        assertEquals(2, spawns.size());
+        assertNotSame(first, npc(settler));
+        assertTrue(npc(settler).isRegistered());
+    }
+
+    @Test
+    void ac12_aSettlerWhoseStrikeEndsHeadsBackToItsPost() {
+        final Location farm = fixture.at(10, 64, 0);
+        workplaces.put("farm", farm);
+        final Settler settler = settler(SettlerRarity.COMMON, "builder", SettlerState.STRIKING, "farm");
+        install();
+        fixture.watcher();
+        final Mob body = materialize(settler);
+        tickNpc(npc(settler), 2);
+        verify(pathfinder(body), never()).moveTo(eq(farm), anyDouble());
+
+        settler.setState(SettlerState.WORKING);
+        presence.onStrike(new SettlerStrikeEvent(key, List.of(settler), false));
+        tickNpc(npc(settler), 1);
+
+        verify(pathfinder(body)).moveTo(farm, 0.6);
+    }
+
+    @Test
     void ac13_rightClickingOpensWhatTheSiteShowsForThatSettler() {
         final Settler settler = idle();
         install();
@@ -568,7 +542,7 @@ class SettlerPresenceTest {
 
         for (Mob body : List.of(firstBody, secondBody)) {
             final ArgumentCaptor<Location> to = ArgumentCaptor.forClass(Location.class);
-            verify(pathfinder(body)).moveTo(to.capture(), anyDouble());
+            verify(pathfinder(body)).moveTo(to.capture(), eq(0.6));
             final double distance = horizontal(to.getValue(), spot);
             assertTrue(distance >= 1 && distance <= 3, "gathered " + distance + " from the spot");
         }

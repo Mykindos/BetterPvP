@@ -1,22 +1,26 @@
 package me.mykindos.betterpvp.core.world.settler.presence;
 
-import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.mob.MobFixture;
-import me.mykindos.betterpvp.core.scene.mob.SceneMob;
-import me.mykindos.betterpvp.core.scene.mob.animation.MobAnimation;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.AttendComponent;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.LookAtNearbyPlayerComponent;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.OrderToSpotComponent;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.PostComponent;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.WanderComponent;
+import me.mykindos.betterpvp.core.scene.mob.sound.MobSoundBehavior;
+import me.mykindos.betterpvp.core.world.settler.Settler;
+import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
+import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 import static me.mykindos.betterpvp.core.scene.mob.MobFixture.tick;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -24,31 +28,38 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class SettlerNPCTest {
 
-    private final MobFixture fixture = new MobFixture();
-    private Optional<Location> post = Optional.empty();
+    private static final String POST = "post";
+
+    private final SettlerFixture settlers = new SettlerFixture();
+    private final MobFixture fixture = settlers.fixture;
 
     @AfterEach
     void close() {
-        fixture.close();
+        settlers.close();
     }
 
-    /** A settler body with a model and the look's clips, spawned at the fixture's position, which is its home. */
-    private SceneMob spawn() {
-        final SettlerNPC npc = new SettlerNPC(mock(SceneObjectFactory.class), UUID.randomUUID(), () -> post, fixture.clock());
-        final SceneMob mob = assertInstanceOf(SceneMob.class, npc);
-        mob.setModelId("settler_builder");
-        mob.setAnimation(MobAnimation.IDLE, "idle");
-        mob.setAnimation(MobAnimation.WALK, "walk");
-        mob.setAnimation(MobAnimation.WORK, "work");
-        mob.configureMaterialization(fixture.position(), anchor -> fixture.newBody());
-        mob.materialize();
-        return mob;
+    /** Puts the settler's workplace at {@code at}. */
+    private void post(Location at) {
+        settlers.workplaces.put(POST, at);
+    }
+
+    /**
+     * A working settler with the look's model and clips, whose workplace is wherever {@link #post} put it, spawned
+     * by the presence at the fixture's position, which is its home.
+     */
+    private SettlerNPC spawn() {
+        settlers.modelInstalled();
+        final Settler settler = settlers.settler(SettlerRarity.COMMON, "builder", SettlerState.WORKING, POST);
+        settlers.install();
+        settlers.materialize(settler);
+        final SettlerNPC npc = settlers.npc(settler);
+        assertNull(npc.getModelId());
+        return npc;
     }
 
     private Location lastTrip() {
@@ -68,7 +79,7 @@ class SettlerNPCTest {
         FakeGround.floorAt(fixture.world, 63);
         final Location home = fixture.position();
         fixture.watcher();
-        final SceneMob mob = spawn();
+        final SettlerNPC mob = spawn();
 
         for (int trip = 0; trip < 20; trip++) {
             clearInvocations(fixture.pathfinder);
@@ -88,7 +99,7 @@ class SettlerNPCTest {
     void ac9_afterArrivingItRests5To15SecondsHoldingIdleThenPicksAnotherSpot() {
         FakeGround.floorAt(fixture.world, 63);
         fixture.watcher();
-        final SceneMob mob = spawn();
+        final SettlerNPC mob = spawn();
         tick(mob, 1);
         final Location first = lastTrip();
 
@@ -107,11 +118,29 @@ class SettlerNPCTest {
     }
 
     @Test
+    void ac8_aWorkplaceFoundLateIsWalkedToAfterTheNextRest() {
+        FakeGround.floorAt(fixture.world, 63);
+        fixture.watcher();
+        final SettlerNPC mob = spawn();
+        tick(mob, 1);
+
+        final Location farm = fixture.at(10, 64, 0);
+        post(farm);
+        tick(mob, 5);
+        verify(fixture.pathfinder, never()).moveTo(farm, 0.6);
+
+        fixture.advance(15_001);
+        tick(mob, 1);
+
+        verify(fixture.pathfinder).moveTo(farm, 0.6);
+    }
+
+    @Test
     void ac10_atItsPostItFacesTheNearestPlayerWithin5Blocks() {
-        post = Optional.of(fixture.position());
+        post(fixture.position());
         final Player near = fixture.player(fixture.position().add(3, 0, 0));
         final Player farther = fixture.player(fixture.position().add(4.5, 0, 0));
-        final SceneMob mob = spawn();
+        final SettlerNPC mob = spawn();
 
         tick(mob, 6);
 
@@ -123,7 +152,7 @@ class SettlerNPCTest {
     void ac10_restingItFacesAPlayerWithin5BlocksButNotOneFurther() {
         FakeGround.none(fixture.world);
         final Player outside = fixture.player(fixture.position().add(6, 0, 0));
-        final SceneMob mob = spawn();
+        final SettlerNPC mob = spawn();
         tick(mob, 6);
         verify(fixture.body, never()).lookAt(outside.getEyeLocation());
 
@@ -135,9 +164,9 @@ class SettlerNPCTest {
 
     @Test
     void ac11_withNoPlayerWithin48BlocksItDoesNotMove() {
-        post = Optional.of(fixture.at(10, 64, 0));
+        post(fixture.at(10, 64, 0));
         fixture.player(fixture.position().add(49, 0, 0));
-        final SceneMob mob = spawn();
+        final SettlerNPC mob = spawn();
 
         tick(mob, 25);
 
@@ -147,9 +176,9 @@ class SettlerNPCTest {
     @Test
     void ac13_aRightClickedSettlerFacesThePlayerFor4SecondsThenGoesBackToItsPost() {
         final Location farm = fixture.at(10, 64, 0);
-        post = Optional.of(farm);
+        post(farm);
         final Player player = fixture.player(fixture.position().add(2, 0, 0));
-        final SceneMob mob = spawn();
+        final SettlerNPC mob = spawn();
         tick(mob, 1);
         clearInvocations(fixture.pathfinder);
 
@@ -166,8 +195,15 @@ class SettlerNPCTest {
     }
 
     @Test
-    void ac16_settlersHaveNoRoutineOfTheirOwn() {
-        assertThrows(ClassNotFoundException.class,
-                () -> Class.forName("me.mykindos.betterpvp.core.world.settler.presence.SettlerRoutine"));
+    void ac16_aSettlersDayIsRunByTheSharedMobAiAlone() {
+        final Settler settler = settlers.idle();
+        settlers.install();
+        settlers.materialize(settler);
+        final SettlerNPC npc = settlers.npc(settler);
+
+        assertEquals(List.of(AttendComponent.class, OrderToSpotComponent.class, PostComponent.class,
+                        WanderComponent.class, LookAtNearbyPlayerComponent.class),
+                npc.getAi().getComponents().stream().map(Object::getClass).toList());
+        assertEquals(List.of(MobSoundBehavior.class), npc.getBehaviors().stream().map(Object::getClass).toList());
     }
 }
