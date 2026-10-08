@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.scene.mob;
 
+import com.destroystokyo.paper.entity.Pathfinder;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import me.mykindos.betterpvp.core.scene.SceneEntity;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
@@ -7,6 +8,7 @@ import me.mykindos.betterpvp.core.scene.controller.SceneTicker;
 import me.mykindos.betterpvp.core.scene.mob.MobFixture.TestMob;
 import me.mykindos.betterpvp.core.scene.mob.ai.AIControl;
 import me.mykindos.betterpvp.core.scene.mob.ai.FakeComponent;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.PostComponent;
 import me.mykindos.betterpvp.core.scene.mob.animation.MobAnimation;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,10 +20,12 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -411,6 +415,137 @@ class SceneMobTest {
         tick(mob, 30);
 
         verify(body, never()).setAI(false);
+    }
+
+    @Test
+    void ac32_askingAMobToAttendStopsWhatItWasDoingAndFacesThePlayer() {
+        final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
+        final TestMob mob = fixture.spawn("knight", created -> {
+            clips(created);
+            created.getAi().add(walking);
+        });
+        fixture.watcher();
+        final Player player = fixture.player(fixture.at(3, 64, 0));
+        mob.tick();
+
+        mob.attend(player);
+        mob.tick();
+
+        assertFalse(walking.isRunning());
+        verify(fixture.pathfinder, atLeastOnce()).stopPathfinding();
+        verify(fixture.body, atLeastOnce()).lookAt(player.getEyeLocation());
+        verify(fixture.handler, atLeastOnce()).playAnimation(eq("idle"), anyDouble(), anyDouble(), anyDouble(), anyBoolean());
+    }
+
+    @Test
+    void ac33_orderingAMobToASpotSendsItNearTheSpot() {
+        final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
+        final TestMob mob = fixture.spawn(created -> created.getAi().add(walking));
+        fixture.watcher();
+        mob.tick();
+        final Location spot = fixture.at(20, 64, 20);
+
+        mob.orderTo(spot);
+        mob.tick();
+
+        assertFalse(walking.isRunning());
+        final ArgumentCaptor<Location> sent = ArgumentCaptor.forClass(Location.class);
+        verify(fixture.pathfinder, atLeastOnce()).moveTo(sent.capture(), anyDouble());
+        final double distance = Math.hypot(sent.getValue().getX() - 20, sent.getValue().getZ() - 20);
+        assertTrue(distance >= 1 && distance <= 3, "sent " + distance + " from the spot");
+    }
+
+    @Test
+    void ac33_attendingDuringAnOrderPausesItAndTheOrderResumesAfter() {
+        final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
+        final TestMob mob = fixture.spawn(created -> created.getAi().add(walking));
+        fixture.watcher();
+        when(fixture.pathfinder.getCurrentPath()).thenReturn(mock(Pathfinder.PathResult.class));
+        mob.tick();
+        mob.orderTo(fixture.at(20, 64, 20));
+        mob.tick();
+        final ArgumentCaptor<Location> sent = ArgumentCaptor.forClass(Location.class);
+        verify(fixture.pathfinder).moveTo(sent.capture(), anyDouble());
+        final Player player = fixture.player(fixture.at(3, 64, 0));
+
+        mob.attend(player);
+        mob.tick();
+        fixture.advance(3000);
+        tick(mob, 2);
+        verify(fixture.body, atLeastOnce()).lookAt(player.getEyeLocation());
+        verify(fixture.pathfinder, times(1)).moveTo(any(Location.class), anyDouble());
+
+        fixture.advance(1001);
+        tick(mob, 2);
+
+        verify(fixture.pathfinder, times(2)).moveTo(eq(sent.getValue()), anyDouble());
+        assertFalse(walking.isRunning());
+    }
+
+    @Test
+    void ac33_anOrderGivenWhileAttendingWaitsForTheAttentionToEnd() {
+        final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
+        final TestMob mob = fixture.spawn(created -> created.getAi().add(walking));
+        fixture.watcher();
+        mob.tick();
+        final Player player = fixture.player(fixture.at(3, 64, 0));
+
+        mob.attend(player);
+        mob.tick();
+        mob.orderTo(fixture.at(20, 64, 20));
+        tick(mob, 2);
+        verify(fixture.pathfinder, never()).moveTo(any(Location.class), anyDouble());
+        verify(fixture.body, atLeastOnce()).lookAt(player.getEyeLocation());
+
+        fixture.advance(4001);
+        tick(mob, 2);
+
+        final ArgumentCaptor<Location> sent = ArgumentCaptor.forClass(Location.class);
+        verify(fixture.pathfinder).moveTo(sent.capture(), anyDouble());
+        final double distance = Math.hypot(sent.getValue().getX() - 20, sent.getValue().getZ() - 20);
+        assertTrue(distance >= 1 && distance <= 3, "sent " + distance + " from the spot");
+        assertFalse(walking.isRunning());
+    }
+
+    @Test
+    void ac34_replanningStopsRunningComponentsSoEachDecidesAgainNextTick() {
+        final FakeComponent walking = new FakeComponent("walking", AIControl.MOVE);
+        final FakeComponent thinking = new FakeComponent("thinking");
+        final TestMob mob = fixture.spawn(created -> {
+            created.getAi().add(walking);
+            created.getAi().add(thinking);
+        });
+        fixture.watcher();
+        mob.tick();
+
+        mob.replan();
+
+        assertEquals(1, walking.stops);
+        assertEquals(1, thinking.stops);
+        mob.tick();
+        assertEquals(2, walking.starts);
+        assertEquals(2, thinking.starts);
+    }
+
+    @Test
+    void ac34_aChangedPostLocationIsPickedUpOnReplan() {
+        final Location first = fixture.at(10, 64, 0);
+        final Location second = fixture.at(-10, 64, 0);
+        final AtomicReference<Location> post = new AtomicReference<>(first);
+        final TestMob mob = fixture.spawn(created ->
+                created.getAi().add(new PostComponent(created, () -> Optional.of(post.get()))));
+        fixture.watcher();
+        when(fixture.pathfinder.getCurrentPath()).thenReturn(mock(Pathfinder.PathResult.class));
+        mob.tick();
+        verify(fixture.pathfinder).moveTo(eq(first), anyDouble());
+
+        post.set(second);
+        tick(mob, 5);
+        verify(fixture.pathfinder, never()).moveTo(eq(second), anyDouble());
+
+        mob.replan();
+        mob.tick();
+        verify(fixture.pathfinder).moveTo(eq(second), anyDouble());
     }
 
     @Test

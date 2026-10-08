@@ -4,12 +4,15 @@ import com.destroystokyo.paper.entity.ai.MobGoals;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.scene.HasModeledEntity;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.mob.ai.AIController;
 import me.mykindos.betterpvp.core.scene.mob.ai.Navigator;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.AttendComponent;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.OrderToSpotComponent;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationController;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationProvider;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationProviders;
@@ -37,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.LongSupplier;
 
 /**
  * Base class for code-driven custom mobs. It is an {@link NPC} (a non-playable character) whose
@@ -84,6 +88,8 @@ public class SceneMob extends NPC implements HasModeledEntity {
     /** ModelEngine clip name that signals the mob is dying; while it plays the mob is treated as dead. */
     private static final String DEATH_CLIP = "death";
 
+    @Getter(AccessLevel.NONE) private final LongSupplier clock;
+
     /** Vanilla entity used to host this mob in the world (spawned by the factory before init). */
     private final EntityType entityType;
 
@@ -126,8 +132,16 @@ public class SceneMob extends NPC implements HasModeledEntity {
     private boolean enabledBodyAi;
     private int activationCheckCounter = 0;
 
+    @Getter(AccessLevel.NONE) private AttendComponent attending;
+    @Getter(AccessLevel.NONE) private OrderToSpotComponent orders;
+
     public SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition) {
+        this(factory, entityType, disposition, System::currentTimeMillis);
+    }
+
+    SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition, LongSupplier clock) {
         super(factory);
+        this.clock = clock;
         this.entityType = entityType;
         this.disposition = disposition;
         // Created here (not in onInit) so subclasses can tune it fluently in their constructor via
@@ -216,6 +230,10 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this.animations = new AnimationController(this, animationProviders);
         this.homeAnchor = getEntity().getLocation();
         registerComponents();
+        orders = new OrderToSpotComponent(this, clock);
+        attending = new AttendComponent(this, clock);
+        ai.addFirst(orders);
+        ai.addFirst(attending);
     }
 
     @Override
@@ -320,10 +338,34 @@ public class SceneMob extends NPC implements HasModeledEntity {
         animations.play(MobAnimation.WALK);
     }
 
+    /**
+     * Starts a trip to a fixed point and holds the WALK clip. The trip searches again when it has no path or the body
+     * stops moving. See {@link Navigator#travelTo}.
+     */
+    public void travelTo(Location target, double speed, Runnable onGiveUp) {
+        navigator.travelTo(target, speed, onGiveUp);
+        animations.play(MobAnimation.WALK);
+    }
+
     /** Halts pathfinding and drops back to the IDLE clip. Call when a movement behaviour ends or yields. */
     public void stopMoving() {
         navigator.stop();
         animations.play(MobAnimation.IDLE);
+    }
+
+    /** Stops pathing, faces {@code player} and holds IDLE for a moment, then lets the AI decide again. */
+    public void attend(Player player) {
+        attending.attend(player);
+    }
+
+    /** Sends the mob to a random point near {@code spot}, rests there, then lets the AI decide again. */
+    public void orderTo(Location spot) {
+        orders.orderTo(spot);
+    }
+
+    /** Stops every running component so each decides again on the next tick. */
+    public void replan() {
+        ai.replan();
     }
 
     /** @return {@code true} if the target is non-null, alive, still valid, and in this mob's world. */

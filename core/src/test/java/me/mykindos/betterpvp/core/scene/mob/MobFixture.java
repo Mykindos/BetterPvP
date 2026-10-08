@@ -211,7 +211,7 @@ public final class MobFixture implements AutoCloseable {
     }
 
     public TestMob create(String modelId, Consumer<TestMob> components) {
-        final TestMob mob = new TestMob(components);
+        final TestMob mob = new TestMob(components, clock());
         mob.setModelId(modelId);
         return mob;
     }
@@ -229,14 +229,14 @@ public final class MobFixture implements AutoCloseable {
         bukkit.close();
     }
 
-    /** A mob whose components are supplied by the test. */
+    /** A mob whose components are supplied by the test, on the fixture's clock. */
     public static final class TestMob extends SceneMob {
 
         private final Consumer<TestMob> components;
         public int registrations;
 
-        public TestMob(Consumer<TestMob> components) {
-            super(mock(SceneObjectFactory.class), EntityType.ZOMBIE, Disposition.HOSTILE);
+        public TestMob(Consumer<TestMob> components, LongSupplier clock) {
+            super(mock(SceneObjectFactory.class), EntityType.ZOMBIE, Disposition.HOSTILE, clock);
             this.components = components;
         }
 

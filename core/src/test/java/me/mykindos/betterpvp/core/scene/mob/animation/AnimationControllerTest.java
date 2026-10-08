@@ -276,4 +276,43 @@ class AnimationControllerTest {
     void ac23_aModelledMobReportsItsModel() {
         assertTrue(modelled().getAnimations().hasModel());
     }
+
+    @Test
+    void ac35_workIsALoopingState() {
+        assertTrue(MobAnimation.WORK.isLooping());
+    }
+
+    @Test
+    void ac35_workIsHeldLikeTheOtherLoopingStates() {
+        final TestMob mob = modelled();
+        mob.setAnimation(MobAnimation.WORK, "hammer");
+        final AnimationController animations = mob.getAnimations();
+        animations.play(MobAnimation.WALK);
+
+        animations.play(MobAnimation.WORK);
+        animations.tick();
+
+        verify(fixture.handler).stopAnimation("walk");
+        verify(fixture.handler, times(2)).playAnimation("hammer", 0.2, 0.2, 1.0, false);
+    }
+
+    @Test
+    void ac35_idleWalkAndWorkClipsCanBeSetAfterTheMobIsBuilt() {
+        final TestMob mob = modelled();
+        mob.setAnimation(MobAnimation.WORK, "hammer");
+        final AnimationController animations = mob.getAnimations();
+        animations.play(MobAnimation.WORK);
+
+        mob.setAnimation(MobAnimation.IDLE, "idle_settler");
+        mob.setAnimation(MobAnimation.WALK, "walk_settler");
+        mob.setAnimation(MobAnimation.WORK, "saw");
+        animations.tick();
+        animations.play(MobAnimation.WALK);
+        animations.play(MobAnimation.IDLE);
+
+        verify(fixture.handler).stopAnimation("hammer");
+        verify(fixture.handler).playAnimation("saw", 0.2, 0.2, 1.0, false);
+        verify(fixture.handler).playAnimation("walk_settler", 0.2, 0.2, 1.0, false);
+        verify(fixture.handler).playAnimation("idle_settler", 0.2, 0.2, 1.0, false);
+    }
 }

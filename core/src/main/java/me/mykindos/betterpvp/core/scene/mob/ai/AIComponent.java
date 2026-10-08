@@ -48,4 +48,7 @@ public interface AIComponent {
     /** Called when the component stops (no longer continuing, or preempted). */
     default void stop() {}
 
+    /** Called when the mob is replanned. A component that remembers a decision drops it here. */
+    default void replan() {}
+
 }
