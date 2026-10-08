@@ -17,26 +17,26 @@ class CrewSpeedTest {
     }
 
     @Test
-    void oneLegendaryRunsAtItsOwnSpeed() {
+    void ac13_oneBuilderRunsAtItsOwnSpeed() {
         assertEquals(2.2, CrewSpeed.of(List.of(builder(2.2, 0.9, "mason")), LIMITS), 1e-9);
     }
 
     @Test
-    void theFastestCountsFullyAndTheRestAtTheirEfficiency() {
+    void ac13_theFastestCountsFullyAndTheRestAtTheirEfficiency() {
         final List<BuilderStats> laborers = List.of(builder(1, 0.5, "laborer"), builder(1, 0.5, "laborer"),
                 builder(1, 0.5, "laborer"));
         assertEquals(2.0, CrewSpeed.of(laborers, LIMITS), 1e-9);
     }
 
     @Test
-    void compatibleTradesCountFullyWithABonus() {
+    void ac14_compatibleTradesCountFullyWithABonus() {
         final List<BuilderStats> crew = List.of(builder(1, 0.5, "mason", "carpenter"),
                 builder(1, 0.5, "carpenter", "mason"));
         assertEquals(2.2, CrewSpeed.of(crew, LIMITS), 1e-9);
     }
 
     @Test
-    void crewSpeedIsCapped() {
+    void ac15_crewSpeedIsCappedAndZeroWithNoCrew() {
         final List<BuilderStats> crew = List.of(builder(2.2, 0.9, "mason"), builder(2.2, 0.9, "smith"),
                 builder(2.2, 0.9, "laborer"));
         assertEquals(4.0, CrewSpeed.of(crew, LIMITS), 1e-9);
@@ -45,7 +45,7 @@ class CrewSpeedTest {
     }
 
     @Test
-    void contributionsFollowTheCrewOrderAndAddUpToTheSpeed() {
+    void ac24_contributionsFollowTheCrewOrderAndAddUpToTheSpeed() {
         final List<BuilderStats> crew = List.of(builder(1, 0.5, "laborer"), builder(2, 0.5, "mason"));
         final double[] contributions = CrewSpeed.contributions(crew, LIMITS);
         assertEquals(0.5, contributions[0], 1e-9, "the slower one counts at its efficiency");
@@ -54,7 +54,7 @@ class CrewSpeedTest {
     }
 
     @Test
-    void wastedSpeedIsWhatEfficiencyAndTheCapTakeAway() {
+    void ac25_wastedSpeedIsWhatEfficiencyAndTheCapTakeAway() {
         final List<BuilderStats> crew = List.of(builder(1, 0.5, "laborer"), builder(2, 0.5, "mason"));
         final double[] wasted = CrewSpeed.wasted(crew, LIMITS);
         assertEquals(0.5, wasted[0], 1e-9);
@@ -67,7 +67,7 @@ class CrewSpeedTest {
     }
 
     @Test
-    void aCompatibleBonusIsNeverWasted() {
+    void ac25_aCompatibleBonusIsNeverWasted() {
         final List<BuilderStats> crew = List.of(builder(1, 0.5, "mason", "carpenter"),
                 builder(1, 0.5, "carpenter", "mason"));
         final double[] wasted = CrewSpeed.wasted(crew, LIMITS);

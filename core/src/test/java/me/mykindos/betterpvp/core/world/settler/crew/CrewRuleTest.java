@@ -1,268 +1,183 @@
 package me.mykindos.betterpvp.core.world.settler.crew;
 
-import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
-import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
-import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
-import me.mykindos.betterpvp.core.world.construction.StructureFlags;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
-import me.mykindos.betterpvp.core.world.construction.StructureStage;
-import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
-import me.mykindos.betterpvp.core.world.construction.StructureType;
-import me.mykindos.betterpvp.core.world.settler.Profession;
-import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
-import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
-import me.mykindos.betterpvp.core.world.settler.SettlerAction;
-import me.mykindos.betterpvp.core.world.settler.SettlerLook;
-import me.mykindos.betterpvp.core.world.settler.SettlerService;
-import me.mykindos.betterpvp.core.world.settler.SettlerSite;
+import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
+import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
-import me.mykindos.betterpvp.core.world.site.SiteInstances;
-import me.mykindos.betterpvp.core.world.site.SiteKey;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 
+import static me.mykindos.betterpvp.core.world.settler.crew.CrewFixture.CAMP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class CrewRuleTest {
 
-    private static final SiteKey CAMP = SiteKey.of("camp", 7);
-
-    private final ProfessionRegistry professions = new ProfessionRegistry();
-    private final StructureCatalogue catalogue = new StructureCatalogue();
-    private final Site site = new Site();
-    private final List<Settler> finished = new ArrayList<>();
-    private final ConstructionSites sites = mock(ConstructionSites.class);
-    private final StructureStatusTracker tracker = mock(StructureStatusTracker.class);
-
-    private MockedStatic<Bukkit> bukkit;
-    private SettlerService settlers;
-    private CrewRule rule;
-    private CrewService crews;
-
-    @BeforeEach
-    void setUp() {
-        bukkit = Mockito.mockStatic(Bukkit.class);
-        bukkit.when(Bukkit::getPluginManager).thenReturn(mock(PluginManager.class));
-
-        professions.register(Profession.construction("builder", "builder", List.of()));
-        catalogue.register(new Hall());
-        settlers = new SettlerService(professions);
-        settlers.register("camp", site);
-        rule = new CrewRule(settlers, catalogue);
-        crews = new CrewService(sites, tracker, settlers, professions, mock(SiteInstances.class), rule);
-        when(tracker.now()).thenReturn(10_000L);
-    }
+    private final CrewFixture fixture = new CrewFixture();
+    private final CrewRule rule = fixture.rule;
 
     @AfterEach
     void tearDown() {
-        bukkit.close();
+        fixture.close();
     }
 
-    private Settler builder(int workforce) {
-        final Settler settler = new Settler();
-        settler.setId(UUID.randomUUID());
-        settler.setName("Brienne Ashford");
-        settler.setProfession("builder");
-        settler.setMorale(workforce);
-        site.roster.getSettlers().add(settler);
-        return settler;
-    }
-
-    private static PlacedStructure hall(int stage) {
-        final PlacedStructure structure = new PlacedStructure(UUID.randomUUID(), "hall",
-                new StructurePosition(0, 64, 0, 0), StructureCondition.ACTIVE);
-        structure.setStage(stage);
-        return structure;
+    private static Job job(JobKind kind, int targetStage) {
+        return Job.start(kind, Duration.ofMinutes(5), ResourceCost.NONE, targetStage, 0);
     }
 
     @Test
-    void aJobWaitsUntilItsCrewMeetsTheThreshold() {
-        final PlacedStructure hall = hall(0);
-        final Job job = Job.start(JobKind.ADVANCE, Duration.ofHours(1), ResourceCost.NONE, 1, 0);
-        hall.setJob(job);
+    void ac8_aJobWaitsUntilItsCrewMeetsTheThreshold() {
+        final PlacedStructure hall = fixture.advancing();
+        final Job job = hall.getJob();
 
         assertEquals(5, rule.threshold(hall, job));
         assertTrue(rule.holds(CAMP, hall, job));
 
-        job.getStaff().add(builder(3).getId());
+        job.getStaff().add(fixture.builder(3).getId());
         assertTrue(rule.holds(CAMP, hall, job));
-        job.getStaff().add(builder(2).getId());
+        job.getStaff().add(fixture.builder(2).getId());
         assertFalse(rule.holds(CAMP, hall, job));
-        assertEquals(2.0, rule.rate(CAMP, hall, job), 1e-9);
+        assertEquals(5, rule.workforce(CAMP, hall, job));
     }
 
     @Test
-    void repairsAndMovesNeedHalfTheStageTheyStandAt() {
-        final PlacedStructure hall = hall(1);
-        assertEquals(3, rule.threshold(hall, Job.start(JobKind.REPAIR, Duration.ofMinutes(5), ResourceCost.NONE, 1, 0)));
-        assertEquals(3, rule.threshold(hall, Job.start(JobKind.MOVE, Duration.ofMinutes(5), ResourceCost.NONE, 1, 0)));
+    void ac9_buildingAndAdvancingNeedTheStageTheyWorkToward() {
+        final PlacedStructure hall = fixture.hall(0);
+        assertEquals(2, rule.threshold(hall, job(JobKind.BUILD, 0)));
+        assertEquals(5, rule.threshold(hall, job(JobKind.ADVANCE, 1)));
     }
 
     @Test
-    void strikersAndLeaversBringNothing() {
-        final PlacedStructure hall = hall(0);
-        final Job job = Job.start(JobKind.BUILD, Duration.ofHours(1), ResourceCost.NONE, 0, 0);
+    void ac9_repairsAndMovesNeedHalfTheStageTheyStandAtRoundedUp() {
+        final PlacedStructure hall = fixture.hall(1);
+        assertEquals(3, rule.threshold(hall, job(JobKind.REPAIR, 1)));
+        assertEquals(3, rule.threshold(hall, job(JobKind.MOVE, 1)));
+        assertEquals(1, rule.threshold(fixture.hall(0), job(JobKind.REPAIR, 0)));
+    }
+
+    @Test
+    void ac9_fittingAnUpgradeNeedsItsOwnWorkforce() {
+        final PlacedStructure hall = fixture.hall(0);
+        final Job lantern = job(JobKind.FIT_UPGRADE, 0);
+        lantern.setUpgrade("lantern");
+        assertEquals(3, rule.threshold(hall, lantern));
+    }
+
+    @Test
+    void ac9_whatTheCatalogueDoesNotKnowNeedsNothing() {
+        final PlacedStructure hall = fixture.hall(0);
+        final Job unknownUpgrade = job(JobKind.FIT_UPGRADE, 0);
+        unknownUpgrade.setUpgrade("moat");
+        assertEquals(0, rule.threshold(hall, unknownUpgrade));
+        assertEquals(0, rule.threshold(hall, job(JobKind.FIT_UPGRADE, 0)), "no upgrade named");
+        assertEquals(0, rule.threshold(hall, job(JobKind.ADVANCE, 5)), "a stage the type does not have");
+
+        final PlacedStructure shed = new PlacedStructure(UUID.randomUUID(), "shed",
+                new StructurePosition(0, 64, 0, 0), StructureCondition.ACTIVE);
+        assertEquals(0, rule.threshold(shed, job(JobKind.BUILD, 0)));
+    }
+
+    @Test
+    void ac10_aJobThatNeedsNoWorkforceRunsWithoutACrewAtItsListedTime() {
+        final PlacedStructure hall = fixture.hall(0);
+        final Job flag = job(JobKind.FIT_UPGRADE, 0);
+        flag.setUpgrade("flag");
+        hall.setJob(flag);
+
+        assertFalse(rule.holds(CAMP, hall, flag));
+        assertEquals(1.0, rule.rate(CAMP, hall, flag), 1e-9);
+    }
+
+    @Test
+    void ac11_strikersLeaversAndBuildersWithoutStatsBringNothing() {
+        final PlacedStructure hall = fixture.hall(0);
+        final Job job = job(JobKind.BUILD, 0);
         hall.setJob(job);
-        final Settler striker = builder(2);
+        final Settler striker = fixture.builder(2);
         striker.changeState(SettlerState.STRIKING, 0);
+        final Settler statless = fixture.builder(-1);
         job.getStaff().add(striker.getId());
+        job.getStaff().add(statless.getId());
         job.getStaff().add(UUID.randomUUID());
 
         assertEquals(0, rule.workforce(CAMP, hall, job));
         assertTrue(rule.holds(CAMP, hall, job));
+        assertEquals(List.of(), rule.stats(CAMP, hall, job));
     }
 
     @Test
-    void aFinishedJobLetsItsCrewGoOnce() {
-        final PlacedStructure hall = hall(0);
-        final Job job = Job.start(JobKind.BUILD, Duration.ofMillis(1_000), ResourceCost.NONE, 0, 0);
-        hall.setJob(job);
-        final Settler first = builder(2);
-        settlers.assign(CAMP, first.getId(), hall.getId().toString());
-        job.getStaff().add(first.getId());
-        final Holding holding = new Holding();
-        holding.getStructures().add(hall);
+    void ac11_theSiteIsAskedForEachBuilderBesideTheWorkingCrew() {
+        final PlacedStructure hall = fixture.advancing();
+        final Job job = hall.getJob();
+        final Settler first = fixture.builder(3);
+        final Settler second = fixture.builder(2);
+        final Settler striker = fixture.builder(4);
+        striker.changeState(SettlerState.STRIKING, 0);
+        job.getStaff().addAll(List.of(first.getId(), second.getId(), striker.getId()));
 
-        crews.release(CAMP, holding);
-        crews.release(CAMP, holding);
-
-        assertNull(first.getAssignment());
-        assertEquals(1, first.getJobsFinished());
-        assertEquals(List.of(first), finished);
-        assertTrue(job.getStaff().isEmpty());
+        assertEquals(5, rule.workforce(CAMP, hall, job));
+        assertEquals(2, fixture.site.statsCrews.size());
+        fixture.site.statsCrews.forEach(crew -> assertEquals(List.of(first, second), crew));
     }
 
     @Test
-    void aRunningJobKeepsItsCrew() {
-        final PlacedStructure hall = hall(0);
-        final Job job = Job.start(JobKind.BUILD, Duration.ofHours(1), ResourceCost.NONE, 0, 0);
-        hall.setJob(job);
-        final Settler member = builder(2);
-        settlers.assign(CAMP, member.getId(), hall.getId().toString());
-        job.getStaff().add(member.getId());
-        final Holding holding = new Holding();
-        holding.getStructures().add(hall);
+    void ac12_aJobPausesWhenItsCrewFallsShortAndRunsAgainOnceItMeetsTheThreshold() {
+        final PlacedStructure hall = fixture.advancing();
+        final Job job = hall.getJob();
+        final Settler first = fixture.builder(3);
+        final Settler second = fixture.builder(2);
+        job.getStaff().addAll(List.of(first.getId(), second.getId()));
+        fixture.applyRule(hall);
+        assertFalse(job.isHeld());
 
-        crews.release(CAMP, holding);
-        assertEquals(hall.getId().toString(), member.getAssignment());
+        first.changeState(SettlerState.STRIKING, 0);
+        fixture.applyRule(hall);
+        assertTrue(job.isHeld(), "a striker leaves the crew short");
 
-        hall.setJob(null);
-        crews.release(CAMP, holding);
-        assertNull(member.getAssignment(), "a cancelled or claimed job lets its crew go");
+        first.changeState(SettlerState.WORKING, 0);
+        fixture.applyRule(hall);
+        assertFalse(job.isHeld());
+
+        fixture.settlers.remove(CAMP, second.getId(), SettlerLeaveReason.UNHAPPY);
+        fixture.applyRule(hall);
+        assertTrue(job.isHeld(), "a member that leaves the roster leaves the crew short");
+
+        job.getStaff().add(fixture.builder(2).getId());
+        fixture.applyRule(hall);
+        assertFalse(job.isHeld());
     }
 
-    /** A site whose Builders bring their morale as Workforce, at speed 1. */
-    private final class Site implements SettlerSite {
-
-        private final Roster roster = new Roster();
-
-        @Override
-        public @NotNull Optional<Roster> roster(@NotNull SiteKey site) {
-            return Optional.of(roster);
-        }
-
-        @Override
-        public void changed(@NotNull SiteKey site) {
-        }
-
-        @Override
-        public int populationCap(@NotNull SiteKey site) {
-            return 20;
-        }
-
-        @Override
-        public @NotNull OptionalInt workingCap(@NotNull SiteKey site, @NotNull String profession) {
-            return OptionalInt.empty();
-        }
-
-        @Override
-        public boolean allows(@NotNull Player player, @NotNull SiteKey site, @NotNull SettlerAction action) {
-            return true;
-        }
-
-        @Override
-        public @NotNull SettlerLook look(@NotNull SiteKey site, @NotNull Settler settler) {
-            return new SettlerLook("model", null, "idle", "walk", "work", 1);
-        }
-
-        @Override
-        public @NotNull Optional<BuilderStats> builderStats(@NotNull SiteKey site, @NotNull Settler settler,
-                                                            @NotNull PlacedStructure structure, @NotNull Job job,
-                                                            @NotNull List<Settler> crew) {
-            return Optional.of(new BuilderStats(settler.getMorale(), 1, 1, null, Set.of()));
-        }
-
-        @Override
-        public void crewFinished(@NotNull SiteKey site, @NotNull PlacedStructure structure, @NotNull Job job,
-                                 @NotNull List<Settler> crew) {
-            finished.addAll(crew);
-        }
+    @Test
+    void ac15_withNoWorkingCrewTheCrewSpeedIsZero() {
+        final PlacedStructure hall = fixture.advancing();
+        assertEquals(0.0, rule.speed(CAMP, hall, hall.getJob()), 1e-9);
     }
 
-    private static final class Hall implements StructureType {
+    @Test
+    void ac16_aJobWithAWorkingCrewRunsAtTheCrewSpeed() {
+        final PlacedStructure hall = fixture.advancing();
+        final Job job = hall.getJob();
+        job.getStaff().add(fixture.builder(3, 2.0, 0.5, SettlerRarity.RARE).getId());
+        job.getStaff().add(fixture.builder(2, 1.0, 0.5, SettlerRarity.COMMON).getId());
 
-        @Override
-        public @NotNull String getId() {
-            return "hall";
-        }
+        assertEquals(2.5, rule.rate(CAMP, hall, job), 1e-9);
+        assertEquals(2.5, rule.speed(CAMP, hall, job), 1e-9);
+        fixture.applyRule(hall);
+        assertEquals(2.5, job.getRate(), 1e-9);
 
-        @Override
-        public @NotNull Component getDisplayName() {
-            return Component.text("Hall");
-        }
-
-        @Override
-        public int getTier() {
-            return 1;
-        }
-
-        @Override
-        public @NotNull Set<String> getRequiredStructures() {
-            return Set.of();
-        }
-
-        @Override
-        public @Nullable String getRequiredZoneTag() {
-            return null;
-        }
-
-        @Override
-        public @NotNull List<StructureStage> getStages() {
-            return List.of(new StructureStage("hall_1", ResourceCost.NONE, Duration.ZERO, 2),
-                    new StructureStage("hall_2", ResourceCost.NONE, Duration.ofHours(1), 5));
-        }
-
-        @Override
-        public @NotNull StructureFlags getFlags() {
-            return StructureFlags.builder().build();
-        }
+        fixture.site.limits = new CrewLimits(5, 2.0, Map.of(), 0.1);
+        assertEquals(2.0, rule.rate(CAMP, hall, job), 1e-9, "the site's maximum speed caps the pace");
     }
 }
