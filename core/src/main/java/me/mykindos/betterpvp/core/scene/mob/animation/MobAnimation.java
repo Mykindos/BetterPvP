@@ -23,6 +23,7 @@ import lombok.Getter;
 public enum MobAnimation {
     IDLE(true),
     WALK(true),
+    WORK(true),
     ATTACK(false),
     HURT(false),
     DEATH(false); // played when the entity is removed by ModelEngine itself

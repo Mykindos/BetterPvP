@@ -47,6 +47,19 @@ public class WanderComponent implements AIComponent {
         this.clock = clock;
     }
 
+    /** Rests for a random time between {@code minMillis} and {@code maxMillis} after each trip, holding IDLE. */
+    public WanderComponent rest(long minMillis, long maxMillis) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /**
+     * Picks spots at least {@code minRadius} from home where a solid block has two free blocks above it, instead of
+     * any point at home's height.
+     */
+    public WanderComponent checkFloor(double minRadius) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
     @Override
     public EnumSet<AIControl> getControls() {
         return EnumSet.of(AIControl.MOVE);

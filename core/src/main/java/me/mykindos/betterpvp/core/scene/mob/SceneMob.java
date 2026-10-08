@@ -326,6 +326,21 @@ public class SceneMob extends NPC implements HasModeledEntity {
         animations.play(MobAnimation.IDLE);
     }
 
+    /** Stops pathing, faces {@code player} and holds IDLE for a moment, then lets the AI decide again. */
+    public void attend(Player player) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /** Sends the mob to a random point near {@code spot}, rests there, then lets the AI decide again. */
+    public void orderTo(Location spot) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /** Stops every running component so each decides again on the next tick. */
+    public void replan() {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
     /** @return {@code true} if the target is non-null, alive, still valid, and in this mob's world. */
     public boolean isValidTarget(@Nullable LivingEntity target) {
         return target != null && !target.isDead() && target.isValid()
