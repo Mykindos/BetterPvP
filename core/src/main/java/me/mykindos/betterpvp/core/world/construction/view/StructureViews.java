@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.core.world.schematic.ghost.GhostShell;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -161,6 +162,8 @@ public class StructureViews implements Listener {
                             .ifPresent(found -> {
                                 if (!service.canUse(event.getPlayer(), worksite.getKey(), structure)) {
                                     event.setCancelled(true);
+                                    UtilMessage.plain(event.getPlayer(), Translations
+                                            .component("core.construction.not_yours").color(NamedTextColor.RED));
                                     return;
                                 }
                                 final StructurePieceUseEvent use = new StructurePieceUseEvent(event.getPlayer(),

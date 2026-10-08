@@ -601,7 +601,8 @@ public class ConstructionService {
 
     private boolean repairedItself(@NotNull PlacedStructure structure) {
         final Long disabledAt = structure.getDisabledAt();
-        if (structure.getCondition() != StructureCondition.DISABLED || disabledAt == null) {
+        if (structure.getCondition() != StructureCondition.DISABLED || disabledAt == null
+                || structure.getJob() != null) {
             return false;
         }
         final Optional<StructureType> type = catalogue.find(structure.getType());

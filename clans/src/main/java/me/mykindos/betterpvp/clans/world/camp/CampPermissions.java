@@ -82,12 +82,6 @@ public class CampPermissions {
         });
     }
 
-    public boolean isMember(@NotNull Player player, long clanId) {
-        return clanManager.getClanById(clanId)
-                .flatMap(owner -> owner.getMemberByUUID(player.getUniqueId()))
-                .isPresent();
-    }
-
     /** Whether {@code player} may open containers in camp {@code clanId}: every member, and allies if allowed. */
     public boolean mayOpenContainers(@NotNull Player player, long clanId) {
         return clanManager.getClanById(clanId)
