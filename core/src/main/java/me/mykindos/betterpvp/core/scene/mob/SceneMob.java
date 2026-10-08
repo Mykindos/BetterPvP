@@ -134,9 +134,9 @@ public class SceneMob extends NPC implements HasModeledEntity {
 
     /**
      * Maps a logical animation state to a single fixed ModelEngine clip - the common case. Shorthand
-     * for {@code setAnimation(animation, AnimationProviders.fixed(animationId))}. Call in the constructor.
+     * for {@code setAnimation(animation, AnimationProviders.fixed(animationId))}.
      */
-    protected void setAnimation(MobAnimation animation, String animationId) {
+    public void setAnimation(MobAnimation animation, String animationId) {
         setAnimation(animation, AnimationProviders.fixed(animationId));
     }
 
@@ -144,9 +144,9 @@ public class SceneMob extends NPC implements HasModeledEntity {
      * Maps a logical animation state to an {@link AnimationProvider} that chooses the concrete clip
      * at play time based on the mob's state - use for multi-clip states (hurt1..hurt4) or
      * state-dependent variations (idle vs idle_combat). See {@link AnimationProviders} for ready-made
-     * strategies. Call in the constructor.
+     * strategies. A held looping state picks up a changed clip on the next tick.
      */
-    protected void setAnimation(MobAnimation animation, AnimationProvider provider) {
+    public void setAnimation(MobAnimation animation, AnimationProvider provider) {
         animationProviders.put(animation, provider);
     }
 

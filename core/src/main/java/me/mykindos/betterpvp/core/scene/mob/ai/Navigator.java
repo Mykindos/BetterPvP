@@ -29,6 +29,26 @@ public class Navigator {
         moveTo(target.getLocation(), speed);
     }
 
+    /**
+     * Starts a trip to a fixed point that searches again when it has no path or the body stops moving, and gives up
+     * after too many searches. {@link #tick()} drives it.
+     *
+     * @param onGiveUp run once if the trip gives up
+     */
+    public void travelTo(Location location, double speed, Runnable onGiveUp) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /** @return whether the body is at the point of the current trip */
+    public boolean hasArrived() {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /** Advances the current trip. */
+    public void tick() {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
     public void stop() {
         final Mob bukkitMob = mob.getBukkitMob();
         if (bukkitMob != null) {

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Range;
 
 import java.util.EnumSet;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.LongSupplier;
 
 /**
  * Idle ambient behaviour: when the mob has no target it periodically strolls to a random point
@@ -19,6 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class WanderComponent implements AIComponent {
 
     private final SceneMob mob;
+    private final LongSupplier clock;
 
     /** Maximum distance (in blocks) from home a wander point may be picked. */
     @Setter
@@ -37,7 +39,12 @@ public class WanderComponent implements AIComponent {
     private boolean moving = false;
 
     public WanderComponent(SceneMob mob) {
+        this(mob, System::currentTimeMillis);
+    }
+
+    WanderComponent(SceneMob mob, LongSupplier clock) {
         this.mob = mob;
+        this.clock = clock;
     }
 
     @Override
@@ -62,7 +69,7 @@ public class WanderComponent implements AIComponent {
             mob.stopMoving();
         }
 
-        final long now = System.currentTimeMillis();
+        final long now = clock.getAsLong();
         if (now - lastRepath < repathCooldownMillis) {
             return;
         }
