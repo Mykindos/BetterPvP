@@ -239,6 +239,26 @@ class BlueprintSessionsTest {
     }
 
     @Test
+    void ac3_swappingToABlueprintWhoseBuildFailsToLoadClosesTheOldPreviewAndClearsItsTitleAndActionBar() {
+        when(schematics.load("workshop_0")).thenReturn(Optional.empty());
+        hold(blueprint("hall", null));
+        sessions.follow();
+        final TitleComponent title = lastTitle();
+        final DisplayObject<Component> bar = actionBarEntry();
+        when(titles.isShowing(title)).thenReturn(true);
+
+        hold(blueprint("workshop", null));
+        sessions.follow();
+        sessions.follow();
+
+        verify(previews).close(player);
+        verify(actionBar).remove(bar);
+        verify(titles).remove(title);
+        verify(player).clearTitle();
+        assertEquals(1, opened.size(), "nothing opens for the build that failed to load");
+    }
+
+    @Test
     void ac4_loggingOutClosesThePreviewAndClearsTheTitleAndActionBar() {
         hold(blueprint("hall", null));
         sessions.follow();
