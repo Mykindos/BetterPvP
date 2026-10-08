@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.world.construction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.world.construction.ConstructionChecks.OnStructure;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
@@ -95,19 +94,24 @@ public class ConstructionService {
 
     public @NotNull ConstructionResult build(@NotNull Player player, @NotNull World world, @NotNull StructureType type,
                                              @NotNull Location anchor, int quarterTurns) {
-        final Optional<Component> problem = checks.problem(player, world, type, anchor, quarterTurns);
-        if (problem.isPresent()) {
-            return ConstructionResult.refused(problem.get());
-        }
-        final Worksite worksite = sites.worksite(world).orElseThrow();
+        final StructurePosition position = StructurePosition.of(anchor, quarterTurns);
+        return checks.locate(world, ConstructionResult::refused, worksite -> {
+            final Optional<Component> problem = checks.buildProblem(player, worksite, type, position);
+            if (problem.isPresent()) {
+                return ConstructionResult.refused(problem.get());
+            }
+            final StructureStage first = type.stage(0);
+            final Optional<ConstructionResult> unpaid = pay(worksite, first.getCost());
+            if (unpaid.isPresent()) {
+                return unpaid.get();
+            }
 
-        final StructureStage first = type.stage(0);
-        worksite.getSite().ledger().spend(worksite.getKey(), first.getCost());
-        final PlacedStructure structure = new PlacedStructure(UUID.randomUUID(), type.getId(),
-                StructurePosition.of(anchor, quarterTurns), StructureCondition.UNDER_CONSTRUCTION);
-        structure.setJob(Job.start(JobKind.BUILD, first.getBuildTime(), first.getCost(), 0, now()));
-        add(worksite, structure);
-        return ConstructionResult.done(structure);
+            final PlacedStructure structure = new PlacedStructure(UUID.randomUUID(), type.getId(), position,
+                    StructureCondition.UNDER_CONSTRUCTION);
+            structure.setJob(Job.start(JobKind.BUILD, first.getBuildTime(), first.getCost(), 0, now()));
+            add(worksite, structure);
+            return ConstructionResult.done(structure);
+        });
     }
 
     /** Puts a structure into a holding with no checks and nothing spent, such as the ones every new holding starts with. */
@@ -173,7 +177,10 @@ public class ConstructionService {
             if (problem.isPresent()) {
                 return ConstructionResult.refused(problem.get());
             }
-            worksite.getSite().ledger().spend(worksite.getKey(), type.getMoveCost());
+            final Optional<ConstructionResult> unpaid = pay(worksite, type.getMoveCost());
+            if (unpaid.isPresent()) {
+                return unpaid.get();
+            }
 
             final Duration time = type.getMoveTime();
             if (time.isZero() || structure.getCondition() == StructureCondition.NOT_PLACED) {
@@ -237,14 +244,16 @@ public class ConstructionService {
             return ConstructionResult.refused("core.construction.advance_needs_idle");
         }
 
-        final StructureStage stage = type.stage(next);
-        final Optional<Component> problem = checks.requirements(worksite, type, next)
-                .or(() -> checks.fit(worksite, type, next, structure.getPosition(), structure.getId()))
-                .or(() -> checks.afford(worksite, stage.getCost()));
+        final Optional<Component> problem = checks.requirements(worksite.siteHolding(), type, next)
+                .or(() -> checks.fit(worksite, type, next, structure.getPosition(), structure.getId()));
         if (problem.isPresent()) {
             return ConstructionResult.refused(problem.get());
         }
-        worksite.getSite().ledger().spend(worksite.getKey(), stage.getCost());
+        final StructureStage stage = type.stage(next);
+        final Optional<ConstructionResult> unpaid = pay(worksite, stage.getCost());
+        if (unpaid.isPresent()) {
+            return unpaid.get();
+        }
 
         structure.setJob(Job.start(JobKind.ADVANCE, stage.getBuildTime(), stage.getCost(), next, now()));
         return changed(worksite, structure);
@@ -259,11 +268,10 @@ public class ConstructionService {
         if (structure.getJob() != null) {
             return ConstructionResult.refused("core.construction.already_working");
         }
-        final Optional<Component> unpaid = checks.afford(worksite, type.getRepairCost());
+        final Optional<ConstructionResult> unpaid = pay(worksite, type.getRepairCost());
         if (unpaid.isPresent()) {
-            return ConstructionResult.refused(unpaid.get());
+            return unpaid.get();
         }
-        worksite.getSite().ledger().spend(worksite.getKey(), type.getRepairCost());
 
         if (type.getRepairTime().isZero()) {
             StructureStatusTracker.repaired(structure);
@@ -281,24 +289,23 @@ public class ConstructionService {
      */
     public @NotNull ConstructionResult upgrade(@NotNull Player player, @NotNull World world, @NotNull UUID id,
                                                @NotNull String upgradeId) {
-        return act(player, world, id, ConstructionAction.PICK_UPGRADE, (worksite, structure, type) -> {
-            final Optional<Component> problem = checks.upgradeProblem(worksite, structure, type, upgradeId);
-            if (problem.isPresent()) {
-                return ConstructionResult.refused(problem.get());
-            }
-            final StructureUpgrade upgrade = type.upgrade(upgradeId).orElseThrow();
-            worksite.getSite().ledger().spend(worksite.getKey(), upgrade.getCost());
+        return act(player, world, id, ConstructionAction.PICK_UPGRADE, (worksite, structure, type) ->
+                checks.upgrade(structure, type, upgradeId, ConstructionResult::refused, upgrade -> {
+                    final Optional<ConstructionResult> unpaid = pay(worksite, upgrade.getCost());
+                    if (unpaid.isPresent()) {
+                        return unpaid.get();
+                    }
 
-            if (upgrade.getTime().isZero()) {
-                fitted(worksite, structure, upgrade);
-                return changed(worksite, structure);
-            }
-            final Job job = Job.start(JobKind.FIT_UPGRADE, upgrade.getTime(), upgrade.getCost(), structure.getStage(),
-                    now());
-            job.setUpgrade(upgrade.getId());
-            structure.setJob(job);
-            return changed(worksite, structure);
-        });
+                    if (upgrade.getTime().isZero()) {
+                        fitted(worksite, structure, upgrade);
+                        return changed(worksite, structure);
+                    }
+                    final Job job = Job.start(JobKind.FIT_UPGRADE, upgrade.getTime(), upgrade.getCost(),
+                            structure.getStage(), now());
+                    job.setUpgrade(upgrade.getId());
+                    structure.setJob(job);
+                    return changed(worksite, structure);
+                }));
     }
 
     /**
@@ -353,17 +360,31 @@ public class ConstructionService {
         UtilServer.callEvent(new StructureUpgradedEvent(worksite.getKey(), structure, upgrade));
     }
 
+    /** Spends {@code cost} from the site's ledger, or gives the refusal if it cannot afford it. */
+    private @NotNull Optional<ConstructionResult> pay(@NotNull Worksite worksite, @NotNull ResourceCost cost) {
+        final Optional<Component> unaffordable = checks.afford(worksite.siteHolding(), cost);
+        if (unaffordable.isPresent()) {
+            return Optional.of(ConstructionResult.refused(unaffordable.get()));
+        }
+        worksite.getSite().ledger().spend(worksite.getKey(), cost);
+        return Optional.empty();
+    }
+
     /** Runs {@code body} on structure {@code id} on the site's own behalf, with no permission to check. */
-    private @NotNull ConstructionResult act(@NotNull World world, @NotNull UUID id,
-                                            @NotNull OnStructure<ConstructionResult> body) {
-        return checks.resolve(sites.worksite(world).orElse(null), id, ConstructionResult::refused, body);
+    private @NotNull ConstructionResult act(@NotNull World world, @NotNull UUID id, @NotNull Action body) {
+        final Optional<Worksite> found = sites.worksite(world);
+        if (found.isEmpty()) {
+            return ConstructionResult.refused("core.construction.no_holding");
+        }
+        final Worksite worksite = found.get();
+        return checks.resolve(worksite.getHolding(), id, ConstructionResult::refused,
+                (structure, type) -> body.run(worksite, structure, type));
     }
 
     /** Runs {@code body} on structure {@code id} once {@code player} is allowed {@code action} on its site. */
     private @NotNull ConstructionResult act(@NotNull Player player, @NotNull World world, @NotNull UUID id,
-                                            @NotNull ConstructionAction action,
-                                            @NotNull OnStructure<ConstructionResult> body) {
-        return act(world, id, (worksite, structure, type) -> checks.allowed(player, worksite, action)
+                                            @NotNull ConstructionAction action, @NotNull Action body) {
+        return act(world, id, (worksite, structure, type) -> checks.allowed(player, worksite.siteHolding(), action)
                 .map(ConstructionResult::refused)
                 .orElseGet(() -> body.run(worksite, structure, type)));
     }
@@ -388,5 +409,11 @@ public class ConstructionService {
         worksite.getSite().changed(worksite.getKey());
         tracker.publish(worksite, structure);
         return ConstructionResult.done(structure);
+    }
+
+    @FunctionalInterface
+    private interface Action {
+        @NotNull ConstructionResult run(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
+                                        @NotNull StructureType type);
     }
 }

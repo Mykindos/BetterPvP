@@ -16,11 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Why a construction action would be refused. The queries here and the actions in {@link ConstructionService} run the
- * same checks in the same order, so a menu shows the reason the action would give.
+ * same checks in the same order, with cost always last, so a menu shows the reason the action would give.
  */
 @Singleton
 public class ConstructionChecks {
@@ -42,12 +44,9 @@ public class ConstructionChecks {
     /** Why {@code type} could not be built at {@code anchor} by {@code player}, or empty if it could. */
     public @NotNull Optional<Component> problem(@NotNull Player player, @NotNull World world, @NotNull StructureType type,
                                                 @NotNull Location anchor, int quarterTurns) {
-        if (!sites.isSite(world)) {
-            return Optional.of(text("core.construction.cannot_build_here"));
-        }
-        return sites.worksite(world)
-                .map(worksite -> buildProblem(player, worksite, type, StructurePosition.of(anchor, quarterTurns)))
-                .orElseGet(() -> Optional.of(text("core.construction.no_holding")));
+        final StructurePosition position = StructurePosition.of(anchor, quarterTurns);
+        return locate(world, Optional::of, worksite -> buildProblem(player, worksite, type, position)
+                .or(() -> afford(worksite.siteHolding(), type.stage(0).getCost())));
     }
 
     /**
@@ -56,17 +55,22 @@ public class ConstructionChecks {
      */
     public @NotNull Optional<Component> unavailable(@NotNull Player player, @NotNull SiteKey site,
                                                     @NotNull StructureType type) {
-        return sites.worksite(site)
-                .map(worksite -> buildProblem(player, worksite, type, null))
+        return sites.holding(site)
+                .map(at -> buildProblem(player, at, type, Optional::empty)
+                        .or(() -> afford(at, type.stage(0).getCost())))
                 .orElseGet(() -> Optional.of(text("core.construction.no_holding")));
     }
 
     /** Why {@code player} could not move structure {@code id} to {@code anchor}, or empty if they could. */
     public @NotNull Optional<Component> moveProblem(@NotNull Player player, @NotNull World world, @NotNull UUID id,
                                                     @NotNull Location anchor, int quarterTurns) {
-        return resolve(sites.worksite(world).orElse(null), id, Optional::of, (worksite, structure, type) ->
-                allowed(player, worksite, ConstructionAction.MOVE)
-                        .or(() -> moveProblem(worksite, structure, type, StructurePosition.of(anchor, quarterTurns))));
+        final StructurePosition target = StructurePosition.of(anchor, quarterTurns);
+        return sites.worksite(world)
+                .map(worksite -> resolve(worksite.getHolding(), id, Optional::of, (structure, type) ->
+                        allowed(player, worksite.siteHolding(), ConstructionAction.MOVE)
+                                .or(() -> moveProblem(worksite, structure, type, target))
+                                .or(() -> afford(worksite.siteHolding(), type.getMoveCost()))))
+                .orElseGet(() -> Optional.of(text("core.construction.no_holding")));
     }
 
     /**
@@ -75,21 +79,33 @@ public class ConstructionChecks {
      */
     public @NotNull Optional<Component> upgradeUnavailable(@NotNull Player player, @NotNull SiteKey site,
                                                            @NotNull UUID id, @NotNull String upgradeId) {
-        return resolve(sites.worksite(site).orElse(null), id, Optional::of, (worksite, structure, type) ->
-                allowed(player, worksite, ConstructionAction.PICK_UPGRADE)
-                        .or(() -> upgradeProblem(worksite, structure, type, upgradeId)));
+        return sites.holding(site)
+                .map(at -> resolve(at.getHolding(), id, Optional::of, (structure, type) ->
+                        allowed(player, at, ConstructionAction.PICK_UPGRADE)
+                                .or(() -> upgrade(structure, type, upgradeId, Optional::of,
+                                        upgrade -> afford(at, upgrade.getCost())))))
+                .orElseGet(() -> Optional.of(text("core.construction.no_holding")));
     }
 
     /**
-     * Runs {@code body} on structure {@code id} in {@code worksite} with its type, or gives {@code refused} the reason
-     * there is none: no loaded holding, no such structure, or a type the catalogue does not know.
+     * Runs {@code body} on the worksite {@code world} belongs to, or gives {@code refused} the reason there is none:
+     * the world is no site, or its holding is not loaded.
      */
-    <T> @NotNull T resolve(@Nullable Worksite worksite, @NotNull UUID id, @NotNull Function<Component, T> refused,
-                           @NotNull OnStructure<T> body) {
-        if (worksite == null) {
-            return refused.apply(text("core.construction.no_holding"));
+    <T> @NotNull T locate(@NotNull World world, @NotNull Function<Component, T> refused,
+                          @NotNull Function<Worksite, T> body) {
+        if (!sites.isSite(world)) {
+            return refused.apply(text("core.construction.cannot_build_here"));
         }
-        final Optional<PlacedStructure> structure = worksite.getHolding().find(id);
+        return sites.worksite(world).map(body).orElseGet(() -> refused.apply(text("core.construction.no_holding")));
+    }
+
+    /**
+     * Runs {@code body} on structure {@code id} in {@code holding} with its type, or gives {@code refused} the reason
+     * there is none: no such structure, or a type the catalogue does not know.
+     */
+    <T> @NotNull T resolve(@NotNull Holding holding, @NotNull UUID id, @NotNull Function<Component, T> refused,
+                           @NotNull BiFunction<PlacedStructure, StructureType, T> body) {
+        final Optional<PlacedStructure> structure = holding.find(id);
         if (structure.isEmpty()) {
             return refused.apply(text("core.construction.missing_structure"));
         }
@@ -97,27 +113,59 @@ public class ConstructionChecks {
         if (type.isEmpty()) {
             return refused.apply(text("core.construction.unknown_type"));
         }
-        return body.run(worksite, structure.get(), type.get());
+        return body.apply(structure.get(), type.get());
     }
 
-    @NotNull Optional<Component> allowed(@NotNull Player player, @NotNull Worksite worksite,
+    /**
+     * Runs {@code fitting} with upgrade {@code upgradeId} of {@code type} if {@code structure} can take it, cost
+     * aside, or gives {@code refused} the reason it cannot.
+     */
+    <T> @NotNull T upgrade(@NotNull PlacedStructure structure, @NotNull StructureType type, @NotNull String upgradeId,
+                           @NotNull Function<Component, T> refused, @NotNull Function<StructureUpgrade, T> fitting) {
+        final Optional<StructureUpgrade> found = type.upgrade(upgradeId);
+        if (found.isEmpty()) {
+            return refused.apply(text("core.construction.unknown_upgrade"));
+        }
+        final StructureUpgrade upgrade = found.get();
+        if (structure.getStage() < upgrade.getStage()) {
+            return refused.apply(text("core.construction.upgrade_locked"));
+        }
+        if (structure.upgradeAt(upgrade.getStage()).isPresent()) {
+            return refused.apply(text("core.construction.upgrade_taken"));
+        }
+        if (structure.getJob() != null) {
+            return refused.apply(text("core.construction.busy"));
+        }
+        if (structure.getCondition() != StructureCondition.ACTIVE) {
+            return refused.apply(text("core.construction.upgrade_needs_active"));
+        }
+        return fitting.apply(upgrade);
+    }
+
+    @NotNull Optional<Component> allowed(@NotNull Player player, @NotNull SiteHolding at,
                                          @NotNull ConstructionAction action) {
-        if (worksite.getSite().allows(player, worksite.getKey(), action)) {
+        if (at.getSite().allows(player, at.getKey(), action)) {
             return Optional.empty();
         }
         return Optional.of(text(action == ConstructionAction.BUILD
                 ? "core.construction.build_not_allowed" : "core.construction.action_not_allowed"));
     }
 
-    /** The build checks, leaving out where it stands when {@code position} is null. */
+    /** The build checks at {@code worksite} with {@code position}, cost aside. */
     @NotNull Optional<Component> buildProblem(@NotNull Player player, @NotNull Worksite worksite,
-                                              @NotNull StructureType type, @Nullable StructurePosition position) {
-        return allowed(player, worksite, ConstructionAction.BUILD)
-                .or(() -> requirements(worksite, type, 0))
-                .or(() -> position == null ? Optional.empty() : fit(worksite, type, 0, position, null))
-                .or(() -> afford(worksite, type.stage(0).getCost()));
+                                              @NotNull StructureType type, @NotNull StructurePosition position) {
+        return buildProblem(player, worksite.siteHolding(), type, () -> fit(worksite, type, 0, position, null));
     }
 
+    private @NotNull Optional<Component> buildProblem(@NotNull Player player, @NotNull SiteHolding at,
+                                                      @NotNull StructureType type,
+                                                      @NotNull Supplier<Optional<Component>> fit) {
+        return allowed(player, at, ConstructionAction.BUILD)
+                .or(() -> requirements(at, type, 0))
+                .or(fit);
+    }
+
+    /** The move checks, cost aside. */
     @NotNull Optional<Component> moveProblem(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
                                              @NotNull StructureType type, @NotNull StructurePosition target) {
         if (!type.getFlags().isMovable()) {
@@ -126,66 +174,36 @@ public class ConstructionChecks {
         if (structure.getJob() != null) {
             return Optional.of(text("core.construction.busy"));
         }
-        return fit(worksite, type, structure.getStage(), target, structure.getId())
-                .or(() -> afford(worksite, type.getMoveCost()));
+        return fit(worksite, type, structure.getStage(), target, structure.getId());
     }
 
-    @NotNull Optional<Component> upgradeProblem(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
-                                                @NotNull StructureType type, @NotNull String upgradeId) {
-        final Optional<StructureUpgrade> found = type.upgrade(upgradeId);
-        if (found.isEmpty()) {
-            return Optional.of(text("core.construction.unknown_upgrade"));
-        }
-        final StructureUpgrade upgrade = found.get();
-        if (structure.getStage() < upgrade.getStage()) {
-            return Optional.of(text("core.construction.upgrade_locked"));
-        }
-        if (structure.upgradeAt(upgrade.getStage()).isPresent()) {
-            return Optional.of(text("core.construction.upgrade_taken"));
-        }
-        if (structure.getJob() != null) {
-            return Optional.of(text("core.construction.busy"));
-        }
-        if (structure.getCondition() != StructureCondition.ACTIVE) {
-            return Optional.of(text("core.construction.upgrade_needs_active"));
-        }
-        return afford(worksite, upgrade.getCost());
-    }
-
-    @NotNull Optional<Component> requirements(@NotNull Worksite worksite, @NotNull StructureType type, int stage) {
+    @NotNull Optional<Component> requirements(@NotNull SiteHolding at, @NotNull StructureType type, int stage) {
         for (String required : type.getRequiredStructures()) {
-            if (!worksite.getHolding().hasBuilt(required)) {
+            if (!at.getHolding().hasBuilt(required)) {
                 final Component name = catalogue.find(required).map(StructureType::getDisplayName)
                         .orElse(Component.text(required));
                 return Optional.of(text("core.construction.requires", name));
             }
         }
-        return worksite.getSite().blocked(worksite.getKey(), worksite.getHolding(), type, stage);
+        return at.getSite().blocked(at.getKey(), at.getHolding(), type, stage);
     }
 
     @NotNull Optional<Component> fit(@NotNull Worksite worksite, @NotNull StructureType type, int stage,
                                      @NotNull StructurePosition position, @Nullable UUID ignoring) {
-        final World world = worksite.getWorld();
-        final Optional<SchematicPlacement> placement = world == null ? Optional.empty()
-                : shapes.placementOf(world, type.getId(), stage, position);
+        final Optional<SchematicPlacement> placement = shapes.placementOf(worksite.getWorld(), type.getId(), stage,
+                position);
         if (placement.isEmpty()) {
             return Optional.of(text("core.construction.no_build"));
         }
-        return fitCheck.problem(world, worksite.getHolding(), type, placement.get(), ignoring);
+        return fitCheck.problem(worksite.getWorld(), worksite.getHolding(), type, placement.get(), ignoring);
     }
 
-    @NotNull Optional<Component> afford(@NotNull Worksite worksite, @NotNull ResourceCost cost) {
-        return worksite.getSite().ledger().canAfford(worksite.getKey(), cost)
+    @NotNull Optional<Component> afford(@NotNull SiteHolding at, @NotNull ResourceCost cost) {
+        return at.getSite().ledger().canAfford(at.getKey(), cost)
                 ? Optional.empty() : Optional.of(text("core.construction.cannot_afford"));
     }
 
     private static @NotNull Component text(@NotNull String key, @NotNull ComponentLike... args) {
         return Translations.component(key, args).color(NamedTextColor.RED);
-    }
-
-    /** A check or action on one structure, once it is resolved. */
-    @FunctionalInterface
-    interface OnStructure<T> {
-        @NotNull T run(@NotNull Worksite worksite, @NotNull PlacedStructure structure, @NotNull StructureType type);
     }
 }

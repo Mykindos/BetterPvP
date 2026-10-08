@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,17 +39,14 @@ public class ConstructionSites {
 
     /** The holding a world belongs to, if construction happens there and its record is loaded. */
     public @NotNull Optional<Worksite> worksite(@NotNull World world) {
-        return instances.byWorld(world.getName()).map(SiteInstance::getKey).flatMap(key -> worksite(key, world));
+        return instances.byWorld(world.getName()).map(SiteInstance::getKey).flatMap(this::holding)
+                .map(at -> new Worksite(at.getKey(), at.getSite(), at.getHolding(), world));
     }
 
-    /** The holding of {@code key}, if construction happens there and its record is loaded, with no world. */
-    public @NotNull Optional<Worksite> worksite(@NotNull SiteKey key) {
-        return worksite(key, null);
-    }
-
-    private @NotNull Optional<Worksite> worksite(@NotNull SiteKey key, @Nullable World world) {
+    /** The holding of {@code key}, if construction happens there and its record is loaded, loaded world or not. */
+    @NotNull Optional<SiteHolding> holding(@NotNull SiteKey key) {
         return Optional.ofNullable(sites.get(key.getSiteId()))
-                .flatMap(site -> site.holding(key).map(holding -> new Worksite(key, site, holding, world)));
+                .flatMap(site -> site.holding(key).map(holding -> new SiteHolding(key, site, holding)));
     }
 
     /** Whether {@code player} may use the features of {@code structure} on {@code site}: anyone if it is public. */
@@ -65,12 +61,12 @@ public class ConstructionSites {
         return owner != null && owner.isMember(player, site);
     }
 
-    /** What demolishing {@code structure} on {@code site} gives back, nothing if the site is not registered. */
+    /** What demolishing {@code structure} on {@code site} gives back. */
     public @NotNull ResourceCost demolishRefund(@NotNull SiteKey site, @NotNull PlacedStructure structure,
                                                 @NotNull StructureType type) {
         final double share = Optional.ofNullable(sites.get(site.getSiteId()))
                 .map(owner -> owner.demolishRefund(site, structure, type))
-                .orElse(0.0);
+                .orElseGet(() -> type.getFlags().getDemolishRefund());
         return type.costUpTo(structure.getStage()).share(share);
     }
 }
