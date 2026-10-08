@@ -17,6 +17,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -56,6 +57,11 @@ public class ProsperityLeaderboard extends Leaderboard<Long, Integer> {
                         .displayName(Translations.component("clans.camp.prosperity.leaderboard").color(NamedTextColor.GOLD))
                         .build())
                 .build();
+    }
+
+    @Override
+    protected Duration getRefreshPeriod() {
+        return Duration.ofMinutes(10);
     }
 
     @Override
