@@ -259,6 +259,16 @@ class PayrollTest {
     }
 
     @Test
+    void ac9_aFundRunningOutAtZeroIsNotTouched() {
+        final Settler builder = settler("builder", SettlerRarity.COMMON);
+        payroll.settle(CAMP);
+
+        settleAfter(MINUTE);
+        assertEquals(SettlerState.STRIKING, builder.getState());
+        assertTrue(site.fund.withdrawals.isEmpty(), "an empty fund should not be asked for 0 coins");
+    }
+
+    @Test
     void ac10_onlySitesWithALoadedWorldAreSettledAndChangesAreWrittenDown() {
         settler("builder", SettlerRarity.COMMON);
         site.rosters.put(CLOSED, new Roster());
@@ -356,6 +366,7 @@ class PayrollTest {
         settleAfter(MINUTE);
 
         assertEquals(SettlerState.WORKING, striker.getState(), "a site with no fund owes nobody");
+        assertReturnedOnce(striker);
     }
 
     @Test
@@ -366,6 +377,7 @@ class PayrollTest {
         settleAfter(MINUTE);
 
         assertEquals(SettlerState.IDLE, striker.getState(), "a site with no wage model owes nobody");
+        assertReturnedOnce(striker);
     }
 
     @Test
@@ -376,6 +388,13 @@ class PayrollTest {
         settleAfter(MINUTE);
 
         assertEquals(SettlerState.IDLE, striker.getState(), "a settler that costs nothing is owed nothing");
+        assertReturnedOnce(striker);
+    }
+
+    private void assertReturnedOnce(Settler striker) {
+        final List<SettlerStrikeEvent> ended = strikes(false);
+        assertEquals(1, ended.size());
+        assertEquals(List.of(striker), ended.getFirst().getSettlers());
     }
 
     @Test
