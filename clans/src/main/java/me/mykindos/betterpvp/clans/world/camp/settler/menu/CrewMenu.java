@@ -41,8 +41,6 @@ public class CrewMenu extends AbstractGui implements Windowed {
     private static final int FIRST_FREE_SLOT = 27;
     private static final int FREE_SLOTS = 18;
 
-    private final CrewMenus menus;
-    private final Player viewer;
     private final SiteKey key;
     private final PlacedStructure structure;
     private final Job job;
@@ -52,8 +50,6 @@ public class CrewMenu extends AbstractGui implements Windowed {
     CrewMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull Worksite worksite,
              @NotNull PlacedStructure structure, @Nullable Windowed previous) {
         super(9, 6);
-        this.menus = menus;
-        this.viewer = viewer;
         this.key = worksite.getKey();
         this.structure = structure;
         this.job = structure.getJob();

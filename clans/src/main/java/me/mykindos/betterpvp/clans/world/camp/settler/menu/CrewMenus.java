@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
-import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewRule;
@@ -27,26 +26,24 @@ import java.util.UUID;
 @Getter(AccessLevel.PACKAGE)
 public class CrewMenus {
 
+    @Getter(AccessLevel.NONE)
     private final ConstructionSites sites;
     private final StructureStatusTracker tracker;
     private final CrewService crews;
     private final CrewRule rule;
     private final SettlerService settlers;
     private final StructureCatalogue catalogue;
-    private final ProfessionRegistry professions;
 
     @Inject
     public CrewMenus(@NotNull ConstructionSites sites, @NotNull StructureStatusTracker tracker,
                      @NotNull CrewService crews, @NotNull CrewRule rule,
-                     @NotNull SettlerService settlers, @NotNull StructureCatalogue catalogue,
-                     @NotNull ProfessionRegistry professions) {
+                     @NotNull SettlerService settlers, @NotNull StructureCatalogue catalogue) {
         this.sites = sites;
         this.tracker = tracker;
         this.crews = crews;
         this.rule = rule;
         this.settlers = settlers;
         this.catalogue = catalogue;
-        this.professions = professions;
     }
 
     /** Every job running in the camp {@code player} stands in. Back leads to {@code previous}. */
