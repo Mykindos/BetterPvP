@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureStage;
 import me.mykindos.betterpvp.core.world.construction.StructureStatus;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,7 +56,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
     private final UUID id;
     private final @Nullable Windowed back;
     private final @Nullable Windowed returnTo;
-    private final @Nullable ConstructionService.Worksite worksite;
+    private final @Nullable Worksite worksite;
     private Component title = Component.empty();
 
     /**

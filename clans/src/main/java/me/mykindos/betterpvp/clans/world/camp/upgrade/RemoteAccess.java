@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.clans.world.camp.storage.StorehouseChests;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -71,7 +71,7 @@ public class RemoteAccess implements Listener {
         if (!permissions.mayOpenContainers(player, key.getOwnerId())) {
             return "clans.camp.upgrade.remote_access.not_allowed";
         }
-        final Optional<ConstructionService.Worksite> here = chests.here(player, key);
+        final Optional<Worksite> here = chests.here(player, key);
         if (here.isEmpty()) {
             return "clans.camp.storage.not_here";
         }

@@ -257,7 +257,7 @@ class ConstructionServiceTest {
         final boolean[] siege = {false};
         site.rules.add(rule("siege", () -> siege[0], 1.0));
         final PlacedStructure hall = build("hall").getStructure();
-        final ConstructionService.Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = service.worksite(world).orElseThrow();
 
         siege[0] = true;
         service.refresh(worksite);
@@ -305,7 +305,7 @@ class ConstructionServiceTest {
             }
         });
         final PlacedStructure hall = build("hall").getStructure();
-        final ConstructionService.Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = service.worksite(world).orElseThrow();
 
         now.addAndGet(60 * MINUTE);
         siege[0] = true;
@@ -558,7 +558,7 @@ class ConstructionServiceTest {
     @Test
     void ac15_aSelfRepairingStructureComesBackOnItsOwnForNothing() {
         final PlacedStructure well = finished("well");
-        final ConstructionService.Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = service.worksite(world).orElseThrow();
         service.disable(world, well.getId());
 
         now.addAndGet(4 * MINUTE - 1);

@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,7 +46,7 @@ import java.util.Optional;
 @Singleton
 public class ResourceChestDeposit implements Listener {
 
-    private final ConstructionService construction;
+    private final ConstructionSites construction;
     private final ResourceChests chests;
     private final CampResources resources;
     private final CampStore store;
@@ -56,7 +56,7 @@ public class ResourceChestDeposit implements Listener {
     private final ItemRegistry itemRegistry;
 
     @Inject
-    public ResourceChestDeposit(@NotNull ConstructionService construction, @NotNull ResourceChests chests,
+    public ResourceChestDeposit(@NotNull ConstructionSites construction, @NotNull ResourceChests chests,
                                 @NotNull CampResources resources, @NotNull CampStore store,
                                 @NotNull CampConfig config, @NotNull ClanManager clanManager,
                                 @NotNull ItemFactory itemFactory, @NotNull ItemRegistry itemRegistry) {

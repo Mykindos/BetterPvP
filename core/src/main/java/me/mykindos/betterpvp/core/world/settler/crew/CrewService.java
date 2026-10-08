@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.settler.Profession;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.Roster;
@@ -80,7 +81,7 @@ public class CrewService implements Listener {
      */
     public @NotNull SettlerResult join(@NotNull Player player, @NotNull World world, @NotNull UUID structureId,
                                        @NotNull UUID settlerId) {
-        final ConstructionService.Worksite worksite = construction.worksite(world).orElse(null);
+        final Worksite worksite = construction.worksite(world).orElse(null);
         final SettlerSite site = worksite == null ? null : settlers.site(worksite.getKey()).orElse(null);
         if (worksite == null || site == null) {
             return SettlerResult.refused("core.settler.not_loaded");
@@ -92,7 +93,7 @@ public class CrewService implements Listener {
     }
 
     /** Puts {@code settlerId} on the crew of the job running on {@code structureId}, if the crew has room for it. */
-    public @NotNull SettlerResult enlist(@NotNull ConstructionService.Worksite worksite, @NotNull UUID structureId,
+    public @NotNull SettlerResult enlist(@NotNull Worksite worksite, @NotNull UUID structureId,
                                          @NotNull UUID settlerId) {
         final SettlerSite site = settlers.site(worksite.getKey()).orElse(null);
         if (site == null) {

@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.content.SceneSpawn;
@@ -60,7 +60,7 @@ public class DockArrivals implements Listener {
     public static final String POINT = "settler_arrival";
 
     private final CampRecruitment recruitment;
-    private final ConstructionService construction;
+    private final ConstructionSites construction;
     private final StructureShapes shapes;
     private final ClansSceneObjectFactory factory;
     private final SettlerModels models;
@@ -71,7 +71,7 @@ public class DockArrivals implements Listener {
     private final Map<String, Waiting> worlds = new HashMap<>();
 
     @Inject
-    public DockArrivals(@NotNull CampRecruitment recruitment, @NotNull ConstructionService construction,
+    public DockArrivals(@NotNull CampRecruitment recruitment, @NotNull ConstructionSites construction,
                         @NotNull StructureShapes shapes, @NotNull ClansSceneObjectFactory factory,
                         @NotNull SettlerModels models, @NotNull CampSettlers campSettlers,
                         @NotNull SettlerCards cards, @NotNull Camps camps, @NotNull SiteInstances instances) {

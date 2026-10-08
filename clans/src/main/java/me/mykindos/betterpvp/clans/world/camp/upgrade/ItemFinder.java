@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.clans.world.camp.storage.StorehouseChests;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.World;
@@ -55,7 +55,7 @@ public class ItemFinder implements Listener {
 
     /** Every item chest in camp {@code key} holding something that passes {@code test}, with how many it holds. */
     public @NotNull List<Found> find(@NotNull Player player, @NotNull SiteKey key, @NotNull Predicate<ItemStack> test) {
-        final Optional<ConstructionService.Worksite> here = chests.here(player, key);
+        final Optional<Worksite> here = chests.here(player, key);
         if (here.isEmpty() || !isActive(key)) {
             return List.of();
         }

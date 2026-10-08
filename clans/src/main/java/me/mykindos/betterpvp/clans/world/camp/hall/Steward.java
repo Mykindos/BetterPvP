@@ -10,13 +10,14 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePlacedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.content.SceneSpawn;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
@@ -51,7 +52,7 @@ public class Steward implements Listener {
     public static final String POINT = "steward";
     private static final String LOOK = "steward";
 
-    private final ConstructionService construction;
+    private final ConstructionSites construction;
     private final StructureShapes shapes;
     private final ClansSceneObjectFactory factory;
     private final SettlerConfig config;
@@ -60,7 +61,7 @@ public class Steward implements Listener {
     private final Map<String, Placed> worlds = new HashMap<>();
 
     @Inject
-    public Steward(@NotNull ConstructionService construction, @NotNull StructureShapes shapes,
+    public Steward(@NotNull ConstructionSites construction, @NotNull StructureShapes shapes,
                    @NotNull ClansSceneObjectFactory factory, @NotNull SettlerConfig config, @NotNull HallMenus menus,
                    @NotNull SettlerModels models) {
         this.construction = construction;
@@ -138,7 +139,7 @@ public class Steward implements Listener {
             placed.npc = null;
         }
         placed.at = wanted;
-        final SiteKey key = construction.worksite(world).map(ConstructionService.Worksite::getKey).orElse(null);
+        final SiteKey key = construction.worksite(world).map(Worksite::getKey).orElse(null);
         if (wanted == null || key == null) {
             return;
         }

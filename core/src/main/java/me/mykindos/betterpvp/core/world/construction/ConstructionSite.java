@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * Everything construction needs from the module that owns a kind of site: where its holdings are kept, what pays for
- * building, who may do what, and any rules of its own. Registered per site id with the {@link ConstructionService}, so
+ * building, who may do what, and any rules of its own. Registered per site id with {@link ConstructionSites}, so
  * core never learns what the owner of a site is.
  */
 public interface ConstructionSite {

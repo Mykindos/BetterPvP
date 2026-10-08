@@ -9,9 +9,9 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -25,7 +25,7 @@ import java.util.Locale;
 /** Every job running in a camp, with how its crew stands. Clicking one opens its crew. */
 public class CrewJobsMenu extends AbstractGui implements Windowed {
 
-    CrewJobsMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull ConstructionService.Worksite worksite,
+    CrewJobsMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull Worksite worksite,
                  @Nullable Windowed previous) {
         super(9, 4);
         final long now = menus.getConstruction().now();
