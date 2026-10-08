@@ -28,7 +28,7 @@ public class StructureShapes {
     private final SchematicService schematics;
     private final Map<String, Footprint> footprints = new ConcurrentHashMap<>();
     private final Map<String, BoundingBox> bounds = new ConcurrentHashMap<>();
-    private long generation;
+    private volatile long seen;
 
     @Inject
     public StructureShapes(@NotNull StructureCatalogue catalogue, @NotNull SchematicService schematics) {
@@ -77,8 +77,7 @@ public class StructureShapes {
 
     public @NotNull Optional<Footprint> footprintOf(@NotNull World world, @NotNull String type, int stage,
                                                     @NotNull StructurePosition position) {
-        forgetIfReloaded();
-        final String key = key(type, stage, position);
+        final String key = key(current(), type, stage, position);
         final Footprint known = footprints.get(key);
         if (known != null) {
             return Optional.of(known);
@@ -92,8 +91,7 @@ public class StructureShapes {
     /** The structure's bounds, the captured selection turned and moved to where it stands. */
     public @NotNull Optional<BoundingBox> boundsOf(@NotNull World world, @NotNull String type, int stage,
                                                    @NotNull StructurePosition position) {
-        forgetIfReloaded();
-        final String key = key(type, stage, position);
+        final String key = key(current(), type, stage, position);
         final BoundingBox known = bounds.get(key);
         if (known != null) {
             return Optional.of(known.clone());
@@ -105,17 +103,23 @@ public class StructureShapes {
         });
     }
 
-    private synchronized void forgetIfReloaded() {
-        final long current = schematics.generation();
-        if (current != generation) {
-            generation = current;
+    /**
+     * The schematics' generation, dropping what was worked out under an older one. Keys carry it, so an entry from an
+     * older generation is never read.
+     */
+    private long current() {
+        final long generation = schematics.generation();
+        if (generation != seen) {
+            seen = generation;
             footprints.clear();
             bounds.clear();
         }
+        return generation;
     }
 
-    private static @NotNull String key(@NotNull String type, int stage, @NotNull StructurePosition position) {
-        return type + ":" + stage + ":" + position.getX() + ":" + position.getY() + ":" + position.getZ()
-                + ":" + position.getQuarterTurns();
+    private static @NotNull String key(long generation, @NotNull String type, int stage,
+                                       @NotNull StructurePosition position) {
+        return generation + ":" + type + ":" + stage + ":" + position.getX() + ":" + position.getY() + ":"
+                + position.getZ() + ":" + position.getQuarterTurns();
     }
 }

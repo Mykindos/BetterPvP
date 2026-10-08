@@ -140,6 +140,7 @@ public class SchematicService {
 
         cache.remove(name.toLowerCase(Locale.ROOT));
         cache.remove(fileName.toLowerCase(Locale.ROOT));
+        generation.incrementAndGet();
         return Optional.of(file);
     }
 
@@ -157,7 +158,7 @@ public class SchematicService {
         return Optional.empty();
     }
 
-    /** How many times the cache has been dropped, so anything worked out from a schematic knows to work it out again. */
+    /** Goes up whenever a cached schematic is dropped or saved over, so anything worked out from one is worked out again. */
     public long generation() {
         return generation.get();
     }
