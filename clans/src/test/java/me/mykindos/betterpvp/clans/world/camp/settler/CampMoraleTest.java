@@ -8,8 +8,6 @@ import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.settler.SettlerTable;
-import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
-import me.mykindos.betterpvp.core.world.settler.morale.MoraleBoost;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

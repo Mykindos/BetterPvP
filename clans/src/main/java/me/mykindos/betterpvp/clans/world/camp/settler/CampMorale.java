@@ -7,8 +7,6 @@ import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerDeparture;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
-import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
-import me.mykindos.betterpvp.core.world.settler.morale.MoraleBoost;
 import me.mykindos.betterpvp.core.world.settler.morale.MoraleModel;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.settler.morale;
+package me.mykindos.betterpvp.clans.world.camp.settler;
 
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.jetbrains.annotations.NotNull;

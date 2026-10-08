@@ -12,14 +12,14 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampSettlers;
+import me.mykindos.betterpvp.clans.world.camp.settler.FoodSource;
+import me.mykindos.betterpvp.clans.world.camp.settler.MoraleBoost;
 import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.DatabaseProsperityStore;
 import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.ProsperityStore;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.CasualtyStore;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.DatabaseCasualtyStore;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.FeastTable;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.GreatBell;
-import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
-import me.mykindos.betterpvp.core.world.settler.morale.MoraleBoost;
 
 public class ClansInjectorModule extends AbstractModule {
 
