@@ -13,10 +13,10 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
 
 /**
- * Tears a {@link SceneMob} out of the scene registry when its backing entity is removed from the
- * world for any reason (death, despawn, chunk unload, ...). Without this, a killed or unloaded mob
- * would linger forever in the registry - still ticked, still holding references to its target and
- * threat table - which is both a memory leak and a correctness bug.
+ * Tears a {@link SceneMob} out of the scene registry when its backing entity is removed by anything
+ * other than the framework (death, another plugin, ...). Without this, a killed mob would linger
+ * forever in the registry - still ticked, still holding references to its target and threat table.
+ * A chunk-managed mob whose chunk unloads stays registered so it can spawn again.
  */
 @BPvPListener
 @Singleton
@@ -48,8 +48,9 @@ public class MobLifecycleListener implements Listener {
     public void onRemove(EntityRemoveEvent event) {
         final SceneMob mob = registry.getObject(event.getEntity(), SceneMob.class);
         // isRegistered guards the re-entrant case: our own remove() unregisters first, then removes
-        // the entity, which fires EntityRemoveEvent again.
-        if (mob != null && mob.isRegistered()) {
+        // the entity, which fires EntityRemoveEvent again. isDespawning keeps a chunk unload from
+        // removing a chunk-managed mob for good.
+        if (mob != null && mob.isRegistered() && !mob.isDespawning()) {
             mob.remove();
         }
     }
