@@ -126,13 +126,14 @@ public class SceneMob extends NPC implements HasModeledEntity {
     /** The follow range the body gets while the AI runs, so the pathfinder can plan trips this long. */
     @Setter private double pathRange = 48.0;
     /** Pathfinding speed multiplier used on the way to a spot it is {@link #orderTo ordered to}. */
-    @Setter private double orderSpeed = 1.0;
+    private double orderSpeed = 1.0;
 
     // Activation-gate state. The proximity check is sampled (not every tick) to keep it cheap.
     private boolean active = true;
+    private boolean playerInRange;
     private boolean aiRunning;
     private boolean enabledBodyAi;
-    private int activationCheckCounter = 0;
+    private int ticksUntilProximityCheck;
 
     @Getter(AccessLevel.NONE) private AttendComponent attending;
     @Getter(AccessLevel.NONE) private OrderToSpotComponent orders;
@@ -200,9 +201,10 @@ public class SceneMob extends NPC implements HasModeledEntity {
         currentTarget = null;
         threat.clear();
         active = true;
+        playerInRange = false;
         aiRunning = false;
         enabledBodyAi = false;
-        activationCheckCounter = 0;
+        ticksUntilProximityCheck = 0;
 
         boolean bound = false;
         if (modelId != null) {
@@ -293,19 +295,20 @@ public class SceneMob extends NPC implements HasModeledEntity {
 
     /**
      * Decides whether the mob should drive its AI this tick. A mob is active only while alive, with a
-     * player within {@link #activationRadius} (sampled ~once per second to stay cheap), and not already
+     * player within {@link #activationRadius} (sampled once every 20 ticks to stay cheap), and not already
      * playing its death clip.
      */
     private boolean computeActive() {
-        if (entity == null || entity.isDead()) {
-            return false; // dead entities are never active, even if players are nearby
+        if (entity == null) {
+            return false;
         }
 
-        if (activationCheckCounter-- <= 0) {
-            activationCheckCounter = 20; // re-check proximity ~once per second
-            active = !getEntity().getWorld().getNearbyPlayers(getEntity().getLocation(), activationRadius).isEmpty();
+        if (ticksUntilProximityCheck == 0) {
+            ticksUntilProximityCheck = 20;
+            playerInRange = !entity.getWorld().getNearbyPlayers(entity.getLocation(), activationRadius).isEmpty();
         }
-        if (!active) {
+        ticksUntilProximityCheck--;
+        if (entity.isDead() || !playerInRange) {
             return false;
         }
 
@@ -356,14 +359,32 @@ public class SceneMob extends NPC implements HasModeledEntity {
         animations.play(MobAnimation.IDLE);
     }
 
-    /** Stops pathing, faces {@code player} and holds IDLE for a moment, then lets the AI decide again. */
+    /**
+     * Stops pathing, faces {@code player} and holds IDLE for a moment, then lets the AI decide again. Does nothing
+     * before the mob has spawned.
+     */
     public void attend(Player player) {
-        attending.attend(player);
+        if (attending != null) {
+            attending.attend(player);
+        }
     }
 
-    /** Sends the mob to a random point near {@code spot}, rests there, then lets the AI decide again. */
+    /**
+     * Sends the mob to a random point near {@code spot}, rests there, then lets the AI decide again. Does nothing
+     * before the mob has spawned.
+     */
     public void orderTo(Location spot) {
-        orders.orderTo(spot);
+        if (orders != null) {
+            orders.orderTo(spot);
+        }
+    }
+
+    /** Sets the pathfinding speed of the next order. */
+    public void setOrderSpeed(double orderSpeed) {
+        this.orderSpeed = orderSpeed;
+        if (orders != null) {
+            orders.speed(orderSpeed);
+        }
     }
 
     /** Stops every running component so each decides again on the next tick. */
