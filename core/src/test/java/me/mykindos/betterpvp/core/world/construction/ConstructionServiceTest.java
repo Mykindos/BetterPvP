@@ -257,7 +257,7 @@ class ConstructionServiceTest {
         final boolean[] siege = {false};
         site.rules.add(rule("siege", () -> siege[0], 1.0));
         final PlacedStructure hall = build("hall").getStructure();
-        final ConstructionService.Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = service.worksite(world).orElseThrow();
 
         siege[0] = true;
         service.refresh(worksite);
@@ -305,7 +305,7 @@ class ConstructionServiceTest {
             }
         });
         final PlacedStructure hall = build("hall").getStructure();
-        final ConstructionService.Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = service.worksite(world).orElseThrow();
 
         now.addAndGet(60 * MINUTE);
         siege[0] = true;
@@ -558,7 +558,7 @@ class ConstructionServiceTest {
     @Test
     void ac15_aSelfRepairingStructureComesBackOnItsOwnForNothing() {
         final PlacedStructure well = finished("well");
-        final ConstructionService.Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = service.worksite(world).orElseThrow();
         service.disable(world, well.getId());
 
         now.addAndGet(4 * MINUTE - 1);
@@ -769,6 +769,113 @@ class ConstructionServiceTest {
         assertFalse(service.canUse(visitor, CAMP, hall));
         assertTrue(service.canUse(player, CAMP, market));
         assertTrue(service.canUse(player, CAMP, hall));
+    }
+
+    @Test
+    void ac2_buildAndAvailabilityAgreeWhenTheHoldingIsNotLoaded() {
+        site.loaded = false;
+
+        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+    }
+
+    @Test
+    void ac2_buildAndAvailabilityAgreeWhenTheSiteIsNotRegistered() {
+        final World arena = unregisteredWorld();
+
+        assertSameReason(service.unavailable(player, SiteKey.of("arena", 1), type("hall")),
+                service.build(player, arena, type("hall"), new Location(arena, 0, 64, 0), 0));
+    }
+
+    @Test
+    void ac2_buildAndAvailabilityAgreeOnEveryOtherRefusal() {
+        site.denied.add(ConstructionAction.BUILD);
+        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+        site.denied.clear();
+
+        assertSameReason(service.unavailable(player, CAMP, type("workshop")), build("workshop"));
+
+        site.gate = Component.text("needs a bigger hall");
+        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+        site.gate = null;
+
+        site.balance.put("wood", 5);
+        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+    }
+
+    @Test
+    void ac2_upgradeAndAvailabilityAgreeWhenDeniedAndTheUpgradeIsUnknown() {
+        final PlacedStructure hall = finished("hall");
+        site.denied.add(ConstructionAction.PICK_UPGRADE);
+
+        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "moat"),
+                service.upgrade(player, world, hall.getId(), "moat"));
+    }
+
+    @Test
+    void ac2_upgradeAndAvailabilityAgreeWhenTheHoldingIsNotLoaded() {
+        final PlacedStructure hall = finished("hall");
+        site.loaded = false;
+
+        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
+                service.upgrade(player, world, hall.getId(), "lantern"));
+    }
+
+    @Test
+    void ac2_upgradeAndAvailabilityAgreeWhenTheSiteIsNotRegistered() {
+        final World arena = unregisteredWorld();
+        final UUID id = UUID.randomUUID();
+
+        assertSameReason(service.upgradeUnavailable(player, SiteKey.of("arena", 1), id, "lantern"),
+                service.upgrade(player, arena, id, "lantern"));
+    }
+
+    @Test
+    void ac2_upgradeAndAvailabilityAgreeWhenTheStructuresTypeIsUnknown() {
+        final PlacedStructure ruin = new PlacedStructure(UUID.randomUUID(), "ruin", new StructurePosition(0, 64, 0, 0),
+                StructureCondition.ACTIVE);
+        site.holding.getStructures().add(ruin);
+
+        assertSameReason(service.upgradeUnavailable(player, CAMP, ruin.getId(), "lantern"),
+                service.upgrade(player, world, ruin.getId(), "lantern"));
+    }
+
+    @Test
+    void ac2_upgradeAndAvailabilityAgreeOnEveryOtherRefusal() {
+        final PlacedStructure hall = finished("hall");
+        final PlacedStructure dock = finished("dock");
+
+        site.denied.add(ConstructionAction.PICK_UPGRADE);
+        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
+                service.upgrade(player, world, hall.getId(), "lantern"));
+        site.denied.clear();
+
+        final UUID missing = UUID.randomUUID();
+        assertSameReason(service.upgradeUnavailable(player, CAMP, missing, "lantern"),
+                service.upgrade(player, world, missing, "lantern"));
+        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "moat"),
+                service.upgrade(player, world, hall.getId(), "moat"));
+        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "tower"),
+                service.upgrade(player, world, hall.getId(), "tower"));
+        assertSameReason(service.upgradeUnavailable(player, CAMP, dock.getId(), "lantern"),
+                service.upgrade(player, world, dock.getId(), "lantern"));
+
+        site.balance.put("wood", 0);
+        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
+                service.upgrade(player, world, hall.getId(), "lantern"));
+    }
+
+    private World unregisteredWorld() {
+        final World arena = mock(World.class);
+        when(arena.getName()).thenReturn("arena_1");
+        when(instances.byWorld("arena_1")).thenReturn(Optional.of(
+                new SiteInstance(UUID.randomUUID(), SiteKey.of("arena", 1), "arena_1", SiteInstance.State.READY)));
+        return arena;
+    }
+
+    private static void assertSameReason(Optional<Component> query, ConstructionResult action) {
+        assertFalse(action.isSuccess(), "the action is refused");
+        assertTrue(query.isPresent(), "the query refuses too");
+        assertEquals(query, Optional.ofNullable(action.getReason()));
     }
 
     private void assertRefusedOnlyWithout(ConstructionAction action, Supplier<ConstructionResult> attempt) {

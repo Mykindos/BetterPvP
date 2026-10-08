@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
@@ -75,7 +76,7 @@ public class StructureMenus {
     }
 
     /** The camp's worksite, only if {@code player} stands in it. */
-    @NotNull Optional<ConstructionService.Worksite> worksite(@NotNull Player player, @NotNull SiteKey camp) {
+    @NotNull Optional<Worksite> worksite(@NotNull Player player, @NotNull SiteKey camp) {
         return construction.worksite(player.getWorld()).filter(worksite -> worksite.getKey().equals(camp));
     }
 

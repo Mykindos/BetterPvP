@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -76,7 +76,7 @@ public class SortingTable implements Listener {
             tell(player, Translations.component("clans.camp.upgrade.sorting_table.inactive").color(NamedTextColor.RED));
             return;
         }
-        final Optional<ConstructionService.Worksite> here = chests.here(player, key);
+        final Optional<Worksite> here = chests.here(player, key);
         if (here.isEmpty()) {
             tell(player, Translations.component("clans.camp.storage.not_here").color(NamedTextColor.RED));
             return;

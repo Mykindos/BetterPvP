@@ -8,10 +8,10 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
@@ -49,7 +49,7 @@ public class CrewMenu extends AbstractGui implements Windowed {
     private final SettlerSite site;
 
     /** @param previous where the job list this menu goes back to leads back to */
-    CrewMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull ConstructionService.Worksite worksite,
+    CrewMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull Worksite worksite,
              @NotNull PlacedStructure structure, @Nullable Windowed previous) {
         super(9, 6);
         this.menus = menus;
@@ -105,7 +105,7 @@ public class CrewMenu extends AbstractGui implements Windowed {
 
     /** A job at a glance: what it is, the Workforce it needs against what its crew brings, and its pace. */
     static @NotNull ItemView.ItemViewBuilder summary(@NotNull CrewMenus menus,
-                                                     @NotNull ConstructionService.Worksite worksite,
+                                                     @NotNull Worksite worksite,
                                                      @NotNull PlacedStructure structure, @NotNull Material icon) {
         final Job job = structure.getJob();
         final SiteKey key = worksite.getKey();

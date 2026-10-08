@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.fatigue.RespawnHoldService;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.site.Party;
@@ -49,14 +49,14 @@ public class CampRespawn implements Listener {
 
     private final Clans clans;
     private final ClanManager clanManager;
-    private final ConstructionService construction;
+    private final ConstructionSites construction;
     private final StructureShapes shapes;
     private final SiteInstances instances;
     private final Placement placement;
     private final RespawnHoldService hold;
 
     @Inject
-    public CampRespawn(@NotNull Clans clans, @NotNull ClanManager clanManager, @NotNull ConstructionService construction,
+    public CampRespawn(@NotNull Clans clans, @NotNull ClanManager clanManager, @NotNull ConstructionSites construction,
                        @NotNull StructureShapes shapes, @NotNull SiteInstances instances, @NotNull Placement placement,
                        @NotNull RespawnHoldService hold, @NotNull SiteLandings landings) {
         this.clans = clans;

@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.world.construction.ComponentKeys;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSite;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
@@ -143,7 +144,7 @@ class BlueprintSessionsTest {
         when(construction.problem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.empty());
         when(construction.moveProblem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.empty());
         when(construction.worksite(world)).thenReturn(Optional.of(
-                new ConstructionService.Worksite(CAMP, mock(ConstructionSite.class), holding, world)));
+                new Worksite(CAMP, mock(ConstructionSite.class), holding, world)));
 
         sessions = new BlueprintSessions(blueprintItem, itemFactory, catalogue, schematics, construction, previews,
                 clients);

@@ -17,7 +17,7 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureUpgradedEvent;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.content.SceneSpawn;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
@@ -67,7 +68,7 @@ public class DeputySteward implements Listener {
     private final CampUpgrades upgrades;
     private final CampStore store;
     private final CampPermissions permissions;
-    private final ConstructionService construction;
+    private final ConstructionSites construction;
     private final StructureShapes shapes;
     private final ClansSceneObjectFactory factory;
     private final SettlerConfig config;
@@ -77,7 +78,7 @@ public class DeputySteward implements Listener {
 
     @Inject
     public DeputySteward(@NotNull CampUpgrades upgrades, @NotNull CampStore store,
-                         @NotNull CampPermissions permissions, @NotNull ConstructionService construction,
+                         @NotNull CampPermissions permissions, @NotNull ConstructionSites construction,
                          @NotNull StructureShapes shapes, @NotNull ClansSceneObjectFactory factory,
                          @NotNull SettlerConfig config, @NotNull SettlerModels models, @NotNull HallMenus menus) {
         this.upgrades = upgrades;
@@ -128,7 +129,7 @@ public class DeputySteward implements Listener {
         final Location at = player.getLocation();
         final Holding holding = construction.worksite(at.getWorld())
                 .filter(worksite -> worksite.getKey().equals(key))
-                .map(ConstructionService.Worksite::getHolding)
+                .map(Worksite::getHolding)
                 .orElse(null);
         final Block feet = at.getBlock();
         final boolean standable = feet.getRelative(BlockFace.DOWN).isSolid() && feet.isPassable()
@@ -250,7 +251,7 @@ public class DeputySteward implements Listener {
         if (placed.scope.isReleased()) {
             return;
         }
-        final ConstructionService.Worksite worksite = construction.worksite(world).orElse(null);
+        final Worksite worksite = construction.worksite(world).orElse(null);
         final Camp camp = worksite == null ? null : store.cached(worksite.getKey().getOwnerId()).orElse(null);
         Location wanted = null;
         if (camp != null && camp.getDeputy() != null) {

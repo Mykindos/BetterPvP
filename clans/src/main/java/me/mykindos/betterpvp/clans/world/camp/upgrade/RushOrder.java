@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -125,7 +126,7 @@ public class RushOrder {
     }
 
     /** Charges {@code player} and finishes the job on {@code structure} in {@code worksite}, if nothing stops it. */
-    public @NotNull ConstructionResult rush(@NotNull Player player, @NotNull ConstructionService.Worksite worksite,
+    public @NotNull ConstructionResult rush(@NotNull Player player, @NotNull Worksite worksite,
                                             @NotNull PlacedStructure structure) {
         final SiteKey key = worksite.getKey();
         final Optional<Component> problem = problem(player, key, structure);

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.world.construction.ComponentKeys;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSite;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
@@ -193,7 +194,7 @@ class StructureViewsTest {
 
         when(service.now()).thenAnswer(invocation -> now.get());
         when(service.worksite(world)).thenReturn(Optional.of(
-                new ConstructionService.Worksite(CAMP, site, holding, world)));
+                new Worksite(CAMP, site, holding, world)));
         when(service.canUse(any(), any(), any())).thenReturn(true);
         doAnswer(invocation -> spawns.add(invocation.getArgument(0))).when(scope).add(any(SceneSpawn.class));
 

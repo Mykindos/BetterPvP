@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.world.camp.storage.StorehouseChests;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -58,7 +58,7 @@ public class TallyBoard implements Listener {
 
     /** Every resource chest of camp {@code key} with its share, empty when {@code player} is not in that camp. */
     public @NotNull List<Share> tally(@NotNull Player player, @NotNull SiteKey key) {
-        final Optional<ConstructionService.Worksite> here = chests.here(player, key);
+        final Optional<Worksite> here = chests.here(player, key);
         final Optional<Camp> camp = store.cached(key.getOwnerId());
         if (here.isEmpty() || camp.isEmpty()) {
             return List.of();

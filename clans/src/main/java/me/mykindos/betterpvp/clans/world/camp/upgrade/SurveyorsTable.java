@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
@@ -133,7 +134,7 @@ public class SurveyorsTable implements Listener {
             tell(player, Translations.component("clans.camp.upgrade.surveyors_table.inactive").color(NamedTextColor.RED));
             return false;
         }
-        final ConstructionService.Worksite worksite = construction.worksite(player.getWorld())
+        final Worksite worksite = construction.worksite(player.getWorld())
                 .filter(found -> found.getKey().equals(camp))
                 .orElse(null);
         if (worksite == null) {

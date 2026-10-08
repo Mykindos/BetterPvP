@@ -5,10 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceChests;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.locale.Translations;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureStorage;
+import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.World;
@@ -34,11 +35,11 @@ public class StorehouseChests {
     public static final String MARKER = "item_chest";
 
     private final ChestPoints points;
-    private final ConstructionService construction;
+    private final ConstructionSites construction;
     private final CampStructures structures;
 
     @Inject
-    public StorehouseChests(@NotNull ChestPoints points, @NotNull ConstructionService construction,
+    public StorehouseChests(@NotNull ChestPoints points, @NotNull ConstructionSites construction,
                             @NotNull CampStructures structures) {
         this.points = points;
         this.construction = construction;
@@ -87,7 +88,7 @@ public class StorehouseChests {
     }
 
     /** The worksite {@code player} stands in, if it is camp {@code key}'s. */
-    public @NotNull Optional<ConstructionService.Worksite> here(@NotNull Player player, @NotNull SiteKey key) {
+    public @NotNull Optional<Worksite> here(@NotNull Player player, @NotNull SiteKey key) {
         return construction.worksite(player.getWorld()).filter(worksite -> worksite.getKey().equals(key));
     }
 
