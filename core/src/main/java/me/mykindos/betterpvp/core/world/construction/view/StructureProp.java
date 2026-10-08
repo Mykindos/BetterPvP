@@ -87,15 +87,6 @@ public final class StructureProp extends Prop implements Actor {
         }
     }
 
-    @NotNull Component getLabel() {
-        return label;
-    }
-
-    /** The box around the label a click claims it through, or null while there is nothing to claim. */
-    @Nullable BoundingBox clickArea() {
-        return claimable ? area.clone() : null;
-    }
-
     @Override
     public void act(Player runner) {
         if (claimable) {
