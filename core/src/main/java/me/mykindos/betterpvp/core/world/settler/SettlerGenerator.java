@@ -50,6 +50,11 @@ public class SettlerGenerator {
         return settler;
     }
 
+    /** Whether {@code profession} is registered, so a roll with it won't throw. */
+    public boolean knows(@NotNull String profession) {
+        return professions.find(profession).isPresent();
+    }
+
     private @NotNull List<String> rollTraits(@NotNull SettlerTemplate template, @NotNull RarityNumbers numbers,
                                              @NotNull Random random) {
         final List<String> rolled = new ArrayList<>();

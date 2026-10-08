@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
+import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerGenerator;
@@ -140,7 +141,7 @@ public class CampRecruitment implements Listener {
         }
         final long now = clock.getAsLong();
         final Random random = ThreadLocalRandom.current();
-        camp.getArrivals().removeIf(candidate -> candidate.isExpired(now));
+        final boolean left = camp.getArrivals().removeIf(candidate -> candidate.isExpired(now));
 
         final long level = clanManager.getClanById(key.getOwnerId()).map(Clan::getLevel).orElse(0L);
         boolean sent = false;
@@ -158,6 +159,7 @@ public class CampRecruitment implements Listener {
             UtilServer.callEvent(new SettlerBoatEvent(key, true));
         }
 
+        final long scheduled = camp.getNextArrivalAt();
         final long interval = interval(key);
         if (camp.getNextArrivalAt() == 0 || !dockWorking) {
             if (camp.getNextArrivalAt() == 0 || now >= camp.getNextArrivalAt()) {
@@ -177,7 +179,9 @@ public class CampRecruitment implements Listener {
                 camp.setNextArrivalAt(now + interval);
             }
         }
-        store.changed(key.getOwnerId());
+        if (left || sent || camp.getNextArrivalAt() != scheduled) {
+            store.changed(key.getOwnerId());
+        }
     }
 
     /** The hiring board, rolled again once it is old enough. */
@@ -216,15 +220,23 @@ public class CampRecruitment implements Listener {
     /** Takes a candidate on, paid for by {@code player}. Refused, and nothing is paid, if there is no room. */
     public @NotNull SettlerResult hire(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID id) {
         final Camp camp = store.cached(key.getOwnerId()).orElse(null);
-        final SettlerCandidate candidate = camp == null ? null : find(camp, id).orElse(null);
+        if (camp == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final SettlerCandidate candidate = find(camp, id).orElse(null);
         if (candidate == null || candidate.isExpired(clock.getAsLong())) {
             return SettlerResult.refused("clans.settler.recruit.gone");
         }
         if (!permissions.allows(player, key.getOwnerId(), SettlerAction.HIRE)) {
             return SettlerResult.refused("clans.settler.card.not_allowed");
         }
-        if (settlers.roster(key).map(roster -> roster.size() >= settlers.populationCap(key)).orElse(true)) {
-            return SettlerResult.refused("core.settler.population_full", Component.text(settlers.populationCap(key)));
+        final Roster roster = settlers.roster(key).orElse(null);
+        if (roster == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final int cap = settlers.populationCap(key);
+        if (roster.size() >= cap) {
+            return SettlerResult.refused("core.settler.population_full", Component.text(cap));
         }
         final long price = price(key, candidate);
         if (!coins.take(player, price)) {
@@ -247,7 +259,10 @@ public class CampRecruitment implements Listener {
     /** Sends a candidate away without taking them on. */
     public @NotNull SettlerResult turnAway(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID id) {
         final Camp camp = store.cached(key.getOwnerId()).orElse(null);
-        final SettlerCandidate candidate = camp == null ? null : find(camp, id).orElse(null);
+        if (camp == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final SettlerCandidate candidate = find(camp, id).orElse(null);
         if (candidate == null) {
             return SettlerResult.refused("clans.settler.recruit.gone");
         }
@@ -322,7 +337,8 @@ public class CampRecruitment implements Listener {
 
     private @NotNull Settler roll(@NotNull SettlerRarity rarity, @Nullable String profession, @NotNull String source,
                                   @NotNull Random random) {
-        return generator.roll(SettlerTemplate.builder().rarity(rarity).profession(profession).source(source).build(),
+        final String known = profession != null && generator.knows(profession) ? profession : null;
+        return generator.roll(SettlerTemplate.builder().rarity(rarity).profession(known).source(source).build(),
                 settlerConfig.getTable(), random);
     }
 
