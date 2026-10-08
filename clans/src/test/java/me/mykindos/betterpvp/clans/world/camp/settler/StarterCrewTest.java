@@ -114,16 +114,18 @@ class StarterCrewTest {
     }
 
     @Test
-    void ac35_aStarterWithAProfessionTheCampLacksIsSkipped() {
-        final StarterCrew crew = crew(ShippedSettlers.config(yaml -> yaml.set("starting-settlers", List.of(
+    void ac35_anUnregisteredProfessionHoldsTheWholeCrewBackUntilTheConfigIsFixed() {
+        final StarterCrew broken = crew(ShippedSettlers.config(yaml -> yaml.set("starting-settlers", List.of(
                 Map.of("profession", "fisher", "rarity", "common"),
                 Map.of("profession", "builder", "rarity", "rare")))));
 
-        assertDoesNotThrow(() -> open(crew));
-        final ArgumentCaptor<Settler> granted = ArgumentCaptor.forClass(Settler.class);
-        verify(service).grant(eq(SITE), granted.capture());
-        assertEquals(CampProfessions.BUILDER, granted.getValue().getProfession());
-        assertEquals(SettlerRarity.RARE, granted.getValue().getRarity());
+        assertDoesNotThrow(() -> open(broken));
+        verify(service, never()).grant(any(), any());
+        assertFalse(camp.isStartingSettlers());
+        verify(store, never()).changed(CLAN);
+
+        open(crew(ShippedSettlers.config()));
+        verify(service, times(2)).grant(eq(SITE), any());
         assertTrue(camp.isStartingSettlers());
     }
 }

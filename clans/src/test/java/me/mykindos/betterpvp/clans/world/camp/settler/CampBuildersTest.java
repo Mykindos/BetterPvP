@@ -271,17 +271,17 @@ class CampBuildersTest {
     }
 
     @Test
-    void ac19_prodigyAndHomesickRaiseWorkforceAndSpeed() {
+    void ac19_prodigyAndHomesickRaiseWorkforceAndSpeedAtStrengthAndACommonHomesickKeepsTwoWorkforce() {
         final BuilderStats prodigy = alone(builder(SettlerRarity.LEGENDARY, null, CampTraits.PRODIGY), PLAIN);
-        assertEquals(9, prodigy.getWorkforce());
-        assertEquals(2.2 * 1.5, prodigy.getSpeed(), 1e-9);
+        assertEquals(9, prodigy.getWorkforce(), "6 raised by 25% at x2");
+        assertEquals(3.3, prodigy.getSpeed(), 1e-9, "2.2 raised by 25% at x2");
 
         final BuilderStats homesick = alone(builder(CampTraits.HOMESICK), PLAIN);
-        assertEquals(2, homesick.getWorkforce());
+        assertEquals(2, homesick.getWorkforce(), "2.2 rounds back down to 2");
         assertEquals(1.1, homesick.getSpeed(), 1e-9);
 
         final BuilderStats rare = alone(builder(SettlerRarity.RARE, null, CampTraits.HOMESICK), PLAIN);
-        assertEquals(Math.round(4 * 1.15), rare.getWorkforce());
-        assertEquals(1.6 * 1.15, rare.getSpeed(), 1e-9);
+        assertEquals(5, rare.getWorkforce(), "4 raised by 10% at x1.5 is 4.6, rounded");
+        assertEquals(1.84, rare.getSpeed(), 1e-9, "1.6 raised by 10% at x1.5");
     }
 }

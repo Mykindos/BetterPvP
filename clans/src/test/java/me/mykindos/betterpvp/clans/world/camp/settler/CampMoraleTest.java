@@ -61,6 +61,13 @@ class CampMoraleTest {
         return settler;
     }
 
+    /** Morale worked out with the shipped settlers.yml, keeping the test's food. */
+    private void shipped() {
+        final SettlerConfig shipped = ShippedSettlers.config();
+        final FoodSource granary = site -> food;
+        morale = new CampMorale(shipped, new CampWideTraits(shipped), Set.of(granary), Set.of());
+    }
+
     private int of(Settler settler) {
         return morale.morale(CAMP, settler, roster, NOW);
     }
@@ -182,21 +189,29 @@ class CampMoraleTest {
 
     @Test
     void ac25_aBardLiftsEveryoneAtItsStrength() {
+        shipped();
         final Settler wanderer = settler(null, SettlerRarity.COMMON);
         settler(null, SettlerRarity.COMMON, CampTraits.BARD);
         assertEquals(5, of(wanderer));
+        settler(null, SettlerRarity.UNCOMMON, CampTraits.BARD);
+        assertEquals(6, of(wanderer), "5 at x1.25, rounded");
+        settler(null, SettlerRarity.RARE, CampTraits.BARD);
+        assertEquals(8, of(wanderer), "5 at x1.5, rounded");
         settler(null, SettlerRarity.LEGENDARY, CampTraits.BARD);
         assertEquals(10, of(wanderer), "only the strongest Bard counts");
     }
 
     @Test
     void ac26_aCookMakesFoodGoFurtherUpToItsMost() {
+        shipped();
         final Settler wanderer = settler(null, SettlerRarity.COMMON);
         settler(null, SettlerRarity.COMMON, CampTraits.COOK);
         assertEquals(0, of(wanderer), "no food, nothing to cook");
 
         food = 20;
         assertEquals(25, of(wanderer));
+        settler(null, SettlerRarity.UNCOMMON, CampTraits.COOK);
+        assertEquals(26, of(wanderer), "25% at x1.25 of 20, rounded");
         settler(null, SettlerRarity.LEGENDARY, CampTraits.COOK);
         assertEquals(30, of(wanderer), "only the strongest Cook counts, up to the food cap");
         food = 40;
@@ -205,6 +220,7 @@ class CampMoraleTest {
 
     @Test
     void ac27_aBelovedSettlerSoftensIdlenessAndDismissals() {
+        shipped();
         final Settler builder = settler("builder", SettlerRarity.COMMON);
         builder.setStateSince(NOW - 500 * HOUR);
         builder.setJoinedAt(NOW - 500 * HOUR);
@@ -212,11 +228,12 @@ class CampMoraleTest {
         assertEquals(-40, of(builder));
 
         settler(null, SettlerRarity.LEGENDARY, CampTraits.BELOVED);
-        assertEquals(-10, of(builder));
+        assertEquals(-10, of(builder), "a legendary Beloved's bound is not multiplied by its strength");
     }
 
     @Test
     void ac27_belovedLeavesOtherDropsAlone() {
+        shipped();
         final Settler wanderer = settler(null, SettlerRarity.COMMON);
         settler("builder", SettlerRarity.COMMON).changeState(SettlerState.STRIKING, NOW);
         settler(null, SettlerRarity.LEGENDARY, CampTraits.BELOVED);
@@ -226,6 +243,7 @@ class CampMoraleTest {
 
     @Test
     void ac28_personalTraitsShapeHowASettlerTakesIt() {
+        shipped();
         settler("builder", SettlerRarity.COMMON).changeState(SettlerState.STRIKING, NOW);
         final Settler content = settler(null, SettlerRarity.COMMON, CampTraits.CONTENT);
         final Settler moody = settler(null, SettlerRarity.COMMON, CampTraits.MOODY);
@@ -238,6 +256,7 @@ class CampMoraleTest {
 
     @Test
     void ac28_moodySwingsBothWaysAndContentOnlyHoldsTheFloor() {
+        shipped();
         food = 20;
         assertEquals(40, of(settler(null, SettlerRarity.COMMON, CampTraits.MOODY)));
         assertEquals(20, of(settler(null, SettlerRarity.COMMON, CampTraits.CONTENT)));
@@ -246,6 +265,7 @@ class CampMoraleTest {
 
     @Test
     void ac28_onlyLoyalSettlersNeverLeave() {
+        shipped();
         assertFalse(morale.mayLeave(settler(null, SettlerRarity.COMMON, CampTraits.LOYAL)));
         assertTrue(morale.mayLeave(settler(null, SettlerRarity.COMMON)));
         assertTrue(morale.mayLeave(settler("builder", SettlerRarity.LEGENDARY, CampTraits.CONTENT)));

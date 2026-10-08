@@ -311,8 +311,11 @@ class CampSettlersTest {
     }
 
     @Test
-    void ac39_clickingASettlerOpensItsCard() {
+    void ac39_clickingASettlerOpensItsCardWhateverTheRank() {
         final Player player = mock(Player.class);
+        for (SettlerAction action : SettlerAction.values()) {
+            when(permissions.allows(player, CLAN, action)).thenReturn(false);
+        }
         final Settler settler = settler(null);
         settlers.interact(player, SITE, settler);
         verify(cards).open(player, SITE, settler.getId());

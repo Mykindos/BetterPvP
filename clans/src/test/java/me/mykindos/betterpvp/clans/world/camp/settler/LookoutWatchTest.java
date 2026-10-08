@@ -59,12 +59,21 @@ class LookoutWatchTest {
 
         clan(CLAN, online, offline);
         clan(OTHER_CLAN, online);
+        when(online.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(offline.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(online.isOnline()).thenReturn(true);
+        when(offline.isOnline()).thenReturn(false);
+        // As on a server, getPlayer finds only online players, while the offline member is still a player object
+        // reachable through getOfflinePlayer.
         bukkit.when(() -> Bukkit.getPlayer(any(UUID.class))).thenAnswer(invocation -> {
             final UUID id = invocation.getArgument(0);
             return id.equals(online.getUniqueId()) ? online : null;
         });
-        when(online.getUniqueId()).thenReturn(UUID.randomUUID());
-        when(offline.getUniqueId()).thenReturn(UUID.randomUUID());
+        bukkit.when(() -> Bukkit.getOfflinePlayer(any(UUID.class))).thenAnswer(invocation -> {
+            final UUID id = invocation.getArgument(0);
+            return id.equals(online.getUniqueId()) ? online : offline;
+        });
+        bukkit.when(Bukkit::getOnlinePlayers).thenAnswer(invocation -> List.of(online));
 
         watch = new LookoutWatch(camps, clanManager, settlers, new CampWideTraits(ShippedSettlers.config()));
     }
