@@ -513,6 +513,36 @@ class StructureViewsTest {
     }
 
     @Test
+    void ac1_theStructureAtABlockIsTheOneWhoseBuildOrPieceCoversIt() {
+        final PlacedStructure store = placed("store", StructureCondition.ACTIVE);
+        store.setPosition(new StructurePosition(200, 64, 200, 0));
+        final PlacedStructure hall = active("hall");
+        hall.getUpgrades().put(0, "lantern");
+        load();
+
+        assertSame(hall, views.structureAt(block(100, 64, 100)).orElseThrow(), "the bottom block of the build");
+        assertSame(hall, views.structureAt(block(108, 68, 100)).orElseThrow(), "the top corner of the build");
+        assertSame(hall, views.structureAt(block(104, 69, 100)).orElseThrow(), "the lantern piece above the build");
+        assertSame(store, views.structureAt(block(201, 64, 200)).orElseThrow());
+        assertTrue(views.structureAt(block(150, 64, 150)).isEmpty(), "between the two builds");
+    }
+
+    @Test
+    void ac1_noStructureIsAtABlockInAWorldShowingNone() {
+        active("hall");
+        load();
+        final World other = mock(World.class);
+        when(other.getName()).thenReturn("elsewhere");
+        final Block elsewhere = mock(Block.class);
+        when(elsewhere.getWorld()).thenReturn(other);
+        when(elsewhere.getX()).thenReturn(100);
+        when(elsewhere.getY()).thenReturn(64);
+        when(elsewhere.getZ()).thenReturn(100);
+
+        assertTrue(views.structureAt(elsewhere).isEmpty());
+    }
+
+    @Test
     void ac19_aLabelThatOnlyInformsHasNoHitbox() {
         building("hall");
         withJob(active("hall"), JobKind.ADVANCE);
