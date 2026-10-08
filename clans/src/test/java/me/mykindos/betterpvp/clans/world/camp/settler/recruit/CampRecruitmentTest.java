@@ -321,12 +321,7 @@ class CampRecruitmentTest {
     }
 
     @Test
-    void ac10_oneCampsBadRollDoesNotStopTheOthers() {
-        final long otherClan = 43;
-        final SiteKey other = Camps.keyFor(otherClan);
-        final Camp otherCamp = new Camp();
-        when(store.cached(otherClan)).thenReturn(Optional.of(otherCamp));
-        when(clanManager.getClanById(otherClan)).thenReturn(Optional.empty());
+    void ac10_anUnknownMilestoneProfessionRollsAsNoProfessionThroughTheTick() {
         when(config.getMilestones()).thenReturn(new TreeMap<>(Map.of(
                 5, new RecruitConfig.Milestone(GHOST, SettlerRarity.COMMON))));
         when(clan.getLevel()).thenReturn(5L);
@@ -334,11 +329,13 @@ class CampRecruitmentTest {
         final World world = mock(World.class);
         bukkit.when(() -> Bukkit.getWorld(anyString())).thenReturn(world);
         when(instances.all()).thenReturn(List.of(
-                new SiteInstance(UUID.randomUUID(), SITE, "camp-42", SiteInstance.State.READY),
-                new SiteInstance(UUID.randomUUID(), other, "camp-43", SiteInstance.State.READY)));
+                new SiteInstance(UUID.randomUUID(), SITE, "camp-42", SiteInstance.State.READY)));
 
-        assertDoesNotThrow(() -> recruitment.tick());
-        assertEquals(now.get() + 4 * HOUR, otherCamp.getNextArrivalAt(), "the second camp was settled too");
+        recruitment.tick();
+        assertEquals(Set.of(5), camp.getMilestones(), "the milestone counts as sent");
+        assertEquals(1, camp.getArrivals().size());
+        assertNull(camp.getArrivals().getFirst().getSettler().getProfession());
+        assertEquals(now.get() + 4 * HOUR, camp.getNextArrivalAt(), "the rest of the pass ran");
     }
 
     @Test
