@@ -374,6 +374,15 @@ command:
     remove:
       enabled: true
       requiredRank: ADMIN
+  testmob:
+    enabled: true
+    requiredRank: ADMIN
+    spawn:
+      enabled: true
+      requiredRank: ADMIN
+    clear:
+      enabled: true
+      requiredRank: ADMIN
   logpurge:
     enabled: true
     requiredRank: ADMIN

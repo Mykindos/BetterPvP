@@ -113,7 +113,7 @@ public class MeleeAttackComponent implements AIComponent {
         this(mob, System::currentTimeMillis);
     }
 
-    MeleeAttackComponent(SceneMob mob, LongSupplier clock) {
+    public MeleeAttackComponent(SceneMob mob, LongSupplier clock) {
         this.mob = mob;
         this.clock = clock;
     }
