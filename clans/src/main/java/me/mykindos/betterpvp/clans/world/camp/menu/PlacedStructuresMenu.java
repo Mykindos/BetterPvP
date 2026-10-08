@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -87,7 +88,7 @@ public class PlacedStructuresMenu extends AbstractGui implements Windowed {
             final boolean mayClear = player.getUniqueId().equals(queued.getQueuedBy())
                     || menus.getPermissions().allows(player, camp.getOwnerId(), queued.getAction());
             if (!mayClear) {
-                menus.tell(player, Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
+                menus.tell(player, ConstructionResult.reason("clans.settler.card.not_allowed"));
                 return;
             }
             if (queue.clear(camp) != null) {

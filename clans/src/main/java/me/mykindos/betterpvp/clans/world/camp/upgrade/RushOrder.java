@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
@@ -107,22 +106,22 @@ public class RushOrder {
                 .map(clan -> clan.getId() == key.getOwnerId())
                 .orElse(false);
         if (!member) {
-            return Optional.of(Translations.component("clans.camp.hall.members_only"));
+            return Optional.of(ConstructionResult.reason("clans.camp.hall.members_only"));
         }
         if (!isActive(key)) {
-            return Optional.of(Translations.component("clans.camp.upgrade.rush_order.inactive"));
+            return Optional.of(ConstructionResult.reason("clans.camp.upgrade.rush_order.inactive"));
         }
         if (job == null || job.isDone(now)) {
-            return Optional.of(Translations.component("core.construction.nothing_to_finish"));
+            return Optional.of(ConstructionResult.reason("core.construction.nothing_to_finish"));
         }
         final long left = cooldownLeft(key, now);
         if (left > 0) {
-            return Optional.of(Translations.component("clans.camp.upgrade.rush_order.cooldown",
+            return Optional.of(ConstructionResult.reason("clans.camp.upgrade.rush_order.cooldown",
                     Component.text(UtilTime.humanReadableFormat(Duration.ofMillis(Math.max(1000, left))))));
         }
         final long price = price(job, now);
         if (gamer(player).getBalance() < price) {
-            return Optional.of(Translations.component("clans.camp.upgrade.rush_order.cannot_afford",
+            return Optional.of(ConstructionResult.reason("clans.camp.upgrade.rush_order.cannot_afford",
                     CoinsTag.of(Component.text(UtilFormat.formatNumber((int) price), NamedTextColor.YELLOW))));
         }
         return Optional.empty();
@@ -134,7 +133,7 @@ public class RushOrder {
         final SiteKey key = worksite.getKey();
         final Optional<Component> problem = problem(player, key, structure);
         if (problem.isPresent()) {
-            return ConstructionResult.refused(problem.get().color(NamedTextColor.RED));
+            return ConstructionResult.refused(problem.get());
         }
         final Optional<Camp> camp = store.cached(key.getOwnerId());
         if (camp.isEmpty()) {

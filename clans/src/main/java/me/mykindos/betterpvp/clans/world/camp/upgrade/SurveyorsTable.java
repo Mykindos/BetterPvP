@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ChatHint;
+import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.FitCheck;
 import me.mykindos.betterpvp.core.world.construction.Holding;
@@ -102,7 +103,7 @@ public class SurveyorsTable implements Listener {
     /** Opens the list of structures to survey in camp {@code camp}, if its Workshop has a working table. */
     public void open(@NotNull Player player, @NotNull SiteKey camp, @Nullable Windowed previous) {
         if (!isActive(camp)) {
-            tell(player, Translations.component("clans.camp.upgrade.surveyors_table.inactive").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("clans.camp.upgrade.surveyors_table.inactive"));
             return;
         }
         new SurveyorsTableMenu(this, camp, previous).show(player);
@@ -135,30 +136,30 @@ public class SurveyorsTable implements Listener {
      */
     public boolean survey(@NotNull Player player, @NotNull SiteKey camp, @NotNull UUID id) {
         if (!isActive(camp)) {
-            tell(player, Translations.component("clans.camp.upgrade.surveyors_table.inactive").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("clans.camp.upgrade.surveyors_table.inactive"));
             return false;
         }
         final Worksite worksite = sites.worksite(player.getWorld())
                 .filter(found -> found.getKey().equals(camp))
                 .orElse(null);
         if (worksite == null) {
-            tell(player, Translations.component("clans.camp.menu.structures.not_in_camp").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("clans.camp.menu.structures.not_in_camp"));
             return false;
         }
         final PlacedStructure structure = worksite.getHolding().find(id).orElse(null);
         final CampStructure type = structure == null ? null : type(structure).orElse(null);
         if (structure == null || type == null) {
-            tell(player, Translations.component("core.construction.missing_structure").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("core.construction.missing_structure"));
             return false;
         }
         final int next = structure.getStage() + 1;
         if (!type.hasStage(next)) {
-            tell(player, Translations.component("core.construction.max_stage").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("core.construction.max_stage"));
             return false;
         }
         final Optional<Schematic> schematic = schematics.load(type.stage(next).getSchematic());
         if (schematic.isEmpty()) {
-            tell(player, Translations.component("core.construction.no_build").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("core.construction.no_build"));
             return false;
         }
 
@@ -184,7 +185,7 @@ public class SurveyorsTable implements Listener {
             tell(player, ChatHint.INFO.attach(
                     Translations.component("clans.camp.upgrade.surveyors_table.clashes",
                             type.stageName(next).color(NamedTextColor.YELLOW)).color(NamedTextColor.RED),
-                    reason.color(NamedTextColor.RED)));
+                    reason));
         }
         return true;
     }

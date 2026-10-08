@@ -266,8 +266,7 @@ public class CampSettlers implements SettlerSite {
     /** The highest stage a finished structure of {@code type} stands at, counting from 0, or -1 for none. */
     static int finishedStage(@NotNull Holding holding, @NotNull String type) {
         return holding.ofType(type).stream()
-                .filter(structure -> structure.getCondition() != StructureCondition.UNDER_CONSTRUCTION
-                        && structure.getCondition() != StructureCondition.NOT_PLACED)
+                .filter(structure -> structure.getCondition().isStanding())
                 .mapToInt(PlacedStructure::getStage)
                 .max()
                 .orElse(-1);

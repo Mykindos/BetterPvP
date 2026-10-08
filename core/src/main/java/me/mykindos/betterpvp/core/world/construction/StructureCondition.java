@@ -10,5 +10,10 @@ public enum StructureCondition {
     /** Broken from the start, and needs a repair. */
     NEEDS_REPAIR,
     /** Owned, but not standing anywhere in the world. */
-    NOT_PLACED
+    NOT_PLACED;
+
+    /** Whether the building stands in the world, having been finished for the first time. */
+    public boolean isStanding() {
+        return this != UNDER_CONSTRUCTION && this != NOT_PLACED;
+    }
 }

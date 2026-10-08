@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.zone.Zone;
@@ -55,10 +54,9 @@ public class FitCheck {
         final Footprint footprint = placement.getFootprint();
         if (!insideBuildZones(world, footprint, type.getRequiredZoneTag())) {
             final String tag = type.getRequiredZoneTag();
-            return Optional.of((tag == null
-                    ? Translations.component("core.construction.outside_build_zone")
-                    : Translations.component("core.construction.outside_tagged_build_zone", zoneTag(tag)))
-                    .color(NamedTextColor.RED));
+            return Optional.of(tag == null
+                    ? ConstructionResult.reason("core.construction.outside_build_zone")
+                    : ConstructionResult.reason("core.construction.outside_tagged_build_zone", zoneTag(tag)));
         }
 
         final BoundingBox bounds = placement.selectionBounds();
@@ -70,8 +68,8 @@ public class FitCheck {
 
     /** Why {@code type} cannot stand where it is: too close to another structure. */
     public static @NotNull Component tooClose(@NotNull StructureType type) {
-        return Translations.component("core.construction.too_close", type.getDisplayName().color(NamedTextColor.WHITE))
-                .color(NamedTextColor.RED);
+        return ConstructionResult.reason("core.construction.too_close",
+                type.getDisplayName().color(NamedTextColor.WHITE));
     }
 
     /**

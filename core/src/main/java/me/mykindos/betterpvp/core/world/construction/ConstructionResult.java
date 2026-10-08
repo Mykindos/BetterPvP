@@ -29,6 +29,11 @@ public class ConstructionResult {
 
     /** Refused with the message under translation key {@code key}. */
     public static @NotNull ConstructionResult refused(@NotNull String key, @NotNull ComponentLike... args) {
-        return refused(Translations.component(key, args).color(NamedTextColor.RED));
+        return refused(reason(key, args));
+    }
+
+    /** The message under translation key {@code key}, coloured as a refusal. */
+    public static @NotNull Component reason(@NotNull String key, @NotNull ComponentLike... args) {
+        return Translations.component(key, args).color(NamedTextColor.RED);
     }
 }

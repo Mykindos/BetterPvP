@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -31,7 +30,6 @@ import me.mykindos.betterpvp.core.world.schematic.ghost.GhostShell;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -192,8 +190,8 @@ public class StructureViews implements Listener {
                 .ifPresent(found -> {
                     if (!sites.canUse(event.getPlayer(), worksite.getKey(), structure)) {
                         event.setCancelled(true);
-                        UtilMessage.plain(event.getPlayer(), Translations
-                                .component("core.construction.not_yours").color(NamedTextColor.RED));
+                        UtilMessage.plain(event.getPlayer(),
+                                ConstructionResult.reason("core.construction.not_yours"));
                         return;
                     }
                     final StructurePieceUseEvent use = new StructurePieceUseEvent(event.getPlayer(),
