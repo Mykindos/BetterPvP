@@ -21,11 +21,13 @@ import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
+import me.mykindos.betterpvp.core.world.settler.SettlerAssignedEvent;
 import me.mykindos.betterpvp.core.world.settler.SettlerLook;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
+import me.mykindos.betterpvp.core.world.site.SiteInstance;
 import me.mykindos.betterpvp.core.world.site.SiteInstances;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
@@ -49,12 +51,15 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * A camp-like site for crew tests. Its Builders bring their morale as Workforce, and Speed and efficiency set per
  * settler. A fake clock drives construction, and the site reports a Builder's job as running the way a camp does.
+ * Assignment events reach the crew service, and the camp is open in the world {@code camp_7}.
  */
 final class CrewFixture implements AutoCloseable {
 
@@ -78,7 +83,9 @@ final class CrewFixture implements AutoCloseable {
 
     CrewFixture() {
         bukkit = Mockito.mockStatic(Bukkit.class);
-        bukkit.when(Bukkit::getPluginManager).thenReturn(mock(PluginManager.class));
+        bukkit.when(() -> Bukkit.getWorld("camp_7")).thenReturn(world);
+        when(instances.forKey(CAMP)).thenReturn(List.of(
+                new SiteInstance(UUID.randomUUID(), CAMP, "camp_7", SiteInstance.State.READY)));
 
         professions.register(Profession.construction("builder", "builder", List.of()));
         professions.register(Profession.workplace("farmer", "farmer", "farm"));
@@ -87,6 +94,14 @@ final class CrewFixture implements AutoCloseable {
         settlers.register("camp", site);
         rule = new CrewRule(settlers, catalogue);
         crews = new CrewService(sites, tracker, settlers, professions, instances, rule);
+        final PluginManager plugins = mock(PluginManager.class);
+        doAnswer(invocation -> {
+            if (invocation.getArgument(0) instanceof SettlerAssignedEvent assigned) {
+                crews.onAssigned(assigned);
+            }
+            return null;
+        }).when(plugins).callEvent(any());
+        bukkit.when(Bukkit::getPluginManager).thenReturn(plugins);
         worksite = new Worksite(CAMP, constructionSite, holding, world);
         when(tracker.now()).thenAnswer(invocation -> now);
         when(sites.worksite(world)).thenReturn(Optional.of(worksite));
