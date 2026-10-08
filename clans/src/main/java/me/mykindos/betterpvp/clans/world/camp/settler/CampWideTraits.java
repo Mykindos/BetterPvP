@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Traits that act on the whole camp from wherever their settler is: Bard, Cook, Recruiter, Haggler, Quartermaster,
- * Chronicler, Lookout and Beloved. Several settlers with one of them do not stack, the strongest counts. A settler on
- * its way out no longer helps.
+ * Chronicler, Lookout and Beloved. When several settlers have the same one, only the strongest counts.
  */
 @Singleton
 public class CampWideTraits {
@@ -23,7 +22,7 @@ public class CampWideTraits {
 
     /** Whether anyone in {@code roster} has {@code trait}. */
     public boolean any(@NotNull Roster roster, @NotNull String trait) {
-        return roster.getSettlers().stream().anyMatch(settler -> counts(settler, trait));
+        return roster.getSettlers().stream().anyMatch(settler -> settler.hasTrait(trait));
     }
 
     /**
@@ -32,14 +31,10 @@ public class CampWideTraits {
      */
     public double best(@NotNull Roster roster, @NotNull String trait, @NotNull String number, double fallback) {
         return roster.getSettlers().stream()
-                .filter(settler -> counts(settler, trait))
+                .filter(settler -> settler.hasTrait(trait))
                 .mapToDouble(settler -> config.trait(trait, number, fallback) * strength(settler))
                 .max()
                 .orElse(0);
-    }
-
-    private static boolean counts(@NotNull Settler settler, @NotNull String trait) {
-        return settler.hasTrait(trait);
     }
 
     private double strength(@NotNull Settler settler) {
