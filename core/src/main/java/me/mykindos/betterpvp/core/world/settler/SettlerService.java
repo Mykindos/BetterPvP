@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -151,6 +152,22 @@ public class SettlerService {
         site.changed(key);
         UtilServer.callEvent(new SettlerAssignedEvent(key, settler, previous));
         return SettlerResult.done(settler);
+    }
+
+    /** {@link #assign(SiteKey, UUID, String)} for {@code player}, if the site allows them to. */
+    public @NotNull SettlerResult assign(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID settlerId,
+                                         @NotNull String workplace) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /** {@link #unassign(SiteKey, UUID)} for {@code player}, if the site allows them to. */
+    public @NotNull SettlerResult unassign(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID settlerId) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    /** {@link #dismiss(SiteKey, UUID)} for {@code player}, if the site allows them to. */
+    public @NotNull SettlerResult dismiss(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID settlerId) {
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /** Takes a settler off whatever it works at, leaving it idle. */
