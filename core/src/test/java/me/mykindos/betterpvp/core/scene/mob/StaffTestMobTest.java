@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
@@ -21,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.calls;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
@@ -63,7 +67,7 @@ class StaffTestMobTest {
 
         assertNull(mob.getCurrentTarget());
         verify(fixture.pathfinder).moveTo(any(Location.class), eq(0.8));
-        verify(fixture.handler).playAnimation("walk", 0.2, 0.2, 1.0, false);
+        verify(fixture.handler, atLeastOnce()).playAnimation("walk", 0.2, 0.2, 1.0, false);
     }
 
     @Test
@@ -73,7 +77,9 @@ class StaffTestMobTest {
         mob.tick();
         mob.tick();
 
-        verify(fixture.handler).playAnimation("idle", 0.2, 0.2, 1.0, false);
+        final InOrder order = inOrder(fixture.handler);
+        order.verify(fixture.handler, calls(1)).playAnimation("walk", 0.2, 0.2, 1.0, false);
+        order.verify(fixture.handler, calls(1)).playAnimation("idle", 0.2, 0.2, 1.0, false);
     }
 
     @Test
