@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
 import me.mykindos.betterpvp.core.world.settler.crew.BuilderStats;
+import me.mykindos.betterpvp.core.world.settler.crew.CrewRule;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -122,9 +123,11 @@ public class CrewMenu extends AbstractGui implements Windowed {
                         Component.text(threshold, NamedTextColor.WHITE)).color(workforce >= threshold ? NamedTextColor.GREEN : NamedTextColor.RED))
                 .lore(Translations.component("clans.settler.crew.speed", Component.text(format(speed), NamedTextColor.WHITE))
                         .color(NamedTextColor.GRAY));
-        if (job.isHeld()) {
+        if (job.getHolds().contains(CrewRule.ID)) {
             view.lore(Translations.component("clans.settler.crew.waiting",
                     Component.text(Math.max(0, threshold - workforce))).color(NamedTextColor.RED));
+        } else if (job.isHeld()) {
+            view.lore(Translations.component("clans.camp.upgrade.job_board.paused").color(NamedTextColor.RED));
         } else {
             view.lore(Translations.component("clans.settler.crew.done_in",
                     Component.text(UtilTime.humanReadableFormat(Duration.ofMillis(job.remainingMillis(now)))))

@@ -241,6 +241,42 @@ class CrewMenuTest {
         assertFalse(loreMentions(met, "clans.settler.crew.waiting"));
     }
 
+    @Test
+    void ac1_aJobHeldForAnotherReasonShowsPausedWithNoWorkforceNeeded() {
+        final Job sieged = job(10);
+        sieged.hold("siege", 0);
+        final PlacedStructure structure = structure(sieged);
+        when(rule.threshold(structure, sieged)).thenReturn(4);
+        when(rule.workforce(SITE, structure, sieged)).thenReturn(1);
+
+        final ItemView crewItem = view(crewMenu(structure), 4).orElseThrow();
+        final ItemView jobsItem = view(new CrewJobsMenu(menus, player, worksite, previous), 0).orElseThrow();
+
+        for (ItemView item : List.of(crewItem, jobsItem)) {
+            assertTrue(loreMentions(item, "clans.camp.upgrade.job_board.paused"));
+            assertFalse(loreMentions(item, "clans.settler.crew.waiting"));
+            assertFalse(loreMentions(item, "clans.settler.crew.done_in"));
+        }
+    }
+
+    @Test
+    void ac1_aJobHeldByItsCrewAmongOtherReasonsShowsTheWorkforceItNeeds() {
+        final Job held = job(10);
+        held.hold("siege", 0);
+        held.hold(CrewRule.ID, 0);
+        final PlacedStructure structure = structure(held);
+        when(rule.threshold(structure, held)).thenReturn(4);
+        when(rule.workforce(SITE, structure, held)).thenReturn(1);
+
+        final ItemView crewItem = view(crewMenu(structure), 4).orElseThrow();
+        final ItemView jobsItem = view(new CrewJobsMenu(menus, player, worksite, previous), 0).orElseThrow();
+
+        for (ItemView item : List.of(crewItem, jobsItem)) {
+            assertTrue(text(line(item, "clans.settler.crew.waiting")).contains("3"));
+            assertFalse(loreMentions(item, "clans.camp.upgrade.job_board.paused"));
+        }
+    }
+
     private static Component line(ItemView view, String key) {
         return view.getLore().stream().filter(line -> mentions(line, key)).findFirst()
                 .orElseThrow(() -> new AssertionError("no lore line " + key));
