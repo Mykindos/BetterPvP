@@ -158,7 +158,10 @@ public class SchematicService {
         return Optional.empty();
     }
 
-    /** Goes up whenever a cached schematic is dropped or saved over, so anything worked out from one is worked out again. */
+    /**
+     * Goes up whenever a cached schematic is dropped or saved over, so anything worked out from one is worked out
+     * again.
+     */
     public long generation() {
         return generation.get();
     }
