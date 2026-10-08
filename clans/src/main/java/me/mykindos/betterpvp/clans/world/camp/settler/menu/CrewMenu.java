@@ -109,7 +109,7 @@ public class CrewMenu extends AbstractGui implements Windowed {
                                                      @NotNull PlacedStructure structure, @NotNull Material icon) {
         final Job job = structure.getJob();
         final SiteKey key = worksite.getKey();
-        final long now = menus.getConstruction().now();
+        final long now = menus.getTracker().now();
         final int threshold = menus.getRule().threshold(structure, job);
         final int workforce = menus.getRule().workforce(key, structure, job);
         final double speed = menus.getRule().speed(key, structure, job);

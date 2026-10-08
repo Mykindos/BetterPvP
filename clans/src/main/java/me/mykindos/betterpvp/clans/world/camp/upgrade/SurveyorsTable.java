@@ -18,13 +18,14 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ChatHint;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.FitCheck;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
@@ -66,7 +67,8 @@ public class SurveyorsTable implements Listener {
     private final CampUpgrades upgrades;
     private final CampConfig config;
     private final CampStore store;
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final StructureCatalogue catalogue;
     private final SchematicService schematics;
     private final FitCheck fitCheck;
@@ -76,13 +78,15 @@ public class SurveyorsTable implements Listener {
 
     @Inject
     public SurveyorsTable(@NotNull CampUpgrades upgrades, @NotNull CampConfig config, @NotNull CampStore store,
-                          @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
+                          @NotNull ConstructionSites sites, @NotNull StructureStatusTracker tracker,
+                          @NotNull StructureCatalogue catalogue,
                           @NotNull SchematicService schematics, @NotNull FitCheck fitCheck,
                           @NotNull GhostPreviews previews) {
         this.upgrades = upgrades;
         this.config = config;
         this.store = store;
-        this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.catalogue = catalogue;
         this.schematics = schematics;
         this.fitCheck = fitCheck;
@@ -134,7 +138,7 @@ public class SurveyorsTable implements Listener {
             tell(player, Translations.component("clans.camp.upgrade.surveyors_table.inactive").color(NamedTextColor.RED));
             return false;
         }
-        final Worksite worksite = construction.worksite(player.getWorld())
+        final Worksite worksite = sites.worksite(player.getWorld())
                 .filter(found -> found.getKey().equals(camp))
                 .orElse(null);
         if (worksite == null) {
@@ -168,7 +172,7 @@ public class SurveyorsTable implements Listener {
         preview.show(anchor, position.getQuarterTurns());
         preview.tint(piece -> fits(clashes, anchor.getBlockX(), anchor.getBlockZ(), piece));
         final int seconds = seconds();
-        surveys.put(player.getUniqueId(), new Survey(preview, construction.now() + seconds * 1000L));
+        surveys.put(player.getUniqueId(), new Survey(preview, tracker.now() + seconds * 1000L));
 
         if (clashes.isEmpty()) {
             tell(player, Translations.component("clans.camp.upgrade.surveyors_table.fits",
@@ -202,7 +206,7 @@ public class SurveyorsTable implements Listener {
 
     @UpdateEvent(delay = 1000)
     public void expire() {
-        final long now = construction.now();
+        final long now = tracker.now();
         surveys.entrySet().removeIf(entry -> {
             if (now < entry.getValue().getUntil()) {
                 return false;

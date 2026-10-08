@@ -30,8 +30,10 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
+import me.mykindos.betterpvp.core.world.construction.ConstructionChecks;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
@@ -57,6 +59,8 @@ public class HallMenus {
     private final CampPermissions permissions;
     private final CampStructures structures;
     private final ConstructionService construction;
+    private final ConstructionChecks checks;
+    private final StructureStatusTracker tracker;
     private final StructureCatalogue catalogue;
     private final BlueprintSessions blueprints;
     private final CrewMenus crews;
@@ -79,7 +83,8 @@ public class HallMenus {
     @Inject
     public HallMenus(@NotNull ClanManager clanManager, @NotNull ClientManager clientManager,
                      @NotNull CampPermissions permissions, @NotNull CampStructures structures,
-                     @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
+                     @NotNull ConstructionService construction, @NotNull ConstructionChecks checks,
+                     @NotNull StructureStatusTracker tracker, @NotNull StructureCatalogue catalogue,
                      @NotNull BlueprintSessions blueprints, @NotNull CrewMenus crews, @NotNull SettlerService settlers,
                      @NotNull Payroll payroll, @NotNull CampWageFund wageFund, @NotNull SettlerCards cards,
                      @NotNull ProfessionRegistry professions, @NotNull CampRecruitment recruitment,
@@ -92,6 +97,8 @@ public class HallMenus {
         this.permissions = permissions;
         this.structures = structures;
         this.construction = construction;
+        this.checks = checks;
+        this.tracker = tracker;
         this.catalogue = catalogue;
         this.blueprints = blueprints;
         this.crews = crews;

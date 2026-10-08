@@ -8,8 +8,8 @@ import me.mykindos.betterpvp.clans.world.camp.upgrade.RankLockbox;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.SalvageBin;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSite;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.JobRule;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
@@ -49,7 +49,7 @@ public class CampConstruction implements ConstructionSite {
     public CampConstruction(@NotNull CampStore store, @NotNull CampResources resources,
                             @NotNull CampPermissions permissions,
                             @NotNull ResourceOverflow overflow, @NotNull CrewRule crews,
-                            @NotNull SalvageBin salvageBin, @NotNull ConstructionService service,
+                            @NotNull SalvageBin salvageBin, @NotNull ConstructionSites sites,
                             @NotNull RankLockbox lockbox, @NotNull Camps camps) {
         this.store = store;
         this.camps = camps;
@@ -59,7 +59,7 @@ public class CampConstruction implements ConstructionSite {
         this.overflow = overflow;
         this.crews = crews;
         this.salvageBin = salvageBin;
-        service.register(Camps.SITE_ID, this);
+        sites.register(Camps.SITE_ID, this);
     }
 
     @Override

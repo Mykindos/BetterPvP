@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureClaimedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
@@ -59,18 +60,21 @@ public class BuildQueue implements Listener {
     private final Camps camps;
     private final ClanManager clanManager;
     private final ConstructionService construction;
+    private final StructureStatusTracker tracker;
     private final StructureCatalogue catalogue;
 
     @Inject
     public BuildQueue(@NotNull Clans clans, @NotNull CampUpgrades upgrades, @NotNull CampStore store,
                       @NotNull Camps camps, @NotNull ClanManager clanManager,
-                      @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue) {
+                      @NotNull ConstructionService construction, @NotNull StructureStatusTracker tracker,
+                      @NotNull StructureCatalogue catalogue) {
         this.clans = clans;
         this.upgrades = upgrades;
         this.store = store;
         this.camps = camps;
         this.clanManager = clanManager;
         this.construction = construction;
+        this.tracker = tracker;
         this.catalogue = catalogue;
         upgrades.declare(CampStructures.WORKSHOP, ID, 2);
     }
@@ -171,7 +175,7 @@ public class BuildQueue implements Listener {
                     describe(queued).color(NamedTextColor.WHITE)).color(NamedTextColor.YELLOW)), null);
             return;
         }
-        queued.setDroppedAt(construction.now());
+        queued.setDroppedAt(tracker.now());
         Component message = Translations.component("clans.camp.upgrade.build_queue.dropped",
                         describe(queued).color(NamedTextColor.YELLOW))
                 .color(NamedTextColor.RED);
@@ -218,7 +222,7 @@ public class BuildQueue implements Listener {
             store.cached(clan.getAsLong()).ifPresent(camp -> {
                 final QueuedAction dropped = camp.getDroppedAction();
                 if (dropped == null || dropped.getTold().contains(player.getUniqueId())
-                        || construction.now() - dropped.getDroppedAt() > Duration.ofDays(1).toMillis()) {
+                        || tracker.now() - dropped.getDroppedAt() > Duration.ofDays(1).toMillis()) {
                     return;
                 }
                 dropped.getTold().add(player.getUniqueId());

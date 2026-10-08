@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.settler.Profession;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
@@ -46,17 +47,20 @@ import java.util.UUID;
 @Singleton
 public class CrewService implements Listener {
 
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final SettlerService settlers;
     private final ProfessionRegistry professions;
     private final SiteInstances instances;
     private final CrewRule rule;
 
     @Inject
-    public CrewService(@NotNull ConstructionService construction, @NotNull SettlerService settlers,
+    public CrewService(@NotNull ConstructionSites sites, @NotNull StructureStatusTracker tracker,
+                       @NotNull SettlerService settlers,
                        @NotNull ProfessionRegistry professions, @NotNull SiteInstances instances,
                        @NotNull CrewRule rule) {
-        this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.settlers = settlers;
         this.professions = professions;
         this.instances = instances;
@@ -81,7 +85,7 @@ public class CrewService implements Listener {
      */
     public @NotNull SettlerResult join(@NotNull Player player, @NotNull World world, @NotNull UUID structureId,
                                        @NotNull UUID settlerId) {
-        final Worksite worksite = construction.worksite(world).orElse(null);
+        final Worksite worksite = sites.worksite(world).orElse(null);
         final SettlerSite site = worksite == null ? null : settlers.site(worksite.getKey()).orElse(null);
         if (worksite == null || site == null) {
             return SettlerResult.refused("core.settler.not_loaded");
@@ -102,7 +106,7 @@ public class CrewService implements Listener {
         final SiteKey key = worksite.getKey();
         final PlacedStructure structure = worksite.getHolding().find(structureId).orElse(null);
         final Job job = structure == null ? null : structure.getJob();
-        if (job == null || job.isDone(construction.now())) {
+        if (job == null || job.isDone(tracker.now())) {
             return SettlerResult.refused("core.settler.crew.no_job");
         }
         final Settler settler = settlers.roster(key).flatMap(roster -> roster.find(settlerId)).orElse(null);
@@ -137,7 +141,7 @@ public class CrewService implements Listener {
         job.getStaff().removeIf(id -> crew.stream().noneMatch(member -> member.getId().equals(id)));
         job.getStaff().add(settlerId);
         worksite.getSite().changed(key);
-        construction.refresh(worksite);
+        tracker.refresh(worksite);
         return assigned;
     }
 
@@ -157,7 +161,7 @@ public class CrewService implements Listener {
         for (SiteInstance instance : new ArrayList<>(instances.all())) {
             final World world = Bukkit.getWorld(instance.getWorldName());
             if (world != null) {
-                construction.worksite(world).ifPresent(worksite -> release(worksite.getKey(), worksite.getHolding()));
+                sites.worksite(world).ifPresent(worksite -> release(worksite.getKey(), worksite.getHolding()));
             }
         }
     }
@@ -166,7 +170,7 @@ public class CrewService implements Listener {
         for (SiteInstance instance : instances.forKey(key)) {
             final World world = Bukkit.getWorld(instance.getWorldName());
             if (world != null) {
-                construction.worksite(world).ifPresent(worksite -> release(key, worksite.getHolding()));
+                sites.worksite(world).ifPresent(worksite -> release(key, worksite.getHolding()));
             }
         }
     }
@@ -181,7 +185,7 @@ public class CrewService implements Listener {
         if (site == null || roster == null) {
             return;
         }
-        final long now = construction.now();
+        final long now = tracker.now();
         boolean changed = false;
 
         for (PlacedStructure structure : holding.getStructures()) {

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
@@ -34,20 +35,23 @@ public class StartingCamp implements WorldContent {
     public static final String MARKER = "camp_start";
 
     private final ConstructionService construction;
+    private final ConstructionSites sites;
     private final StructureCatalogue catalogue;
     private final SchematicService schematics;
 
     @Inject
-    public StartingCamp(@NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
+    public StartingCamp(@NotNull ConstructionService construction, @NotNull ConstructionSites sites,
+                        @NotNull StructureCatalogue catalogue,
                         @NotNull SchematicService schematics) {
         this.construction = construction;
+        this.sites = sites;
         this.catalogue = catalogue;
         this.schematics = schematics;
     }
 
     @Override
     public void install(@NotNull World world, @NotNull RegionIndex regions, @NotNull WorldContentScope scope) {
-        construction.worksite(world)
+        sites.worksite(world)
                 .filter(worksite -> worksite.getHolding().getStructures().isEmpty())
                 .ifPresent(worksite -> {
                     for (PerspectiveRegion marker : regions.find(MARKER, PerspectiveRegion.class)) {

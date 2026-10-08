@@ -12,8 +12,10 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.component.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleQueue;
+import me.mykindos.betterpvp.core.world.construction.ConstructionChecks;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
@@ -65,6 +67,8 @@ public class BlueprintSessions implements Listener {
     private final StructureCatalogue catalogue;
     private final SchematicService schematics;
     private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final ConstructionChecks checks;
     private final GhostPreviews previews;
     private final ClientManager clientManager;
 
@@ -73,13 +77,16 @@ public class BlueprintSessions implements Listener {
     @Inject
     public BlueprintSessions(@NotNull StructureBlueprintItem blueprint, @NotNull ItemFactory itemFactory,
                              @NotNull StructureCatalogue catalogue, @NotNull SchematicService schematics,
-                             @NotNull ConstructionService construction, @NotNull GhostPreviews previews,
+                             @NotNull ConstructionService construction, @NotNull ConstructionSites sites,
+                             @NotNull ConstructionChecks checks, @NotNull GhostPreviews previews,
                              @NotNull ClientManager clientManager) {
         this.blueprint = blueprint;
         this.itemFactory = itemFactory;
         this.catalogue = catalogue;
         this.schematics = schematics;
         this.construction = construction;
+        this.sites = sites;
+        this.checks = checks;
         this.previews = previews;
         this.clientManager = clientManager;
     }
@@ -188,7 +195,7 @@ public class BlueprintSessions implements Listener {
         if (type.isEmpty()) {
             return Optional.empty();
         }
-        final int stage = held.getMoving() == null ? 0 : construction.worksite(player.getWorld())
+        final int stage = held.getMoving() == null ? 0 : sites.worksite(player.getWorld())
                 .flatMap(worksite -> worksite.getHolding().find(held.getMoving()))
                 .map(PlacedStructure::getStage)
                 .orElse(0);
@@ -218,8 +225,8 @@ public class BlueprintSessions implements Listener {
                     .color(NamedTextColor.RED));
         } else {
             problem = session.moving == null
-                    ? construction.problem(player, player.getWorld(), type.get(), anchor, session.quarterTurns)
-                    : construction.moveProblem(player, player.getWorld(), session.moving, anchor, session.quarterTurns);
+                    ? checks.problem(player, player.getWorld(), type.get(), anchor, session.quarterTurns)
+                    : checks.moveProblem(player, player.getWorld(), session.moving, anchor, session.quarterTurns);
             session.preview.setValid(problem.isEmpty());
             session.preview.show(anchor, session.quarterTurns);
         }

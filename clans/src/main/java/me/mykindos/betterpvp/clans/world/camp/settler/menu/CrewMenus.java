@@ -7,8 +7,9 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
@@ -26,7 +27,8 @@ import java.util.UUID;
 @Getter(AccessLevel.PACKAGE)
 public class CrewMenus {
 
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final CrewService crews;
     private final CrewRule rule;
     private final SettlerService settlers;
@@ -34,10 +36,12 @@ public class CrewMenus {
     private final ProfessionRegistry professions;
 
     @Inject
-    public CrewMenus(@NotNull ConstructionService construction, @NotNull CrewService crews, @NotNull CrewRule rule,
+    public CrewMenus(@NotNull ConstructionSites sites, @NotNull StructureStatusTracker tracker,
+                     @NotNull CrewService crews, @NotNull CrewRule rule,
                      @NotNull SettlerService settlers, @NotNull StructureCatalogue catalogue,
                      @NotNull ProfessionRegistry professions) {
-        this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.crews = crews;
         this.rule = rule;
         this.settlers = settlers;
@@ -47,14 +51,14 @@ public class CrewMenus {
 
     /** Every job running in the camp {@code player} stands in. Back leads to {@code previous}. */
     public void openJobs(@NotNull Player player, @Nullable Windowed previous) {
-        construction.worksite(player.getWorld()).ifPresentOrElse(
+        sites.worksite(player.getWorld()).ifPresentOrElse(
                 worksite -> new CrewJobsMenu(this, player, worksite, previous).show(player),
                 () -> tell(player, "clans.settler.crew.not_in_camp"));
     }
 
     /** The crew of the job on {@code structureId} in the camp {@code player} stands in. */
     public void openCrew(@NotNull Player player, @NotNull UUID structureId, @Nullable Windowed previous) {
-        construction.worksite(player.getWorld())
+        sites.worksite(player.getWorld())
                 .flatMap(worksite -> worksite.getHolding().find(structureId)
                         .filter(structure -> structure.getJob() != null)
                         .map(structure -> new CrewMenu(this, player, worksite, structure, previous)))

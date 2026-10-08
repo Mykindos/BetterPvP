@@ -15,8 +15,10 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.construction.blueprint.BlueprintSessions;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -37,6 +39,8 @@ import java.util.UUID;
 public class StructureMenus {
 
     private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final StructureCatalogue catalogue;
     private final CampStore store;
     private final CampPermissions permissions;
@@ -46,11 +50,14 @@ public class StructureMenus {
     private final RushOrder rushOrder;
 
     @Inject
-    public StructureMenus(@NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
+    public StructureMenus(@NotNull ConstructionService construction, @NotNull ConstructionSites sites,
+                          @NotNull StructureStatusTracker tracker, @NotNull StructureCatalogue catalogue,
                           @NotNull CampStore store, @NotNull CampPermissions permissions,
                           @NotNull CampResources resources, @NotNull BlueprintSessions blueprints,
                           @NotNull BuildQueue buildQueue, @NotNull RushOrder rushOrder) {
         this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.catalogue = catalogue;
         this.store = store;
         this.permissions = permissions;
@@ -77,7 +84,7 @@ public class StructureMenus {
 
     /** The camp's worksite, only if {@code player} stands in it. */
     @NotNull Optional<Worksite> worksite(@NotNull Player player, @NotNull SiteKey camp) {
-        return construction.worksite(player.getWorld()).filter(worksite -> worksite.getKey().equals(camp));
+        return sites.worksite(player.getWorld()).filter(worksite -> worksite.getKey().equals(camp));
     }
 
     @NotNull Optional<CampStructure> type(@NotNull String id) {

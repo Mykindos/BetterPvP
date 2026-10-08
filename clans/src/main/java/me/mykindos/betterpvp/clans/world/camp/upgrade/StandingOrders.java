@@ -7,10 +7,11 @@ import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
@@ -45,18 +46,21 @@ public class StandingOrders implements Listener {
     public static final String ID = "standing_orders";
 
     private final CampUpgrades upgrades;
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final SettlerService settlers;
     private final CrewService crews;
     private final CrewRule rule;
     private final SiteInstances instances;
 
     @Inject
-    public StandingOrders(@NotNull CampUpgrades upgrades, @NotNull ConstructionService construction,
+    public StandingOrders(@NotNull CampUpgrades upgrades, @NotNull ConstructionSites sites,
+                          @NotNull StructureStatusTracker tracker,
                           @NotNull SettlerService settlers, @NotNull CrewService crews, @NotNull CrewRule rule,
                           @NotNull SiteInstances instances) {
         this.upgrades = upgrades;
-        this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.settlers = settlers;
         this.crews = crews;
         this.rule = rule;
@@ -72,7 +76,7 @@ public class StandingOrders implements Listener {
             }
             final World world = Bukkit.getWorld(instance.getWorldName());
             if (world != null) {
-                construction.worksite(world).ifPresent(worksite -> staff(worksite.getKey(), worksite.getHolding(),
+                sites.worksite(world).ifPresent(worksite -> staff(worksite.getKey(), worksite.getHolding(),
                         (structure, settler) -> crews.enlist(worksite, structure, settler)));
             }
         }
@@ -99,7 +103,7 @@ public class StandingOrders implements Listener {
             return;
         }
 
-        final long now = construction.now();
+        final long now = tracker.now();
         final List<PlacedStructure> waiting = holding.getStructures().stream()
                 .filter(structure -> structure.getJob() != null && !structure.getJob().isDone(now))
                 .filter(structure -> rule.holds(key, structure, structure.getJob()))

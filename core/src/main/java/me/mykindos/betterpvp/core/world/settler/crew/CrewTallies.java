@@ -5,11 +5,12 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureClaimedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerSite;
@@ -43,7 +44,8 @@ import java.util.UUID;
 @Singleton
 public class CrewTallies implements Listener {
 
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final SettlerService settlers;
     private final SiteInstances instances;
     private final CrewRule rule;
@@ -51,9 +53,11 @@ public class CrewTallies implements Listener {
     private final Map<SiteKey, Map<UUID, Tracked>> tracked = new HashMap<>();
 
     @Inject
-    public CrewTallies(@NotNull ConstructionService construction, @NotNull SettlerService settlers,
+    public CrewTallies(@NotNull ConstructionSites sites, @NotNull StructureStatusTracker tracker,
+                       @NotNull SettlerService settlers,
                        @NotNull SiteInstances instances, @NotNull CrewRule rule) {
-        this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.settlers = settlers;
         this.instances = instances;
         this.rule = rule;
@@ -70,13 +74,13 @@ public class CrewTallies implements Listener {
 
     @UpdateEvent(delay = 5000)
     public void sweep() {
-        final long now = construction.now();
+        final long now = tracker.now();
         for (SiteInstance instance : new ArrayList<>(instances.all())) {
             final World world = Bukkit.getWorld(instance.getWorldName());
             if (world == null) {
                 continue;
             }
-            construction.worksite(world).ifPresent(worksite -> {
+            sites.worksite(world).ifPresent(worksite -> {
                 for (PlacedStructure structure : worksite.getHolding().getStructures()) {
                     track(worksite.getKey(), structure, structure.getJob(), now);
                 }
@@ -86,7 +90,7 @@ public class CrewTallies implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClaimed(@NotNull StructureClaimedEvent event) {
-        track(event.getSite(), event.getStructure(), event.getJob(), construction.now());
+        track(event.getSite(), event.getStructure(), event.getJob(), tracker.now());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionChecks;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureStage;
@@ -43,14 +43,14 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
     private final Player viewer;
     private final SiteKey camp;
     private final List<CampStructure> structures;
-    private final ConstructionService construction;
+    private final ConstructionChecks checks;
     private final StructureCatalogue catalogue;
     private final BlueprintSessions blueprints;
     private final StructureMenus structureMenus;
     private final @Nullable Windowed previous;
 
     public ConstructionMenu(@NotNull Player viewer, @NotNull SiteKey camp, @NotNull List<CampStructure> structures,
-                            @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
+                            @NotNull ConstructionChecks checks, @NotNull StructureCatalogue catalogue,
                             @NotNull BlueprintSessions blueprints, @NotNull StructureMenus structureMenus,
                             @Nullable Windowed previous) {
         super(9, 6);
@@ -58,7 +58,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
         this.viewer = viewer;
         this.camp = camp;
         this.structures = structures.stream().sorted(Comparator.comparingInt(CampStructure::getTier)).toList();
-        this.construction = construction;
+        this.checks = checks;
         this.catalogue = catalogue;
         this.blueprints = blueprints;
         this.structureMenus = structureMenus;
@@ -82,7 +82,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
     }
 
     private @NotNull ItemView view(@NotNull CampStructure structure) {
-        final Optional<Component> unavailable = construction.unavailable(viewer, camp, structure);
+        final Optional<Component> unavailable = checks.unavailable(viewer, camp, structure);
         final StructureStage first = structure.stage(0);
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(structure.getIcon())
@@ -119,7 +119,7 @@ public class ConstructionMenu extends AbstractGui implements Windowed {
     }
 
     private void choose(@NotNull Player player, @NotNull CampStructure structure) {
-        final Optional<Component> unavailable = construction.unavailable(player, camp, structure);
+        final Optional<Component> unavailable = checks.unavailable(player, camp, structure);
         if (unavailable.isPresent()) {
             UtilMessage.plain(player, unavailable.get());
             return;
