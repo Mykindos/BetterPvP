@@ -155,6 +155,11 @@ public class SchematicService {
         return Optional.empty();
     }
 
+    /** How many times the cache has been dropped, so anything worked out from a schematic knows to work it out again. */
+    public long generation() {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
     /**
      * Drops all cached schematics so the next {@link #load(String)} re-reads from disk.
      */
