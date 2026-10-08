@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -55,6 +56,16 @@ public class StarterCrew implements WorldContent {
     void grant(@NotNull SiteKey key) {
         final Camp camp = store.cached(key.getOwnerId()).orElse(null);
         if (camp == null || camp.isStartingSettlers() || service.populationCap(key) <= 0) {
+            return;
+        }
+
+        final List<String> unknown = config.getStartingSettlers().stream()
+                .map(SettlerConfig.Starter::getProfession)
+                .filter(profession -> profession != null && !generator.knows(profession))
+                .toList();
+        if (!unknown.isEmpty()) {
+            log.warn("starting-settlers in settlers.yml names unregistered professions {}, so camp {} gets none yet",
+                    unknown, key).submit();
             return;
         }
 

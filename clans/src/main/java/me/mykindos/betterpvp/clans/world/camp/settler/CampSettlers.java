@@ -78,9 +78,7 @@ public class CampSettlers implements SettlerSite {
                         @NotNull CampPermissions permissions, @NotNull StructureShapes shapes,
                         @NotNull SettlerCards cards, @NotNull CampBuilders builders,
                         @NotNull CampResources resources, @NotNull CampWageFund wageFund,
-                        @NotNull CampMorale morale,
-                        @NotNull CampProfessions professions,
-                        @NotNull CampTraits traits, @NotNull ToolRack toolRack,
+                        @NotNull CampMorale morale, @NotNull ToolRack toolRack,
                         @NotNull WagePolicy wagePolicy, @NotNull StructureStatusTracker tracker) {
         this.store = store;
         this.config = config;
