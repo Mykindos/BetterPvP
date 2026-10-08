@@ -56,6 +56,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -161,11 +162,16 @@ class BlueprintSessionsTest {
 
     @Test
     void ac2_onlyTheBlueprintItemWithACataloguedTypeIsABlueprint() {
-        assertEquals("hall", sessions.structureOf(blueprint("hall", null)).orElseThrow().getId());
-        assertTrue(sessions.structureOf(blueprint("ruin", null)).isEmpty(), "type not in the catalogue");
-        assertTrue(sessions.structureOf(otherItem()).isEmpty(), "not the blueprint item");
-        assertTrue(sessions.structureOf(air()).isEmpty());
-        assertTrue(sessions.structureOf(null).isEmpty());
+        for (ItemStack held : Arrays.asList(blueprint("ruin", null), otherItem(), air(), null)) {
+            when(inventory.getItemInMainHand()).thenReturn(held);
+            sessions.follow();
+        }
+        verify(previews, never()).open(any(), any());
+
+        hold(blueprint("hall", null));
+        sessions.follow();
+
+        assertEquals(List.of(schematic("hall_0")), openedFor, "the hall blueprint previews the hall");
     }
 
     @Test
