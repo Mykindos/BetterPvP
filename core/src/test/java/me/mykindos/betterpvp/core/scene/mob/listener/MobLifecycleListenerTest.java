@@ -78,19 +78,20 @@ class MobLifecycleListenerTest {
         final Mob body = fixture.newBody();
         when(body.isDead()).thenAnswer(invocation -> dead.contains(body));
         doAnswer(invocation -> {
-            lose(body);
+            lose(body, EntityRemoveEvent.Cause.PLUGIN);
             return null;
         }).when(body).remove();
         return body;
     }
 
-    /** The server takes {@code body} away, as a chunk unload, {@code /kill} or a cleanup does. */
-    private void lose(Mob body) {
+    /** The server takes {@code body} away for {@code cause}, firing Paper's removal events once. */
+    private void lose(Mob body, EntityRemoveEvent.Cause cause) {
         if (!dead.add(body)) {
             return;
         }
         final EntityRemoveEvent removed = mock(EntityRemoveEvent.class);
         when(removed.getEntity()).thenReturn(body);
+        when(removed.getCause()).thenReturn(cause);
         listener.onRemove(removed);
         final EntityRemoveFromWorldEvent left = mock(EntityRemoveFromWorldEvent.class);
         when(left.getEntity()).thenReturn(body);
@@ -144,19 +145,39 @@ class MobLifecycleListenerTest {
         when(unload.getChunk()).thenReturn(elsewhere);
 
         controller.onEntitiesUnload(unload);
-        lose(first);
+        lose(first, EntityRemoveEvent.Cause.UNLOAD);
 
         assertRespawnedAtHome(mob, first);
     }
 
     @Test
-    void ac2_aChunkManagedMobWhoseBodyIsRemovedOutrightStaysRegisteredAndRespawns() {
+    void ac2_aChunkManagedMobWhoseBodyIsDiscardedStaysRegisteredAndRespawns() {
         final TestMob mob = chunkManaged();
         final Mob first = fixture.body;
 
-        lose(first);
+        lose(first, EntityRemoveEvent.Cause.DISCARD);
 
         assertRespawnedAtHome(mob, first);
+    }
+
+    @Test
+    void ac2_aChunkManagedMobWhoseBodyAPluginRemovesStaysRegisteredAndRespawns() {
+        final TestMob mob = chunkManaged();
+        final Mob first = fixture.body;
+
+        lose(first, EntityRemoveEvent.Cause.PLUGIN);
+
+        assertRespawnedAtHome(mob, first);
+    }
+
+    @Test
+    void ac2_aChunkManagedMobWhoseBodyDiesIsRemovedForGood() {
+        final TestMob mob = chunkManaged();
+
+        lose(fixture.body, EntityRemoveEvent.Cause.DEATH);
+
+        assertFalse(mob.isRegistered());
+        assertEquals(1, anchors.size());
     }
 
     @Test
@@ -176,7 +197,7 @@ class MobLifecycleListenerTest {
         registry.register(mob);
         assertSame(body, mob.getEntity());
 
-        lose(body);
+        lose(body, EntityRemoveEvent.Cause.PLUGIN);
 
         assertFalse(mob.isRegistered());
     }

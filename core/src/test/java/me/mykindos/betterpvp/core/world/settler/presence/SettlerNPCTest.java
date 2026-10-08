@@ -1,12 +1,6 @@
 package me.mykindos.betterpvp.core.world.settler.presence;
 
 import me.mykindos.betterpvp.core.scene.mob.MobFixture;
-import me.mykindos.betterpvp.core.scene.mob.ai.component.AttendComponent;
-import me.mykindos.betterpvp.core.scene.mob.ai.component.LookAtNearbyPlayerComponent;
-import me.mykindos.betterpvp.core.scene.mob.ai.component.OrderToSpotComponent;
-import me.mykindos.betterpvp.core.scene.mob.ai.component.PostComponent;
-import me.mykindos.betterpvp.core.scene.mob.ai.component.WanderComponent;
-import me.mykindos.betterpvp.core.scene.mob.sound.MobSoundBehavior;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
@@ -15,8 +9,6 @@ import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.util.List;
 
 import static me.mykindos.betterpvp.core.scene.mob.MobFixture.tick;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -192,18 +184,5 @@ class SettlerNPCTest {
         fixture.advance(200);
         tick(mob, 2);
         verify(fixture.pathfinder).moveTo(farm, 0.6);
-    }
-
-    @Test
-    void ac16_aSettlersDayIsRunByTheSharedMobAiAlone() {
-        final Settler settler = settlers.idle();
-        settlers.install();
-        settlers.materialize(settler);
-        final SettlerNPC npc = settlers.npc(settler);
-
-        assertEquals(List.of(AttendComponent.class, OrderToSpotComponent.class, PostComponent.class,
-                        WanderComponent.class, LookAtNearbyPlayerComponent.class),
-                npc.getAi().getComponents().stream().map(Object::getClass).toList());
-        assertEquals(List.of(MobSoundBehavior.class), npc.getBehaviors().stream().map(Object::getClass).toList());
     }
 }

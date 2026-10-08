@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.scene.mob.ai.AIControl;
 import me.mykindos.betterpvp.core.scene.mob.ai.FakeComponent;
 import me.mykindos.betterpvp.core.scene.mob.ai.component.PostComponent;
 import me.mykindos.betterpvp.core.scene.mob.animation.MobAnimation;
+import me.mykindos.betterpvp.core.scene.mob.sound.MobSound;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -343,6 +344,23 @@ class SceneMobTest {
         assertEquals(3, registered.get(1).ticks);
         assertNull(mob.getCurrentTarget());
         assertTrue(mob.getThreat().isEmpty());
+    }
+
+    @Test
+    void aChunkManagedMobKeepsItsAmbientSoundsAfterARespawn() {
+        final AtomicInteger resolved = new AtomicInteger();
+        final TestMob mob = fixture.spawnChunkManaged(null, created -> { });
+        mob.sound(MobSound.IDLE, sounding -> {
+            resolved.incrementAndGet();
+            return null;
+        });
+        fixture.watcher();
+
+        mob.dematerialize();
+        mob.materialize();
+        tick(mob, 301);
+
+        assertTrue(resolved.get() > 0, "no ambient sound after the respawn");
     }
 
     @Test
