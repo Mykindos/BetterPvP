@@ -28,7 +28,8 @@ import java.util.function.LongSupplier;
  * Wages are worked out from when they were last settled, so a site whose world was closed for a day is charged for the
  * whole day the next time its world opens. When the fund runs out, every paid settler goes on strike from the moment
  * the money ran out, and a striker still unpaid after the site's strike limit leaves for good. Strikers are not paid,
- * and they go back to work once the fund can pay everyone for a minute.
+ * and they go back to work once the fund can pay everyone for a minute. A site whose settlers cost nothing has no
+ * strikers.
  * <p>
  * Only the server holding a site's world settles it, so two servers never charge the same fund.
  */
@@ -91,7 +92,16 @@ public class Payroll implements Listener {
         }
         final long now = clock.getAsLong();
         final CoinAccount fund = site.wageFund(key).orElse(null);
-        if (fund == null || site.wageModel(key).isEmpty() || roster.getPayrollAt() == 0) {
+        if (fund == null || site.wageModel(key).isEmpty() || hourly(key) == 0) {
+            roster.setPayrollAt(now);
+            final List<Settler> resumed = returnToWork(roster, now);
+            site.changed(key);
+            if (!resumed.isEmpty()) {
+                UtilServer.callEvent(new SettlerStrikeEvent(key, resumed, false));
+            }
+            return;
+        }
+        if (roster.getPayrollAt() == 0) {
             roster.setPayrollAt(now);
             site.changed(key);
             return;
@@ -112,11 +122,15 @@ public class Payroll implements Listener {
 
         final List<Settler> struck = new ArrayList<>();
         if (charge <= balance) {
-            fund.withdraw(key, charge);
+            if (charge > 0) {
+                fund.withdraw(key, charge);
+            }
             roster.setPayrollCarry(owed - charge);
         } else {
             final long ranOut = from + (long) (balance / perMilli);
-            fund.withdraw(key, balance);
+            if (balance > 0) {
+                fund.withdraw(key, balance);
+            }
             roster.setPayrollCarry(0);
             for (Settler settler : paid) {
                 settler.changeState(SettlerState.STRIKING, ranOut);
@@ -125,14 +139,9 @@ public class Payroll implements Listener {
         }
         roster.setPayrollAt(now);
 
-        final List<Settler> resumed = new ArrayList<>();
-        final List<Settler> striking = roster.inState(SettlerState.STRIKING);
-        if (struck.isEmpty() && !striking.isEmpty() && fund.balance(key) >= Math.max(1, hourly(key) / 60)) {
-            for (Settler settler : striking) {
-                settler.changeState(settler.getAssignment() == null ? SettlerState.IDLE : SettlerState.WORKING, now);
-                resumed.add(settler);
-            }
-        }
+        final List<Settler> resumed = struck.isEmpty() && fund.balance(key) >= Math.max(1, hourly(key) / 60)
+                ? returnToWork(roster, now)
+                : List.of();
 
         site.changed(key);
         if (!struck.isEmpty()) {
@@ -148,5 +157,13 @@ public class Payroll implements Listener {
                 settlers.remove(key, settler.getId(), SettlerLeaveReason.UNPAID);
             }
         }
+    }
+
+    private List<Settler> returnToWork(@NotNull Roster roster, long now) {
+        final List<Settler> striking = roster.inState(SettlerState.STRIKING);
+        for (Settler settler : striking) {
+            settler.changeState(settler.getAssignment() == null ? SettlerState.IDLE : SettlerState.WORKING, now);
+        }
+        return striking;
     }
 }
