@@ -148,18 +148,19 @@ public class CrewService implements Listener {
         return assigned;
     }
 
-    /** A Builder taken off or moved from a structure leaves that job's crew at once, which may pause the job. */
+    /**
+     * A Builder taken off or moved from a structure leaves that job's crew at once, which may pause the job. A job whose
+     * time is up keeps its crew until it is let go, so everyone who saw it through is credited.
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAssigned(@NotNull SettlerAssignedEvent event) {
-        final String previous = event.getPrevious();
-        final UUID structureId = previous == null || previous.equals(event.getSettler().getAssignment())
-                ? null : parse(previous).orElse(null);
+        final UUID structureId = event.getPrevious() == null ? null : parse(event.getPrevious()).orElse(null);
         if (structureId == null) {
             return;
         }
         worksites(event.getSite(), worksite -> worksite.getHolding().find(structureId)
                 .map(PlacedStructure::getJob)
-                .filter(job -> job.getStaff().remove(event.getSettler().getId()))
+                .filter(job -> !job.isDone(tracker.now()) && job.getStaff().remove(event.getSettler().getId()))
                 .ifPresent(job -> {
                     worksite.getSite().changed(worksite.getKey());
                     tracker.refresh(worksite);
