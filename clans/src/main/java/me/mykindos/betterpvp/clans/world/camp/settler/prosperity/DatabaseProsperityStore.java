@@ -45,14 +45,12 @@ public class DatabaseProsperityStore implements ProsperityStore {
         return database.getAsyncDslContext().executeAsyncVoid(ctx -> ctx.insertInto(table(name(TABLE)),
                         field(name("clan"), Long.class),
                         field(name("prosperity"), Integer.class),
-                        field(name("updated_at"), Long.class),
                         field(name("snapshot"), Integer.class),
                         field(name("snapshot_at"), Long.class))
-                .values(clanId, prosperity, now, prosperity, now)
+                .values(clanId, prosperity, prosperity, now)
                 .onConflict(field(name("clan"), Long.class))
                 .doUpdate()
                 .set(field(name("prosperity"), Integer.class), prosperity)
-                .set(field(name("updated_at"), Long.class), now)
                 .set(field(name("snapshot"), Integer.class), when(due, val(prosperity)).otherwise(snapshot))
                 .set(field(name("snapshot_at"), Long.class), when(due, val(now)).otherwise(snapshotAt))
                 .execute()).exceptionally(ex -> {

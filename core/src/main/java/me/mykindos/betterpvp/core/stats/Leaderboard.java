@@ -28,6 +28,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -106,9 +107,16 @@ public abstract class Leaderboard<E, T> implements Describable {
         }
 
         // Schedule updates and register with manager
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, INITIAL_DELAY, 1200L + DELAY_BETWEEN_UPDATE, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, INITIAL_DELAY, getRefreshPeriod().toSeconds(), TimeUnit.SECONDS);
         INITIAL_DELAY += 10;
         DELAY_BETWEEN_UPDATE += 15;
+    }
+
+    /**
+     * @return How often the board re-reads its entries. By default each board is staggered so they don't refresh together.
+     */
+    protected Duration getRefreshPeriod() {
+        return Duration.ofSeconds(1200L + DELAY_BETWEEN_UPDATE);
     }
 
     public void forceUpdate() {
