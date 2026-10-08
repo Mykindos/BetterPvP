@@ -40,8 +40,8 @@ import java.util.UUID;
  * One structure as it appears in the world, kept in step with its status.
  * <p>
  * A build rises layer by layer with its job's progress and stands whole once the job is done. A structure waiting to be
- * claimed blinks with a glow and can be clicked anywhere. Anything that changes its shape, a new stage or a move being
- * claimed, takes the old build down and puts the new one up.
+ * claimed blinks with a glow and is claimed through its label. Anything that changes its shape, a new stage or a move
+ * being claimed, takes the old build down and puts the new one up.
  * <p>
  * The pieces of the upgrades it has stand on top of the finished build, and come down before any of it does.
  */
@@ -173,6 +173,15 @@ final class StructureView {
         settled = false;
     }
 
+    @Nullable PlacedStructure getStructure() {
+        return structure;
+    }
+
+    /** Whether a world position is inside the build's bounds. */
+    boolean covers(int x, int y, int z) {
+        return placement != null && placement.blockBounds().contains(x + 0.5, y + 0.5, z + 0.5);
+    }
+
     /** The upgrade whose piece stands on a world position, if one of this structure's does. */
     @NotNull Optional<String> pieceAt(int x, int y, int z) {
         for (Map.Entry<String, RenderedBuild> piece : pieces.entrySet()) {
@@ -262,8 +271,9 @@ final class StructureView {
             shape = newShape;
 
             final BoundingBox bounds = found.blockBounds();
-            final Location labelAt = new Location(world, bounds.getCenterX(), bounds.getMaxY() + 0.5, bounds.getCenterZ());
-            prop = new StructureProp(views.getPropFactory(), views.getRegistry(), bounds,
+            final Location labelAt = views.getShapes().point(world, structure, "label").orElseGet(() ->
+                    new Location(world, bounds.getCenterX(), bounds.getMaxY() + 0.5, bounds.getCenterZ()));
+            prop = new StructureProp(views.getPropFactory(), views.getRegistry(), labelAt,
                     player -> views.claim(player, world, structure.getId()));
             scope.add(new SceneSpawn(prop, labelAt, at -> at.getWorld().spawn(at, TextDisplay.class)));
         });
@@ -295,7 +305,7 @@ final class StructureView {
             case UNDER_CONSTRUCTION -> timed(isBuilding(structure) ? "building" : "moving", structure, now);
             case ADVANCING -> timed("advancing", structure, now);
             case READY_TO_CLAIM -> Translations.component("core.construction.label.ready").color(NamedTextColor.GREEN);
-            case PAUSED -> Translations.component("core.construction.label.paused").color(NamedTextColor.RED);
+            case PAUSED -> timed("paused", structure, now).color(NamedTextColor.RED);
             case DISABLED -> structure.getJob() == null
                     ? Translations.component("core.construction.label.disabled").color(NamedTextColor.RED)
                     : underWay(structure, now);

@@ -14,10 +14,12 @@ import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePieceUseEvent;
 import me.mykindos.betterpvp.core.world.construction.StructurePlacedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
+import me.mykindos.betterpvp.core.world.construction.StructureStatus;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
@@ -140,7 +142,11 @@ public class StructureViews implements Listener {
         });
     }
 
-    /** Right-clicking an upgrade's piece lets whatever the upgrade does take the click, for whoever may use it. */
+    /**
+     * Right-clicks on a structure being built or waiting to be claimed do nothing, so its containers stay shut and its
+     * pieces stay still. Right-clicking an upgrade's piece on an Active structure lets whatever the upgrade does take
+     * the click, for whoever may use it.
+     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onUse(@NotNull PlayerInteractEvent event) {
         final Block block = event.getClickedBlock();
@@ -151,30 +157,45 @@ public class StructureViews implements Listener {
         if (loaded == null) {
             return;
         }
-        for (Map.Entry<UUID, StructureView> entry : loaded.views.entrySet()) {
-            final Optional<String> upgrade = entry.getValue().pieceAt(block.getX(), block.getY(), block.getZ());
-            if (upgrade.isEmpty()) {
+        for (StructureView view : loaded.views.values()) {
+            final PlacedStructure structure = view.getStructure();
+            final Optional<String> upgrade = view.pieceAt(block.getX(), block.getY(), block.getZ());
+            if (structure == null || (upgrade.isEmpty() && !view.covers(block.getX(), block.getY(), block.getZ()))) {
                 continue;
             }
-            service.worksite(block.getWorld()).ifPresent(worksite -> worksite.getHolding().find(entry.getKey())
-                    .ifPresent(structure -> catalogue.find(structure.getType())
-                            .flatMap(type -> type.upgrade(upgrade.get()))
-                            .ifPresent(found -> {
-                                if (!service.canUse(event.getPlayer(), worksite.getKey(), structure)) {
-                                    event.setCancelled(true);
-                                    UtilMessage.plain(event.getPlayer(), Translations
-                                            .component("core.construction.not_yours").color(NamedTextColor.RED));
-                                    return;
-                                }
-                                final StructurePieceUseEvent use = new StructurePieceUseEvent(event.getPlayer(),
-                                        worksite.getKey(), structure, found);
-                                UtilServer.callEvent(use);
-                                if (use.isHandled()) {
-                                    event.setCancelled(true);
-                                }
-                            })));
+            final StructureStatus status = structure.status(service.now());
+            if (status == StructureStatus.READY_TO_CLAIM
+                    || structure.getCondition() == StructureCondition.UNDER_CONSTRUCTION) {
+                event.setCancelled(true);
+                return;
+            }
+            upgrade.ifPresent(id -> usePiece(event, block.getWorld(), structure, status, id));
             return;
         }
+    }
+
+    private void usePiece(@NotNull PlayerInteractEvent event, @NotNull World world, @NotNull PlacedStructure structure,
+                          @NotNull StructureStatus status, @NotNull String upgrade) {
+        if (!status.isUsable()) {
+            event.setCancelled(true);
+            return;
+        }
+        service.worksite(world).ifPresent(worksite -> catalogue.find(structure.getType())
+                .flatMap(type -> type.upgrade(upgrade))
+                .ifPresent(found -> {
+                    if (!service.canUse(event.getPlayer(), worksite.getKey(), structure)) {
+                        event.setCancelled(true);
+                        UtilMessage.plain(event.getPlayer(), Translations
+                                .component("core.construction.not_yours").color(NamedTextColor.RED));
+                        return;
+                    }
+                    final StructurePieceUseEvent use = new StructurePieceUseEvent(event.getPlayer(),
+                            worksite.getKey(), structure, found);
+                    UtilServer.callEvent(use);
+                    if (use.isHandled()) {
+                        event.setCancelled(true);
+                    }
+                }));
     }
 
     /** Writes down a structure container when whoever had it open closes it. */

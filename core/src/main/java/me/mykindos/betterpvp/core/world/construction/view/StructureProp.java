@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.scene.prop.Prop;
 import me.mykindos.betterpvp.core.utilities.model.Actor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
@@ -16,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 /**
- * The scene object that stands for a structure: a label above it saying what it is and how it is coming along, and,
- * while it waits to be claimed, a hitbox over the whole building so a click anywhere on it claims it.
+ * The scene object that stands for a structure: a two-line label saying what it is and how it is coming along. While
+ * the label asks for an action, it carries a hitbox around itself, and clicking it takes that action.
  * <p>
  * The label is its body, so it comes and goes with the chunk it floats in. The blocks of the building itself are not
  * part of it: those are drawn into the world whether anyone is near or not.
@@ -25,7 +26,7 @@ import java.util.function.Consumer;
 public final class StructureProp extends Prop implements Actor {
 
     private final SceneObjectRegistry registry;
-    private final BoundingBox bounds;
+    private final BoundingBox area;
     private final Consumer<Player> onClaim;
 
     private Component label = Component.empty();
@@ -33,10 +34,11 @@ public final class StructureProp extends Prop implements Actor {
     private @Nullable HitboxVolume hitbox;
 
     StructureProp(@NotNull ConstructionPropFactory factory, @NotNull SceneObjectRegistry registry,
-                  @NotNull BoundingBox bounds, @NotNull Consumer<Player> onClaim) {
+                  @NotNull Location at, @NotNull Consumer<Player> onClaim) {
         super(factory);
         this.registry = registry;
-        this.bounds = bounds.clone();
+        this.area = new BoundingBox(at.getX() - 0.75, at.getY() - 0.25, at.getZ() - 0.75,
+                at.getX() + 0.75, at.getY() + 0.75, at.getZ() + 0.75);
         this.onClaim = onClaim;
     }
 
@@ -89,9 +91,9 @@ public final class StructureProp extends Prop implements Actor {
         return label;
     }
 
-    /** The box a click claims it through, or null while there is nothing to claim. */
+    /** The box around the label a click claims it through, or null while there is nothing to claim. */
     @Nullable BoundingBox clickArea() {
-        return claimable ? bounds.clone() : null;
+        return claimable ? area.clone() : null;
     }
 
     @Override
@@ -102,7 +104,7 @@ public final class StructureProp extends Prop implements Actor {
     }
 
     private void addHitbox() {
-        hitbox = new HitboxVolume(this, registry, bounds);
+        hitbox = new HitboxVolume(this, registry, area);
         addBehavior(hitbox);
     }
 }
