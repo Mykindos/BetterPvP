@@ -57,11 +57,11 @@ class DatabaseProsperityStoreTest {
     }
 
     @Test
-    void ac13_aMigrationDropsUpdatedAt() throws IOException, URISyntaxException {
+    void ac13_aMigrationLetsUpdatedAtBeEmpty() throws IOException, URISyntaxException {
         final URL migrations = getClass().getClassLoader().getResource("clans-migrations/postgres");
         assertNotNull(migrations);
         try (Stream<Path> files = Files.list(Path.of(migrations.toURI()))) {
-            assertTrue(files.anyMatch(DatabaseProsperityStoreTest::dropsUpdatedAt));
+            assertTrue(files.anyMatch(DatabaseProsperityStoreTest::relaxesUpdatedAt));
         }
     }
 
@@ -95,7 +95,7 @@ class DatabaseProsperityStoreTest {
         try (Stream<Path> listed = Files.list(Path.of(migrations.toURI()))) {
             files = listed.toList();
         }
-        final Optional<Path> drop = files.stream().filter(DatabaseProsperityStoreTest::dropsUpdatedAt).findFirst();
+        final Optional<Path> drop = files.stream().filter(DatabaseProsperityStoreTest::relaxesUpdatedAt).findFirst();
         assertTrue(drop.isPresent());
         final Matcher dropName = flyway.matcher(drop.get().getFileName().toString());
         assertTrue(dropName.matches(), drop.get().getFileName().toString());
@@ -132,10 +132,10 @@ class DatabaseProsperityStoreTest {
         }
     }
 
-    private static boolean dropsUpdatedAt(Path migration) {
+    private static boolean relaxesUpdatedAt(Path migration) {
         try {
             final String sql = Files.readString(migration).toLowerCase(Locale.ROOT);
-            return sql.contains("camp_prosperity") && sql.contains("drop column") && sql.contains("updated_at");
+            return sql.contains("camp_prosperity") && sql.contains("updated_at") && sql.contains("drop not null");
         } catch (IOException ex) {
             throw new IllegalStateException(ex);
         }
