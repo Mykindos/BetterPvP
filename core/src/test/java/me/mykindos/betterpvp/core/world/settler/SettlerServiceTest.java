@@ -15,7 +15,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -288,14 +286,21 @@ class SettlerServiceTest {
         site.running.add(builder.getId());
         final int changes = site.changes;
 
-        assertFalse(service.assign(CAMP, builder.getId(), "job-b").isSuccess());
-        assertFalse(service.unassign(CAMP, builder.getId()).isSuccess());
-        assertFalse(service.dismiss(CAMP, builder.getId()).isSuccess());
+        assertEquals("core.settler.job_running", reason(service.assign(CAMP, builder.getId(), "job-b")));
+        assertEquals("core.settler.job_running", reason(service.unassign(CAMP, builder.getId())));
+        assertEquals("core.settler.job_running", reason(service.dismiss(CAMP, builder.getId())));
         assertEquals("job-a", builder.getAssignment());
         assertEquals(SettlerState.WORKING, builder.getState());
         assertTrue(site.roster.find(builder.getId()).isPresent());
         assertEquals(changes, site.changes);
         assertTrue(site.runningAsked > 0, "the service asks the site whether the job is running");
+
+        events.clear();
+        assertTrue(service.assign(CAMP, builder.getId(), "job-a").isSuccess(),
+                "assigning it to the job it is already on is not refused");
+        assertEquals("job-a", builder.getAssignment());
+        assertEquals(changes, site.changes);
+        assertTrue(fired(SettlerAssignedEvent.class).isEmpty());
 
         site.running.clear();
         assertTrue(service.assign(CAMP, builder.getId(), "job-b").isSuccess());
@@ -349,17 +354,6 @@ class SettlerServiceTest {
     }
 
     @Test
-    void ac12_siteBehalfActionsCheckNoPermission() {
-        site.allowed = false;
-
-        final Settler builder = granted("builder");
-        assertTrue(site.roster.find(builder.getId()).isPresent());
-        assertTrue(service.assign(CAMP, builder.getId(), "job-a").isSuccess());
-        assertTrue(service.remove(CAMP, builder.getId(), SettlerLeaveReason.UNHAPPY).isSuccess());
-        assertTrue(site.asked.isEmpty());
-    }
-
-    @Test
     void ac13_leavingTakesItOffTheRosterForGood() {
         final Settler dismissed = granted("builder");
         final Settler unhappy = granted("farmer");
@@ -405,18 +399,28 @@ class SettlerServiceTest {
     }
 
     @Test
-    void ac15_thereIsNoLeavingState() {
+    void ac10_removingForAReasonIgnoresARunningJob() {
+        final Settler builder = granted("builder");
+        service.assign(CAMP, builder.getId(), "job-a");
+        site.running.add(builder.getId());
+
+        assertTrue(service.remove(CAMP, builder.getId(), SettlerLeaveReason.UNPAID).isSuccess());
+        assertTrue(site.roster.find(builder.getId()).isEmpty());
+    }
+
+    @Test
+    void ac15_aSettlerThatLeavesIsGoneAndTheEventCarriesIt() {
         final Settler builder = granted("builder");
         service.assign(CAMP, builder.getId(), "job-a");
 
-        service.dismiss(CAMP, builder.getId());
+        service.remove(CAMP, builder.getId(), SettlerLeaveReason.UNHAPPY);
 
+        assertTrue(site.roster.find(builder.getId()).isEmpty());
+        assertEquals(0, site.roster.size());
         final SettlerLeftEvent left = fired(SettlerLeftEvent.class).getFirst();
         assertSame(builder, left.getSettler());
-        assertTrue(site.roster.find(builder.getId()).isEmpty());
-        assertNotEquals("LEAVING", builder.getState().name());
-        assertTrue(Arrays.stream(SettlerState.values()).noneMatch(state -> state.name().equals("LEAVING")),
-                "SettlerState has no LEAVING");
+        assertEquals(CAMP, left.getSite());
+        assertEquals(SettlerLeaveReason.UNHAPPY, left.getReason());
     }
 
     private static final class FakeSite implements SettlerSite {

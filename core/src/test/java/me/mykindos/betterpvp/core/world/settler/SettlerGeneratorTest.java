@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.core.world.settler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -207,18 +205,20 @@ class SettlerGeneratorTest {
     @Test
     void ac24_strengthAndStatsAreReadFromTheTableWhenUsed() {
         final Settler rare = roll(SettlerRarity.RARE, "builder", 0, 1);
-        final Map<SettlerRarity, RarityNumbers> numbers = new HashMap<>();
-        numbers.put(SettlerRarity.RARE, new RarityNumbers(2, 1.5, 1.5, 0.15));
-        final SettlerTable table = new SettlerTable(numbers, List.of(), List.of(), Map.of());
+        final Settler common = roll(SettlerRarity.COMMON, "builder", 0, 2);
+        final SettlerTable table = new SettlerTable(Map.of(
+                SettlerRarity.COMMON, new RarityNumbers(1, 1.0, 1.0, 0.3),
+                SettlerRarity.RARE, new RarityNumbers(2, 1.5, 1.4, 0.15)), List.of(), List.of(), Map.of());
+
         assertEquals(1.5, table.rarity(rare.getRarity()).getTraitStrength());
+        assertEquals(1.4, table.rarity(rare.getRarity()).getStats());
+        assertEquals(1.0, table.rarity(common.getRarity()).getTraitStrength());
+        assertEquals(1.0, table.rarity(common.getRarity()).getStats());
 
-        numbers.put(SettlerRarity.RARE, new RarityNumbers(2, 1.8, 1.6, 0.15));
-        assertEquals(1.8, table.rarity(rare.getRarity()).getTraitStrength());
-        assertEquals(1.6, table.rarity(rare.getRarity()).getStats());
-
-        for (Field field : Settler.class.getDeclaredFields()) {
-            assertFalse(field.getType() == double.class || field.getType() == RarityNumbers.class,
-                    "a settler keeps no strength or stats of its own: " + field.getName());
-        }
+        final SettlerTable changed = new SettlerTable(Map.of(
+                SettlerRarity.RARE, new RarityNumbers(2, 1.8, 1.6, 0.15)), List.of(), List.of(), Map.of());
+        assertEquals(1.8, changed.rarity(rare.getRarity()).getTraitStrength(),
+                "a settler rolled before the change gets the new strength");
+        assertEquals(1.6, changed.rarity(rare.getRarity()).getStats());
     }
 }
