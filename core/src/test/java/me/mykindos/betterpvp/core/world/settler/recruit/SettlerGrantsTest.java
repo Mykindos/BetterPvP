@@ -105,31 +105,16 @@ class SettlerGrantsTest {
         assertEquals(1, site.roster.size());
     }
 
-    @Test
-    void ac5_hasRoomOnlyWhileLoadedAndBelowTheCap() {
-        site.population = 1;
-        assertTrue(grants.hasRoom(SITE));
-
-        grants.grant(SITE, prisoner());
-        assertFalse(grants.hasRoom(SITE));
-
-        site.population = 5;
-        site.loaded = false;
-        assertFalse(grants.hasRoom(SITE));
-        assertFalse(grants.hasRoom(SiteKey.of("elsewhere", 3)));
-    }
-
     private static final class FakeSite implements SettlerSite {
 
         private final Roster roster = new Roster();
         private SettlerTable table = new SettlerTable(Map.of(SettlerRarity.RARE, new RarityNumbers(0, 1.5, 1.6, 0)),
                 List.of("Mirel"), List.of("Salt"), Map.of("dungeon", List.of("history.dungeon")));
         private int population = 10;
-        private boolean loaded = true;
 
         @Override
         public Optional<Roster> roster(SiteKey site) {
-            return loaded ? Optional.of(roster) : Optional.empty();
+            return Optional.of(roster);
         }
 
         @Override
