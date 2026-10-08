@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.scene.npc.ModeledNPC;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
-import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePlacedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
@@ -160,8 +159,7 @@ public class Steward implements Listener {
 
     private static @NotNull Optional<PlacedStructure> standing(@NotNull List<PlacedStructure> halls) {
         return halls.stream()
-                .filter(hall -> hall.getCondition() != StructureCondition.NOT_PLACED
-                        && hall.getCondition() != StructureCondition.UNDER_CONSTRUCTION)
+                .filter(hall -> hall.getCondition().isStanding())
                 .findFirst();
     }
 

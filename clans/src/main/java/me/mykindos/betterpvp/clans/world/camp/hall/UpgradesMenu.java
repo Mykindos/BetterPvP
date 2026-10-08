@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
-import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureUpgrade;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
@@ -33,8 +32,7 @@ public class UpgradesMenu extends AbstractGui implements Windowed {
         final List<PlacedStructure> placed = menus.getStore().cached(key.getOwnerId())
                 .map(Camp::getHolding)
                 .map(holding -> holding.getStructures().stream()
-                        .filter(structure -> structure.getCondition() != StructureCondition.NOT_PLACED
-                                && structure.getCondition() != StructureCondition.UNDER_CONSTRUCTION)
+                        .filter(structure -> structure.getCondition().isStanding())
                         .toList())
                 .orElse(List.of());
 

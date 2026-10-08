@@ -6,8 +6,8 @@ import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.resource.ResourceOverflow;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.RankLockbox;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.SalvageBin;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
+import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSite;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewRule;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -101,8 +100,8 @@ public class CampConstruction implements ConstructionSite {
         if (hallStage + 1 >= type.getTier()) {
             return Optional.empty();
         }
-        return Optional.of(Translations.component("clans.camp.construction.needs_hall",
-                Component.text(type.getTier())).color(NamedTextColor.RED));
+        return Optional.of(ConstructionResult.reason("clans.camp.construction.needs_hall",
+                Component.text(type.getTier())));
     }
 
     @Override

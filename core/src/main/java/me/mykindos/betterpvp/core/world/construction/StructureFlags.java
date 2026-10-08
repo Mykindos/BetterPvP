@@ -25,4 +25,9 @@ public class StructureFlags {
 
     /** The share of what was spent on it that demolishing gives back, from 0 to 1. */
     double demolishRefund;
+
+    /** The condition a structure of this type is in when it first stands. */
+    public StructureCondition initialCondition() {
+        return startsBroken ? StructureCondition.NEEDS_REPAIR : StructureCondition.ACTIVE;
+    }
 }

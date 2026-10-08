@@ -93,18 +93,17 @@ public class ConstructionService {
                 return ConstructionResult.refused("core.construction.not_finished");
             }
 
+            structure.setJob(null);
             switch (job.getKind()) {
-                case BUILD -> structure.setCondition(type.getFlags().isStartsBroken()
-                        ? StructureCondition.NEEDS_REPAIR : StructureCondition.ACTIVE);
+                case BUILD -> structure.setCondition(type.getFlags().initialCondition());
                 case ADVANCE -> structure.setStage(job.getTargetStage());
                 case MOVE -> structure.setPosition(job.getTarget());
                 case REPAIR -> StructureStatusTracker.repaired(structure);
                 case FIT_UPGRADE -> {
+                    if (job.getUpgrade() != null) {
+                        type.upgrade(job.getUpgrade()).ifPresent(upgrade -> fitted(worksite, structure, upgrade));
+                    }
                 }
-            }
-            structure.setJob(null);
-            if (job.getKind() == JobKind.FIT_UPGRADE && job.getUpgrade() != null) {
-                type.upgrade(job.getUpgrade()).ifPresent(upgrade -> fitted(worksite, structure, upgrade));
             }
             final ConstructionResult result = changed(worksite, structure);
             UtilServer.callEvent(new StructureClaimedEvent(worksite.getKey(), world, structure, job, player));
@@ -261,8 +260,7 @@ public class ConstructionService {
             if (!type.getFlags().isDemolishable()) {
                 return ConstructionResult.refused("core.construction.not_demolishable");
             }
-            if (structure.getCondition() == StructureCondition.UNDER_CONSTRUCTION
-                    || structure.getCondition() == StructureCondition.NOT_PLACED) {
+            if (!structure.getCondition().isStanding()) {
                 return ConstructionResult.refused("core.construction.demolish_needs_standing");
             }
             if (structure.getJob() != null) {

@@ -29,7 +29,6 @@ public class Holding {
 
     /** Whether a structure of {@code type} stands finished, which is what counts as having it for requirements. */
     public boolean hasBuilt(@NotNull String type) {
-        return ofType(type).stream().anyMatch(structure -> structure.getCondition() != StructureCondition.UNDER_CONSTRUCTION
-                && structure.getCondition() != StructureCondition.NOT_PLACED);
+        return ofType(type).stream().anyMatch(structure -> structure.getCondition().isStanding());
     }
 }

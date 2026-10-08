@@ -7,7 +7,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
-import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
@@ -63,8 +62,7 @@ public class StartingCamp implements WorldContent {
                             continue;
                         }
                         construction.grant(worksite, type.get(), position(type.get(), marker),
-                                type.get().getFlags().isStartsBroken()
-                                        ? StructureCondition.NEEDS_REPAIR : StructureCondition.ACTIVE);
+                                type.get().getFlags().initialCondition());
                     }
                 });
     }

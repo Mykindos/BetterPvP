@@ -2,12 +2,9 @@ package me.mykindos.betterpvp.core.world.construction;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -19,6 +16,8 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static me.mykindos.betterpvp.core.world.construction.ConstructionResult.reason;
 
 /**
  * Why a construction action would be refused. The queries here and the actions in {@link ConstructionService} run the
@@ -58,7 +57,7 @@ public class ConstructionChecks {
         return sites.holding(site)
                 .map(at -> buildProblem(player, at, type, Optional::empty)
                         .or(() -> afford(at, type.stage(0).getCost())))
-                .orElseGet(() -> Optional.of(text("core.construction.no_holding")));
+                .orElseGet(() -> Optional.of(reason("core.construction.no_holding")));
     }
 
     /** Why {@code player} could not move structure {@code id} to {@code anchor}, or empty if they could. */
@@ -70,7 +69,7 @@ public class ConstructionChecks {
                         allowed(player, worksite.siteHolding(), ConstructionAction.MOVE)
                                 .or(() -> moveProblem(worksite, structure, type, target))
                                 .or(() -> afford(worksite.siteHolding(), type.getMoveCost()))))
-                .orElseGet(() -> Optional.of(text("core.construction.no_holding")));
+                .orElseGet(() -> Optional.of(reason("core.construction.no_holding")));
     }
 
     /**
@@ -84,7 +83,7 @@ public class ConstructionChecks {
                         allowed(player, at, ConstructionAction.PICK_UPGRADE)
                                 .or(() -> upgrade(structure, type, upgradeId, Optional::of,
                                         upgrade -> afford(at, upgrade.getCost())))))
-                .orElseGet(() -> Optional.of(text("core.construction.no_holding")));
+                .orElseGet(() -> Optional.of(reason("core.construction.no_holding")));
     }
 
     /**
@@ -94,9 +93,9 @@ public class ConstructionChecks {
     <T> @NotNull T locate(@NotNull World world, @NotNull Function<Component, T> refused,
                           @NotNull Function<Worksite, T> body) {
         if (!sites.isSite(world)) {
-            return refused.apply(text("core.construction.cannot_build_here"));
+            return refused.apply(reason("core.construction.cannot_build_here"));
         }
-        return sites.worksite(world).map(body).orElseGet(() -> refused.apply(text("core.construction.no_holding")));
+        return sites.worksite(world).map(body).orElseGet(() -> refused.apply(reason("core.construction.no_holding")));
     }
 
     /**
@@ -107,11 +106,11 @@ public class ConstructionChecks {
                            @NotNull BiFunction<PlacedStructure, StructureType, T> body) {
         final Optional<PlacedStructure> structure = holding.find(id);
         if (structure.isEmpty()) {
-            return refused.apply(text("core.construction.missing_structure"));
+            return refused.apply(reason("core.construction.missing_structure"));
         }
         final Optional<StructureType> type = catalogue.find(structure.get().getType());
         if (type.isEmpty()) {
-            return refused.apply(text("core.construction.unknown_type"));
+            return refused.apply(reason("core.construction.unknown_type"));
         }
         return body.apply(structure.get(), type.get());
     }
@@ -124,20 +123,20 @@ public class ConstructionChecks {
                            @NotNull Function<Component, T> refused, @NotNull Function<StructureUpgrade, T> fitting) {
         final Optional<StructureUpgrade> found = type.upgrade(upgradeId);
         if (found.isEmpty()) {
-            return refused.apply(text("core.construction.unknown_upgrade"));
+            return refused.apply(reason("core.construction.unknown_upgrade"));
         }
         final StructureUpgrade upgrade = found.get();
         if (structure.getStage() < upgrade.getStage()) {
-            return refused.apply(text("core.construction.upgrade_locked"));
+            return refused.apply(reason("core.construction.upgrade_locked"));
         }
         if (structure.upgradeAt(upgrade.getStage()).isPresent()) {
-            return refused.apply(text("core.construction.upgrade_taken"));
+            return refused.apply(reason("core.construction.upgrade_taken"));
         }
         if (structure.getJob() != null) {
-            return refused.apply(text("core.construction.busy"));
+            return refused.apply(reason("core.construction.busy"));
         }
         if (structure.getCondition() != StructureCondition.ACTIVE) {
-            return refused.apply(text("core.construction.upgrade_needs_active"));
+            return refused.apply(reason("core.construction.upgrade_needs_active"));
         }
         return fitting.apply(upgrade);
     }
@@ -147,7 +146,7 @@ public class ConstructionChecks {
         if (at.getSite().allows(player, at.getKey(), action)) {
             return Optional.empty();
         }
-        return Optional.of(text(action == ConstructionAction.BUILD
+        return Optional.of(reason(action == ConstructionAction.BUILD
                 ? "core.construction.build_not_allowed" : "core.construction.action_not_allowed"));
     }
 
@@ -169,10 +168,10 @@ public class ConstructionChecks {
     @NotNull Optional<Component> moveProblem(@NotNull Worksite worksite, @NotNull PlacedStructure structure,
                                              @NotNull StructureType type, @NotNull StructurePosition target) {
         if (!type.getFlags().isMovable()) {
-            return Optional.of(text("core.construction.not_movable"));
+            return Optional.of(reason("core.construction.not_movable"));
         }
         if (structure.getJob() != null) {
-            return Optional.of(text("core.construction.busy"));
+            return Optional.of(reason("core.construction.busy"));
         }
         return fit(worksite, type, structure.getStage(), target, structure.getId());
     }
@@ -182,7 +181,7 @@ public class ConstructionChecks {
             if (!at.getHolding().hasBuilt(required)) {
                 final Component name = catalogue.find(required).map(StructureType::getDisplayName)
                         .orElse(Component.text(required));
-                return Optional.of(text("core.construction.requires", name));
+                return Optional.of(reason("core.construction.requires", name));
             }
         }
         return at.getSite().blocked(at.getKey(), at.getHolding(), type, stage);
@@ -193,17 +192,13 @@ public class ConstructionChecks {
         final Optional<SchematicPlacement> placement = shapes.placementOf(worksite.getWorld(), type.getId(), stage,
                 position);
         if (placement.isEmpty()) {
-            return Optional.of(text("core.construction.no_build"));
+            return Optional.of(reason("core.construction.no_build"));
         }
         return fitCheck.problem(worksite.getWorld(), worksite.getHolding(), type, placement.get(), ignoring);
     }
 
     @NotNull Optional<Component> afford(@NotNull SiteHolding at, @NotNull ResourceCost cost) {
         return at.getSite().ledger().canAfford(at.getKey(), cost)
-                ? Optional.empty() : Optional.of(text("core.construction.cannot_afford"));
-    }
-
-    private static @NotNull Component text(@NotNull String key, @NotNull ComponentLike... args) {
-        return Translations.component(key, args).color(NamedTextColor.RED);
+                ? Optional.empty() : Optional.of(reason("core.construction.cannot_afford"));
     }
 }

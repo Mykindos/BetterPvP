@@ -165,8 +165,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         }
 
         if (type.getFlags().isDemolishable()) {
-            final Component problem = condition == StructureCondition.UNDER_CONSTRUCTION
-                    || condition == StructureCondition.NOT_PLACED
+            final Component problem = !condition.isStanding()
                     ? Translations.component("core.construction.demolish_needs_standing")
                     : busy ? Translations.component("core.construction.busy") : null;
             final ResourceCost refund = menus.getSites().demolishRefund(camp, structure, type);

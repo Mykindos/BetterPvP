@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.clans.world.camp.storage.ChestPoints;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
-import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -90,7 +89,6 @@ public class ResourceChests {
 
     /** Whether a structure's chests count: once it has been built for the first time, and while it stands. */
     public static boolean counts(@NotNull PlacedStructure structure) {
-        return structure.getCondition() != StructureCondition.UNDER_CONSTRUCTION
-                && structure.getCondition() != StructureCondition.NOT_PLACED;
+        return structure.getCondition().isStanding();
     }
 }
