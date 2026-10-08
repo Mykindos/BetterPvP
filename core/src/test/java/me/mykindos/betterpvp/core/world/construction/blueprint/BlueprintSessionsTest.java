@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
+import me.mykindos.betterpvp.core.world.construction.TestStructureType;
 import me.mykindos.betterpvp.core.world.schematic.BlockTransform;
 import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
@@ -104,8 +105,8 @@ class BlueprintSessionsTest {
         bukkit = Mockito.mockStatic(Bukkit.class);
         bukkit.when(Bukkit::getOnlinePlayers).thenAnswer(invocation -> List.of(player));
 
-        catalogue.register(StructureBlueprintTest.type("hall"));
-        catalogue.register(StructureBlueprintTest.type("workshop"));
+        catalogue.register(new TestStructureType("hall"));
+        catalogue.register(new TestStructureType("workshop"));
         for (StructureType type : catalogue.all()) {
             for (int stage = 0; stage < type.getStages().size(); stage++) {
                 final String name = type.stage(stage).getSchematic();

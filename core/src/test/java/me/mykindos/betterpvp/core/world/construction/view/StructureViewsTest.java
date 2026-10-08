@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.construction.view;
 
+import me.mykindos.betterpvp.core.scene.SceneObjectRegistry;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.construction.ComponentKeys;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
@@ -12,14 +13,13 @@ import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
-import me.mykindos.betterpvp.core.world.construction.StructureFlags;
 import me.mykindos.betterpvp.core.world.construction.StructurePieceUseEvent;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
-import me.mykindos.betterpvp.core.world.construction.StructureStage;
 import me.mykindos.betterpvp.core.world.construction.StructureStatus;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.construction.StructureUpgrade;
+import me.mykindos.betterpvp.core.world.construction.TestStructureType;
 import me.mykindos.betterpvp.core.world.content.SceneSpawn;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
@@ -42,7 +42,9 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -51,10 +53,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,7 +78,6 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -114,7 +115,9 @@ class StructureViewsTest {
     private final World world = mock(World.class);
     private final WorldContentScope scope = mock(WorldContentScope.class);
     private final Player player = mock(Player.class);
+    private final SceneObjectRegistry registry = mock(SceneObjectRegistry.class);
     private final List<SceneSpawn> spawns = new ArrayList<>();
+    private final List<Interaction> hitboxParts = new ArrayList<>();
     private final List<Event> events = new ArrayList<>();
     private final Map<UUID, RenderedBuild> builds = new HashMap<>();
     private final Map<String, Block> blocks = new HashMap<>();
@@ -156,10 +159,19 @@ class StructureViewsTest {
                 block(invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2)));
         doReturn(mock(BlockDisplay.class)).when(world).spawn(any(Location.class), eq(BlockDisplay.class),
                 any(Consumer.class));
+        doAnswer(invocation -> {
+            final Interaction part = mock(Interaction.class);
+            final Location at = invocation.getArgument(0);
+            when(part.getLocation()).thenReturn(at);
+            when(part.getPersistentDataContainer()).thenReturn(mock(PersistentDataContainer.class));
+            invocation.<Consumer<Interaction>>getArgument(2).accept(part);
+            hitboxParts.add(part);
+            return part;
+        }).when(world).spawn(any(Location.class), eq(Interaction.class), any(Consumer.class));
 
-        catalogue.register(new TestType("hall", new StructureUpgrade("lantern", 0, ResourceCost.NONE, Duration.ZERO,
-                0, "lantern_piece")));
-        catalogue.register(new TestType("store", null));
+        catalogue.register(new TestStructureType("hall", new StructureUpgrade("lantern", 0, ResourceCost.NONE,
+                Duration.ZERO, 0, "lantern_piece")));
+        catalogue.register(new TestStructureType("store"));
 
         when(shapes.placementOf(any(), any(PlacedStructure.class))).thenAnswer(invocation -> {
             final PlacedStructure structure = invocation.getArgument(1);
@@ -185,9 +197,8 @@ class StructureViewsTest {
         when(service.canUse(any(), any(), any())).thenReturn(true);
         doAnswer(invocation -> spawns.add(invocation.getArgument(0))).when(scope).add(any(SceneSpawn.class));
 
-        // The registry is only touched by a materialized hitbox, and it cannot be mocked without PacketEvents.
         views = new StructureViews(service, catalogue, mock(SiteInstances.class), shapes, renderer,
-                null, mock(ConstructionPropFactory.class));
+                registry, mock(ConstructionPropFactory.class));
     }
 
     @AfterEach
@@ -260,7 +271,7 @@ class StructureViewsTest {
         final Location at = spawns.getFirst().getAnchor();
         assertEquals(104.5, at.getX(), 1e-9);
         assertEquals(100.5, at.getZ(), 1e-9);
-        assertTrue(at.getY() >= 69, "above the top of the build at y 69");
+        assertEquals(69.5, at.getY(), 1e-9, "half a block above the top of the build at y 69");
     }
 
     @Test
@@ -270,7 +281,7 @@ class StructureViewsTest {
 
         load();
 
-        final Component label = prop(0).getLabel();
+        final Component label = shownText(materialize(0));
         assertTrue(ComponentKeys.text(label).startsWith("Hall"));
         assertTrue(ComponentKeys.hasKey(label, "core.construction.label.building"));
     }
@@ -323,7 +334,7 @@ class StructureViewsTest {
 
         assertEquals(Component.empty(), StructureView.label(hall, idle, StructureStatus.ACTIVE, now.get()));
         load();
-        assertEquals(Component.empty(), prop(0).getLabel());
+        assertEquals(Component.empty(), shownText(materialize(0)));
     }
 
     @Test
@@ -331,8 +342,9 @@ class StructureViewsTest {
         final PlacedStructure hall = ready("hall");
         when(service.claim(any(), any(), any())).thenReturn(ConstructionResult.done(hall));
         load();
+        materialize(0);
 
-        assertNotNull(prop(0).clickArea());
+        assertEquals(1, hitboxParts.size());
         prop(0).act(player);
 
         verify(service).claim(player, world, hall.getId());
@@ -355,9 +367,9 @@ class StructureViewsTest {
     void ac16_onlyTheLabelCarriesTheClaimHitbox() {
         ready("hall");
         load();
+        materialize(0);
 
-        final BoundingBox area = prop(0).clickArea();
-        assertNotNull(area);
+        final BoundingBox area = hitbox();
         assertTrue(area.contains(spawns.getFirst().getAnchor().toVector()), "the hitbox is on the label");
         assertFalse(area.contains(100.5, 64.5, 100.5), "the bottom block of the build does not claim");
         assertFalse(area.contains(108.5, 68.5, 100.5), "the top corner of the build does not claim");
@@ -367,14 +379,16 @@ class StructureViewsTest {
     void ac16_onceClaimedTheHitboxIsGone() {
         final PlacedStructure hall = ready("hall");
         load();
-        assertNotNull(prop(0).clickArea());
+        materialize(0);
+        final Interaction part = hitboxParts.getFirst();
 
         hall.setJob(null);
         hall.setCondition(StructureCondition.ACTIVE);
         views.tick();
         prop(0).act(player);
 
-        assertNull(prop(0).clickArea());
+        verify(part).remove();
+        verify(registry).unalias(part);
         verify(service, never()).claim(any(), any(), any());
     }
 
@@ -406,6 +420,20 @@ class StructureViewsTest {
         verify(openChest).setCancelled(true);
         verify(usePiece).setCancelled(true);
         assertTrue(events.stream().noneMatch(StructurePieceUseEvent.class::isInstance));
+    }
+
+    @Test
+    void ac17_aPausedFirstBuildStaysLocked() {
+        final PlacedStructure hall = building("hall");
+        now.addAndGet(5 * MINUTE);
+        hall.getJob().hold("siege", now.get());
+        load();
+        assertEquals(StructureStatus.PAUSED, hall.status(now.get()));
+
+        final PlayerInteractEvent openChest = rightClick(102, 65, 100);
+        views.onUse(openChest);
+
+        verify(openChest).setCancelled(true);
     }
 
     @Test
@@ -492,17 +520,19 @@ class StructureViewsTest {
         load();
 
         for (int i = 0; i < holding.getStructures().size(); i++) {
-            assertNull(prop(i).clickArea(), "structure " + i + " only informs");
+            materialize(i);
         }
+
+        assertTrue(hitboxParts.isEmpty(), "no label here expects an action, so none has a hitbox");
     }
 
     @Test
     void ac19_aLabelThatExpectsAnActionHasAHitboxOnTheLabel() {
         ready("hall");
         load();
+        materialize(0);
 
-        final BoundingBox area = prop(0).clickArea();
-        assertNotNull(area);
+        final BoundingBox area = hitbox();
         assertTrue(area.contains(spawns.getFirst().getAnchor().toVector()));
         assertTrue(area.getVolume() < 8, "sized to the label, not the building, was " + area);
     }
@@ -546,6 +576,35 @@ class StructureViewsTest {
 
     private @NotNull StructureProp prop(int index) {
         return (StructureProp) spawns.get(index).getObject();
+    }
+
+    /** Gives a label its body, as its chunk loading would, and returns that body. */
+    private @NotNull TextDisplay materialize(int index) {
+        final TextDisplay display = mock(TextDisplay.class);
+        when(display.getWorld()).thenReturn(world);
+        when(display.getPersistentDataContainer()).thenReturn(mock(PersistentDataContainer.class));
+        prop(index).init(display);
+        return display;
+    }
+
+    private static @NotNull Component shownText(@NotNull TextDisplay display) {
+        final ArgumentCaptor<Component> text = ArgumentCaptor.forClass(Component.class);
+        verify(display).text(text.capture());
+        return text.getValue();
+    }
+
+    /** The box covered by the one interaction entity the prop spawned to be clicked. */
+    private @NotNull BoundingBox hitbox() {
+        assertEquals(1, hitboxParts.size(), "one hitbox part");
+        final Interaction part = hitboxParts.getFirst();
+        final ArgumentCaptor<Float> width = ArgumentCaptor.forClass(Float.class);
+        final ArgumentCaptor<Float> height = ArgumentCaptor.forClass(Float.class);
+        verify(part).setInteractionWidth(width.capture());
+        verify(part).setInteractionHeight(height.capture());
+        final Location at = part.getLocation();
+        final double half = width.getValue() / 2;
+        return new BoundingBox(at.getX() - half, at.getY(), at.getZ() - half,
+                at.getX() + half, at.getY() + height.getValue(), at.getZ() + half);
     }
 
     private void assertTimed(@NotNull StructureType type, @NotNull PlacedStructure structure, @NotNull String doing) {
@@ -651,57 +710,5 @@ class StructureViewsTest {
         final BlockData data = mock(BlockData.class);
         when(data.getMaterial()).thenReturn(material);
         return data;
-    }
-
-    private static final class TestType implements StructureType {
-
-        private final String id;
-        private final @Nullable StructureUpgrade upgrade;
-
-        private TestType(@NotNull String id, @Nullable StructureUpgrade upgrade) {
-            this.id = id;
-            this.upgrade = upgrade;
-        }
-
-        @Override
-        public @NotNull String getId() {
-            return id;
-        }
-
-        @Override
-        public @NotNull Component getDisplayName() {
-            return Component.text(Character.toUpperCase(id.charAt(0)) + id.substring(1));
-        }
-
-        @Override
-        public int getTier() {
-            return 0;
-        }
-
-        @Override
-        public @NotNull Set<String> getRequiredStructures() {
-            return Set.of();
-        }
-
-        @Override
-        public @Nullable String getRequiredZoneTag() {
-            return null;
-        }
-
-        @Override
-        public @NotNull List<StructureStage> getStages() {
-            return List.of(new StructureStage(id + "_0", ResourceCost.NONE, Duration.ofMinutes(10)),
-                    new StructureStage(id + "_1", ResourceCost.NONE, Duration.ofMinutes(10)));
-        }
-
-        @Override
-        public @NotNull StructureFlags getFlags() {
-            return StructureFlags.builder().build();
-        }
-
-        @Override
-        public @NotNull List<StructureUpgrade> getUpgrades() {
-            return upgrade == null ? List.of() : List.of(upgrade);
-        }
     }
 }
