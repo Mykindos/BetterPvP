@@ -11,7 +11,9 @@ import me.mykindos.betterpvp.clans.clans.fatigue.factor.PlayerDeathFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.factor.RepeatKillerFactor;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.FatiguePunishment;
 import me.mykindos.betterpvp.clans.clans.fatigue.punishment.SlownessPunishment;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampProfessions;
 import me.mykindos.betterpvp.clans.world.camp.settler.CampSettlers;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.FoodSource;
 import me.mykindos.betterpvp.clans.world.camp.settler.MoraleBoost;
 import me.mykindos.betterpvp.clans.world.camp.settler.prosperity.DatabaseProsperityStore;
@@ -48,6 +50,8 @@ public class ClansInjectorModule extends AbstractModule {
         punishments.addBinding().to(SlownessPunishment.class);
 
         // Camps have settlers from the start, so their professions and traits exist before anything rolls one.
+        bind(CampProfessions.class).asEagerSingleton();
+        bind(CampTraits.class).asEagerSingleton();
         bind(CampSettlers.class).asEagerSingleton();
         // What feeds a camp's settlers, and what else lifts them.
         Multibinder.newSetBinder(binder(), FoodSource.class).addBinding().to(FeastTable.class);
