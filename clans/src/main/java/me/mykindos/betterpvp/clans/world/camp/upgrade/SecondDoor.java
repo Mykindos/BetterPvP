@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
@@ -43,17 +43,17 @@ public class SecondDoor implements Listener {
 
     private final CampStore store;
     private final CampUpgrades upgrades;
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
     private final StructureCatalogue catalogue;
     private final StructureShapes shapes;
 
     @Inject
     public SecondDoor(@NotNull CampStore store, @NotNull CampUpgrades upgrades,
-                      @NotNull ConstructionService construction, @NotNull StructureCatalogue catalogue,
+                      @NotNull ConstructionSites sites, @NotNull StructureCatalogue catalogue,
                       @NotNull StructureShapes shapes, @NotNull SiteLandings landings, @NotNull CampRespawn respawn) {
         this.store = store;
         this.upgrades = upgrades;
-        this.construction = construction;
+        this.sites = sites;
         this.catalogue = catalogue;
         this.shapes = shapes;
         upgrades.declare(CampStructures.BARRACKS, ID, 2);
@@ -105,7 +105,7 @@ public class SecondDoor implements Listener {
 
     /** The second door's spot in {@code world}, while its Barracks has the upgrade working. */
     public @NotNull Optional<Location> spot(@NotNull World world) {
-        return construction.worksite(world)
+        return sites.worksite(world)
                 .filter(worksite -> isActive(worksite.getKey()))
                 .flatMap(worksite -> worksite.getHolding().ofType(CampStructures.BARRACKS).stream().findFirst())
                 .flatMap(barracks -> catalogue.find(CampStructures.BARRACKS)

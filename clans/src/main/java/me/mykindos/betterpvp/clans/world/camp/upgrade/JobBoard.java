@@ -14,11 +14,11 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.crew.CrewRule;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -44,18 +44,18 @@ public class JobBoard implements Listener {
 
     private final CampUpgrades upgrades;
     private final CampStore store;
-    private final ConstructionService construction;
+    private final StructureStatusTracker tracker;
     private final StructureCatalogue catalogue;
     private final StructureMenus structureMenus;
     private final CrewRule crews;
 
     @Inject
-    public JobBoard(@NotNull CampUpgrades upgrades, @NotNull CampStore store, @NotNull ConstructionService construction,
+    public JobBoard(@NotNull CampUpgrades upgrades, @NotNull CampStore store, @NotNull StructureStatusTracker tracker,
                     @NotNull StructureCatalogue catalogue, @NotNull StructureMenus structureMenus,
                     @NotNull CrewRule crews) {
         this.upgrades = upgrades;
         this.store = store;
-        this.construction = construction;
+        this.tracker = tracker;
         this.catalogue = catalogue;
         this.structureMenus = structureMenus;
         this.crews = crews;
@@ -79,7 +79,7 @@ public class JobBoard implements Listener {
     @NotNull List<Entry> entries(@NotNull SiteKey camp) {
         return store.cached(camp.getOwnerId())
                 .map(Camp::getHolding)
-                .map(holding -> entries(holding, construction.now()))
+                .map(holding -> entries(holding, tracker.now()))
                 .orElse(List.of());
     }
 

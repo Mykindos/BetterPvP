@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.core.world.construction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.world.site.SiteInstances;
-import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,13 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.LongSupplier;
 
 /**
- * Every construction action a player can take, checked and paid for: build, cancel, claim, move, advance, repair,
- * demolish and fitting an upgrade. Each action finds the {@link Worksite} the world belongs to, runs the
- * {@link ConstructionChecks} for it, pays through the site's ledger, and fires events for whatever shows the result in
- * the world.
+ * The construction actions. A player can build, cancel, claim, move, advance, repair, demolish and fit an upgrade, each
+ * checked against the site's permissions. A site can grant, advance, repair, finish and disable structures on its own
+ * behalf. Every action runs the {@link ConstructionChecks}, pays through the site's ledger, and fires events for
+ * whatever shows the result in the world.
  */
 @Singleton
 public class ConstructionService {
@@ -39,59 +36,6 @@ public class ConstructionService {
         this.shapes = shapes;
     }
 
-    ConstructionService(@NotNull SiteInstances instances, @NotNull StructureCatalogue catalogue,
-                        @NotNull StructureShapes shapes, @NotNull FitCheck fitCheck, @NotNull LongSupplier clock) {
-        this.sites = new ConstructionSites(instances, catalogue);
-        this.checks = new ConstructionChecks(sites, catalogue, shapes, fitCheck);
-        this.tracker = new StructureStatusTracker(catalogue, clock);
-        this.shapes = shapes;
-    }
-
-    public void register(@NotNull String siteId, @NotNull ConstructionSite site) {
-        sites.register(siteId, site);
-    }
-
-    public @NotNull Optional<Worksite> worksite(@NotNull World world) {
-        return sites.worksite(world);
-    }
-
-    public @NotNull Optional<Component> problem(@NotNull Player player, @NotNull World world, @NotNull StructureType type,
-                                                @NotNull Location anchor, int quarterTurns) {
-        return checks.problem(player, world, type, anchor, quarterTurns);
-    }
-
-    public @NotNull Optional<Component> unavailable(@NotNull Player player, @NotNull SiteKey site,
-                                                    @NotNull StructureType type) {
-        return checks.unavailable(player, site, type);
-    }
-
-    public @NotNull Optional<Component> moveProblem(@NotNull Player player, @NotNull World world, @NotNull UUID id,
-                                                    @NotNull Location anchor, int quarterTurns) {
-        return checks.moveProblem(player, world, id, anchor, quarterTurns);
-    }
-
-    public @NotNull Optional<Component> upgradeUnavailable(@NotNull Player player, @NotNull SiteKey site,
-                                                           @NotNull UUID id, @NotNull String upgradeId) {
-        return checks.upgradeUnavailable(player, site, id, upgradeId);
-    }
-
-    public @NotNull ResourceCost demolishRefund(@NotNull SiteKey site, @NotNull PlacedStructure structure,
-                                                @NotNull StructureType type) {
-        return sites.demolishRefund(site, structure, type);
-    }
-
-    public boolean canUse(@NotNull Player player, @NotNull SiteKey site, @NotNull PlacedStructure structure) {
-        return sites.canUse(player, site, structure);
-    }
-
-    public void refresh(@NotNull Worksite worksite) {
-        tracker.refresh(worksite);
-    }
-
-    public long now() {
-        return tracker.now();
-    }
-
     public @NotNull ConstructionResult build(@NotNull Player player, @NotNull World world, @NotNull StructureType type,
                                              @NotNull Location anchor, int quarterTurns) {
         final StructurePosition position = StructurePosition.of(anchor, quarterTurns);
@@ -108,7 +52,7 @@ public class ConstructionService {
 
             final PlacedStructure structure = new PlacedStructure(UUID.randomUUID(), type.getId(), position,
                     StructureCondition.UNDER_CONSTRUCTION);
-            structure.setJob(Job.start(JobKind.BUILD, first.getBuildTime(), first.getCost(), 0, now()));
+            structure.setJob(Job.start(JobKind.BUILD, first.getBuildTime(), first.getCost(), 0, tracker.now()));
             add(worksite, structure);
             return ConstructionResult.done(structure);
         });
@@ -128,7 +72,7 @@ public class ConstructionService {
             if (job == null) {
                 return ConstructionResult.refused("core.construction.nothing_to_cancel");
             }
-            if (job.isDone(now())) {
+            if (job.isDone(tracker.now())) {
                 return ConstructionResult.refused("core.construction.cancel_finished");
             }
 
@@ -145,7 +89,7 @@ public class ConstructionService {
     public @NotNull ConstructionResult claim(@NotNull Player player, @NotNull World world, @NotNull UUID id) {
         return act(player, world, id, ConstructionAction.CLAIM, (worksite, structure, type) -> {
             final Job job = structure.getJob();
-            if (job == null || job.isHeld() || !job.isDone(now())) {
+            if (job == null || job.isHeld() || !job.isDone(tracker.now())) {
                 return ConstructionResult.refused("core.construction.not_finished");
             }
 
@@ -191,7 +135,7 @@ public class ConstructionService {
                 return changed(worksite, structure);
             }
 
-            final Job job = Job.start(JobKind.MOVE, time, type.getMoveCost(), structure.getStage(), now());
+            final Job job = Job.start(JobKind.MOVE, time, type.getMoveCost(), structure.getStage(), tracker.now());
             job.setTarget(target);
             structure.setJob(job);
             return changed(worksite, structure);
@@ -226,10 +170,10 @@ public class ConstructionService {
     public @NotNull ConstructionResult finish(@NotNull World world, @NotNull UUID id) {
         return act(world, id, (worksite, structure, type) -> {
             final Job job = structure.getJob();
-            if (job == null || job.isDone(now())) {
+            if (job == null || job.isDone(tracker.now())) {
                 return ConstructionResult.refused("core.construction.nothing_to_finish");
             }
-            job.finish(now());
+            job.finish(tracker.now());
             return changed(worksite, structure);
         });
     }
@@ -255,7 +199,7 @@ public class ConstructionService {
             return unpaid.get();
         }
 
-        structure.setJob(Job.start(JobKind.ADVANCE, stage.getBuildTime(), stage.getCost(), next, now()));
+        structure.setJob(Job.start(JobKind.ADVANCE, stage.getBuildTime(), stage.getCost(), next, tracker.now()));
         return changed(worksite, structure);
     }
 
@@ -277,7 +221,7 @@ public class ConstructionService {
             StructureStatusTracker.repaired(structure);
         } else {
             structure.setJob(Job.start(JobKind.REPAIR, type.getRepairTime(), type.getRepairCost(),
-                    structure.getStage(), now()));
+                    structure.getStage(), tracker.now()));
         }
         return changed(worksite, structure);
     }
@@ -301,7 +245,7 @@ public class ConstructionService {
                         return changed(worksite, structure);
                     }
                     final Job job = Job.start(JobKind.FIT_UPGRADE, upgrade.getTime(), upgrade.getCost(),
-                            structure.getStage(), now());
+                            structure.getStage(), tracker.now());
                     job.setUpgrade(upgrade.getId());
                     structure.setJob(job);
                     return changed(worksite, structure);
@@ -349,7 +293,7 @@ public class ConstructionService {
                 return ConstructionResult.refused("core.construction.disable_needs_active");
             }
             structure.setCondition(StructureCondition.DISABLED);
-            structure.setDisabledAt(now());
+            structure.setDisabledAt(tracker.now());
             return changed(worksite, structure);
         });
     }

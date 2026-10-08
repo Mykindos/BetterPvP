@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
@@ -60,7 +60,7 @@ class BarracksUpgradesTest {
     @BeforeEach
     void setUp() {
         when(store.cached(CLAN)).thenReturn(Optional.of(camp));
-        door = new SecondDoor(store, upgrades, mock(ConstructionService.class), mock(StructureCatalogue.class),
+        door = new SecondDoor(store, upgrades, mock(ConstructionSites.class), mock(StructureCatalogue.class),
                 mock(StructureShapes.class), new SiteLandings(), mock(CampRespawn.class));
         barracks = new PlacedStructure(UUID.randomUUID(), CampStructures.BARRACKS,
                 new StructurePosition(0, 64, 0, 0), StructureCondition.ACTIVE);

@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.entity.Player;
@@ -130,7 +131,8 @@ class WorkshopUpgradesTest {
     @Test
     void aCampHoldsOneQueuedActionUntilItIsCleared() {
         final BuildQueue queue = new BuildQueue(mock(Clans.class), upgrades, store, mock(Camps.class),
-                mock(ClanManager.class), mock(ConstructionService.class), new StructureCatalogue());
+                mock(ClanManager.class), mock(ConstructionService.class), mock(StructureStatusTracker.class),
+                new StructureCatalogue());
         final Player player = mock(Player.class);
         when(player.getUniqueId()).thenReturn(UUID.randomUUID());
 
@@ -149,7 +151,7 @@ class WorkshopUpgradesTest {
     void theWorkshopOffersEachUpgradeAtItsStage() {
         new SalvageBin(upgrades, config);
         new BuildQueue(mock(Clans.class), upgrades, store, mock(Camps.class), mock(ClanManager.class),
-                mock(ConstructionService.class), new StructureCatalogue());
+                mock(ConstructionService.class), mock(StructureStatusTracker.class), new StructureCatalogue());
 
         assertTrue(upgrades.declared(CampStructures.WORKSHOP).stream()
                 .anyMatch(declared -> declared.getId().equals(SalvageBin.ID) && declared.getStage() == 0));

@@ -28,7 +28,7 @@ public class CrewJobsMenu extends AbstractGui implements Windowed {
     CrewJobsMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull Worksite worksite,
                  @Nullable Windowed previous) {
         super(9, 4);
-        final long now = menus.getConstruction().now();
+        final long now = menus.getTracker().now();
         final List<PlacedStructure> running = worksite.getHolding().getStructures().stream()
                 .filter(structure -> structure.getJob() != null && !structure.getJob().isDone(now))
                 .toList();

@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.world.construction.ComponentKeys;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSite;
 import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.construction.Holding;
@@ -109,6 +111,8 @@ class StructureViewsTest {
 
     private final AtomicLong now = new AtomicLong(1_000_000);
     private final ConstructionService service = mock(ConstructionService.class);
+    private final ConstructionSites sites = mock(ConstructionSites.class);
+    private final StructureStatusTracker tracker = mock(StructureStatusTracker.class);
     private final StructureCatalogue catalogue = new StructureCatalogue();
     private final StructureShapes shapes = mock(StructureShapes.class);
     private final ConstructionSite site = mock(ConstructionSite.class);
@@ -192,13 +196,13 @@ class StructureViewsTest {
             return build;
         }).when(renderer).open(any(), any(), any());
 
-        when(service.now()).thenAnswer(invocation -> now.get());
-        when(service.worksite(world)).thenReturn(Optional.of(
+        when(tracker.now()).thenAnswer(invocation -> now.get());
+        when(sites.worksite(world)).thenReturn(Optional.of(
                 new Worksite(CAMP, site, holding, world)));
-        when(service.canUse(any(), any(), any())).thenReturn(true);
+        when(sites.canUse(any(), any(), any())).thenReturn(true);
         doAnswer(invocation -> spawns.add(invocation.getArgument(0))).when(scope).add(any(SceneSpawn.class));
 
-        views = new StructureViews(service, catalogue, mock(SiteInstances.class), shapes, renderer,
+        views = new StructureViews(service, sites, tracker, catalogue, mock(SiteInstances.class), shapes, renderer,
                 registry, mock(ConstructionPropFactory.class));
     }
 
@@ -495,7 +499,7 @@ class StructureViewsTest {
     @Test
     void ac18_aPlayerWhoMayNotUseItIsToldItIsNotTheirsAndNothingFires() {
         active("hall").getUpgrades().put(0, "lantern");
-        when(service.canUse(any(), any(), any())).thenReturn(false);
+        when(sites.canUse(any(), any(), any())).thenReturn(false);
         load();
 
         final PlayerInteractEvent click = rightClick(104, 69, 100);

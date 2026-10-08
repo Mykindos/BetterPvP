@@ -6,9 +6,10 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.SettlerDeparture;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
@@ -49,17 +50,20 @@ public class CampArrivalNotices implements Listener {
 
     private final Clans clans;
     private final Camps camps;
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final StructureCatalogue catalogue;
     private final SettlerService settlers;
     private final Map<UUID, BukkitTask> pending = new HashMap<>();
 
     @Inject
-    public CampArrivalNotices(@NotNull Clans clans, @NotNull Camps camps, @NotNull ConstructionService construction,
+    public CampArrivalNotices(@NotNull Clans clans, @NotNull Camps camps, @NotNull ConstructionSites sites,
+                              @NotNull StructureStatusTracker tracker,
                               @NotNull StructureCatalogue catalogue, @NotNull SettlerService settlers) {
         this.clans = clans;
         this.camps = camps;
-        this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.catalogue = catalogue;
         this.settlers = settlers;
     }
@@ -92,8 +96,8 @@ public class CampArrivalNotices implements Listener {
     private void announce(@NotNull Player player, @NotNull World world) {
         final List<Component> warnings = new ArrayList<>();
         final List<Component> notices = new ArrayList<>();
-        final long now = construction.now();
-        construction.worksite(world).ifPresent(worksite -> {
+        final long now = tracker.now();
+        sites.worksite(world).ifPresent(worksite -> {
             for (PlacedStructure structure : worksite.getHolding().getStructures()) {
                 final Component name = catalogue.find(structure.getType())
                         .map(type -> type.getDisplayName())

@@ -38,7 +38,7 @@ public class GreatHallMenu extends AbstractGui implements Windowed {
                 player -> new FarmMenu(menus, player, key, this).show(player)));
         setItem(15, entry(Material.CRAFTING_TABLE, "construction",
                 player -> new ConstructionMenu(player, key, List.copyOf(menus.getStructures().all()),
-                        menus.getConstruction(), menus.getCatalogue(), menus.getBlueprints(),
+                        menus.getChecks(), menus.getCatalogue(), menus.getBlueprints(),
                         menus.getStructureMenus(), this).show(player)));
         setItem(21, entry(Material.ANVIL, "upgrades",
                 player -> new UpgradesMenu(menus, player, key, this).show(player)));

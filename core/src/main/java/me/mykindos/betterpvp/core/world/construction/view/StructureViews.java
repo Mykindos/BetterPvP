@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
@@ -21,6 +22,7 @@ import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
 import me.mykindos.betterpvp.core.world.construction.StructureStatus;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
@@ -66,6 +68,8 @@ import java.util.UUID;
 public class StructureViews implements Listener {
 
     private final ConstructionService service;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final StructureCatalogue catalogue;
     private final SiteInstances instances;
     @Getter(AccessLevel.PACKAGE)
@@ -82,11 +86,14 @@ public class StructureViews implements Listener {
     private final Map<String, Loaded> worlds = new HashMap<>();
 
     @Inject
-    public StructureViews(@NotNull ConstructionService service, @NotNull StructureCatalogue catalogue,
+    public StructureViews(@NotNull ConstructionService service, @NotNull ConstructionSites sites,
+                          @NotNull StructureStatusTracker tracker, @NotNull StructureCatalogue catalogue,
                           @NotNull SiteInstances instances, @NotNull StructureShapes shapes,
                           @NotNull SchematicRenderer renderer, @NotNull SceneObjectRegistry registry,
                           @NotNull ConstructionPropFactory propFactory) {
         this.service = service;
+        this.sites = sites;
+        this.tracker = tracker;
         this.catalogue = catalogue;
         this.instances = instances;
         this.shapes = shapes;
@@ -163,7 +170,7 @@ public class StructureViews implements Listener {
             if (structure == null || (upgrade.isEmpty() && !view.covers(block.getX(), block.getY(), block.getZ()))) {
                 continue;
             }
-            final StructureStatus status = structure.status(service.now());
+            final StructureStatus status = structure.status(tracker.now());
             if (status == StructureStatus.READY_TO_CLAIM
                     || structure.getCondition() == StructureCondition.UNDER_CONSTRUCTION) {
                 event.setCancelled(true);
@@ -180,10 +187,10 @@ public class StructureViews implements Listener {
             event.setCancelled(true);
             return;
         }
-        service.worksite(world).ifPresent(worksite -> catalogue.find(structure.getType())
+        sites.worksite(world).ifPresent(worksite -> catalogue.find(structure.getType())
                 .flatMap(type -> type.upgrade(upgrade))
                 .ifPresent(found -> {
-                    if (!service.canUse(event.getPlayer(), worksite.getKey(), structure)) {
+                    if (!sites.canUse(event.getPlayer(), worksite.getKey(), structure)) {
                         event.setCancelled(true);
                         UtilMessage.plain(event.getPlayer(), Translations
                                 .component("core.construction.not_yours").color(NamedTextColor.RED));
@@ -227,7 +234,7 @@ public class StructureViews implements Listener {
 
     /** Marks the record of whatever holding {@code world} belongs to as needing a save. */
     void changed(@NotNull World world) {
-        service.worksite(world).ifPresent(worksite -> worksite.getSite().changed(worksite.getKey()));
+        sites.worksite(world).ifPresent(worksite -> worksite.getSite().changed(worksite.getKey()));
     }
 
     void claim(@NotNull Player player, @NotNull World world, @NotNull UUID structure) {
@@ -238,8 +245,8 @@ public class StructureViews implements Listener {
     }
 
     private void refresh(@NotNull World world, @NotNull Loaded loaded) {
-        service.worksite(world).ifPresent(worksite -> {
-            service.refresh(worksite);
+        sites.worksite(world).ifPresent(worksite -> {
+            tracker.refresh(worksite);
             worksite.getHolding().getStructures()
                     .forEach(structure -> sync(world, loaded, worksite.getKey(), structure));
         });
@@ -249,7 +256,7 @@ public class StructureViews implements Listener {
                       @NotNull PlacedStructure structure) {
         catalogue.find(structure.getType()).ifPresent(type -> {
             loaded.views.computeIfAbsent(structure.getId(), id -> new StructureView(this, world, loaded.scope))
-                    .sync(structure, type, service.now());
+                    .sync(structure, type, tracker.now());
         });
     }
 

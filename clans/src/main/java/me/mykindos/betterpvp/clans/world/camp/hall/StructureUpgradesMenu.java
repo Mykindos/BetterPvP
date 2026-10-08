@@ -93,7 +93,7 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
         final boolean fitting = job != null && job.getKind() == JobKind.FIT_UPGRADE
                 && upgrade.getId().equals(job.getUpgrade());
         final Optional<Component> unavailable = chosen || fitting ? Optional.empty()
-                : menus.getConstruction().upgradeUnavailable(viewer, key, structure.getId(), upgrade.getId());
+                : menus.getChecks().upgradeUnavailable(viewer, key, structure.getId(), upgrade.getId());
         final boolean greyed = !chosen && !fitting && unavailable.isPresent();
 
         final ItemView.ItemViewBuilder view = ItemView.builder()
@@ -127,7 +127,7 @@ public class StructureUpgradesMenu extends AbstractGui implements Windowed {
                     Translations.component("clans.camp.upgrade.menu.open")));
         } else if (fitting) {
             view.lore(Translations.component("clans.camp.upgrade.menu.fitting",
-                    time(Duration.ofMillis(job.remainingMillis(menus.getConstruction().now()))))
+                    time(Duration.ofMillis(job.remainingMillis(menus.getTracker().now()))))
                     .color(NamedTextColor.YELLOW));
         } else if (unavailable.isPresent()) {
             view.lore(unavailable.get());

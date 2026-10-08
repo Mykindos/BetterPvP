@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import net.kyori.adventure.text.Component;
@@ -44,17 +45,19 @@ public class RushOrder {
     private final ClientManager clientManager;
     private final ClanManager clanManager;
     private final ConstructionService construction;
+    private final StructureStatusTracker tracker;
 
     @Inject
     public RushOrder(@NotNull CampUpgrades upgrades, @NotNull CampConfig config, @NotNull CampStore store,
                      @NotNull ClientManager clientManager, @NotNull ClanManager clanManager,
-                     @NotNull ConstructionService construction) {
+                     @NotNull ConstructionService construction, @NotNull StructureStatusTracker tracker) {
         this.upgrades = upgrades;
         this.config = config;
         this.store = store;
         this.clientManager = clientManager;
         this.clanManager = clanManager;
         this.construction = construction;
+        this.tracker = tracker;
         upgrades.declare(CampStructures.WORKSHOP, ID, 3);
     }
 
@@ -98,7 +101,7 @@ public class RushOrder {
     /** Why {@code player} could not rush {@code structure}'s job in camp {@code key}, or empty if they could. */
     public @NotNull Optional<Component> problem(@NotNull Player player, @NotNull SiteKey key,
                                                 @NotNull PlacedStructure structure) {
-        final long now = construction.now();
+        final long now = tracker.now();
         final Job job = structure.getJob();
         final boolean member = clanManager.getClanByPlayer(player)
                 .map(clan -> clan.getId() == key.getOwnerId())
@@ -137,7 +140,7 @@ public class RushOrder {
         if (camp.isEmpty()) {
             return ConstructionResult.refused("core.construction.no_holding");
         }
-        final long now = construction.now();
+        final long now = tracker.now();
         final long price = price(structure.getJob(), now);
         final ConstructionResult result = construction.finish(worksite.getWorld(), structure.getId());
         if (result.isSuccess()) {

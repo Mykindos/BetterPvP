@@ -35,7 +35,7 @@ public class PlacedStructuresMenu extends AbstractGui implements Windowed {
 
     PlacedStructuresMenu(@NotNull StructureMenus menus, @NotNull SiteKey camp, @Nullable Windowed previous) {
         super(9, 6);
-        final long now = menus.getConstruction().now();
+        final long now = menus.getTracker().now();
         final List<PlacedStructure> structures = menus.holding(camp).map(Holding::getStructures)
                 .map(List::copyOf)
                 .orElse(List.of())

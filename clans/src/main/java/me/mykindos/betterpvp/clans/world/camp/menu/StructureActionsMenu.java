@@ -98,7 +98,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
 
     private void populate(@NotNull PlacedStructure structure, @NotNull CampStructure type,
                           @Nullable ConstructionAction confirming) {
-        final long now = menus.getConstruction().now();
+        final long now = menus.getTracker().now();
         final StructureStatus status = structure.status(now);
         final Job job = structure.getJob();
         final boolean busy = job != null;
@@ -169,7 +169,7 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
                     || condition == StructureCondition.NOT_PLACED
                     ? Translations.component("core.construction.demolish_needs_standing")
                     : busy ? Translations.component("core.construction.busy") : null;
-            final ResourceCost refund = menus.getConstruction().demolishRefund(camp, structure, type);
+            final ResourceCost refund = menus.getSites().demolishRefund(camp, structure, type);
             buttons.add(button(Material.TNT, ConstructionAction.DEMOLISH, confirming,
                     Translations.component("clans.camp.menu.structures.action.demolish"),
                     List.of(refundLine(refund),

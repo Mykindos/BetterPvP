@@ -69,6 +69,9 @@ class ConstructionServiceTest {
     private MockedStatic<Bukkit> bukkit;
     private World world;
     private SiteInstances instances;
+    private ConstructionSites sites;
+    private ConstructionChecks checks;
+    private StructureStatusTracker tracker;
     private ConstructionService service;
 
     @BeforeEach
@@ -101,8 +104,11 @@ class ConstructionServiceTest {
         catalogue.register(new TestType("well").repair(4, 3)
                 .flags(StructureFlags.builder().selfRepairing(true).build()));
         catalogue.register(new TestType("market").flags(StructureFlags.builder().publicUse(true).build()));
-        service = new ConstructionService(instances, catalogue, shapes, fitCheck, now::get);
-        service.register("camp", site);
+        sites = new ConstructionSites(instances, catalogue);
+        checks = new ConstructionChecks(sites, catalogue, shapes, fitCheck);
+        tracker = new StructureStatusTracker(catalogue, now::get);
+        service = new ConstructionService(sites, checks, tracker, shapes);
+        sites.register("camp", site);
         site.balance.put("wood", 100);
     }
 
@@ -127,7 +133,7 @@ class ConstructionServiceTest {
 
         final PlacedStructure hall = build("hall").getStructure();
         site.loaded = false;
-        assertTrue(service.worksite(world).isEmpty());
+        assertTrue(sites.worksite(world).isEmpty());
         assertFalse(build("hall").isSuccess());
         assertFalse(service.cancel(player, world, hall.getId()).isSuccess());
         assertFalse(service.claim(player, world, hall.getId()).isSuccess());
@@ -161,7 +167,7 @@ class ConstructionServiceTest {
         assertTrue(service.advance(world, hall.getId()).isSuccess());
         assertTrue(service.repair(world, dock.getId()).isSuccess());
         assertTrue(service.finish(world, hall.getId()).isSuccess());
-        final PlacedStructure shed = service.grant(service.worksite(world).orElseThrow(), type("shed"),
+        final PlacedStructure shed = service.grant(sites.worksite(world).orElseThrow(), type("shed"),
                 new StructurePosition(40, 64, 0, 0), StructureCondition.ACTIVE);
         assertEquals(new StructurePosition(40, 64, 0, 0),
                 site.holding.find(shed.getId()).orElseThrow().getPosition());
@@ -183,7 +189,7 @@ class ConstructionServiceTest {
     void ac3_buildingIsRefusedByTheSitesOwnGateOrWithoutEnoughResources() {
         site.gate = Component.text("needs a bigger hall");
         assertFalse(build("hall").isSuccess());
-        assertTrue(service.unavailable(player, CAMP, type("hall")).isPresent());
+        assertTrue(checks.unavailable(player, CAMP, type("hall")).isPresent());
 
         site.gate = null;
         site.balance.put("wood", 5);
@@ -195,17 +201,17 @@ class ConstructionServiceTest {
     @Test
     void ac3_availabilityGivesTheSameReasonsWithoutTheWorld() {
         final StructureType workshop = type("workshop");
-        assertTrue(service.unavailable(player, CAMP, workshop).isPresent(), "needs a hall first");
+        assertTrue(checks.unavailable(player, CAMP, workshop).isPresent(), "needs a hall first");
 
         finished("hall");
-        assertTrue(service.unavailable(player, CAMP, workshop).isEmpty());
+        assertTrue(checks.unavailable(player, CAMP, workshop).isEmpty());
 
         site.balance.put("wood", 0);
-        assertTrue(service.unavailable(player, CAMP, workshop).isPresent(), "cannot afford it");
+        assertTrue(checks.unavailable(player, CAMP, workshop).isPresent(), "cannot afford it");
 
         site.balance.put("wood", 100);
         site.denied.add(ConstructionAction.BUILD);
-        assertTrue(service.unavailable(player, CAMP, workshop).isPresent(), "not allowed");
+        assertTrue(checks.unavailable(player, CAMP, workshop).isPresent(), "not allowed");
     }
 
     @Test
@@ -257,15 +263,15 @@ class ConstructionServiceTest {
         final boolean[] siege = {false};
         site.rules.add(rule("siege", () -> siege[0], 1.0));
         final PlacedStructure hall = build("hall").getStructure();
-        final Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = sites.worksite(world).orElseThrow();
 
         siege[0] = true;
-        service.refresh(worksite);
+        tracker.refresh(worksite);
         assertEquals(StructureStatus.PAUSED, hall.status(now.get()));
 
         now.addAndGet(60 * MINUTE);
         siege[0] = false;
-        service.refresh(worksite);
+        tracker.refresh(worksite);
         assertEquals(StructureStatus.UNDER_CONSTRUCTION, hall.status(now.get()), "time under siege did not count");
         assertTrue(events.stream().anyMatch(event -> event instanceof StructureStatusChangeEvent change
                 && change.getTo() == StructureStatus.PAUSED));
@@ -305,12 +311,12 @@ class ConstructionServiceTest {
             }
         });
         final PlacedStructure hall = build("hall").getStructure();
-        final Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = sites.worksite(world).orElseThrow();
 
         now.addAndGet(60 * MINUTE);
         siege[0] = true;
         rate[0] = 0;
-        service.refresh(worksite);
+        tracker.refresh(worksite);
 
         assertEquals(StructureStatus.READY_TO_CLAIM, hall.status(now.get()), "its crew leaving must not stop the claim");
         assertEquals(1.0, hall.getJob().getRate(), 1e-9);
@@ -455,7 +461,7 @@ class ConstructionServiceTest {
 
         when(fitCheck.problem(any(), any(), any(), any(), any())).thenReturn(Optional.of(Component.text("overlaps")));
         assertFalse(service.move(player, world, hall.getId(), target, 0).isSuccess());
-        assertTrue(service.moveProblem(player, world, hall.getId(), target, 0).isPresent());
+        assertTrue(checks.moveProblem(player, world, hall.getId(), target, 0).isPresent());
     }
 
     @Test
@@ -558,15 +564,15 @@ class ConstructionServiceTest {
     @Test
     void ac15_aSelfRepairingStructureComesBackOnItsOwnForNothing() {
         final PlacedStructure well = finished("well");
-        final Worksite worksite = service.worksite(world).orElseThrow();
+        final Worksite worksite = sites.worksite(world).orElseThrow();
         service.disable(world, well.getId());
 
         now.addAndGet(4 * MINUTE - 1);
-        service.refresh(worksite);
+        tracker.refresh(worksite);
         assertEquals(StructureStatus.DISABLED, well.status(now.get()));
 
         now.addAndGet(1);
-        service.refresh(worksite);
+        tracker.refresh(worksite);
         assertEquals(StructureCondition.ACTIVE, well.getCondition());
         assertNull(well.getJob());
         assertEquals(90, site.balance.get("wood"), "only its build was paid for");
@@ -579,7 +585,7 @@ class ConstructionServiceTest {
         service.repair(player, world, well.getId());
 
         now.addAndGet(4 * MINUTE);
-        service.refresh(service.worksite(world).orElseThrow());
+        tracker.refresh(sites.worksite(world).orElseThrow());
 
         assertEquals(StructureCondition.DISABLED, well.getCondition(), "the paid repair is claimed as usual");
         assertEquals(StructureStatus.READY_TO_CLAIM, well.status(now.get()));
@@ -593,7 +599,7 @@ class ConstructionServiceTest {
         service.disable(world, shed.getId());
 
         now.addAndGet(60 * MINUTE);
-        service.refresh(service.worksite(world).orElseThrow());
+        tracker.refresh(sites.worksite(world).orElseThrow());
 
         assertEquals(StructureCondition.DISABLED, shed.getCondition());
     }
@@ -610,7 +616,7 @@ class ConstructionServiceTest {
                 && upgraded.getUpgrade().getId().equals("lantern")));
         assertFalse(service.upgrade(player, world, hall.getId(), "bell").isSuccess(), "one pick per stage");
         assertEquals(85, site.balance.get("wood"));
-        assertTrue(service.upgradeUnavailable(player, CAMP, hall.getId(), "bell").isPresent());
+        assertTrue(checks.upgradeUnavailable(player, CAMP, hall.getId(), "bell").isPresent());
     }
 
     @Test
@@ -659,7 +665,7 @@ class ConstructionServiceTest {
         final PlacedStructure dock = finished("dock");
 
         assertFalse(service.upgrade(player, world, dock.getId(), "lantern").isSuccess());
-        assertTrue(service.upgradeUnavailable(player, CAMP, dock.getId(), "lantern").isPresent());
+        assertTrue(checks.upgradeUnavailable(player, CAMP, dock.getId(), "lantern").isPresent());
     }
 
     @Test
@@ -682,7 +688,7 @@ class ConstructionServiceTest {
         final PlacedStructure hall = finished("hall");
         site.refundShare = 1.0;
 
-        assertEquals(10, service.demolishRefund(CAMP, hall, type("hall")).getAmounts().get("wood"));
+        assertEquals(10, sites.demolishRefund(CAMP, hall, type("hall")).getAmounts().get("wood"));
         assertTrue(service.demolish(player, world, hall.getId()).isSuccess());
         assertEquals(100, site.balance.get("wood"), "all of the 10 it cost");
     }
@@ -735,7 +741,7 @@ class ConstructionServiceTest {
         site.denied.addAll(EnumSet.allOf(ConstructionAction.class));
         when(fitCheck.problem(any(), any(), any(), any(), any())).thenReturn(Optional.of(Component.text("overlaps")));
 
-        final PlacedStructure workshop = service.grant(service.worksite(world).orElseThrow(), type("workshop"),
+        final PlacedStructure workshop = service.grant(sites.worksite(world).orElseThrow(), type("workshop"),
                 new StructurePosition(5, 64, 5, 0), StructureCondition.ACTIVE);
 
         assertEquals(new StructurePosition(5, 64, 5, 0),
@@ -765,41 +771,41 @@ class ConstructionServiceTest {
         final Player visitor = mock(Player.class);
         site.members.add(player);
 
-        assertTrue(service.canUse(visitor, CAMP, market));
-        assertFalse(service.canUse(visitor, CAMP, hall));
-        assertTrue(service.canUse(player, CAMP, market));
-        assertTrue(service.canUse(player, CAMP, hall));
+        assertTrue(sites.canUse(visitor, CAMP, market));
+        assertFalse(sites.canUse(visitor, CAMP, hall));
+        assertTrue(sites.canUse(player, CAMP, market));
+        assertTrue(sites.canUse(player, CAMP, hall));
     }
 
     @Test
     void ac2_buildAndAvailabilityAgreeWhenTheHoldingIsNotLoaded() {
         site.loaded = false;
 
-        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+        assertSameReason(checks.unavailable(player, CAMP, type("hall")), build("hall"));
     }
 
     @Test
     void ac2_buildAndAvailabilityAgreeWhenTheSiteIsNotRegistered() {
         final World arena = unregisteredWorld();
 
-        assertSameReason(service.unavailable(player, SiteKey.of("arena", 1), type("hall")),
+        assertSameReason(checks.unavailable(player, SiteKey.of("arena", 1), type("hall")),
                 service.build(player, arena, type("hall"), new Location(arena, 0, 64, 0), 0));
     }
 
     @Test
     void ac2_buildAndAvailabilityAgreeOnEveryOtherRefusal() {
         site.denied.add(ConstructionAction.BUILD);
-        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+        assertSameReason(checks.unavailable(player, CAMP, type("hall")), build("hall"));
         site.denied.clear();
 
-        assertSameReason(service.unavailable(player, CAMP, type("workshop")), build("workshop"));
+        assertSameReason(checks.unavailable(player, CAMP, type("workshop")), build("workshop"));
 
         site.gate = Component.text("needs a bigger hall");
-        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+        assertSameReason(checks.unavailable(player, CAMP, type("hall")), build("hall"));
         site.gate = null;
 
         site.balance.put("wood", 5);
-        assertSameReason(service.unavailable(player, CAMP, type("hall")), build("hall"));
+        assertSameReason(checks.unavailable(player, CAMP, type("hall")), build("hall"));
     }
 
     @Test
@@ -807,7 +813,7 @@ class ConstructionServiceTest {
         final PlacedStructure hall = finished("hall");
         site.denied.add(ConstructionAction.PICK_UPGRADE);
 
-        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "moat"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, hall.getId(), "moat"),
                 service.upgrade(player, world, hall.getId(), "moat"));
     }
 
@@ -816,7 +822,7 @@ class ConstructionServiceTest {
         final PlacedStructure hall = finished("hall");
         site.loaded = false;
 
-        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
                 service.upgrade(player, world, hall.getId(), "lantern"));
     }
 
@@ -825,7 +831,7 @@ class ConstructionServiceTest {
         final World arena = unregisteredWorld();
         final UUID id = UUID.randomUUID();
 
-        assertSameReason(service.upgradeUnavailable(player, SiteKey.of("arena", 1), id, "lantern"),
+        assertSameReason(checks.upgradeUnavailable(player, SiteKey.of("arena", 1), id, "lantern"),
                 service.upgrade(player, arena, id, "lantern"));
     }
 
@@ -835,7 +841,7 @@ class ConstructionServiceTest {
                 StructureCondition.ACTIVE);
         site.holding.getStructures().add(ruin);
 
-        assertSameReason(service.upgradeUnavailable(player, CAMP, ruin.getId(), "lantern"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, ruin.getId(), "lantern"),
                 service.upgrade(player, world, ruin.getId(), "lantern"));
     }
 
@@ -845,22 +851,22 @@ class ConstructionServiceTest {
         final PlacedStructure dock = finished("dock");
 
         site.denied.add(ConstructionAction.PICK_UPGRADE);
-        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
                 service.upgrade(player, world, hall.getId(), "lantern"));
         site.denied.clear();
 
         final UUID missing = UUID.randomUUID();
-        assertSameReason(service.upgradeUnavailable(player, CAMP, missing, "lantern"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, missing, "lantern"),
                 service.upgrade(player, world, missing, "lantern"));
-        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "moat"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, hall.getId(), "moat"),
                 service.upgrade(player, world, hall.getId(), "moat"));
-        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "tower"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, hall.getId(), "tower"),
                 service.upgrade(player, world, hall.getId(), "tower"));
-        assertSameReason(service.upgradeUnavailable(player, CAMP, dock.getId(), "lantern"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, dock.getId(), "lantern"),
                 service.upgrade(player, world, dock.getId(), "lantern"));
 
         site.balance.put("wood", 0);
-        assertSameReason(service.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
+        assertSameReason(checks.upgradeUnavailable(player, CAMP, hall.getId(), "lantern"),
                 service.upgrade(player, world, hall.getId(), "lantern"));
     }
 

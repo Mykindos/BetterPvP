@@ -16,7 +16,8 @@ import me.mykindos.betterpvp.clans.world.camp.upgrade.GuestQuarters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerGenerator;
@@ -73,7 +74,8 @@ public class CampRecruitment implements Listener {
     private final SettlerConfig settlerConfig;
     private final RecruitConfig config;
     private final TraitRegistry traits;
-    private final ConstructionService construction;
+    private final ConstructionSites sites;
+    private final StructureStatusTracker tracker;
     private final SiteInstances instances;
     private final ClanManager clanManager;
     private final CampPermissions permissions;
@@ -86,17 +88,19 @@ public class CampRecruitment implements Listener {
     public CampRecruitment(@NotNull CampStore store, @NotNull SettlerService settlers,
                            @NotNull SettlerGenerator generator, @NotNull SettlerConfig settlerConfig,
                            @NotNull RecruitConfig config, @NotNull TraitRegistry traits,
-                           @NotNull ConstructionService construction, @NotNull SiteInstances instances,
+                           @NotNull ConstructionSites sites, @NotNull StructureStatusTracker tracker,
+                           @NotNull SiteInstances instances,
                            @NotNull ClanManager clanManager, @NotNull CampPermissions permissions,
                            @NotNull CampCoins coins, @NotNull CampWideTraits campWide,
                            @NotNull GuestQuarters guestQuarters) {
-        this(store, settlers, generator, settlerConfig, config, traits, construction, instances, clanManager,
+        this(store, settlers, generator, settlerConfig, config, traits, sites, tracker, instances, clanManager,
                 permissions, coins, campWide, guestQuarters, System::currentTimeMillis);
     }
 
     CampRecruitment(@NotNull CampStore store, @NotNull SettlerService settlers, @NotNull SettlerGenerator generator,
                     @NotNull SettlerConfig settlerConfig, @NotNull RecruitConfig config,
-                    @NotNull TraitRegistry traits, @NotNull ConstructionService construction,
+                    @NotNull TraitRegistry traits, @NotNull ConstructionSites sites,
+                    @NotNull StructureStatusTracker tracker,
                     @NotNull SiteInstances instances, @NotNull ClanManager clanManager,
                     @NotNull CampPermissions permissions, @NotNull CampCoins coins,
                     @NotNull CampWideTraits campWide, @NotNull GuestQuarters guestQuarters,
@@ -107,7 +111,8 @@ public class CampRecruitment implements Listener {
         this.settlerConfig = settlerConfig;
         this.config = config;
         this.traits = traits;
-        this.construction = construction;
+        this.sites = sites;
+        this.tracker = tracker;
         this.instances = instances;
         this.clanManager = clanManager;
         this.permissions = permissions;
@@ -340,8 +345,8 @@ public class CampRecruitment implements Listener {
     }
 
     private boolean dockWorking(@NotNull World world) {
-        final long now = construction.now();
-        return construction.worksite(world)
+        final long now = tracker.now();
+        return sites.worksite(world)
                 .map(worksite -> worksite.getHolding().ofType(CampStructures.DOCK).stream()
                         .anyMatch(dock -> dock.status(now).isUsable()))
                 .orElse(false);
