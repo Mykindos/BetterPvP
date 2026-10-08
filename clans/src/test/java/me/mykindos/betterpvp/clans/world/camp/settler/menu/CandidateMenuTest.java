@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +37,7 @@ import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.name
 import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.slotNamed;
 import static me.mykindos.betterpvp.clans.testing.Messages.told;
 import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.view;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,8 +60,12 @@ class CandidateMenuTest {
     private final ProfessionRegistry professions = new ProfessionRegistry();
     private final TraitRegistry traits = new TraitRegistry();
     private final Player player = mock(Player.class);
-    private final Windowed board = mock(Windowed.class);
-    private final Supplier<Windowed> previous = () -> board;
+    private final List<Windowed> boards = new ArrayList<>();
+    private final Supplier<Windowed> previous = () -> {
+        final Windowed board = mock(Windowed.class);
+        boards.add(board);
+        return board;
+    };
     private final SettlerCandidate candidate = new SettlerCandidate(settler(), 15_000, 0);
 
     private MockedConstruction<BackButton> backButtons;
@@ -99,6 +105,16 @@ class CandidateMenuTest {
         return settler;
     }
 
+    private void assertWentBackToAFreshMenu() {
+        assertEquals(2, boards.size(), "one menu for Back and a fresh one on leaving");
+        verify(boards.getFirst(), never()).show(player);
+        verify(boards.getLast()).show(player);
+    }
+
+    private void assertStayed() {
+        boards.forEach(board -> verify(board, never()).show(player));
+    }
+
     private CandidateMenu menu(Supplier<Windowed> back) {
         return new CandidateMenu(cards, player, SITE, candidate, back);
     }
@@ -133,7 +149,7 @@ class CandidateMenuTest {
 
         verify(recruitment).hire(player, SITE, candidate.getSettler().getId());
         verify(cards).tell(eq(player), argThat(message -> mentions(message, "clans.settler.recruit.hired")));
-        verify(board).show(player);
+        assertWentBackToAFreshMenu();
     }
 
     @Test
@@ -151,7 +167,7 @@ class CandidateMenuTest {
         click(menu(previous), HIRE, player);
 
         verify(cards).tell(player, broke.getReason());
-        verify(board, never()).show(player);
+        assertStayed();
         verify(player, never()).closeInventory();
     }
 
@@ -160,7 +176,7 @@ class CandidateMenuTest {
         click(menu(previous), REJECT, player);
 
         verify(recruitment).turnAway(player, SITE, candidate.getSettler().getId());
-        verify(board).show(player);
+        assertWentBackToAFreshMenu();
     }
 
     @Test
@@ -171,7 +187,7 @@ class CandidateMenuTest {
         click(menu(previous), REJECT, player);
 
         verify(cards).tell(player, refused.getReason());
-        verify(board, never()).show(player);
+        assertStayed();
     }
 
     @Test

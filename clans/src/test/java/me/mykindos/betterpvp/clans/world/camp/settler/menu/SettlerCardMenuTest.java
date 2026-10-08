@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
+import me.mykindos.betterpvp.core.world.settler.SettlerSite;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.settler.Trait;
 import me.mykindos.betterpvp.core.world.settler.TraitGroup;
@@ -47,6 +48,7 @@ import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.lore
 import static me.mykindos.betterpvp.clans.testing.Messages.mentions;
 import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.named;
 import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.slotNamed;
+import static me.mykindos.betterpvp.clans.testing.Messages.sent;
 import static me.mykindos.betterpvp.clans.testing.Messages.text;
 import static me.mykindos.betterpvp.clans.testing.Messages.told;
 import static me.mykindos.betterpvp.clans.world.camp.settler.menu.MenuProbe.view;
@@ -56,9 +58,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -295,13 +300,25 @@ class SettlerCardMenuTest {
     @Test
     void ac8_takingABuilderOffARunningJobShowsTheJobRunningRefusal() {
         final Settler builder = settler(CampProfessions.BUILDER);
-        builder.setAssignment(UUID.randomUUID().toString());
-        final SettlerResult running = SettlerResult.refused("core.settler.job_running");
-        when(service.unassign(player, SITE, builder.getId())).thenReturn(running);
+        final String job = UUID.randomUUID().toString();
+        builder.setAssignment(job);
+        final Roster roster = new Roster();
+        roster.getSettlers().add(builder);
+        final SettlerSite site = mock(SettlerSite.class);
+        when(site.roster(SITE)).thenReturn(Optional.of(roster));
+        when(site.allows(any(), any(), any())).thenReturn(true);
+        when(site.jobRunning(SITE, builder)).thenReturn(true);
+        final SettlerService realService = new SettlerService(professions);
+        realService.register(SITE.getSiteId(), site);
+        final SettlerCards real = spy(MenuProbe.build(SettlerCards.class, realService, professions, traits, morale,
+                payroll, crews));
+        doNothing().when(real).open(player, SITE, builder.getId(), previous);
 
-        click(card(builder), TAKE_OFF_CREW, player);
+        click(new SettlerCardMenu(real, player, SITE, builder, previous), TAKE_OFF_CREW, player);
 
-        verify(cards).after(player, SITE, builder.getId(), running, previous);
+        assertTrue(told(player, "core.settler.job_running"));
+        assertEquals(job, builder.getAssignment(), "the Builder stays on its job");
+        verify(real).open(player, SITE, builder.getId(), previous);
     }
 
     @Test
@@ -379,10 +396,29 @@ class SettlerCardMenuTest {
         builder.setAssignment(UUID.randomUUID().toString());
         final SettlerCardMenu card = card(builder);
 
-        assertTrue(loreMentions(named(card, TAKE_OFF_CREW), "clans.settler.card.not_allowed"));
+        final ItemView takeOff = named(card, TAKE_OFF_CREW);
+        assertEquals(NamedTextColor.GRAY, takeOff.getDisplayName().color());
+        assertTrue(loreMentions(takeOff, "clans.settler.card.not_allowed"));
+        assertTrue(takeOff.getClickActions().isEmpty());
         click(card, TAKE_OFF_CREW, player);
 
         verify(service, never()).unassign(any(Player.class), any(), any());
+        verify(cards, never()).after(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void ac11_aSuccessAndARefusalBothReopenTheCard() {
+        final UUID settlerId = UUID.randomUUID();
+        final SettlerCards real = spy(MenuProbe.build(SettlerCards.class));
+        doNothing().when(real).open(player, SITE, settlerId, previous);
+
+        real.after(player, SITE, settlerId, SettlerResult.done(new Settler()), previous);
+        assertTrue(sent(player).isEmpty(), "a success says nothing");
+        verify(real).open(player, SITE, settlerId, previous);
+
+        real.after(player, SITE, settlerId, SettlerResult.refused("core.settler.job_running"), previous);
+        assertTrue(told(player, "core.settler.job_running"));
+        verify(real, times(2)).open(player, SITE, settlerId, previous);
     }
 
     @Test
