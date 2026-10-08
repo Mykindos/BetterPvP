@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.world.camp.settler.recruit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.Camp;
@@ -63,6 +64,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
  * while the camp was closed are still waiting if their time is not up.
  */
 @BPvPListener
+@CustomLog
 @Singleton
 public class CampRecruitment implements Listener {
 
@@ -127,8 +129,14 @@ public class CampRecruitment implements Listener {
     public void tick() {
         for (SiteInstance instance : new ArrayList<>(instances.all())) {
             final World world = Bukkit.getWorld(instance.getWorldName());
-            if (world != null && instance.getKey().getSiteId().equals(Camps.SITE_ID)) {
+            if (world == null || !instance.getKey().getSiteId().equals(Camps.SITE_ID)) {
+                continue;
+            }
+            try {
                 settle(instance.getKey(), dockWorking(world));
+            } catch (RuntimeException exception) {
+                log.error("Could not settle recruitment for camp {}", instance.getKey().getOwnerId(), exception)
+                        .submit();
             }
         }
     }
