@@ -123,4 +123,10 @@ public class AIController {
         }
     }
 
+    /** Stops every running component and unregisters them all. */
+    public void clear() {
+        stopAll();
+        components.clear();
+    }
+
 }

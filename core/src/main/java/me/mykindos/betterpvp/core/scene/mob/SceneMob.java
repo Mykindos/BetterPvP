@@ -26,6 +26,8 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -66,16 +68,15 @@ import java.util.UUID;
  * A spawner constructs the mob, spawns a backing entity of {@link #getEntityType()}, then calls
  * {@code factory.spawn(mob, entity)} (two-phase init + registration).
  * <p>
- * The vanilla brain is disabled via {@link Mob#setAware(boolean)} so the components are the sole
- * driver, while {@link Navigator} (manual pathfinding) still works. Mobs run on a bare vanilla
+ * The vanilla goals are removed so the components are the sole driver, while {@link Navigator} (manual
+ * pathfinding) still works. While the AI runs the body's own AI is on so it can path. Mobs run on a bare vanilla
  * entity; setting a {@link #setModelId(String) modelId} binds a ModelEngine model and hides the
  * vanilla entity. Ticking is gated on player proximity ({@link #getActivationRadius()}).
  * <p>
- * <b>Eager, not chunk-managed.</b> Unlike static props and NPCs, a mob is spawned via the eager
- * {@code factory.spawn(mob, entity)} path and is deliberately left out of chunk-driven materialization. A roaming
- * combat entity wanders away from its spawn anchor, so anchor-keyed respawn would diverge from where it actually is;
- * and its lifetime belongs to the encounter/spawner that created it, which decides when it (re)spawns. On chunk unload
- * it simply despawns (non-persistent) and the owning system re-spawns it as appropriate.
+ * A mob is usually spawned eagerly with {@code factory.spawn(mob, entity)}, and the encounter or spawner that created
+ * it decides when it (re)spawns. A mob that stays near its anchor can instead be chunk-managed with
+ * {@link #configureMaterialization}. Its body is then spawned again on each chunk load, set up again from
+ * {@link #onInit()}, and its AI starts from scratch. On unload its components stop and it stops ticking.
  */
 @Getter
 public class SceneMob extends NPC implements HasModeledEntity {
@@ -116,10 +117,13 @@ public class SceneMob extends NPC implements HasModeledEntity {
     private AnimationController animations;
     private MobSoundBehavior sounds;
     private Location homeAnchor;
+    /** The follow range the body gets while the AI runs, so the pathfinder can plan trips this long. */
+    @Setter private double pathRange = 48.0;
 
     // Activation-gate state. The proximity check is sampled (not every tick) to keep it cheap.
     private boolean active = true;
-    private boolean wasActive = true;
+    private boolean aiRunning;
+    private boolean enabledBodyAi;
     private int activationCheckCounter = 0;
 
     public SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition) {
@@ -134,9 +138,10 @@ public class SceneMob extends NPC implements HasModeledEntity {
 
     /**
      * Maps a logical animation state to a single fixed ModelEngine clip - the common case. Shorthand
-     * for {@code setAnimation(animation, AnimationProviders.fixed(animationId))}. Call in the constructor.
+     * for {@code setAnimation(animation, AnimationProviders.fixed(animationId))}. Call in the constructor, or later to
+     * change the look of a mob that is already spawned.
      */
-    protected void setAnimation(MobAnimation animation, String animationId) {
+    public void setAnimation(MobAnimation animation, String animationId) {
         setAnimation(animation, AnimationProviders.fixed(animationId));
     }
 
@@ -144,9 +149,10 @@ public class SceneMob extends NPC implements HasModeledEntity {
      * Maps a logical animation state to an {@link AnimationProvider} that chooses the concrete clip
      * at play time based on the mob's state - use for multi-clip states (hurt1..hurt4) or
      * state-dependent variations (idle vs idle_combat). See {@link AnimationProviders} for ready-made
-     * strategies. Call in the constructor.
+     * strategies. Call in the constructor, or later to change the look of a mob that is already spawned. A held looping
+     * state picks up a changed clip on the next tick.
      */
-    protected void setAnimation(MobAnimation animation, AnimationProvider provider) {
+    public void setAnimation(MobAnimation animation, AnimationProvider provider) {
         animationProviders.put(animation, provider);
     }
 
@@ -168,12 +174,20 @@ public class SceneMob extends NPC implements HasModeledEntity {
         soundProviders.put(sound, provider);
     }
 
-    /** Override to attach this mob's AI components. Called once after controllers are ready. */
+    /** Override to attach this mob's AI components. Called after controllers are ready, on every spawn. */
     protected void registerComponents() {
     }
 
     @Override
     protected void onInit() {
+        ai.clear();
+        currentTarget = null;
+        threat.clear();
+        active = true;
+        aiRunning = false;
+        enabledBodyAi = false;
+        activationCheckCounter = 0;
+
         boolean bound = false;
         if (modelId != null) {
             final ModeledEntity modeledEntity = ModelEngineHelper.bind(getEntity());
@@ -209,20 +223,51 @@ public class SceneMob extends NPC implements HasModeledEntity {
         active = computeActive();
 
         if (active) {
+            if (!aiRunning) {
+                startRuntime();
+            }
             ai.tick();
+            navigator.tick();
             // Re-resolve the held looping animation so state-dependent variants swap live. Runs after
             // the AI tick so it reflects any state the components just changed (e.g. acquiring a target).
             animations.tick();
-        } else if (wasActive) {
-            // Just went out of range - halt cleanly, drop references, and stop ticking AI.
-            ai.stopAll();
-            navigator.stop();
-            currentTarget = null;
-            threat.clear();
+        } else if (aiRunning) {
+            stopRuntime();
         }
-        wasActive = active;
 
         super.tick(); // existing SceneBehaviors (nameplates, etc.)
+    }
+
+    /** Hands the body to the AI: its own AI on, no vanilla goals, and a follow range that covers a trip. */
+    private void startRuntime() {
+        aiRunning = true;
+        final Mob bukkitMob = getBukkitMob();
+        if (bukkitMob == null) {
+            return;
+        }
+        if (!bukkitMob.hasAI()) {
+            bukkitMob.setAI(true);
+            enabledBodyAi = true;
+        }
+        Bukkit.getMobGoals().removeAllGoals(bukkitMob);
+        final AttributeInstance followRange = bukkitMob.getAttribute(Attribute.FOLLOW_RANGE);
+        if (followRange != null && followRange.getBaseValue() < pathRange) {
+            followRange.setBaseValue(pathRange);
+        }
+    }
+
+    /** Halts cleanly, drops references and gives the body back its AI setting. */
+    private void stopRuntime() {
+        aiRunning = false;
+        ai.stopAll();
+        navigator.stop();
+        currentTarget = null;
+        threat.clear();
+        final Mob bukkitMob = getBukkitMob();
+        if (enabledBodyAi && bukkitMob != null) {
+            bukkitMob.setAI(false);
+        }
+        enabledBodyAi = false;
     }
 
     /**
@@ -316,15 +361,13 @@ public class SceneMob extends NPC implements HasModeledEntity {
     }
 
     @Override
-    public void remove() {
-        ai.stopAll();
-        currentTarget = null;
-        threat.clear();
+    protected void onDematerialize() {
+        stopRuntime();
         final ModeledEntity modeledEntity = getModeledEntity();
         if (modeledEntity != null) {
             modeledEntity.markRemoved();
         }
-        super.remove();
+        super.onDematerialize();
     }
 
 }

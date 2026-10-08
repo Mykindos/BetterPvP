@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Range;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.LongSupplier;
 
 /**
  * Chases the mob's current target and strikes it on a cooldown when within melee range.
@@ -54,6 +55,7 @@ import java.util.List;
 public class MeleeAttackComponent implements AIComponent {
 
     private final SceneMob mob;
+    private final LongSupplier clock;
 
     /** Distance (in blocks) within which the mob will strike rather than keep chasing. */
     @Setter
@@ -108,12 +110,17 @@ public class MeleeAttackComponent implements AIComponent {
     private ModelEngineScriptDispatcher scriptDispatcher;
 
     public MeleeAttackComponent(SceneMob mob) {
+        this(mob, System::currentTimeMillis);
+    }
+
+    MeleeAttackComponent(SceneMob mob, LongSupplier clock) {
         this.mob = mob;
+        this.clock = clock;
     }
 
     @Override
     public EnumSet<AIControl> getControls() {
-        return EnumSet.of(AIControl.MOVE, AIControl.LOOK);
+        return EnumSet.of(AIControl.MOVE);
     }
 
     @Override
@@ -128,7 +135,7 @@ public class MeleeAttackComponent implements AIComponent {
 
     @Override
     public void tick() {
-        final long now = System.currentTimeMillis();
+        final long now = clock.getAsLong();
 
         // Land a queued timed strike the moment its wind-up elapses - done first so it still resolves
         // while the mob is frozen mid-swing (the freeze check below returns early during the wind-up).
