@@ -36,7 +36,6 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -162,8 +161,10 @@ class ConstructionServiceTest {
         assertTrue(service.advance(world, hall.getId()).isSuccess());
         assertTrue(service.repair(world, dock.getId()).isSuccess());
         assertTrue(service.finish(world, hall.getId()).isSuccess());
-        assertNotNull(service.grant(service.worksite(world).orElseThrow(), type("shed"),
-                new StructurePosition(40, 64, 0, 0), StructureCondition.ACTIVE));
+        final PlacedStructure shed = service.grant(service.worksite(world).orElseThrow(), type("shed"),
+                new StructurePosition(40, 64, 0, 0), StructureCondition.ACTIVE);
+        assertEquals(new StructurePosition(40, 64, 0, 0),
+                site.holding.find(shed.getId()).orElseThrow().getPosition());
     }
 
     @Test
@@ -572,6 +573,21 @@ class ConstructionServiceTest {
     }
 
     @Test
+    void ac15_aPaidRepairUnderWayFinishesTheJobInstead() {
+        final PlacedStructure well = finished("well");
+        service.disable(world, well.getId());
+        service.repair(player, world, well.getId());
+
+        now.addAndGet(4 * MINUTE);
+        service.refresh(service.worksite(world).orElseThrow());
+
+        assertEquals(StructureCondition.DISABLED, well.getCondition(), "the paid repair is claimed as usual");
+        assertEquals(StructureStatus.READY_TO_CLAIM, well.status(now.get()));
+        assertTrue(service.claim(player, world, well.getId()).isSuccess());
+        assertEquals(StructureCondition.ACTIVE, well.getCondition());
+    }
+
+    @Test
     void ac15_otherStructuresStayDisabledUntilRepaired() {
         final PlacedStructure shed = finished("shed");
         service.disable(world, shed.getId());
@@ -722,7 +738,8 @@ class ConstructionServiceTest {
         final PlacedStructure workshop = service.grant(service.worksite(world).orElseThrow(), type("workshop"),
                 new StructurePosition(5, 64, 5, 0), StructureCondition.ACTIVE);
 
-        assertTrue(site.holding.find(workshop.getId()).isPresent());
+        assertEquals(new StructurePosition(5, 64, 5, 0),
+                site.holding.find(workshop.getId()).orElseThrow().getPosition());
         assertEquals(0, site.balance.get("wood"));
     }
 
