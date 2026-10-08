@@ -14,12 +14,12 @@ import me.mykindos.betterpvp.clans.world.camp.resource.CampResources;
 import me.mykindos.betterpvp.clans.world.camp.settler.menu.SettlerCards;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.ToolRack;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureShapes;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
@@ -71,7 +71,7 @@ public class CampSettlers implements SettlerSite {
     private final CampMorale morale;
     private final ToolRack toolRack;
     private final WagePolicy wagePolicy;
-    private final ConstructionService construction;
+    private final StructureStatusTracker tracker;
 
     @Inject
     public CampSettlers(@NotNull CampStore store, @NotNull SettlerConfig config, @NotNull SettlerService service,
@@ -81,7 +81,7 @@ public class CampSettlers implements SettlerSite {
                         @NotNull CampMorale morale,
                         @NotNull CampProfessions professions,
                         @NotNull CampTraits traits, @NotNull ToolRack toolRack,
-                        @NotNull WagePolicy wagePolicy, @NotNull ConstructionService construction) {
+                        @NotNull WagePolicy wagePolicy, @NotNull StructureStatusTracker tracker) {
         this.store = store;
         this.config = config;
         this.permissions = permissions;
@@ -93,7 +93,7 @@ public class CampSettlers implements SettlerSite {
         this.morale = morale;
         this.toolRack = toolRack;
         this.wagePolicy = wagePolicy;
-        this.construction = construction;
+        this.tracker = tracker;
         service.register(Camps.SITE_ID, this);
     }
 
@@ -138,7 +138,7 @@ public class CampSettlers implements SettlerSite {
         if (settler.getAssignment() == null || !settler.hasProfession(CampProfessions.BUILDER)) {
             return false;
         }
-        final long now = construction.now();
+        final long now = tracker.now();
         return structureId(settler.getAssignment())
                 .flatMap(holding(site)::find)
                 .map(PlacedStructure::getJob)
