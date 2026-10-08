@@ -13,7 +13,9 @@ import me.mykindos.betterpvp.core.utilities.model.display.title.TitleQueue;
 import me.mykindos.betterpvp.core.utilities.search.SearchEngineBase;
 import me.mykindos.betterpvp.core.world.construction.ComponentKeys;
 import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
+import me.mykindos.betterpvp.core.world.construction.ConstructionChecks;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSite;
 import me.mykindos.betterpvp.core.world.construction.Worksite;
 import me.mykindos.betterpvp.core.world.construction.Holding;
@@ -83,6 +85,8 @@ class BlueprintSessionsTest {
     private final StructureCatalogue catalogue = new StructureCatalogue();
     private final SchematicService schematics = mock(SchematicService.class);
     private final ConstructionService construction = mock(ConstructionService.class);
+    private final ConstructionSites sites = mock(ConstructionSites.class);
+    private final ConstructionChecks checks = mock(ConstructionChecks.class);
     private final GhostPreviews previews = mock(GhostPreviews.class);
     private final ClientManager clients = mock(ClientManager.class);
     private final Gamer gamer = mock(Gamer.class);
@@ -141,12 +145,12 @@ class BlueprintSessionsTest {
         when(target.getRelative(BlockFace.UP)).thenReturn(above);
         when(player.getTargetBlockExact(anyInt())).thenReturn(target);
 
-        when(construction.problem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.empty());
-        when(construction.moveProblem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.empty());
-        when(construction.worksite(world)).thenReturn(Optional.of(
+        when(checks.problem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.empty());
+        when(checks.moveProblem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.empty());
+        when(sites.worksite(world)).thenReturn(Optional.of(
                 new Worksite(CAMP, mock(ConstructionSite.class), holding, world)));
 
-        sessions = new BlueprintSessions(blueprintItem, itemFactory, catalogue, schematics, construction, previews,
+        sessions = new BlueprintSessions(blueprintItem, itemFactory, catalogue, schematics, construction, sites, checks, previews,
                 clients);
     }
 
@@ -321,8 +325,8 @@ class BlueprintSessionsTest {
 
         sessions.follow();
 
-        verify(construction, atLeastOnce()).problem(player, world, hall, anchor, facing);
-        verify(construction, never()).moveProblem(any(), any(), any(), any(), anyInt());
+        verify(checks, atLeastOnce()).problem(player, world, hall, anchor, facing);
+        verify(checks, never()).moveProblem(any(), any(), any(), any(), anyInt());
         verify(opened.getFirst(), atLeastOnce()).setValid(true);
         verify(opened.getFirst(), never()).setValid(false);
     }
@@ -335,8 +339,8 @@ class BlueprintSessionsTest {
 
         sessions.follow();
 
-        verify(construction, atLeastOnce()).moveProblem(player, world, placed.getId(), anchor, facing);
-        verify(construction, never()).problem(any(), any(), any(), any(), anyInt());
+        verify(checks, atLeastOnce()).moveProblem(player, world, placed.getId(), anchor, facing);
+        verify(checks, never()).problem(any(), any(), any(), any(), anyInt());
         verify(opened.getFirst(), atLeastOnce()).setValid(true);
         verify(opened.getFirst(), never()).setValid(false);
     }
@@ -344,7 +348,7 @@ class BlueprintSessionsTest {
     @Test
     void ac7_whereItCannotGoTheTitleSaysSoAndTheActionBarGivesTheServicesReason() {
         final Component reason = Component.text("Too close to the well");
-        when(construction.problem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.of(reason));
+        when(checks.problem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.of(reason));
         hold(blueprint("hall", null));
 
         sessions.follow();
@@ -360,7 +364,7 @@ class BlueprintSessionsTest {
     void ac7_aRefusedMoveShowsWhateverReasonTheMoveCheckGives() {
         final PlacedStructure placed = placed("hall", 0);
         final Component reason = Component.text("Something odd");
-        when(construction.moveProblem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.of(reason));
+        when(checks.moveProblem(any(), any(), any(), any(), anyInt())).thenReturn(Optional.of(reason));
         hold(blueprint("hall", placed.getId()));
 
         sessions.follow();

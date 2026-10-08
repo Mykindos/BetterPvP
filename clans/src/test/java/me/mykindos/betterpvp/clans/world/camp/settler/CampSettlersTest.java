@@ -12,8 +12,8 @@ import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.ToolRack;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.WagePolicy;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.Job;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
@@ -59,7 +59,7 @@ class CampSettlersTest {
     private final StructureShapes shapes = mock(StructureShapes.class);
     private final World world = mock(World.class);
     private final RegionIndex regions = mock(RegionIndex.class);
-    private final ConstructionService construction = mock(ConstructionService.class);
+    private final StructureStatusTracker construction = mock(StructureStatusTracker.class);
     private final AtomicLong now = new AtomicLong(1_000);
     private CampSettlers settlers;
 
