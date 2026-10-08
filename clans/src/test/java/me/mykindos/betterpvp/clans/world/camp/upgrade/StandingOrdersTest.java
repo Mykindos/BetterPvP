@@ -6,13 +6,14 @@ import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerService;
@@ -50,7 +51,8 @@ class StandingOrdersTest {
     private final SettlerService settlers = mock(SettlerService.class);
     private final CrewService crews = mock(CrewService.class);
     private final CrewRule rule = mock(CrewRule.class);
-    private final ConstructionService construction = mock(ConstructionService.class);
+    private final ConstructionSites sites = mock(ConstructionSites.class);
+    private final StructureStatusTracker tracker = mock(StructureStatusTracker.class);
     private final Map<Job, Integer> thresholds = new IdentityHashMap<>();
     private final List<String> enlisted = new ArrayList<>();
     private StandingOrders orders;
@@ -60,7 +62,7 @@ class StandingOrdersTest {
     void setUp() {
         when(store.cached(CLAN)).thenReturn(Optional.of(camp));
         when(settlers.roster(SITE)).thenReturn(Optional.of(camp.getRoster()));
-        when(construction.now()).thenReturn(1_000L);
+        when(tracker.now()).thenReturn(1_000L);
         when(crews.isFree(any())).thenAnswer(invocation -> {
             final Settler settler = invocation.getArgument(0);
             return settler.getAssignment() == null && "builder".equals(settler.getProfession());
@@ -69,7 +71,7 @@ class StandingOrdersTest {
             final Job job = invocation.getArgument(2);
             return job.getStaff().size() < thresholds.getOrDefault(job, 0);
         });
-        orders = new StandingOrders(new CampUpgrades(store), construction, settlers, crews, rule,
+        orders = new StandingOrders(new CampUpgrades(store), sites, tracker, settlers, crews, rule,
                 mock(SiteInstances.class));
         hall = new PlacedStructure(UUID.randomUUID(), CampConstruction.GREAT_HALL, new StructurePosition(0, 64, 0, 0),
                 StructureCondition.ACTIVE);

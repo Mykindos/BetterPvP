@@ -13,10 +13,11 @@ import me.mykindos.betterpvp.clans.world.camp.settler.CampWideTraits;
 import me.mykindos.betterpvp.clans.world.camp.settler.SettlerConfig;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampUpgrades;
 import me.mykindos.betterpvp.clans.world.camp.upgrade.GuestQuarters;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.RarityNumbers;
 import me.mykindos.betterpvp.core.world.settler.Roster;
@@ -132,7 +133,8 @@ class CampRecruitmentTest {
         new CampProfessions(professions);
         new CampTraits(traits);
         recruitment = new CampRecruitment(store, settlers, new SettlerGenerator(professions, traits), settlerConfig,
-                config, traits, mock(ConstructionService.class), mock(SiteInstances.class), clanManager, permissions,
+                config, traits, mock(ConstructionSites.class), mock(StructureStatusTracker.class),
+                mock(SiteInstances.class), clanManager, permissions,
                 coins, new CampWideTraits(settlerConfig), guestQuarters, now::get);
     }
 

@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.world.settler.crew;
 
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.Holding;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureFlags;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureStage;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.settler.Profession;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
@@ -58,7 +59,8 @@ class CrewRuleTest {
     private final StructureCatalogue catalogue = new StructureCatalogue();
     private final Site site = new Site();
     private final List<Settler> finished = new ArrayList<>();
-    private final ConstructionService construction = mock(ConstructionService.class);
+    private final ConstructionSites sites = mock(ConstructionSites.class);
+    private final StructureStatusTracker tracker = mock(StructureStatusTracker.class);
 
     private MockedStatic<Bukkit> bukkit;
     private SettlerService settlers;
@@ -75,8 +77,8 @@ class CrewRuleTest {
         settlers = new SettlerService(professions);
         settlers.register("camp", site);
         rule = new CrewRule(settlers, catalogue);
-        crews = new CrewService(construction, settlers, professions, mock(SiteInstances.class), rule);
-        when(construction.now()).thenReturn(10_000L);
+        crews = new CrewService(sites, tracker, settlers, professions, mock(SiteInstances.class), rule);
+        when(tracker.now()).thenReturn(10_000L);
     }
 
     @AfterEach

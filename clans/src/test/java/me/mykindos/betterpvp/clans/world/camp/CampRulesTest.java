@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.world.construction.ConstructionAction;
-import me.mykindos.betterpvp.core.world.construction.ConstructionService;
+import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
@@ -71,7 +71,7 @@ class CampRulesTest {
         permissions = new CampPermissions(clanManager, store, config);
         construction = new CampConstruction(store, resources, permissions,
                 new ResourceOverflow(store, resources, config), mock(CrewRule.class), mock(SalvageBin.class),
-                mock(ConstructionService.class), mock(RankLockbox.class), mock(Camps.class));
+                mock(ConstructionSites.class), mock(RankLockbox.class), mock(Camps.class));
     }
 
     @Test
