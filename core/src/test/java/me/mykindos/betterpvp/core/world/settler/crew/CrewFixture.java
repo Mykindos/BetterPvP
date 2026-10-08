@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructureFlags;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.construction.StructureStage;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
 import me.mykindos.betterpvp.core.world.construction.StructureType;
 import me.mykindos.betterpvp.core.world.construction.StructureUpgrade;
@@ -59,7 +60,7 @@ import static org.mockito.Mockito.when;
 /**
  * A camp-like site for crew tests. Its Builders bring their morale as Workforce, and Speed and efficiency set per
  * settler. A fake clock drives construction, and the site reports a Builder's job as running the way a camp does.
- * Assignment events reach the crew service, and the camp is open in the world {@code camp_7}.
+ * Assignment and status change events reach the crew service, and the camp is open in the world {@code camp_7}.
  */
 final class CrewFixture implements AutoCloseable {
 
@@ -98,6 +99,8 @@ final class CrewFixture implements AutoCloseable {
         doAnswer(invocation -> {
             if (invocation.getArgument(0) instanceof SettlerAssignedEvent assigned) {
                 crews.onAssigned(assigned);
+            } else if (invocation.getArgument(0) instanceof StructureStatusChangeEvent changed) {
+                crews.onStatusChange(changed);
             }
             return null;
         }).when(plugins).callEvent(any());

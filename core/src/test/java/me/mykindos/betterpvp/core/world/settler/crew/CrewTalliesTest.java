@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.StructureRemovedEvent;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
-import org.bukkit.Bukkit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,6 @@ class CrewTalliesTest {
     void setUp() {
         when(fixture.instances.all()).thenReturn(List.of(
                 new SiteInstance(UUID.randomUUID(), CAMP, "camp_7", SiteInstance.State.READY)));
-        fixture.bukkit.when(() -> Bukkit.getWorld("camp_7")).thenReturn(fixture.world);
         tallies = new CrewTallies(fixture.sites, fixture.tracker, fixture.settlers, fixture.instances, fixture.rule);
     }
 

@@ -1,15 +1,17 @@
 package me.mykindos.betterpvp.core.world.settler.crew;
 
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.Job;
 import me.mykindos.betterpvp.core.world.construction.JobKind;
 import me.mykindos.betterpvp.core.world.construction.PlacedStructure;
 import me.mykindos.betterpvp.core.world.construction.ResourceCost;
+import me.mykindos.betterpvp.core.world.construction.StructureStatus;
+import me.mykindos.betterpvp.core.world.construction.StructureStatusChangeEvent;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.site.SiteInstance;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
@@ -29,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -253,16 +257,20 @@ class CrewServiceTest {
         fixture.applyRule(hall);
         assertTrue(hall.getJob().isHeld());
 
+        clearInvocations(fixture.constructionSite, fixture.tracker);
         assertEquals("done", reason(fixture.settlers.unassign(CAMP, second.getId())));
 
         final Job job = hall.getJob();
         assertFalse(job.getStaff().contains(second.getId()), "it leaves the job's staff at once");
+        verify(fixture.constructionSite).changed(CAMP);
+        verify(fixture.tracker).refresh(fixture.worksite);
         assertEquals(List.of(first), fixture.rule.crew(CAMP, job));
         assertEquals("done", reason(fixture.enlist(hall, fixture.builder(1))), "its place is free again");
 
         final PlacedStructure other = fixture.advancing();
         assertEquals("done", reason(fixture.enlist(other, second)));
-        assertFalse(job.getStaff().contains(second.getId()), "it is on one crew only");
+        assertEquals(List.of(second.getId()), other.getJob().getStaff());
+        assertEquals(other.getId().toString(), second.getAssignment());
     }
 
     @Test
@@ -273,13 +281,76 @@ class CrewServiceTest {
         fixture.enlist(hall, first);
         fixture.enlist(hall, second);
         hall.getJob().hold("siege", fixture.now);
+        clearInvocations(fixture.constructionSite, fixture.tracker);
 
         fixture.settlers.unassign(CAMP, second.getId());
+        verify(fixture.constructionSite).changed(CAMP);
+        verify(fixture.tracker).refresh(fixture.worksite);
         hall.getJob().release("siege", fixture.now);
         fixture.applyRule(hall);
 
         assertEquals(3, fixture.rule.workforce(CAMP, hall, hall.getJob()));
         assertTrue(hall.getJob().isHeld(), "3 of 5 Workforce left");
+    }
+
+    @Test
+    void ac18_movingABuilderToAnotherStructureTakesItOffTheFirstCrew() {
+        final PlacedStructure from = fixture.advancing();
+        final PlacedStructure to = fixture.advancing();
+        final Settler builder = fixture.builder(2);
+        fixture.enlist(from, builder);
+        fixture.applyRule(from);
+        assertTrue(from.getJob().isHeld());
+        clearInvocations(fixture.constructionSite, fixture.tracker);
+
+        assertEquals("done", reason(fixture.settlers.assign(CAMP, builder.getId(), to.getId().toString())));
+
+        assertTrue(from.getJob().getStaff().isEmpty());
+        assertEquals(to.getId().toString(), builder.getAssignment());
+        verify(fixture.constructionSite).changed(CAMP);
+        verify(fixture.tracker).refresh(fixture.worksite);
+    }
+
+    @Test
+    void ac18_aBuilderTakenOffAJobWhoseTimeIsUpIsStillCredited() {
+        final PlacedStructure hall = finishedHall();
+        final Settler first = fixture.builder(2);
+        final Settler second = fixture.builder(2);
+        onCrew(hall, first);
+        onCrew(hall, second);
+
+        assertEquals("done", reason(fixture.settlers.unassign(CAMP, second.getId())));
+        assertEquals(List.of(first.getId(), second.getId()), hall.getJob().getStaff());
+
+        crews.release(CAMP, fixture.holding);
+
+        assertEquals(List.of(List.of(first, second)), fixture.site.finished);
+        assertEquals(1, second.getJobsFinished());
+        assertTrue(hall.getJob().getStaff().isEmpty());
+    }
+
+    @Test
+    void ac18_aStatusChangeFromTakingABuilderOffLetsAFinishedCrewGo() {
+        final PlacedStructure hall = fixture.advancing();
+        final Settler first = fixture.builder(3);
+        final Settler second = fixture.builder(2);
+        fixture.enlist(hall, first);
+        fixture.enlist(hall, second);
+        hall.getJob().hold("siege", fixture.now);
+        final PlacedStructure finished = finishedHall();
+        final Settler member = fixture.builder(2);
+        onCrew(finished, member);
+        doAnswer(invocation -> UtilServer.callEvent(new StructureStatusChangeEvent(CAMP, hall,
+                StructureStatus.ADVANCING, StructureStatus.PAUSED)))
+                .when(fixture.tracker).refresh(fixture.worksite);
+
+        fixture.settlers.unassign(CAMP, second.getId());
+
+        assertEquals(List.of(first.getId()), hall.getJob().getStaff());
+        assertEquals(hall.getId().toString(), first.getAssignment());
+        assertEquals(List.of(List.of(member)), fixture.site.finished);
+        assertNull(member.getAssignment());
+        assertEquals(1, member.getJobsFinished());
     }
 
     @Test
@@ -370,7 +441,6 @@ class CrewServiceTest {
         onCrew(hall, member);
         when(fixture.instances.all()).thenReturn(List.of(
                 new SiteInstance(UUID.randomUUID(), CAMP, "camp_7", SiteInstance.State.READY)));
-        fixture.bukkit.when(() -> Bukkit.getWorld("camp_7")).thenReturn(fixture.world);
 
         crews.sweep();
 
