@@ -7,6 +7,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Value;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.world.camp.settler.CampProfessions;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
@@ -16,8 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,6 +36,8 @@ public class RecruitConfig implements Reloadable {
 
     @Getter(AccessLevel.NONE)
     private final Clans clans;
+    @Getter(AccessLevel.NONE)
+    private final CampProfessions professions;
 
     private Duration arrivalEvery = Duration.ofHours(4);
     private Duration arrivalWait = Duration.ofHours(2);
@@ -51,8 +56,9 @@ public class RecruitConfig implements Reloadable {
     private Map<Integer, Milestone> milestones = Map.of();
 
     @Inject
-    public RecruitConfig(@NotNull Clans clans) {
+    public RecruitConfig(@NotNull Clans clans, @NotNull CampProfessions professions) {
         this.clans = clans;
+        this.professions = professions;
         clans.getReloadables().add(this);
         reload();
     }
@@ -102,6 +108,33 @@ public class RecruitConfig implements Reloadable {
             }
         }
         milestones = levels;
+
+        unknownProfessions().forEach((path, unknown) -> log.warn(
+                "{} in settlers.yml names unregistered professions {}, which roll as no profession", path, unknown)
+                .submit());
+    }
+
+    /** The unregistered professions each odds table and milestone names, by config path. */
+    @NotNull Map<String, List<String>> unknownProfessions() {
+        final Map<String, List<String>> unknown = new LinkedHashMap<>();
+        addUnknown(unknown, "arrivals.profession-odds", arrivalOdds.getProfessions().keySet());
+        addUnknown(unknown, "hiring.profession-odds", boardOdds.getProfessions().keySet());
+        milestones.forEach((level, milestone) -> {
+            if (!ANY.equals(milestone.getProfession())) {
+                addUnknown(unknown, "milestones." + level, List.of(milestone.getProfession()));
+            }
+        });
+        return unknown;
+    }
+
+    private void addUnknown(@NotNull Map<String, List<String>> unknown, @NotNull String path,
+                            @NotNull Collection<String> named) {
+        final List<String> names = named.stream()
+                .filter(profession -> !SettlerOdds.NONE.equals(profession) && !professions.isRegistered(profession))
+                .toList();
+        if (!names.isEmpty()) {
+            unknown.put(path, names);
+        }
     }
 
     private static @NotNull SettlerOdds odds(@NotNull ExtendedYamlConfiguration config, @NotNull String section) {

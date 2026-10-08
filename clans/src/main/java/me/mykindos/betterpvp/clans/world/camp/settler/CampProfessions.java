@@ -21,11 +21,18 @@ public class CampProfessions {
     public static final String SMITH = "smith";
     public static final String LABORER = "laborer";
 
+    private final ProfessionRegistry registry;
+
     @Inject
     public CampProfessions(@NotNull ProfessionRegistry registry) {
+        this.registry = registry;
         registry.register(Profession.construction(BUILDER, key(BUILDER),
                 List.of(MASON, CARPENTER, SMITH, LABORER)));
         registry.register(Profession.workplace(FARMER, key(FARMER), CampGrounds.FARM));
+    }
+
+    public boolean isRegistered(@NotNull String profession) {
+        return registry.find(profession).isPresent();
     }
 
     private static @NotNull String key(@NotNull String profession) {

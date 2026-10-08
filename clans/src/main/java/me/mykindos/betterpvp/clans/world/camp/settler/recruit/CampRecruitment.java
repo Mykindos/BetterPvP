@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.world.camp.settler.recruit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.Camp;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.world.construction.ConstructionSites;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
+import me.mykindos.betterpvp.core.world.settler.Roster;
 import me.mykindos.betterpvp.core.world.settler.Settler;
 import me.mykindos.betterpvp.core.world.settler.SettlerAction;
 import me.mykindos.betterpvp.core.world.settler.SettlerGenerator;
@@ -62,6 +64,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
  * while the camp was closed are still waiting if their time is not up.
  */
 @BPvPListener
+@CustomLog
 @Singleton
 public class CampRecruitment implements Listener {
 
@@ -126,8 +129,14 @@ public class CampRecruitment implements Listener {
     public void tick() {
         for (SiteInstance instance : new ArrayList<>(instances.all())) {
             final World world = Bukkit.getWorld(instance.getWorldName());
-            if (world != null && instance.getKey().getSiteId().equals(Camps.SITE_ID)) {
+            if (world == null || !instance.getKey().getSiteId().equals(Camps.SITE_ID)) {
+                continue;
+            }
+            try {
                 settle(instance.getKey(), dockWorking(world));
+            } catch (RuntimeException exception) {
+                log.error("Could not settle recruitment for camp {}", instance.getKey().getOwnerId(), exception)
+                        .submit();
             }
         }
     }
@@ -140,30 +149,45 @@ public class CampRecruitment implements Listener {
         }
         final long now = clock.getAsLong();
         final Random random = ThreadLocalRandom.current();
-        camp.getArrivals().removeIf(candidate -> candidate.isExpired(now));
+        final boolean left = camp.getArrivals().removeIf(candidate -> candidate.isExpired(now));
 
+        final boolean sent = sendMilestones(key, camp, random);
+        final long scheduled = camp.getNextArrivalAt();
+        scheduleBoats(key, camp, now, random, dockWorking);
+        if (left || sent || camp.getNextArrivalAt() != scheduled) {
+            store.changed(key.getOwnerId());
+        }
+    }
+
+    /** Sends each milestone settler the clan's level has reached and the camp has not had yet. */
+    private boolean sendMilestones(@NotNull SiteKey key, @NotNull Camp camp, @NotNull Random random) {
         final long level = clanManager.getClanById(key.getOwnerId()).map(Clan::getLevel).orElse(0L);
         boolean sent = false;
         for (Map.Entry<Integer, RecruitConfig.Milestone> milestone : config.getMilestones().entrySet()) {
             if (milestone.getKey() <= level && camp.getMilestones().add(milestone.getKey())) {
                 sent = true;
-                final String profession = milestone.getValue().getProfession();
                 camp.getArrivals().add(new SettlerCandidate(roll(milestone.getValue().getRarity(),
-                        RecruitConfig.ANY.equals(profession) ? config.getArrivalOdds().profession(random)
-                                : SettlerOdds.NONE.equals(profession) ? null : profession,
-                        "milestone", random), 0, 0));
+                        milestoneProfession(milestone.getValue().getProfession(), random), "milestone", random), 0, 0));
             }
         }
         if (sent) {
             UtilServer.callEvent(new SettlerBoatEvent(key, true));
         }
+        return sent;
+    }
 
+    private @Nullable String milestoneProfession(@NotNull String profession, @NotNull Random random) {
+        if (RecruitConfig.ANY.equals(profession)) {
+            return config.getArrivalOdds().profession(random);
+        }
+        return SettlerOdds.NONE.equals(profession) ? null : profession;
+    }
+
+    /** Lands every boat due while the Dock works, and keeps the next one in the future. */
+    private void scheduleBoats(@NotNull SiteKey key, @NotNull Camp camp, long now, @NotNull Random random,
+                               boolean dockWorking) {
         final long interval = interval(key);
-        if (camp.getNextArrivalAt() == 0 || !dockWorking) {
-            if (camp.getNextArrivalAt() == 0 || now >= camp.getNextArrivalAt()) {
-                camp.setNextArrivalAt(now + interval);
-            }
-        } else {
+        if (camp.getNextArrivalAt() != 0 && dockWorking) {
             int boats = 0;
             while (now >= camp.getNextArrivalAt() && boats++ < MAX_BOATS) {
                 final long leaves = camp.getNextArrivalAt() + config.getArrivalWait().toMillis();
@@ -173,11 +197,10 @@ public class CampRecruitment implements Listener {
                 }
                 camp.setNextArrivalAt(camp.getNextArrivalAt() + interval);
             }
-            if (now >= camp.getNextArrivalAt()) {
-                camp.setNextArrivalAt(now + interval);
-            }
         }
-        store.changed(key.getOwnerId());
+        if (camp.getNextArrivalAt() == 0 || now >= camp.getNextArrivalAt()) {
+            camp.setNextArrivalAt(now + interval);
+        }
     }
 
     /** The hiring board, rolled again once it is old enough. */
@@ -216,15 +239,23 @@ public class CampRecruitment implements Listener {
     /** Takes a candidate on, paid for by {@code player}. Refused, and nothing is paid, if there is no room. */
     public @NotNull SettlerResult hire(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID id) {
         final Camp camp = store.cached(key.getOwnerId()).orElse(null);
-        final SettlerCandidate candidate = camp == null ? null : find(camp, id).orElse(null);
+        if (camp == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final SettlerCandidate candidate = find(camp, id).orElse(null);
         if (candidate == null || candidate.isExpired(clock.getAsLong())) {
             return SettlerResult.refused("clans.settler.recruit.gone");
         }
         if (!permissions.allows(player, key.getOwnerId(), SettlerAction.HIRE)) {
             return SettlerResult.refused("clans.settler.card.not_allowed");
         }
-        if (settlers.roster(key).map(roster -> roster.size() >= settlers.populationCap(key)).orElse(true)) {
-            return SettlerResult.refused("core.settler.population_full", Component.text(settlers.populationCap(key)));
+        final Roster roster = settlers.roster(key).orElse(null);
+        if (roster == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final int cap = settlers.populationCap(key);
+        if (roster.size() >= cap) {
+            return SettlerResult.refused("core.settler.population_full", Component.text(cap));
         }
         final long price = price(key, candidate);
         if (!coins.take(player, price)) {
@@ -247,7 +278,10 @@ public class CampRecruitment implements Listener {
     /** Sends a candidate away without taking them on. */
     public @NotNull SettlerResult turnAway(@NotNull Player player, @NotNull SiteKey key, @NotNull UUID id) {
         final Camp camp = store.cached(key.getOwnerId()).orElse(null);
-        final SettlerCandidate candidate = camp == null ? null : find(camp, id).orElse(null);
+        if (camp == null) {
+            return SettlerResult.refused("core.settler.not_loaded");
+        }
+        final SettlerCandidate candidate = find(camp, id).orElse(null);
         if (candidate == null) {
             return SettlerResult.refused("clans.settler.recruit.gone");
         }
@@ -322,7 +356,8 @@ public class CampRecruitment implements Listener {
 
     private @NotNull Settler roll(@NotNull SettlerRarity rarity, @Nullable String profession, @NotNull String source,
                                   @NotNull Random random) {
-        return generator.roll(SettlerTemplate.builder().rarity(rarity).profession(profession).source(source).build(),
+        final String known = profession != null && generator.knows(profession) ? profession : null;
+        return generator.roll(SettlerTemplate.builder().rarity(rarity).profession(known).source(source).build(),
                 settlerConfig.getTable(), random);
     }
 

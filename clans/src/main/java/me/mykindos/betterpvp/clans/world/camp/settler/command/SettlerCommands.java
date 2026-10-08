@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.world.camp.CampStore;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
+import me.mykindos.betterpvp.clans.world.camp.settler.SettlerConfig;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -37,15 +38,18 @@ public class SettlerCommands {
     private final CampStore store;
     private final ProfessionRegistry professions;
     private final TraitRegistry traits;
+    private final SettlerConfig config;
 
     @Inject
     public SettlerCommands(@NotNull Clans clans, @NotNull ClanManager clanManager, @NotNull CampStore store,
-                           @NotNull ProfessionRegistry professions, @NotNull TraitRegistry traits) {
+                           @NotNull ProfessionRegistry professions, @NotNull TraitRegistry traits,
+                           @NotNull SettlerConfig config) {
         this.clans = clans;
         this.clanManager = clanManager;
         this.store = store;
         this.professions = professions;
         this.traits = traits;
+        this.config = config;
     }
 
     /** Reads the camp of the clan named {@code name}, then runs {@code action} on the main thread. */
@@ -80,6 +84,11 @@ public class SettlerCommands {
 
     @NotNull List<String> professionIds() {
         return professions.all().stream().map(Profession::getId).toList();
+    }
+
+    /** The sources the camp table has history lines for. */
+    @NotNull List<String> historySources() {
+        return List.copyOf(config.getTable().getHistories().keySet());
     }
 
     /** A settler's name in its rarity's colour. */

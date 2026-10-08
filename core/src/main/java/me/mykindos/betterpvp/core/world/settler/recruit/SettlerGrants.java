@@ -37,9 +37,4 @@ public class SettlerGrants {
         }
         return settlers.grant(site, generator.roll(template, table, ThreadLocalRandom.current()));
     }
-
-    /** Whether {@code site} has room for one more settler right now. */
-    public boolean hasRoom(@NotNull SiteKey site) {
-        return settlers.roster(site).map(roster -> roster.size() < settlers.populationCap(site)).orElse(false);
-    }
 }
