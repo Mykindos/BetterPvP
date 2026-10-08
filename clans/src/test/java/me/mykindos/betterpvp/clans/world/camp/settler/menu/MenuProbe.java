@@ -102,17 +102,40 @@ public final class MenuProbe {
     }
 
     /**
-     * Builds {@code type} through its injected constructor, passing the given dependencies and a mock for every other,
-     * so the test keeps compiling when an unused dependency is dropped.
+     * Builds {@code type} through its injected constructor. Each given dependency fills one parameter of its type and
+     * every other parameter gets a mock. Fails when a given dependency fills no parameter.
      */
     public static <T> T build(Class<T> type, Object... given) {
+        return build(type, false, given);
+    }
+
+    /** As {@link #build(Class, Object...)}, but fails when any parameter is left for a mock. */
+    public static <T> T buildExactly(Class<T> type, Object... given) {
+        return build(type, true, given);
+    }
+
+    private static <T> T build(Class<T> type, boolean exactly, Object... given) {
         final Constructor<?> constructor = Arrays.stream(type.getConstructors())
                 .max(Comparator.comparingInt(Constructor::getParameterCount))
                 .orElseThrow();
-        final Object[] args = Arrays.stream(constructor.getParameterTypes())
-                .map(parameter -> Arrays.stream(given).filter(parameter::isInstance).findFirst()
-                        .orElseGet(() -> mock(parameter)))
-                .toArray();
+        final List<Object> unused = new ArrayList<>(Arrays.asList(given));
+        final Object[] args = new Object[constructor.getParameterCount()];
+        for (int i = 0; i < args.length; i++) {
+            final Class<?> parameter = constructor.getParameterTypes()[i];
+            final Optional<Object> match = unused.stream().filter(parameter::isInstance).findFirst();
+            if (match.isPresent()) {
+                unused.remove(match.get());
+                args[i] = match.get();
+            } else if (exactly) {
+                throw new AssertionError(type.getSimpleName() + " takes a " + parameter.getSimpleName()
+                        + " the test did not give");
+            } else {
+                args[i] = mock(parameter);
+            }
+        }
+        if (!unused.isEmpty()) {
+            throw new AssertionError(type.getSimpleName() + " takes nothing for " + unused);
+        }
         try {
             return type.cast(constructor.newInstance(args));
         } catch (ReflectiveOperationException exception) {

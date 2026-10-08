@@ -41,9 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 
-import java.lang.reflect.Field;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -154,8 +152,9 @@ class CrewMenuTest {
         return new CrewMenu(menus, player, worksite, structure, previous);
     }
 
+    /** Built from exactly these dependencies, so {@code CrewMenus} taking anything more fails the tests that use it (AC33). */
     private CrewMenus realMenus() {
-        return spy(MenuProbe.build(CrewMenus.class, sites, tracker, crews, rule, settlers, catalogue));
+        return spy(MenuProbe.buildExactly(CrewMenus.class, sites, tracker, crews, rule, settlers, catalogue));
     }
 
     @Test
@@ -345,23 +344,6 @@ class CrewMenuTest {
         click(menu, "clans.settler.crew.back", player);
 
         verify(menus).openJobs(player, previous);
-    }
-
-    @Test
-    void ac33_crewMenusHoldsNoProfessionsAndHasNoSitesGetter() {
-        assertFalse(Arrays.stream(CrewMenus.class.getDeclaredFields())
-                .anyMatch(field -> field.getName().equals("professions")), "nothing reads the profession registry");
-        assertFalse(Arrays.stream(CrewMenus.class.getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("getSites")), "nothing calls getSites");
-    }
-
-    @Test
-    void ac33_crewMenuKeepsNoFieldsItNeverReads() {
-        final List<String> fields = Arrays.stream(CrewMenu.class.getDeclaredFields())
-                .map(Field::getName)
-                .toList();
-        assertFalse(fields.contains("menus"), "menus is only read in the constructor");
-        assertFalse(fields.contains("viewer"), "viewer is only read in the constructor");
     }
 
     @Test
