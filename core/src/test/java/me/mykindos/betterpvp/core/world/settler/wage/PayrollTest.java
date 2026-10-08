@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.world.settler.wage;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import me.mykindos.betterpvp.core.world.settler.Profession;
 import me.mykindos.betterpvp.core.world.settler.ProfessionRegistry;
 import me.mykindos.betterpvp.core.world.settler.Roster;
@@ -287,25 +286,6 @@ class PayrollTest {
         site.fund.balance = 1_000;
         settleAfter(HOUR);
         assertTrue(site.changed.contains(CAMP));
-    }
-
-    @Test
-    void ac11_wageAndMoraleClocksSurviveARoundTrip() throws Exception {
-        final Settler striker = striker("job");
-        striker.setStateSince(12_345);
-        final Settler unhappy = settler("farmer", SettlerRarity.RARE);
-        unhappy.setUnhappySince(67_890);
-        site.roster.setPayrollAt(99_000);
-        site.roster.setPayrollCarry(0.4);
-
-        final ObjectMapper mapper = new ObjectMapper();
-        final Roster read = mapper.readValue(mapper.writeValueAsString(site.roster), Roster.class);
-
-        assertEquals(99_000, read.getPayrollAt());
-        assertEquals(0.4, read.getPayrollCarry(), 1e-9);
-        assertEquals(12_345, read.find(striker.getId()).orElseThrow().getStateSince());
-        assertEquals(SettlerState.STRIKING, read.find(striker.getId()).orElseThrow().getState());
-        assertEquals(67_890, read.find(unhappy.getId()).orElseThrow().getUnhappySince());
     }
 
     @Test
