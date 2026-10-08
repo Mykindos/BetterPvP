@@ -139,7 +139,7 @@ public class StructureViews implements Listener {
         });
     }
 
-    /** Right-clicking an upgrade's piece lets whatever the upgrade does take the click. */
+    /** Right-clicking an upgrade's piece lets whatever the upgrade does take the click, for whoever may use it. */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onUse(@NotNull PlayerInteractEvent event) {
         final Block block = event.getClickedBlock();
@@ -159,6 +159,10 @@ public class StructureViews implements Listener {
                     .ifPresent(structure -> catalogue.find(structure.getType())
                             .flatMap(type -> type.upgrade(upgrade.get()))
                             .ifPresent(found -> {
+                                if (!service.canUse(event.getPlayer(), worksite.getKey(), structure)) {
+                                    event.setCancelled(true);
+                                    return;
+                                }
                                 final StructurePieceUseEvent use = new StructurePieceUseEvent(event.getPlayer(),
                                         worksite.getKey(), structure, found);
                                 UtilServer.callEvent(use);
