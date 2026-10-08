@@ -2,15 +2,12 @@ package me.mykindos.betterpvp.clans.world.camp.settler.command;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.world.camp.settler.SettlerConfig;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.world.settler.Settler;
-import me.mykindos.betterpvp.core.world.settler.SettlerGenerator;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerResult;
-import me.mykindos.betterpvp.core.world.settler.SettlerService;
 import me.mykindos.betterpvp.core.world.settler.SettlerTemplate;
 import me.mykindos.betterpvp.core.world.settler.recruit.SettlerGrants;
 import net.kyori.adventure.text.Component;
@@ -24,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 /**
@@ -39,21 +35,12 @@ public class SettlerGrantSubCommand extends Command {
     private static final String DEFAULT_SOURCE = "hiring";
 
     private final SettlerCommands commands;
-    private final SettlerService service;
-    private final SettlerGenerator generator;
-    private final SettlerConfig config;
+    private final SettlerGrants grants;
 
     @Inject
-    public SettlerGrantSubCommand(@NotNull SettlerCommands commands, @NotNull SettlerService service,
-                                  @NotNull SettlerGenerator generator, @NotNull SettlerConfig config) {
-        this.commands = commands;
-        this.service = service;
-        this.generator = generator;
-        this.config = config;
-    }
-
     public SettlerGrantSubCommand(@NotNull SettlerCommands commands, @NotNull SettlerGrants grants) {
-        throw new UnsupportedOperationException("#2363 AC28");
+        this.commands = commands;
+        this.grants = grants;
     }
 
     @Override
@@ -97,12 +84,12 @@ public class SettlerGrantSubCommand extends Command {
         }
 
         commands.withCamp(player, args[0], clan -> {
-            final Settler settler = generator.roll(template.build(), config.getTable(), ThreadLocalRandom.current());
-            final SettlerResult result = service.grant(SettlerCommands.key(clan), settler);
+            final SettlerResult result = grants.grant(SettlerCommands.key(clan), template.build());
             if (!result.isSuccess()) {
                 SettlerCommands.send(player, Objects.requireNonNull(result.getReason()));
                 return;
             }
+            final Settler settler = Objects.requireNonNull(result.getSettler());
             SettlerCommands.send(player, "clans.command.settler.granted", SettlerCommands.name(settler),
                     Component.text(clan.getName(), NamedTextColor.YELLOW));
             SettlerCommands.send(player, commands.line(settler));
@@ -117,7 +104,7 @@ public class SettlerGrantSubCommand extends Command {
             case 1 -> commands.clanNames(typed).stream();
             case 2 -> Arrays.stream(SettlerRarity.values()).map(rarity -> rarity.name().toLowerCase(Locale.ROOT));
             case 3 -> Stream.concat(commands.professionIds().stream(), Stream.of(NONE));
-            case 4 -> config.getTable().getHistories().keySet().stream();
+            case 4 -> commands.historySources().stream();
             default -> Stream.empty();
         };
         options.filter(option -> option.toLowerCase(Locale.ROOT).startsWith(typed)).forEach(completions::add);
