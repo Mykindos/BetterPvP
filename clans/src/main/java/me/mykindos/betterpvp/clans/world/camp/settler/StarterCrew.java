@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -58,12 +59,17 @@ public class StarterCrew implements WorldContent {
             return;
         }
 
+        final List<String> unknown = config.getStartingSettlers().stream()
+                .map(SettlerConfig.Starter::getProfession)
+                .filter(profession -> profession != null && !generator.knows(profession))
+                .toList();
+        if (!unknown.isEmpty()) {
+            log.warn("starting-settlers in settlers.yml names unregistered professions {}, so camp {} gets none yet",
+                    unknown, key).submit();
+            return;
+        }
+
         for (SettlerConfig.Starter starter : config.getStartingSettlers()) {
-            if (starter.getProfession() != null && !generator.knows(starter.getProfession())) {
-                log.warn("Starting settler profession {} in settlers.yml is not registered, skipping it",
-                        starter.getProfession()).submit();
-                continue;
-            }
             final SettlerTemplate template = SettlerTemplate.builder()
                     .rarity(starter.getRarity())
                     .profession(starter.getProfession())
