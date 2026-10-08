@@ -103,7 +103,7 @@ public class SurveyorsTable implements Listener {
     /** Opens the list of structures to survey in camp {@code camp}, if its Workshop has a working table. */
     public void open(@NotNull Player player, @NotNull SiteKey camp, @Nullable Windowed previous) {
         if (!isActive(camp)) {
-            tell(player, Translations.component("clans.camp.upgrade.surveyors_table.inactive").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("clans.camp.upgrade.surveyors_table.inactive"));
             return;
         }
         new SurveyorsTableMenu(this, camp, previous).show(player);
@@ -136,7 +136,7 @@ public class SurveyorsTable implements Listener {
      */
     public boolean survey(@NotNull Player player, @NotNull SiteKey camp, @NotNull UUID id) {
         if (!isActive(camp)) {
-            tell(player, Translations.component("clans.camp.upgrade.surveyors_table.inactive").color(NamedTextColor.RED));
+            tell(player, ConstructionResult.reason("clans.camp.upgrade.surveyors_table.inactive"));
             return false;
         }
         final Worksite worksite = sites.worksite(player.getWorld())
@@ -185,7 +185,7 @@ public class SurveyorsTable implements Listener {
             tell(player, ChatHint.INFO.attach(
                     Translations.component("clans.camp.upgrade.surveyors_table.clashes",
                             type.stageName(next).color(NamedTextColor.YELLOW)).color(NamedTextColor.RED),
-                    reason.color(NamedTextColor.RED)));
+                    reason));
         }
         return true;
     }

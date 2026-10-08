@@ -31,6 +31,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.world.construction.ConstructionChecks;
+import me.mykindos.betterpvp.core.world.construction.ConstructionResult;
 import me.mykindos.betterpvp.core.world.construction.ConstructionService;
 import me.mykindos.betterpvp.core.world.construction.StructureCatalogue;
 import me.mykindos.betterpvp.core.world.construction.StructureStatusTracker;
@@ -168,7 +169,7 @@ public class HallMenus {
 
     /** Tells the player why something was refused, in red. */
     void refuse(@NotNull Player player, @NotNull String key, @NotNull ComponentLike... args) {
-        UtilMessage.plain(player, Translations.component(key, args).color(NamedTextColor.RED));
+        UtilMessage.plain(player, ConstructionResult.reason(key, args));
     }
 
     /** Tells the player what they just did, in green. */
