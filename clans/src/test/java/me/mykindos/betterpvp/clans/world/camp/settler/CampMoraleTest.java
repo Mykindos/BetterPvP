@@ -8,8 +8,6 @@ import me.mykindos.betterpvp.core.world.settler.SettlerLeaveReason;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import me.mykindos.betterpvp.core.world.settler.SettlerState;
 import me.mykindos.betterpvp.core.world.settler.SettlerTable;
-import me.mykindos.betterpvp.core.world.settler.morale.FoodSource;
-import me.mykindos.betterpvp.core.world.settler.morale.MoraleBoost;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,6 @@ class CampMoraleTest {
     private final SettlerConfig config = mock(SettlerConfig.class);
     private final Roster roster = new Roster();
     private int food;
-    private int boost;
     private CampMorale morale;
 
     @BeforeEach
@@ -47,8 +44,7 @@ class CampMoraleTest {
                 SettlerRarity.COMMON, new RarityNumbers(1, 1, 1, 0.3),
                 SettlerRarity.LEGENDARY, new RarityNumbers(3, 2, 2.2, 0.05)), List.of(), List.of(), Map.of()));
         final FoodSource granary = site -> food;
-        final MoraleBoost bell = site -> boost;
-        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary), Set.of(bell));
+        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary), Set.of());
     }
 
     private Settler settler(String profession, SettlerRarity rarity, String... traits) {
@@ -69,19 +65,54 @@ class CampMoraleTest {
     }
 
     @Test
-    void aSettlerWithNothingHappeningIsNeutral() {
+    void ac20_moraleIsNeutralWhenNothingIsHappening() {
         assertEquals(0, of(settler(null, SettlerRarity.COMMON)));
+        final Settler working = settler("builder", SettlerRarity.COMMON);
+        working.setState(SettlerState.WORKING);
+        assertEquals(0, of(working));
+        final Settler newcomer = settler("builder", SettlerRarity.COMMON);
+        newcomer.setJoinedAt(NOW - HOUR);
+        newcomer.setStateSince(NOW - HOUR);
+        assertEquals(0, of(newcomer));
     }
 
     @Test
-    void anyStrikeBringsEveryoneDown() {
+    void ac21_foodOnlyRaisesMoraleAndOnlyTheBestCounts() {
         final Settler wanderer = settler(null, SettlerRarity.COMMON);
-        settler("builder", SettlerRarity.COMMON).changeState(SettlerState.STRIKING, NOW);
-        assertEquals(-25, of(wanderer));
+        food = -15;
+        assertEquals(0, of(wanderer), "food never lowers morale");
+
+        final FoodSource granary = site -> 10;
+        final FoodSource mill = site -> 20;
+        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary, mill), Set.of());
+        assertEquals(20, of(wanderer), "only the best food counts");
+
+        final FoodSource feast = site -> 45;
+        morale = new CampMorale(config, new CampWideTraits(config), Set.of(granary, feast), Set.of());
+        assertEquals(30, of(wanderer), "food stops at its most");
     }
 
     @Test
-    void idleProfessionalsGrowRestlessAfterADay() {
+    void ac21_boostsAddOnTopOfFoodAndOfEachOther() {
+        final Settler wanderer = settler(null, SettlerRarity.COMMON);
+        final FoodSource feast = site -> 30;
+        final MoraleBoost bell = site -> 10;
+        final MoraleBoost banner = site -> 5;
+        morale = new CampMorale(config, new CampWideTraits(config), Set.of(feast), Set.of(bell, banner));
+        assertEquals(45, of(wanderer));
+    }
+
+    @Test
+    void ac22_anyStrikeBringsEveryoneDown() {
+        final Settler wanderer = settler(null, SettlerRarity.COMMON);
+        final Settler striker = settler("builder", SettlerRarity.COMMON);
+        striker.changeState(SettlerState.STRIKING, NOW);
+        assertEquals(-25, of(wanderer));
+        assertEquals(-25, of(striker));
+    }
+
+    @Test
+    void ac23_idleProfessionalsGrowRestlessAfterADay() {
         final Settler builder = settler("builder", SettlerRarity.COMMON);
         builder.setStateSince(NOW - 30 * HOUR);
         builder.setJoinedAt(NOW - 30 * HOUR);
@@ -95,7 +126,27 @@ class CampMoraleTest {
     }
 
     @Test
-    void dismissalsFadeAndStopAtTheirFloor() {
+    void ac23_idleTimeCountsFromTheLaterOfJoiningAndTheLastChange() {
+        final Settler builder = settler("builder", SettlerRarity.COMMON);
+        builder.setStateSince(NOW - 500 * HOUR);
+        builder.setJoinedAt(NOW - 25 * HOUR - HOUR / 2);
+        assertEquals(-1, of(builder), "one full hour past the day");
+    }
+
+    @Test
+    void ac23_wanderersAndStrikersAreNeverIdle() {
+        final Settler wanderer = settler(null, SettlerRarity.COMMON);
+        wanderer.setStateSince(NOW - 500 * HOUR);
+        wanderer.setJoinedAt(NOW - 500 * HOUR);
+        assertEquals(0, of(wanderer));
+
+        final Settler striker = settler("builder", SettlerRarity.COMMON);
+        striker.setState(SettlerState.STRIKING);
+        assertEquals(-25, of(striker), "only the unpaid penalty, no idleness");
+    }
+
+    @Test
+    void ac24_dismissalsFadeAndStopAtTheirFloor() {
         final Settler wanderer = settler(null, SettlerRarity.COMMON);
         roster.getDepartures().add(new SettlerDeparture("Tobin", SettlerRarity.COMMON, SettlerLeaveReason.DISMISSED,
                 NOW - 24 * HOUR));
@@ -106,8 +157,26 @@ class CampMoraleTest {
                     SettlerLeaveReason.DISMISSED, NOW));
         }
         assertEquals(-30, of(wanderer));
+    }
+
+    @Test
+    void ac24_aDismissalStartsAtTenAndIsGoneAfterTwoDays() {
+        final Settler wanderer = settler(null, SettlerRarity.COMMON);
+        roster.getDepartures().add(new SettlerDeparture("Tobin", SettlerRarity.COMMON, SettlerLeaveReason.DISMISSED,
+                NOW));
+        assertEquals(-10, of(wanderer));
+        roster.getDepartures().clear();
+        roster.getDepartures().add(new SettlerDeparture("Tobin", SettlerRarity.COMMON, SettlerLeaveReason.DISMISSED,
+                NOW - 48 * HOUR));
+        assertEquals(0, of(wanderer));
+    }
+
+    @Test
+    void ac24_onlyDismissalsCount() {
+        final Settler wanderer = settler(null, SettlerRarity.COMMON);
         roster.getDepartures().add(new SettlerDeparture("Maud", SettlerRarity.COMMON, SettlerLeaveReason.UNHAPPY, NOW));
-        assertEquals(-30, of(wanderer), "only dismissals count");
+        roster.getDepartures().add(new SettlerDeparture("Hal", SettlerRarity.COMMON, SettlerLeaveReason.UNPAID, NOW));
+        assertEquals(0, of(wanderer));
     }
 
     @Test
@@ -144,13 +213,5 @@ class CampMoraleTest {
         settler(null, SettlerRarity.LEGENDARY, CampTraits.BELOVED);
 
         assertEquals(-10, of(builder));
-    }
-
-    @Test
-    void boostsAddOnTopOfFoodPastItsCap() {
-        final Settler wanderer = settler(null, SettlerRarity.COMMON);
-        food = 30;
-        boost = 10;
-        assertEquals(40, of(wanderer));
     }
 }
