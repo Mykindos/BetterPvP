@@ -342,6 +342,21 @@ class CampRecruitmentTest {
     }
 
     @Test
+    void ac10_aCampThatFailsToSettleDoesNotStopTheOthers() {
+        final long brokenClan = 43;
+        when(store.cached(brokenClan)).thenThrow(new IllegalStateException("broken camp"));
+
+        final World world = mock(World.class);
+        bukkit.when(() -> Bukkit.getWorld(anyString())).thenReturn(world);
+        when(instances.all()).thenReturn(List.of(
+                new SiteInstance(UUID.randomUUID(), Camps.keyFor(brokenClan), "camp-43", SiteInstance.State.READY),
+                new SiteInstance(UUID.randomUUID(), SITE, "camp-42", SiteInstance.State.READY)));
+
+        assertDoesNotThrow(() -> recruitment.tick());
+        assertEquals(now.get() + 4 * HOUR, camp.getNextArrivalAt(), "the camp after the broken one was settled");
+    }
+
+    @Test
     void ac11_aPassWithNothingToDoWritesNothing() {
         recruitment.settle(SITE, true);
         verify(store).changed(CLAN);
@@ -360,6 +375,32 @@ class CampRecruitmentTest {
         clearInvocations(store);
         now.addAndGet(4 * HOUR);
         recruitment.settle(SITE, true);
+        verify(store).changed(CLAN);
+    }
+
+    @Test
+    void ac11_aPassWhereOnlyACandidateLeavesIsWrittenDown() {
+        landABoat();
+        clearInvocations(store);
+        now.addAndGet(2 * HOUR);
+        final long nextBoat = camp.getNextArrivalAt();
+
+        recruitment.settle(SITE, true);
+        assertTrue(camp.getArrivals().isEmpty());
+        assertEquals(nextBoat, camp.getNextArrivalAt(), "no boat was rescheduled");
+        verify(store).changed(CLAN);
+    }
+
+    @Test
+    void ac11_aPassWhereOnlyAMilestoneIsSentIsWrittenDown() {
+        recruitment.settle(SITE, true);
+        clearInvocations(store);
+        final long nextBoat = camp.getNextArrivalAt();
+        when(clan.getLevel()).thenReturn(5L);
+
+        recruitment.settle(SITE, true);
+        assertEquals(1, camp.getArrivals().size());
+        assertEquals(nextBoat, camp.getNextArrivalAt(), "no boat was rescheduled");
         verify(store).changed(CLAN);
     }
 
