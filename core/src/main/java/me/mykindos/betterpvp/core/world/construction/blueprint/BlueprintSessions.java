@@ -102,11 +102,6 @@ public class BlueprintSessions implements Listener {
                 .createItemStack();
     }
 
-    /** Which structure {@code stack} is a blueprint for, if it is one. */
-    public @NotNull Optional<StructureType> structureOf(@Nullable ItemStack stack) {
-        return componentOf(stack).flatMap(component -> catalogue.find(component.getStructure()));
-    }
-
     private @NotNull Optional<StructureBlueprintComponent> componentOf(@Nullable ItemStack stack) {
         if (stack == null || stack.getType().isAir()) {
             return Optional.empty();
