@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Function;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 
 /**
@@ -120,7 +121,10 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
         return new SimpleItem(SettlerItems.trait(trait));
     }
 
-    /** Farmers are sent to and called back from the farm here. Builders open their crew, or the jobs they could join. */
+    /**
+     * Farmers are sent to and called back from the farm here. Builders open their crew, or the jobs they could join,
+     * and can be taken off the crew they are on.
+     */
     private void assignButton() {
         if (profession == null) {
             return;
@@ -138,29 +142,39 @@ public class SettlerCardMenu extends AbstractGui implements Windowed {
                             cards.getCrews().openCrew(click.getPlayer(), job, this);
                         }
                     }));
+            if (settler.getAssignment() != null) {
+                setItem(30, assignAction(Material.OAK_DOOR, "clans.settler.card.take_off_crew",
+                        player -> cards.getService().unassign(player, site, settler.getId())));
+            }
             return;
         }
 
-        final boolean working = settler.getAssignment() != null;
+        if (settler.getAssignment() != null) {
+            setItem(29, assignAction(Material.OAK_DOOR, "clans.settler.card.unassign",
+                    player -> cards.getService().unassign(player, site, settler.getId())));
+        } else {
+            setItem(29, assignAction(Material.WHEAT, "clans.settler.card.assign_farm",
+                    player -> cards.getService().assign(player, site, settler.getId(), profession.getWorkplace())));
+        }
+    }
+
+    /** A button that needs the assign permission and reopens the card on what {@code action} returns. */
+    private @NotNull SimpleItem assignAction(@NotNull Material material, @NotNull String key,
+                                             @NotNull Function<Player, SettlerResult> action) {
         final boolean allowed = cards.allows(viewer, site, SettlerAction.ASSIGN);
         final ItemView.ItemViewBuilder view = ItemView.builder()
-                .material(working ? Material.OAK_DOOR : Material.WHEAT)
-                .displayName(Translations.component(working ? "clans.settler.card.unassign" : "clans.settler.card.assign_farm")
-                        .color(allowed ? NamedTextColor.GREEN : NamedTextColor.GRAY));
+                .material(material)
+                .displayName(Translations.component(key).color(allowed ? NamedTextColor.GREEN : NamedTextColor.GRAY));
         if (allowed) {
-            view.action(ClickActions.ALL, Translations.component(working ? "clans.settler.card.unassign" : "clans.settler.card.assign_farm"));
+            view.action(ClickActions.ALL, Translations.component(key));
         } else {
             view.lore(Translations.component("clans.settler.card.not_allowed").color(NamedTextColor.RED));
         }
-        setItem(29, new SimpleItem(view.build(), click -> {
-            if (!allowed) {
-                return;
+        return new SimpleItem(view.build(), click -> {
+            if (allowed) {
+                cards.after(click.getPlayer(), site, settler.getId(), action.apply(click.getPlayer()), previous);
             }
-            final Player player = click.getPlayer();
-            cards.after(player, site, settler.getId(), working
-                    ? cards.getService().unassign(player, site, settler.getId())
-                    : cards.getService().assign(player, site, settler.getId(), profession.getWorkplace()), previous);
-        }));
+        });
     }
 
     private void dismissButton() {

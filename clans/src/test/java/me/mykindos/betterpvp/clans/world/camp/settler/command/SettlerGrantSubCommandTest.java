@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.world.settler.SettlerResult;
 import me.mykindos.betterpvp.core.world.settler.SettlerTemplate;
 import me.mykindos.betterpvp.core.world.settler.recruit.SettlerGrants;
 import net.kyori.adventure.text.Component;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static me.mykindos.betterpvp.clans.testing.Messages.mentions;
+import static me.mykindos.betterpvp.clans.testing.Messages.sent;
+import static me.mykindos.betterpvp.clans.testing.Messages.text;
+import static me.mykindos.betterpvp.clans.testing.Messages.told;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -51,6 +58,10 @@ class SettlerGrantSubCommandTest {
         when(grants.grant(any(), any())).thenReturn(SettlerResult.done(settler));
     }
 
+    private SettlerGrantSubCommand command() {
+        return new SettlerGrantSubCommand(commands, grants);
+    }
+
     @Test
     void ac28_staffGrantsGoThroughSettlerGrants() {
         final SettlerGrantSubCommand command = new SettlerGrantSubCommand(commands, grants);
@@ -72,5 +83,82 @@ class SettlerGrantSubCommandTest {
         command.execute(player, null, "Wolves", "rare", "ghost");
 
         verify(grants, never()).grant(any(), any());
+    }
+
+    @Test
+    void ac31_theSourceDefaultsToHiringAndNoneLeavesNoProfession() {
+        command().execute(player, null, "Wolves", "common", "none");
+
+        verify(grants).grant(Camps.keyFor(CLAN), SettlerTemplate.builder()
+                .rarity(SettlerRarity.COMMON)
+                .source("hiring")
+                .build());
+    }
+
+    @Test
+    void ac31_aGrantSaysWhoWasAddedAndShowsItsLine() {
+        when(commands.line(any())).thenReturn(Component.text("line Tamsin Reed"));
+
+        command().execute(player, null, "Wolves", "rare");
+
+        assertTrue(told(player, "clans.command.settler.granted"));
+        final String granted = text(sent(player).getFirst());
+        assertTrue(granted.contains("Tamsin Reed") && granted.contains("Wolves"));
+        assertTrue(text(sent(player).get(1)).contains("line Tamsin Reed"));
+        assertTrue(sent(player).stream().allMatch(message -> mentions(message, "clans.prefix.settler")));
+    }
+
+    @Test
+    void ac31_anUnknownRarityIsRefusedByNameAndNeverReachesTheGrant() {
+        command().execute(player, null, "Wolves", "mythic", "builder");
+
+        assertTrue(told(player, "clans.command.settler.unknown_rarity"));
+        assertTrue(text(sent(player).getFirst()).contains("mythic"));
+        verify(grants, never()).grant(any(), any());
+        verify(commands, never()).withCamp(any(), any(), any());
+    }
+
+    @Test
+    void ac31_anUnknownProfessionIsRefusedByName() {
+        command().execute(player, null, "Wolves", "rare", "ghost");
+
+        assertTrue(told(player, "clans.command.settler.unknown_profession"));
+        assertTrue(text(sent(player).getFirst()).contains("ghost"));
+        verify(commands, never()).withCamp(any(), any(), any());
+    }
+
+    @Test
+    void ac31_aRefusalFromTheGrantIsShown() {
+        when(grants.grant(any(), any())).thenReturn(SettlerResult.refused("core.settler.population_full"));
+
+        command().execute(player, null, "Wolves", "rare");
+
+        assertTrue(told(player, "core.settler.population_full"));
+        assertTrue(sent(player).stream().noneMatch(message -> mentions(message, "clans.command.settler.granted")));
+    }
+
+    @Test
+    void ac26_grantWithoutARarityShowsItsUsage() {
+        command().execute(player, null, "Wolves");
+
+        assertTrue(told(player, "clans.command.settler.grant.usage"));
+        verify(grants, never()).grant(any(), any());
+    }
+
+    @Test
+    void ac32_grantCompletesClanRarityProfessionThenSource() {
+        final CommandSender sender = mock(CommandSender.class);
+        when(commands.clanNames("wo")).thenReturn(List.of("Wolves"));
+        when(commands.historySources()).thenReturn(List.of("hiring", "dungeon"));
+
+        assertEquals(List.of("Wolves"), command().processTabComplete(sender, new String[]{"Wo"}));
+        assertEquals(List.of("common", "uncommon", "rare", "legendary"),
+                command().processTabComplete(sender, new String[]{"Wolves", ""}));
+        assertEquals(List.of("rare"), command().processTabComplete(sender, new String[]{"Wolves", "ra"}));
+        assertEquals(List.of("builder", "farmer", "none"),
+                command().processTabComplete(sender, new String[]{"Wolves", "rare", ""}));
+        assertEquals(List.of("dungeon"),
+                command().processTabComplete(sender, new String[]{"Wolves", "rare", "builder", "d"}));
+        assertTrue(command().processTabComplete(sender, new String[]{"Wolves", "rare", "builder", "dungeon", ""}).isEmpty());
     }
 }
