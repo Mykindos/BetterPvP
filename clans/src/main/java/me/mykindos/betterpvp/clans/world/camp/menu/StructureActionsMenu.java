@@ -165,9 +165,12 @@ public class StructureActionsMenu extends AbstractGui implements Windowed {
         }
 
         if (type.getFlags().isDemolishable()) {
-            final Component problem = !condition.isStanding()
-                    ? ConstructionResult.reason("core.construction.demolish_needs_standing")
-                    : busy ? ConstructionResult.reason("core.construction.busy") : null;
+            Component problem = null;
+            if (!condition.isStanding()) {
+                problem = ConstructionResult.reason("core.construction.demolish_needs_standing");
+            } else if (busy) {
+                problem = ConstructionResult.reason("core.construction.busy");
+            }
             final ResourceCost refund = menus.getSites().demolishRefund(camp, structure, type);
             buttons.add(button(Material.TNT, ConstructionAction.DEMOLISH, confirming,
                     Translations.component("clans.camp.menu.structures.action.demolish"),
