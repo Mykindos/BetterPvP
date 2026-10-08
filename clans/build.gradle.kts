@@ -30,6 +30,7 @@ dependencies {
     testImplementation(libs.bundles.test)
     testImplementation(project(":core"))
     testImplementation(libs.mapper)
+    testImplementation(libs.modelengine)
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
