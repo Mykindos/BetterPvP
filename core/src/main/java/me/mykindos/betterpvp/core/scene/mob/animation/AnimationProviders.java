@@ -66,6 +66,9 @@ public final class AnimationProviders {
      * stateless point events, not held looping states.)
      */
     private static AnimationProvider picking(String[] animationIds, IntUnaryOperator nextIndex) {
+        for (String animationId : animationIds) {
+            Preconditions.checkNotNull(animationId, "animationId cannot be null");
+        }
         return new AnimationProvider() {
             private int index = -1; // pre-first: the first advance yields the starting index (0 for sequential)
             private String last;
