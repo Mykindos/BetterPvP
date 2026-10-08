@@ -123,6 +123,12 @@ public class AIController {
         }
     }
 
+    /** Stops every running component and has every component decide again on the next tick. */
+    public void replan() {
+        stopAll();
+        components.forEach(AIComponent::replan);
+    }
+
     /** Stops every running component and unregisters them all. */
     public void clear() {
         stopAll();

@@ -11,6 +11,8 @@ import me.mykindos.betterpvp.core.scene.HasModeledEntity;
 import me.mykindos.betterpvp.core.scene.SceneObjectFactory;
 import me.mykindos.betterpvp.core.scene.mob.ai.AIController;
 import me.mykindos.betterpvp.core.scene.mob.ai.Navigator;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.AttendComponent;
+import me.mykindos.betterpvp.core.scene.mob.ai.component.OrderToSpotComponent;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationController;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationProvider;
 import me.mykindos.betterpvp.core.scene.mob.animation.AnimationProviders;
@@ -130,6 +132,9 @@ public class SceneMob extends NPC implements HasModeledEntity {
     private boolean enabledBodyAi;
     private int activationCheckCounter = 0;
 
+    @Getter(AccessLevel.NONE) private AttendComponent attending;
+    @Getter(AccessLevel.NONE) private OrderToSpotComponent orders;
+
     public SceneMob(SceneObjectFactory factory, EntityType entityType, Disposition disposition) {
         this(factory, entityType, disposition, System::currentTimeMillis);
     }
@@ -225,6 +230,10 @@ public class SceneMob extends NPC implements HasModeledEntity {
         this.animations = new AnimationController(this, animationProviders);
         this.homeAnchor = getEntity().getLocation();
         registerComponents();
+        orders = new OrderToSpotComponent(this, clock);
+        attending = new AttendComponent(this, clock);
+        ai.addFirst(orders);
+        ai.addFirst(attending);
     }
 
     @Override
@@ -329,6 +338,15 @@ public class SceneMob extends NPC implements HasModeledEntity {
         animations.play(MobAnimation.WALK);
     }
 
+    /**
+     * Starts a trip to a fixed point and holds the WALK clip. The trip searches again when it has no path or the body
+     * stops moving. See {@link Navigator#travelTo}.
+     */
+    public void travelTo(Location target, double speed, Runnable onGiveUp) {
+        navigator.travelTo(target, speed, onGiveUp);
+        animations.play(MobAnimation.WALK);
+    }
+
     /** Halts pathfinding and drops back to the IDLE clip. Call when a movement behaviour ends or yields. */
     public void stopMoving() {
         navigator.stop();
@@ -337,17 +355,17 @@ public class SceneMob extends NPC implements HasModeledEntity {
 
     /** Stops pathing, faces {@code player} and holds IDLE for a moment, then lets the AI decide again. */
     public void attend(Player player) {
-        throw new UnsupportedOperationException("not implemented");
+        attending.attend(player);
     }
 
     /** Sends the mob to a random point near {@code spot}, rests there, then lets the AI decide again. */
     public void orderTo(Location spot) {
-        throw new UnsupportedOperationException("not implemented");
+        orders.orderTo(spot);
     }
 
     /** Stops every running component so each decides again on the next tick. */
     public void replan() {
-        throw new UnsupportedOperationException("not implemented");
+        ai.replan();
     }
 
     /** @return {@code true} if the target is non-null, alive, still valid, and in this mob's world. */
