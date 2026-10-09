@@ -37,7 +37,7 @@ import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
  * One settler: who it is, where it came from, what it does and how it feels, with buttons to put it to work or send
  * it away for players whose rank allows it. Everyone else can look.
  */
-public class SettlerCardMenu extends AbstractGui implements Windowed {
+class SettlerCardMenu extends AbstractGui implements Windowed {
 
     private final SettlerCards cards;
     private final Player viewer;

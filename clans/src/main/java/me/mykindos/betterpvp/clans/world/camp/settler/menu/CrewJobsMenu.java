@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 /** Every job running in a camp, with how its crew stands. Clicking one opens its crew. */
-public class CrewJobsMenu extends AbstractGui implements Windowed {
+class CrewJobsMenu extends AbstractGui implements Windowed {
 
     CrewJobsMenu(@NotNull CrewMenus menus, @NotNull Player viewer, @NotNull Worksite worksite,
                  @Nullable Windowed previous) {

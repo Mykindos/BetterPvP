@@ -30,10 +30,6 @@ public class Roster {
         return settlers.size();
     }
 
-    public @NotNull List<Settler> withProfession(@NotNull String profession) {
-        return settlers.stream().filter(settler -> settler.hasProfession(profession)).toList();
-    }
-
     public @NotNull List<Settler> assignedTo(@NotNull String workplace) {
         return settlers.stream().filter(settler -> workplace.equals(settler.getAssignment())).toList();
     }

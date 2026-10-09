@@ -34,7 +34,7 @@ import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
  * Someone who could join the camp: who they are, what they would do, what they ask, and how long they will wait.
  * Members whose rank may hire can take them on or send them away.
  */
-public class CandidateMenu extends AbstractGui implements Windowed {
+class CandidateMenu extends AbstractGui implements Windowed {
 
     private final SettlerCards cards;
     private final SiteKey site;

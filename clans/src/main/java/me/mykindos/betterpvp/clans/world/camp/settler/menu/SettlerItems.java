@@ -36,7 +36,7 @@ public final class SettlerItems {
     }
 
     /** Its profession and specialty, or that it has none and wanders. */
-    public static @NotNull ItemView.ItemViewBuilder profession(@NotNull Settler settler,
+    static @NotNull ItemView.ItemViewBuilder profession(@NotNull Settler settler,
                                                               @Nullable Profession profession) {
         final ItemView.ItemViewBuilder view = ItemView.builder()
                 .material(profession == null ? Material.LEATHER_BOOTS : Material.IRON_PICKAXE)
@@ -55,7 +55,7 @@ public final class SettlerItems {
     }
 
     /** One trait, what it does and when. */
-    public static @NotNull ItemView trait(@NotNull Trait trait) {
+    static @NotNull ItemView trait(@NotNull Trait trait) {
         final String group = trait.getGroup().name().toLowerCase(Locale.ROOT);
         return ItemView.builder()
                 .material(trait.isTradeOff() ? Material.REDSTONE : Material.GLOWSTONE_DUST)

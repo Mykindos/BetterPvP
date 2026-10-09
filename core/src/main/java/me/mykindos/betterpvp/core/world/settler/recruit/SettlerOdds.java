@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.world.settler.recruit;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Value;
 import me.mykindos.betterpvp.core.world.settler.SettlerRarity;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +17,7 @@ public class SettlerOdds {
     /** The profession key that means a settler with no profession. */
     public static final String NONE = "none";
 
+    @Getter(AccessLevel.NONE)
     @NotNull Map<SettlerRarity, Double> rarities;
     @NotNull Map<String, Double> professions;
 

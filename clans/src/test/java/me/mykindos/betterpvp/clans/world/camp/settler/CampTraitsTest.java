@@ -77,7 +77,12 @@ class CampTraitsTest {
         final Map<String, SettlerRarity> least = Map.of(CampTraits.LOOKOUT, SettlerRarity.RARE,
                 CampTraits.BELOVED, SettlerRarity.LEGENDARY, CampTraits.PRODIGY, SettlerRarity.LEGENDARY);
         for (Trait trait : registry.all()) {
-            assertEquals(least.getOrDefault(trait.getId(), SettlerRarity.COMMON), trait.getMinimumRarity(), trait.getId());
+            final SettlerRarity expected = least.getOrDefault(trait.getId(), SettlerRarity.COMMON);
+            final String profession = trait.getProfessions().isEmpty() ? null : trait.getProfessions().iterator().next();
+            assertTrue(trait.canRoll(expected, profession), trait.getId());
+            if (expected != SettlerRarity.COMMON) {
+                assertFalse(trait.canRoll(SettlerRarity.values()[expected.ordinal() - 1], profession), trait.getId());
+            }
         }
         assertFalse(trait(CampTraits.LOOKOUT).canRoll(SettlerRarity.UNCOMMON, null));
         assertTrue(trait(CampTraits.LOOKOUT).canRoll(SettlerRarity.RARE, null));

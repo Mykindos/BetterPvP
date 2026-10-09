@@ -13,16 +13,16 @@ import java.util.UUID;
  * building a new one.
  */
 @Getter
-public class StructureBlueprintComponent extends AbstractItemComponent {
+class StructureBlueprintComponent extends AbstractItemComponent {
 
     private final String structure;
     private final @Nullable UUID moving;
 
-    public StructureBlueprintComponent(@NotNull String structure) {
+    StructureBlueprintComponent(@NotNull String structure) {
         this(structure, null);
     }
 
-    public StructureBlueprintComponent(@NotNull String structure, @Nullable UUID moving) {
+    StructureBlueprintComponent(@NotNull String structure, @Nullable UUID moving) {
         super("structure_blueprint");
         this.structure = structure;
         this.moving = moving;

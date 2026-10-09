@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.world.settler;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
@@ -24,6 +26,7 @@ public class Trait {
     boolean tradeOff;
     /** The least rare settler that can roll it. */
     @Builder.Default
+    @Getter(AccessLevel.NONE)
     @NotNull SettlerRarity minimumRarity = SettlerRarity.COMMON;
     /** The professions that can roll it, or empty for any settler including one with no profession. */
     @Singular
