@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 /** Keeps which structure a blueprint places, and which placed structure it moves if any, on the item itself. */
-public class StructureBlueprintSerializer implements ComponentSerializer<StructureBlueprintComponent>,
+class StructureBlueprintSerializer implements ComponentSerializer<StructureBlueprintComponent>,
         ComponentDeserializer<StructureBlueprintComponent> {
 
     private static final NamespacedKey KEY = new NamespacedKey("betterpvp", "structure_blueprint");

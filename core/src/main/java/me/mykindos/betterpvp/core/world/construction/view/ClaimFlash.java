@@ -18,7 +18,7 @@ import java.util.List;
  */
 final class ClaimFlash {
 
-    static final Color COLOUR = Color.fromRGB(0xFFD24D);
+    private static final Color COLOUR = Color.fromRGB(0xFFD24D);
 
     private final List<BlockDisplay> displays = new ArrayList<>();
     private boolean lit = true;

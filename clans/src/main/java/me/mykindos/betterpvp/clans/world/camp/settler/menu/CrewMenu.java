@@ -37,7 +37,7 @@ import java.util.Optional;
  * One job's crew: the Workforce it needs against what the crew brings, how fast it runs, who is on it, and the free
  * Builders who could join. Builders stay on a crew until its job ends.
  */
-public class CrewMenu extends AbstractGui implements Windowed {
+class CrewMenu extends AbstractGui implements Windowed {
 
     private static final int FIRST_FREE_SLOT = 27;
     private static final int FREE_SLOTS = 18;

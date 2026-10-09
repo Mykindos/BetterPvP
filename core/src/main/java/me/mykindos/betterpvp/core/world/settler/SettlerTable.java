@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.world.settler;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,6 +15,7 @@ import java.util.Map;
 @Value
 public class SettlerTable {
 
+    @Getter(AccessLevel.NONE)
     @NotNull Map<SettlerRarity, RarityNumbers> rarities;
     @NotNull List<String> firstNames;
     @NotNull List<String> bynames;
