@@ -78,9 +78,11 @@ public class AIController {
             startComponent(component);
         }
 
-        // 3. Tick everything currently running.
-        for (AIComponent component : List.copyOf(running)) {
-            component.tick();
+        // 3. Tick everything currently running, highest priority first.
+        for (AIComponent component : List.copyOf(components)) {
+            if (running.contains(component)) {
+                component.tick();
+            }
         }
     }
 

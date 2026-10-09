@@ -57,11 +57,16 @@ public class RetaliateComponent implements AIComponent {
             return;
         }
 
-        final Entity entity = Bukkit.getEntity(highest.get());
+        final UUID attacker = highest.get();
+        final Entity entity = Bukkit.getEntity(attacker);
         if (entity instanceof LivingEntity living && mob.isValidTarget(living)) {
             mob.setCurrentTarget(living);
-        } else if (entity instanceof LivingEntity stale) {
-            mob.getThreat().remove(stale);
+            return;
+        }
+        mob.getThreat().remove(attacker);
+        final LivingEntity target = mob.getCurrentTarget();
+        if (target != null && target.getUniqueId().equals(attacker)) {
+            mob.setCurrentTarget(null);
         }
     }
 
