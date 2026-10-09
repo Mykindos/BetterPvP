@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.scene.mob.SceneMob;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -37,6 +39,23 @@ public class TargetSelectors {
             return getEnemies(source, radius)
                     .min(Comparator.comparingDouble(candidate ->
                             candidate.getLocation().distanceSquared(source.getLocation())));
+        };
+    }
+
+    /**
+     * Selects the nearest player within {@code radius} blocks of the mob, skipping players in creative or spectator.
+     *
+     * @param radius the search radius in blocks
+     * @return a selector returning the closest such player, or empty if none are nearby
+     */
+    public TargetSelector nearestPlayer(double radius) {
+        return mob -> {
+            final Location location = mob.getEntity().getLocation();
+            return location.getWorld().getNearbyPlayers(location, radius).stream()
+                    .filter(player -> player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR)
+                    .filter(mob::isValidTarget)
+                    .map(LivingEntity.class::cast)
+                    .min(Comparator.comparingDouble(player -> player.getLocation().distanceSquared(location)));
         };
     }
 

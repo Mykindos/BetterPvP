@@ -88,7 +88,7 @@ public class SceneMob extends NPC implements HasModeledEntity {
     /** ModelEngine clip name that signals the mob is dying; while it plays the mob is treated as dead. */
     private static final String DEATH_CLIP = "death";
 
-    @Getter(AccessLevel.NONE) private final LongSupplier clock;
+    @Getter(AccessLevel.PROTECTED) private final LongSupplier clock;
 
     /** Vanilla entity used to host this mob in the world (spawned by the factory before init). */
     private final EntityType entityType;
