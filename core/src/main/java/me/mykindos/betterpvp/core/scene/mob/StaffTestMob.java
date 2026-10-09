@@ -19,15 +19,12 @@ import java.util.function.LongSupplier;
  */
 public class StaffTestMob extends SceneMob {
 
-    private final LongSupplier clock;
-
     public StaffTestMob(SceneObjectFactory factory) {
         this(factory, System::currentTimeMillis);
     }
 
     StaffTestMob(SceneObjectFactory factory, LongSupplier clock) {
-        super(factory, EntityType.HUSK, Disposition.HOSTILE, clock);
-        this.clock = clock;
+        super(factory, EntityType.VINDICATOR, Disposition.HOSTILE, clock);
         setModelId("skeleton_warrior");
         setAnimation(MobAnimation.IDLE, "idle");
         setAnimation(MobAnimation.WALK, "walk");
@@ -41,8 +38,8 @@ public class StaffTestMob extends SceneMob {
         getAi().add(new RetaliateComponent(this));
         getAi().add(new TargetingComponent(this, TargetSelectors.nearestPlayer(16)));
         // The attack clip is 2.2s long and the blade lands about 0.8s in.
-        getAi().add(new MeleeAttackComponent(this, clock).windupMillis(800).cooldownMillis(2200));
+        getAi().add(new MeleeAttackComponent(this, getClock()).windupMillis(800).cooldownMillis(2200));
         getAi().add(new LookAtTargetComponent(this));
-        getAi().add(new WanderComponent(this, clock));
+        getAi().add(new WanderComponent(this, getClock()));
     }
 }
