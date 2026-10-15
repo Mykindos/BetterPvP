@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Holds the release this server's channel serves. {@link #reload()} reads the newest one and calls
- * {@link PackReleaseChangedEvent} when it differs from the one held.
+ * {@link PackReleaseChangedEvent} when it differs from the one held. A server whose database has no release, such as
+ * one started from scratch, reads it from the pack server instead.
  */
 @CustomLog
 @Singleton
@@ -21,6 +22,7 @@ public class ResourcePackService {
 
     private final Core core;
     private final PackReleaseStore store;
+    private final PackServerReleaseStore packServer;
     private final AtomicReference<PackRelease> current = new AtomicReference<>();
 
     @Getter
@@ -29,9 +31,10 @@ public class ResourcePackService {
     private String channel;
 
     @Inject
-    public ResourcePackService(Core core, PackReleaseStore store) {
+    public ResourcePackService(Core core, PackReleaseStore store, PackServerReleaseStore packServer) {
         this.core = core;
         this.store = store;
+        this.packServer = packServer;
     }
 
     public Optional<PackRelease> current() {
@@ -42,7 +45,7 @@ public class ResourcePackService {
         UtilServer.runTaskAsync(core, () -> {
             final Optional<PackRelease> latest;
             try {
-                latest = store.latest(channel);
+                latest = store.latest(channel).or(() -> packServer.latest(channel));
             } catch (Exception ex) {
                 log.error("Could not read the {} resource pack release", channel, ex).submit();
                 return;

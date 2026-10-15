@@ -35,6 +35,8 @@ core:
     enabled: true
     # The pack server channel this server serves: staging or production.
     channel: staging
+    # Where the packs come from when this server's database has no release.
+    server: https://packs.brauw.dev
 pvp:
   attackCooldown:
     enabled: false
