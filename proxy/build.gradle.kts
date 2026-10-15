@@ -13,5 +13,5 @@ dependencies {
     implementation(libs.jackson.core)
     implementation(libs.jackson.annotations)
     implementation(libs.jackson.databind)
-    implementation("org.tomlj:tomlj:1.1.1")
+    implementation("org.tomlj:tomlj:2.2.0")
 }
