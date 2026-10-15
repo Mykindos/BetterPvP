@@ -285,10 +285,11 @@ public class SiteInstances implements Listener {
         return locate(SiteKey.of(fallback), party, visited);
     }
 
-    /** Opens an instance's world from whatever its owner says it should be built from. */
+    /** Opens an instance's world from whatever its owner says it should be built from, once the owner is ready. */
     private @NotNull CompletableFuture<World> open(@NotNull Site site, @NotNull SiteKey key,
-                                                              @NotNull String worldName) {
-        return worlds.open(site.getWorldSource(), worldName, owners.templateFor(site, key).orElse(null));
+                                                   @NotNull String worldName) {
+        return owners.prepare(site, key).thenCompose(unused ->
+                worlds.open(site.getWorldSource(), worldName, owners.templateFor(site, key).orElse(null)));
     }
 
     private boolean hasRoom(@NotNull SiteInstance instance, @NotNull SitePolicy policy, @NotNull Party party) {
