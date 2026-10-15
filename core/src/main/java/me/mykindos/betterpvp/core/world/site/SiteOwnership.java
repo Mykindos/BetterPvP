@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * What the module owning a site knows about it that core cannot work out.
@@ -25,5 +26,13 @@ public interface SiteOwnership {
      */
     default @NotNull Optional<String> templateFor(@NotNull SiteKey key) {
         return Optional.empty();
+    }
+
+    /**
+     * Completes once everything the owner needs to answer for a world is in hand. An owner's world is opened only
+     * after this, so content installed as it loads never reads an owner that has not been read yet.
+     */
+    default @NotNull CompletableFuture<Void> prepare(@NotNull SiteKey key) {
+        return CompletableFuture.completedFuture(null);
     }
 }

@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Everything the site framework has to be told in order for a clan to have a camp, and nothing else.
@@ -107,6 +108,12 @@ public class Camps implements Listener, SiteOwnership {
         return store.cached(key.getOwnerId())
                 .map(Camp::getSkin)
                 .map(skin -> skinFolder + skin);
+    }
+
+    /** A camp world is only opened once its record is read, since everything that fills it reads that record. */
+    @Override
+    public @NotNull CompletableFuture<Void> prepare(@NotNull SiteKey key) {
+        return store.load(key.getOwnerId()).thenAccept(camp -> {});
     }
 
     /**

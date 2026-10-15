@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @DisplayName("What the site framework is told about a clan's camp")
@@ -169,5 +171,19 @@ class CampsTest {
         when(store.cached(OWNER)).thenReturn(Optional.of(new Camp()));
 
         assertTrue(camps.templateFor(Camps.keyFor(OWNER)).isEmpty());
+    }
+
+    @Test
+    @DisplayName("a camp world waits for its record, so what fills the world has something to read")
+    void openingWaitsForTheRecord() {
+        final CompletableFuture<Camp> read = new CompletableFuture<>();
+        when(store.load(OWNER)).thenReturn(read);
+
+        final CompletableFuture<Void> prepared = camps.prepare(Camps.keyFor(OWNER));
+        verify(store).load(OWNER);
+        assertFalse(prepared.isDone(), "the world would open before the record arrived");
+
+        read.complete(new Camp());
+        assertTrue(prepared.isDone());
     }
 }

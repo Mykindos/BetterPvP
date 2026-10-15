@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -49,5 +50,11 @@ public class SiteOwners {
     public @NotNull Optional<String> templateFor(@NotNull Site site, @NotNull SiteKey key) {
         final SiteOwnership owner = ownership.get(site.getId().toLowerCase(Locale.ROOT));
         return owner == null ? Optional.empty() : owner.templateFor(key);
+    }
+
+    /** Completes once the owner of {@code key} is ready for its world to be opened. */
+    public @NotNull CompletableFuture<Void> prepare(@NotNull Site site, @NotNull SiteKey key) {
+        final SiteOwnership owner = ownership.get(site.getId().toLowerCase(Locale.ROOT));
+        return owner == null ? CompletableFuture.completedFuture(null) : owner.prepare(key);
     }
 }
