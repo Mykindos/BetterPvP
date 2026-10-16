@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -32,7 +32,7 @@ public class CapturedRegionCodec {
 
     public static void write(@NotNull OutputStream out, @NotNull List<CapturedRegion> regions, float anchorYaw)
             throws IOException {
-        MAPPER.writeValue(out, new Document(1, anchorYaw, regions));
+        MAPPER.writeValue(out, new Document(StructureFormat.FORMAT_VERSION, anchorYaw, regions));
     }
 
     public static @NotNull Document read(@NotNull InputStream in) throws IOException {
@@ -41,8 +41,8 @@ public class CapturedRegionCodec {
     }
 
     /**
-     * The file's top level. {@code version} exists so a later change to how points are stored can be migrated rather
-     * than silently misread — a structure with the wrong coordinates would paste a ship inside a cliff.
+     * The file's top level. {@code version} is the structure's format version ({@link StructureFormat#FORMAT_VERSION}),
+     * so a later change to how points are stored can be migrated rather than silently misread.
      */
     @Value
     @Builder

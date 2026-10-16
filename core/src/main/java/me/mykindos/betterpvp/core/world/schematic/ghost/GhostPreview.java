@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.world.schematic.ghost;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.BlockDisplay;

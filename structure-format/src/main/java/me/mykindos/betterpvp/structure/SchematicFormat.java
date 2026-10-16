@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -9,8 +9,8 @@ import java.util.Set;
 
 /**
  * Reads a {@link Schematic} from a particular on-disk file type. This is the extension point of the schematic
- * subsystem: implement it and register with {@link SchematicService#register(SchematicFormat)} to support a new
- * format. The built-in {@link FaweSchematicFormat} handles {@code .schem}/{@code .schematic}.
+ * subsystem: implement it and register it with Core's {@code SchematicService} to support a new format. The
+ * built-in {@link FaweSchematicFormat} handles {@code .schem}/{@code .schematic}.
  */
 public interface SchematicFormat {
 

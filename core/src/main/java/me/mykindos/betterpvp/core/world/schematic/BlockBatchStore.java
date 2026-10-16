@@ -7,6 +7,7 @@ import lombok.Value;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.store.RecordCodec;
 import me.mykindos.betterpvp.core.framework.store.RecordStore;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;

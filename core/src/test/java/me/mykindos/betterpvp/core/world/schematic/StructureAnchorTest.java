@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.world.schematic;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.PointRegion;
 import dev.brauw.mapper.region.Region;
+import me.mykindos.betterpvp.structure.CapturedRegion;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;

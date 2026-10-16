@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.world.construction.view;
 
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.ghost.GhostShell;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.World;

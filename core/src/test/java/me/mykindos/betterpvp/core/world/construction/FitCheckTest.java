@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.core.world.construction;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.core.world.zone.Zone;
 import me.mykindos.betterpvp.core.world.zone.ZoneManager;
+import me.mykindos.betterpvp.structure.Schematic;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;

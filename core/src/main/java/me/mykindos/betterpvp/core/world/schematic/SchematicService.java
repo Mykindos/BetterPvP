@@ -4,6 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.structure.FaweSchematicFormat;
+import me.mykindos.betterpvp.structure.Schematic;
+import me.mykindos.betterpvp.structure.SchematicFormat;
+import me.mykindos.betterpvp.structure.StructureFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.world.schematic;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.Region;
 import lombok.experimental.UtilityClass;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 

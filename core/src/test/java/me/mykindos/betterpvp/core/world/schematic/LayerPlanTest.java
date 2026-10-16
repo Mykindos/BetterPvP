@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.world.schematic;
 
 import dev.brauw.mapper.region.Region;
+import me.mykindos.betterpvp.structure.CapturedRegion;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Material;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;

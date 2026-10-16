@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.world.construction.ResourceCost;
 import me.mykindos.betterpvp.core.world.construction.StructureCondition;
 import me.mykindos.betterpvp.core.world.construction.StructurePosition;
 import me.mykindos.betterpvp.core.world.schematic.Footprint;
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.block.data.BlockData;
 import org.junit.jupiter.api.Test;
 

@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.world.schematic;
 
 import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.structure.CapturedRegion;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.block.data.Bisected;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

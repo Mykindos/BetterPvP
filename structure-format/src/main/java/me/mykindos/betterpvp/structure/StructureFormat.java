@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +24,12 @@ import java.util.zip.ZipOutputStream;
  * nothing to warn them. Captured together, they cannot disagree.
  */
 public class StructureFormat implements SchematicFormat {
+
+    /**
+     * The version this format writes, stored as {@code version} in {@code regions.json}. A file without that entry is
+     * version 1. A file from a newer version is refused rather than misread.
+     */
+    public static final int FORMAT_VERSION = 1;
 
     static final String BLOCKS_ENTRY = "blocks.schem";
     static final String REGIONS_ENTRY = "regions.json";
@@ -68,6 +74,11 @@ public class StructureFormat implements SchematicFormat {
 
         if (blockBytes == null) {
             throw new IOException("Structure has no " + BLOCKS_ENTRY + " entry");
+        }
+
+        if (document != null && document.getVersion() > FORMAT_VERSION) {
+            throw new IOException("Structure is format version " + document.getVersion()
+                    + ", newer than the supported " + FORMAT_VERSION);
         }
 
         final Schematic blocks = blockFormat.read(new ByteArrayInputStream(blockBytes));

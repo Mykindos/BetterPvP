@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import lombok.Getter;
 import lombok.Value;
@@ -11,7 +11,7 @@ import java.util.List;
  * An immutable, format-agnostic snapshot of a block volume in origin-relative coordinates.
  * <p>
  * A {@link Schematic} carries no Bukkit world or FAWE types beyond {@link BlockData}; it is produced by a
- * {@link SchematicFormat} (one per file type) and placed with {@link SchematicPlacement} and pasted by {@link SchematicRenderer}. Coordinates are relative to the
+ * {@link SchematicFormat} (one per file type). Core places and pastes it. Coordinates are relative to the
  * volume's minimum corner — pasting at a {@code Location} places that corner at the location.
  */
 @Getter

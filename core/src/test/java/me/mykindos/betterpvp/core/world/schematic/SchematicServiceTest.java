@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.world.schematic;
 
+import me.mykindos.betterpvp.structure.Schematic;
+import me.mykindos.betterpvp.structure.SchematicFormat;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
