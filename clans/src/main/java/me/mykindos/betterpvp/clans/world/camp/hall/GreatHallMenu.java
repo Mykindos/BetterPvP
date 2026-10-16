@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.world.site.SiteKey;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -45,7 +46,7 @@ public class GreatHallMenu extends AbstractGui implements Windowed {
         setItem(23, entry(Material.WRITABLE_BOOK, "permissions",
                 player -> new CampPermissionsMenu(key.getOwnerId(), menus.getPermissions(),
                         menus.isLeader(player, key), CampPermissionsMenu.Page.CONSTRUCTION, this).show(player)));
-        setItem(31, new BackButton(null));
+        setItem(31, new BackButton(null, Key.key("betterpvp", "menu/icon/regular/cross_icon"), null));
         setBackground(Menu.BACKGROUND_ITEM);
     }
 
