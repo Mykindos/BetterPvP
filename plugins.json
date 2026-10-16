@@ -1,0 +1,11 @@
+{
+  "plugins": [
+    {
+      "name": "Mapper",
+      "file": "Mapper-1.1.0.jar",
+      "url": "https://github.com/BetterPvP/Mapper/releases/download/1.1.0/Mapper-1.1.0.jar",
+      "sha256": "fb757993f8c9c45a63cb8020a76dd4e8c80bceb6557924a0eddfb1bb53607123",
+      "replaces": "Mapper*.jar"
+    }
+  ]
+}
