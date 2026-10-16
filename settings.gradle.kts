@@ -113,7 +113,7 @@ dependencyResolutionManagement {
             library("jexl3", "org.apache.commons", "commons-jexl3").version("3.4.0")
 
             // Library - Mapper
-            library("mapper", "com.github.BetterPvP", "Mapper").version("1.0.20")
+            library("mapper", "com.github.BetterPvP", "Mapper").version("1.1.0")
 
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
