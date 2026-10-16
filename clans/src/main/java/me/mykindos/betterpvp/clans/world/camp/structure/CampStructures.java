@@ -26,6 +26,7 @@ public class CampStructures {
     public static final String DOCK = "dock";
     public static final String WORKSHOP = "workshop";
     public static final String STOREHOUSE = "storehouse";
+    public static final String CARPENTER = "carpenter";
 
     private final List<CampStructure> structures;
 
@@ -43,7 +44,8 @@ public class CampStructures {
                         StructureFlags.builder().demolishable(false).movable(false).startsBroken(true).build(), config,
                         upgrades),
                 new CampStructure(WORKSHOP, 1, afterHall, null, ordinary, config, upgrades),
-                new CampStructure(STOREHOUSE, 1, afterHall, null, ordinary, config, upgrades));
+                new CampStructure(STOREHOUSE, 1, afterHall, null, ordinary, config, upgrades),
+                new CampStructure(CARPENTER, 2, Set.of(WORKSHOP), null, ordinary, config, upgrades));
         structures.forEach(catalogue::register);
     }
 

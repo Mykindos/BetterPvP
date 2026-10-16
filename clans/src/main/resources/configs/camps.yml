@@ -344,6 +344,16 @@ structures:
         seconds: 1800
         workforce: 6
         piece: camps/upgrades/remote_access
+  carpenter:
+    icon: OAK_PLANKS
+    stages:
+      - schematic: camps/carpenter_1
+        cost: {wood: 64, stone: 32}
+        build-seconds: 300
+        workforce: 4
+    move: {cost: {}, seconds: 0}
+    repair: {cost: {wood: 20}, seconds: 120}
+    demolish-refund: 0.0
 
 # What each rank may do in its camp, until a clan changes it. RECRUIT, MEMBER, ADMIN, LEADER, and ALLY for members of
 # allied clans. ally-containers is whether allies may open the camp's containers.
