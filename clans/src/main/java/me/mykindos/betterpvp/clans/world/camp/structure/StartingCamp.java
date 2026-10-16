@@ -13,8 +13,8 @@ import me.mykindos.betterpvp.core.world.content.WorldContent;
 import me.mykindos.betterpvp.core.world.content.WorldContentScope;
 import me.mykindos.betterpvp.core.world.mapper.RegionIndex;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
-import me.mykindos.betterpvp.core.world.schematic.BlockTransform;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
+import me.mykindos.betterpvp.structure.BlockTransform;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 

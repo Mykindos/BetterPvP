@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.schematic;
 
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

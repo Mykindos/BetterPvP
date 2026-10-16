@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.world.schematic.command;
 
 import com.google.inject.Singleton;
 import lombok.Value;
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 

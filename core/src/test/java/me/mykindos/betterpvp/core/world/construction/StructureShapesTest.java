@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.world.construction;
 
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
+import me.mykindos.betterpvp.structure.Schematic;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.World;

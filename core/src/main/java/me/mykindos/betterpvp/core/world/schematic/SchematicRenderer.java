@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.world.schematic;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;

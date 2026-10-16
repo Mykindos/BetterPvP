@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.world.schematic.ghost;
 
-import me.mykindos.betterpvp.core.world.schematic.Schematic;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
 

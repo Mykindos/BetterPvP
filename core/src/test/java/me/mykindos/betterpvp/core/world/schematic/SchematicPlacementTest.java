@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.world.schematic;
 
+import me.mykindos.betterpvp.structure.BlockTransform;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.util.BoundingBox;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -97,5 +100,40 @@ class SchematicPlacementTest {
         when(data.getMaterial()).thenReturn(material);
         when(data.clone()).thenReturn(data);
         return data;
+    }
+
+    /**
+     * The property a ship's hull is read off: whatever the structure is turned by, the bounds hold every block the
+     * paste writes and nothing more. Slack would make somebody standing beside the vessel count as aboard it; a gap
+     * would leave part of the deck ashore.
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3})
+    @DisplayName("pasted bounds fit every block a paste writes, exactly")
+    void boundsFitThePastedBlocks(int quarterTurns) {
+        final int width = 5;
+        final int height = 3;
+        final int length = 9;
+        // An off-centre anchor, as a ship's is: at the stern rather than in the middle of the selection.
+        final Schematic schematic = new Schematic(width, height, length, 1, 0, 7, List.of());
+        final Location at = new Location(null, 100, 64, -40);
+
+        final BoundingBox bounds = SchematicPlacement.of(schematic, at, quarterTurns).selectionBounds();
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                for (int z = 0; z < length; z++) {
+                    final int[] rotated = BlockTransform.rotateBlock(x - 1, z - 7, quarterTurns);
+                    assertTrue(bounds.contains(
+                                    at.getBlockX() + rotated[0] + 0.5,
+                                    at.getBlockY() + y + 0.5,
+                                    at.getBlockZ() + rotated[1] + 0.5),
+                            "block (" + x + ", " + y + ", " + z + ") turned " + quarterTurns + " times");
+                }
+            }
+        }
+
+        assertEquals(width * height * length, bounds.getVolume(), 1e-9,
+                "the box is the selection itself, with no slack around it");
     }
 }

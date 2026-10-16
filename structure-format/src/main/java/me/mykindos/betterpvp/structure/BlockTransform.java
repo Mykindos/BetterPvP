@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import lombok.experimental.UtilityClass;
 import org.bukkit.Axis;

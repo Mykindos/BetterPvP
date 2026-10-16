@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import dev.brauw.mapper.region.Region;
 import org.jetbrains.annotations.NotNull;
@@ -156,6 +156,38 @@ class StructureFormatTest {
         final ZipOutputStream zip = new ZipOutputStream(raw);
         zip.putNextEntry(new ZipEntry(StructureFormat.REGIONS_ENTRY));
         CapturedRegionCodec.write(zip, List.of(), 0f);
+        zip.closeEntry();
+        zip.finish();
+
+        assertThrows(IOException.class, () -> format.read(new ByteArrayInputStream(raw.toByteArray())));
+    }
+
+    @Test
+    @DisplayName("a written structure records the format version it was written with")
+    void writesFormatVersion() throws IOException {
+        final ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(write(schematicWithRegions())));
+        ZipEntry entry;
+        while ((entry = zip.getNextEntry()) != null) {
+            if (StructureFormat.REGIONS_ENTRY.equals(entry.getName())) {
+                final int version = CapturedRegionCodec.read(new ByteArrayInputStream(zip.readAllBytes())).getVersion();
+                assertEquals(StructureFormat.FORMAT_VERSION, version);
+                return;
+            }
+        }
+        throw new AssertionError("missing " + StructureFormat.REGIONS_ENTRY);
+    }
+
+    @Test
+    @DisplayName("a structure from a newer format version is refused rather than misread")
+    void newerFormatVersionThrows() throws IOException {
+        final ByteArrayOutputStream raw = new ByteArrayOutputStream();
+        final ZipOutputStream zip = new ZipOutputStream(raw);
+        zip.putNextEntry(new ZipEntry(StructureFormat.BLOCKS_ENTRY));
+        new StubBlockFormat().write(zip, new Schematic(1, 1, 1, List.of()));
+        zip.closeEntry();
+        zip.putNextEntry(new ZipEntry(StructureFormat.REGIONS_ENTRY));
+        zip.write(("{\"version\":" + (StructureFormat.FORMAT_VERSION + 1) + ",\"anchorYaw\":0,\"regions\":[]}")
+                .getBytes(StandardCharsets.UTF_8));
         zip.closeEntry();
         zip.finish();
 

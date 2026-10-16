@@ -5,6 +5,7 @@
 rootProject.name = "BetterPvP"
 include(":clans")
 include(":core")
+include(":structure-format")
 include(":lunar")
 include(":champions")
 include(":shops")

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.schematic;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 

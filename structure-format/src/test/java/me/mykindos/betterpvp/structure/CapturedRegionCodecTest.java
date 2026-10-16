@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import dev.brauw.mapper.region.Region;
 import org.junit.jupiter.api.DisplayName;

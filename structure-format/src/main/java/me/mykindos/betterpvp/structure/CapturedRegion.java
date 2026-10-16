@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.world.schematic;
+package me.mykindos.betterpvp.structure;
 
 import dev.brauw.mapper.region.CuboidRegion;
 import dev.brauw.mapper.region.PathRegion;
@@ -38,7 +38,7 @@ public class CapturedRegion {
     /**
      * Captures {@code region} relative to {@code anchor}.
      * <p>
-     * The anchor's <em>block</em> position is the origin, matching {@link SchematicPlacement}'s use of
+     * The anchor's <em>block</em> position is the origin, matching Core's {@code SchematicPlacement} use of
      * {@code getBlockX()} — the two must agree or the datapoints drift from the blocks they mark.
      */
     public static @NotNull CapturedRegion capture(@NotNull Region region, @NotNull Location anchor) {
