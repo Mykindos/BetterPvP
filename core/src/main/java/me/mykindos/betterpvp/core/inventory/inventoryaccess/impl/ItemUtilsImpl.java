@@ -63,7 +63,7 @@ public class ItemUtilsImpl implements ItemUtils {
             CompoundTag nbt = compressed
                     ? NbtIo.readCompressed(inputStream, NbtAccounter.unlimitedHeap())
                     : NbtIo.read(new DataInputStream(inputStream));
-            // Blobs written before the DataVersion was stored come from 1.20.4.
+            // A blob without a DataVersion is read as 1.20.4 data.
             if (nbt.getInt("DataVersion").isEmpty()) {
                 nbt.putInt("DataVersion", 3700);
             }

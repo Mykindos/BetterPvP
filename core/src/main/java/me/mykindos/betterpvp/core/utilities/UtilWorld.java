@@ -36,8 +36,8 @@ public class UtilWorld {
 
     /**
      * The folder a world is stored in, whether or not it is loaded: {@code dimensions/<namespace>/<key>} under the
-     * main level. A world folder from before 26.x sits at {@code <world container>/<name>} until its first load, when
-     * Paper imports it here and deletes the old folder.
+     * main level. A world in the older layout sits at {@code <world container>/<name>} until its first load, when
+     * Paper imports it here and deletes that folder.
      */
     public static @NotNull Path getStorageFolder(@NotNull String worldName) {
         final World loaded = Bukkit.getWorld(worldName);
@@ -50,14 +50,14 @@ public class UtilWorld {
     }
 
     /**
-     * Where a world from before 26.x, or one just copied in that layout, sits until Paper imports it on its first
+     * Where a world in the older layout, such as a template just copied, sits until Paper imports it on its first
      * load. Paper deletes this folder once the import is done, files that are not world data included.
      */
     public static @NotNull File getImportFolder(@NotNull String worldName) {
         return new File(Bukkit.getWorldContainer(), worldName);
     }
 
-    /** The world's folder: where it is stored, or its import folder while it has not been loaded since 26.x. */
+    /** The world's folder: where it is stored, or its import folder while it waits for import. */
     public static @NotNull File getWorldFolder(@NotNull String worldName) {
         final File storage = getStorageFolder(worldName).toFile();
         return storage.isDirectory() ? storage : getImportFolder(worldName);
