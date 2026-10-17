@@ -20,8 +20,8 @@ public class ArgumentException {
             (originName, targetName, type) -> translatable("core.command.error.not_invited", originName, targetName, type)
     );
 
-    public static final DynamicCommandExceptionType TARGET_MUST_BE_PLAYER = new DynamicCommandExceptionType(
-            targetName -> translatable("core.command.error.not_a_player", targetName)
+    public static final SimpleCommandExceptionType PLAYER_ONLY = new SimpleCommandExceptionType(
+            translatable("core.command.error.player_only")
     );
 
     public static final DynamicCommandExceptionType COMMAND_ON_COOLDOWN = new DynamicCommandExceptionType(

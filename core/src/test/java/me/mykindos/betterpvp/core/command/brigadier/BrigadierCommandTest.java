@@ -165,7 +165,7 @@ class BrigadierCommandTest {
         final CommandSyntaxException exception = assertThrows(CommandSyntaxException.class,
                 () -> dispatcher.execute("root me", fixtures.source(fixtures.console())));
 
-        assertEquals("CONSOLE is not a player", message(exception));
+        assertEquals("Only players can run this command", message(exception));
     }
 
     @Test
@@ -237,12 +237,12 @@ class BrigadierCommandTest {
     void ac27_frameworkErrorStaysTranslatable() {
         final CommandSender sender = mock(CommandSender.class);
 
-        UtilMessage.sendCommandSyntaxException(sender, ArgumentException.TARGET_MUST_BE_PLAYER.create("CONSOLE"));
+        UtilMessage.sendCommandSyntaxException(sender, ArgumentException.PLAYER_ONLY.create());
 
         final ArgumentCaptor<Component> sent = ArgumentCaptor.forClass(Component.class);
         verify(sender).sendMessage(sent.capture());
-        assertTrue(containsKey(sent.getValue(), "core.command.error.not_a_player"), sent.getValue().toString());
-        assertEquals("CONSOLE is not a player", plain(sent.getValue()));
+        assertTrue(containsKey(sent.getValue(), "core.command.error.player_only"), sent.getValue().toString());
+        assertEquals("Only players can run this command", plain(sent.getValue()));
         assertEquals(NamedTextColor.RED, sent.getValue().color());
     }
 

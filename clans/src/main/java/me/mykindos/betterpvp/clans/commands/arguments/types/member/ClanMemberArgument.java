@@ -41,7 +41,7 @@ public class ClanMemberArgument extends BPvPArgumentType<ClanMember, String> imp
 
         if (!(source instanceof final CommandSourceStack sourceStack)) throw new ClassCastException("source type of invalid type");
         final Player executor = executingPlayer(sourceStack);
-        if (executor == null) throw ArgumentException.TARGET_MUST_BE_PLAYER.create(sourceStack.getSender().getName());
+        if (executor == null) throw ArgumentException.PLAYER_ONLY.create();
 
         final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(executor.getUniqueId());
         if (executorClanOptional.isEmpty()) throw ClanArgumentException.MUST_BE_IN_A_CLAN_EXCEPTION.create();

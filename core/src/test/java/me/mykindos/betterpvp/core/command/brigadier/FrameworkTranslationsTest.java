@@ -48,7 +48,7 @@ class FrameworkTranslationsTest {
         final Set<String> english = frameworkKeys(load("en"));
         assertTrue(english.containsAll(Set.of(
                 "core.command.error.insufficient_permission",
-                "core.command.error.not_a_player",
+                "core.command.error.player_only",
                 "core.command.error.on_cooldown",
                 "core.command.error.unknown_player",
                 "core.command.error.unknown_offline_player",

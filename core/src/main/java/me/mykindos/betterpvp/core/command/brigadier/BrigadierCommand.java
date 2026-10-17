@@ -210,10 +210,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     @NotNull
     protected Player getPlayerFromExecutor(@NotNull CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         final CommandSourceStack source = context.getSource();
-        if (!(source.getExecutor() instanceof final Player player)) {
-            final String name = source.getExecutor() == null ? source.getSender().getName() : source.getExecutor().getName();
-            throw ArgumentException.TARGET_MUST_BE_PLAYER.create(name);
-        }
+        if (!(source.getExecutor() instanceof final Player player)) throw ArgumentException.PLAYER_ONLY.create();
         return player;
     }
 
@@ -225,7 +222,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      */
     @NotNull
     protected Player getPlayerFromSender(@NotNull CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (!(context.getSource().getSender() instanceof final Player player)) throw ArgumentException.TARGET_MUST_BE_PLAYER.create(context.getSource().getSender().getName());
+        if (!(context.getSource().getSender() instanceof final Player player)) throw ArgumentException.PLAYER_ONLY.create();
         return player;
     }
 

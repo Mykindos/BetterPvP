@@ -66,8 +66,8 @@ class ConsoleClanCommandsTest {
         return context;
     }
 
-    private static void assertNotAPlayer(CommandSyntaxException exception) {
-        assertSame(ArgumentException.TARGET_MUST_BE_PLAYER, exception.getType());
+    private static void assertPlayerOnly(CommandSyntaxException exception) {
+        assertSame(ArgumentException.PLAYER_ONLY, exception.getType());
     }
 
     @Test
@@ -86,7 +86,7 @@ class ConsoleClanCommandsTest {
     void ac9_clanMemberFromConsoleIsSyntaxError() {
         final ClanMemberArgument argument = new ClanMemberArgument(clanManager);
 
-        assertNotAPlayer(assertThrows(CommandSyntaxException.class, () -> argument.convert("Bob", console)));
+        assertPlayerOnly(assertThrows(CommandSyntaxException.class, () -> argument.convert("Bob", console)));
         assertTrue(argument.listSuggestions(context(), new SuggestionsBuilder("", 0)).join().isEmpty());
     }
 
@@ -116,6 +116,6 @@ class ConsoleClanCommandsTest {
         };
         command.setConfig(new ExtendedYamlConfiguration());
 
-        assertNotAPlayer(assertThrows(CommandSyntaxException.class, () -> command.getRequirementComponent(context())));
+        assertPlayerOnly(assertThrows(CommandSyntaxException.class, () -> command.getRequirementComponent(context())));
     }
 }
