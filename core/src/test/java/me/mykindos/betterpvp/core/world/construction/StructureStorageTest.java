@@ -1,13 +1,12 @@
 package me.mykindos.betterpvp.core.world.construction;
 
+import io.papermc.paper.InternalAPIBridge;
 import me.mykindos.betterpvp.core.world.schematic.LayerPlan;
 import me.mykindos.betterpvp.core.world.schematic.SchematicPlacement;
 import me.mykindos.betterpvp.structure.Schematic;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.Bukkit;
-import org.bukkit.UnsafeValues;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -71,8 +70,8 @@ class StructureStorageTest {
 
     @Test
     void ac23_itemsOfAContainerTheBuildLostMoveIntoTheOnesLeft() {
-        try (MockedStatic<Bukkit> bukkit = Mockito.mockStatic(Bukkit.class)) {
-            final ItemStack stone = item(bukkit);
+        try (MockedStatic<InternalAPIBridge> bridge = Mockito.mockStatic(InternalAPIBridge.class)) {
+            final ItemStack stone = item(bridge);
             final Inventory kept = mock(Inventory.class);
             when(kept.addItem(any(ItemStack[].class))).thenReturn(new HashMap<>());
             when(kept.getContents()).thenReturn(new ItemStack[]{stone, stone});
@@ -89,8 +88,8 @@ class StructureStorageTest {
 
     @Test
     void ac23_whateverDoesNotFitDrops() {
-        try (MockedStatic<Bukkit> bukkit = Mockito.mockStatic(Bukkit.class)) {
-            final ItemStack stone = item(bukkit);
+        try (MockedStatic<InternalAPIBridge> bridge = Mockito.mockStatic(InternalAPIBridge.class)) {
+            final ItemStack stone = item(bridge);
             final Inventory full = mock(Inventory.class);
             when(full.addItem(any(ItemStack[].class))).thenReturn(new HashMap<>(Map.of(0, stone)));
             when(full.getContents()).thenReturn(new ItemStack[]{stone});
@@ -133,13 +132,13 @@ class StructureStorageTest {
     }
 
     /** A stone item that encodes as {@link #ENCODED} and decodes back to itself. */
-    private static ItemStack item(MockedStatic<Bukkit> bukkit) {
+    private static ItemStack item(MockedStatic<InternalAPIBridge> bridge) {
         final ItemStack stone = mock(ItemStack.class);
         when(stone.getType()).thenReturn(Material.STONE);
         when(stone.serializeAsBytes()).thenReturn(BYTES);
-        final UnsafeValues unsafe = mock(UnsafeValues.class);
-        when(unsafe.deserializeItem(any())).thenReturn(stone);
-        bukkit.when(Bukkit::getUnsafe).thenReturn(unsafe);
+        final InternalAPIBridge api = mock(InternalAPIBridge.class);
+        when(api.deserializeItem(any())).thenReturn(stone);
+        bridge.when(InternalAPIBridge::get).thenReturn(api);
         return stone;
     }
 

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.world.camp.settler;
 
+import me.mykindos.betterpvp.clans.testing.Messages;
 import me.mykindos.betterpvp.clans.world.camp.Camps;
 import me.mykindos.betterpvp.clans.world.camp.structure.CampStructures;
 import me.mykindos.betterpvp.core.world.construction.Job;
@@ -93,10 +94,10 @@ class CrewNoticesTest {
 
         final ArgumentCaptor<Component> message = ArgumentCaptor.forClass(Component.class);
         verify(member).sendMessage(message.capture());
-        final String text = message.getValue().toString();
-        assertTrue(text.contains("clans.settler.crew.needed"), text);
+        final String text = Messages.text(message.getValue());
+        assertTrue(Messages.mentions(message.getValue(), "clans.settler.crew.needed"), text);
         assertTrue(text.contains(CampStructures.WORKSHOP), text);
-        assertTrue(text.contains("\"4\""), text);
+        assertTrue(text.contains("4"), text);
         verify(visitor, never()).sendMessage(any(Component.class));
     }
 

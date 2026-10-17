@@ -184,7 +184,7 @@ public abstract class Bait {
                     }
                 } else {
                     floatingEntity.teleport(referenceEntity.getLocation().subtract(0, referenceEntity.getEyeHeight(), 0));
-                    Particle.CLOUD.builder().extra(0).location(floatingEntity.getEyeLocation()).receivers(60, true).spawn();
+                    Particle.CLOUD.builder().speed(0).location(floatingEntity.getEyeLocation()).receivers(60, true).spawn();
                 }
 
                 tick();

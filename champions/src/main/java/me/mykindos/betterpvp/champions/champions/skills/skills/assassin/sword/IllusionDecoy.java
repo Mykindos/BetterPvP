@@ -247,7 +247,7 @@ class IllusionDecoy {
                 .receivers(40)
                 .count(0)
                 .offset(-step.getX() * 4, 1.5, -step.getZ() * 4)
-                .extra(1)
+                .speed(1)
                 .spawn();
     }
 

@@ -66,7 +66,7 @@ public class NectarOfDecayProjectile extends Projectile {
                 Particle.DUST.builder()
                         .location(point)
                         .count(1)
-                        .extra(0.5)
+                        .speed(0.5)
                         .data(new Particle.DustOptions(color, 1.5f))
                         .receivers(60)
                         .spawn();
@@ -93,7 +93,7 @@ public class NectarOfDecayProjectile extends Projectile {
                                 (Math.random() * 2f - 1f) * cloudRadius / 2,
                                 (Math.random() * 2f - 1f) * cloudRadius
                         ))
-                        .extra(0)
+                        .speed(0)
                         .count(1)
                         .offset(0.8f, 0.8f, 0.8f)
                         .data(new Particle.DustOptions(color, 1.9f))
@@ -132,7 +132,7 @@ public class NectarOfDecayProjectile extends Projectile {
                 Particle.DUST.builder()
                         .location(point)
                         .count(1)
-                        .extra(0.5)
+                        .speed(0.5)
                         .data(new Particle.DustOptions(color, 1f))
                         .receivers(60)
                         .spawn();

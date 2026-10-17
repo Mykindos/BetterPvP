@@ -122,12 +122,12 @@ public class ThrowingWebAbility extends CooldownInteraction implements Throwable
             }
             throwingWeb.setDestroyStrategy(DestroyStrategy.BREAKABLE);
             Particle.BLOCK.builder().data(Material.COBWEB.createBlockData())
-                    .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();
+                    .location(block.getLocation()).count(1).receivers(30).speed(0).spawn();
             new SoundEffect(Sound.ENTITY_TURTLE_EGG_BREAK, 0.7f, 1f).play(block.getLocation());
             Particle.ITEM_SNOWBALL.builder()
                     .count(30)
                     .offset(0.5, 0.5, 0.5)
-                    .extra(0.1)
+                    .speed(0.1)
                     .location(block.getLocation().toCenterLocation())
                     .receivers(60)
                     .spawn();

@@ -53,7 +53,7 @@ public class ExplosiveShell implements CannonAmmo {
     public void tick(@NotNull CannonProjectile projectile) {
         Particle.SMOKE.builder()
                 .location(projectile.getEntity().getLocation())
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
     }

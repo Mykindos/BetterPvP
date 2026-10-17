@@ -147,7 +147,7 @@ public class FleshHook extends ChargeSkill implements InteractSkill, CooldownSki
             final Location location = hook.getItem().getLocation();
             Particle.CRIT.builder()
                     .count(3)
-                    .extra(0)
+                    .speed(0)
                     .offset(0.2, 0.2, 0.2)
                     .location(location)
                     .receivers(60)

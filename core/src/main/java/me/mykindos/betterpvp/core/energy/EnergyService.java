@@ -19,6 +19,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -117,7 +118,7 @@ public class EnergyService {
             if (inform && this.cooldownManager.use(player, ability + "_no_energy", 0.5, false)) {
                 UtilMessage.message(player, "core.prefix.energy", "core.energy.exhausted",
                         Component.text(ability, NamedTextColor.GREEN));
-                player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
+                player.getWorld().playEffect(player.getLocation(), Effect.SMOKE_SHOOT, BlockFace.UP);
             }
 
             return false;

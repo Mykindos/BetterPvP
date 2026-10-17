@@ -178,7 +178,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 0.2f);
         for (Block cur : UtilBlock.getInRadius(player.getLocation(), 4d).keySet()) {
             if (UtilBlock.airFoliage(cur.getRelative(BlockFace.UP)) && !UtilBlock.airFoliage(cur)) {
-                cur.getWorld().playEffect(cur.getLocation(), Effect.STEP_SOUND, cur.getType().createBlockData());
+                cur.getWorld().playEffect(cur.getLocation(), Effect.DESTROY_BLOCK, cur.getType().createBlockData());
             }
         }
     }
@@ -218,7 +218,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 .count(20)
                 .location(player.getLocation().clone().add(0.0, 0.1, 0.0))
                 .receivers(60)
-                .extra(0.078)
+                .speed(0.078)
                 .spawn();
 
         BukkitTask task = new BukkitRunnable() {

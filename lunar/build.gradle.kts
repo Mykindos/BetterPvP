@@ -15,7 +15,7 @@ dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
 
-    compileOnly("com.lunarclient:apollo-api:1.2.3")
+    compileOnly("com.lunarclient:apollo-api:1.3.0")
     compileOnly(libs.libsdisguises)
     compileOnly(libs.mythic)
     compileOnly(project(":core"))
@@ -23,8 +23,4 @@ dependencies {
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)
-}
-
-paperweight {
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 }

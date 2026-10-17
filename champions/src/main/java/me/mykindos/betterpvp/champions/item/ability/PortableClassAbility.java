@@ -139,7 +139,7 @@ public class PortableClassAbility extends AbstractInteraction implements Listene
                         .location(topCenter)
                         .offset(0.3, 0, 0.3)
                         .receivers(60)
-                        .extra(0.5)
+                        .speed(0.5)
                         .count(5)
                         .spawn();
 
@@ -150,7 +150,7 @@ public class PortableClassAbility extends AbstractInteraction implements Listene
                             .offset(0.25, 0.1, 0.25)
                             .receivers(60)
                             .count(1)
-                            .extra(0)
+                            .speed(0)
                             .spawn();
                 }
 

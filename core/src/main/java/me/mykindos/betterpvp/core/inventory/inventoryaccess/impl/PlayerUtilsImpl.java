@@ -41,7 +41,7 @@ public class PlayerUtilsImpl implements PlayerUtils {
     
     @Override
     public void stopAdvancementListening(@NotNull Object player) {
-        ((ServerPlayer) player).getAdvancements().stopListening();
+        ((ServerPlayer) player).getAdvancements().clearTriggers();
     }
     
     @Override
@@ -54,9 +54,9 @@ public class PlayerUtilsImpl implements PlayerUtils {
         PlayerAdvancements advancements = ((ServerPlayer) player).getAdvancements();
         ServerAdvancementManager manager = ((CraftServer) Bukkit.getServer()).getServer().getAdvancements();
         try {
-            Method b = advancements.getClass().getDeclaredMethod("b", ServerAdvancementManager.class);
-            b.setAccessible(true);
-            b.invoke(advancements, manager);
+            Method registerListeners = PlayerAdvancements.class.getDeclaredMethod("registerListeners", ServerAdvancementManager.class);
+            registerListeners.setAccessible(true);
+            registerListeners.invoke(advancements, manager);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             log.error("Failed to start advancement listening", e).submit();
         }

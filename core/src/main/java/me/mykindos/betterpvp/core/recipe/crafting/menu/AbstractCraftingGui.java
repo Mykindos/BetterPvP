@@ -218,7 +218,7 @@ public abstract class AbstractCraftingGui extends AbstractGui {
         if (craft(player)) {
             cursorItem.setAmount(totalAmount);
             updateEvent.setCancelled(true);
-            clickEvent.setCursor(cursorItem);
+            clickEvent.getView().setCursor(cursorItem);
             updateEvent.setNewItem(ItemStack.of(Material.AIR));
             resultInventory.setItemSilently(0, processResult(player, craftingMatrix.getItems()));
             playCrafted(player);

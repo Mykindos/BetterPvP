@@ -173,7 +173,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 .location(particleLoc)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
     }

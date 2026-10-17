@@ -187,7 +187,7 @@ public class FissionLunge extends AbstractInteraction implements DisplayedIntera
         Particle.EXPLOSION.builder()
                 .location(UtilPlayer.getMidpoint(player))
                 .count(1)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
     }
@@ -258,7 +258,7 @@ public class FissionLunge extends AbstractInteraction implements DisplayedIntera
                     .location(centre)
                     .count(0)
                     .offset(outward.getX(), outward.getY(), outward.getZ())
-                    .extra(0.4)
+                    .speed(0.4)
                     .receivers(60)
                     .spawn();
 

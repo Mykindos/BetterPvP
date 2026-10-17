@@ -42,7 +42,7 @@ public class MeridianBeam extends Projectile {
             Particle.DUST.builder()
                     .location(point)
                     .count(1)
-                    .extra(0.5)
+                    .speed(0.5)
                     .data(new Particle.DustOptions(color, 1.3f))
                     .receivers(60)
                     .spawn();

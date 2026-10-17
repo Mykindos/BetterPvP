@@ -150,14 +150,14 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
                 Particle.END_ROD.builder()
                         .location(l)
                         .receivers(receivers)
-                        .extra(0.f)
+                        .speed(0.f)
                         .spawn();
             }
             for (Location l : VectorLine.withStepSize(l2, l3, 0.15d).toLocations()) {
                 Particle.END_ROD.builder()
                         .location(l)
                         .receivers(receivers)
-                        .extra(0.f)
+                        .speed(0.f)
                         .spawn();
             }
         }

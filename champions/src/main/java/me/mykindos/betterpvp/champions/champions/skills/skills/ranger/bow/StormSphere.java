@@ -193,7 +193,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
         new ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
                 .location(point)
                 .count(1)
-                .extra(1)
+                .speed(1)
                 .data(new Particle.DustTransition(color, toColor, 1.5f))
                 .source(player)
                 .receivers(60)
@@ -221,7 +221,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
     }

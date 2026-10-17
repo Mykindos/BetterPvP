@@ -1,12 +1,11 @@
 package me.mykindos.betterpvp.clans.world.camp.settler.menu;
 
+import io.papermc.paper.InternalAPIBridge;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import org.bukkit.Bukkit;
-import org.bukkit.UnsafeValues;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -37,10 +36,10 @@ public final class MenuProbe {
      * before building any menu.
      */
     public static void load() {
-        final UnsafeValues unsafe = mock(UnsafeValues.class);
-        when(unsafe.createEmptyStack()).thenReturn(mock(ItemStack.class));
-        try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
-            bukkit.when(Bukkit::getUnsafe).thenReturn(unsafe);
+        final InternalAPIBridge api = mock(InternalAPIBridge.class);
+        when(api.createEmptyStack()).thenReturn(mock(ItemStack.class));
+        try (MockedStatic<InternalAPIBridge> bridge = mockStatic(InternalAPIBridge.class)) {
+            bridge.when(InternalAPIBridge::get).thenReturn(api);
             Class.forName(ItemProvider.class.getName(), true, ItemProvider.class.getClassLoader());
         } catch (ClassNotFoundException exception) {
             throw new IllegalStateException(exception);

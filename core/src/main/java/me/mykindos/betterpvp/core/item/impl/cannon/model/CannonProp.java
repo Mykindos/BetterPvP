@@ -287,7 +287,7 @@ public class CannonProp extends ModeledProp implements SoundProvider {
                 .location(location)
                 .count(0) // For directional particles, count must be 0
                 .offset(0, 0.15, 0)
-                .extra(0.2);
+                .speed(0.2);
 
         if (viewer == null) {
             crackle.play(location);

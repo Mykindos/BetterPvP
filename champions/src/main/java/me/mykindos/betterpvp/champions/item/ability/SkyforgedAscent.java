@@ -97,7 +97,7 @@ public class SkyforgedAscent extends CooldownInteraction implements DisplayedInt
         new SoundEffect(Sound.ITEM_TRIDENT_THUNDER, 2f, 0.5f).play(entity.getLocation());
         new SoundEffect(Sound.ITEM_TRIDENT_RIPTIDE_2, 0f, 1f).broadcast(entity);
         Particle.CLOUD.builder()
-                .extra(0.2)
+                .speed(0.2)
                 .count(20)
                 .location(entity.getLocation())
                 .receivers(60)
@@ -122,7 +122,7 @@ public class SkyforgedAscent extends CooldownInteraction implements DisplayedInt
             particleLoc.add(center.toVector());
             particle.builder()
                     .location(particleLoc.toLocation(center.getWorld()))
-                    .extra(0)
+                    .speed(0)
                     .receivers(60)
                     .spawn();
         }
@@ -139,7 +139,7 @@ public class SkyforgedAscent extends CooldownInteraction implements DisplayedInt
             starPoint.add(center.toVector());
             particle.builder()
                     .location(starPoint.toLocation(center.getWorld()))
-                    .extra(0)
+                    .speed(0)
                     .receivers(60)
                     .spawn();
         }
@@ -166,7 +166,7 @@ public class SkyforgedAscent extends CooldownInteraction implements DisplayedInt
                 linePoint.add(center.toVector());
                 particle.builder()
                         .location(linePoint.toLocation(center.getWorld()))
-                        .extra(0)
+                        .speed(0)
                         .receivers(60)
                         .spawn();
             }

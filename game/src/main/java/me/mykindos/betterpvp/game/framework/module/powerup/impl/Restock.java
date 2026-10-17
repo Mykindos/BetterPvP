@@ -134,7 +134,7 @@ public class Restock implements Powerup {
             Particle.FIREWORK.builder()
                     .location(location.clone().add(0, translation.y, 0))
                     .receivers(60)
-                    .extra(0.05)
+                    .speed(0.05)
                     .spawn();
         }
     }

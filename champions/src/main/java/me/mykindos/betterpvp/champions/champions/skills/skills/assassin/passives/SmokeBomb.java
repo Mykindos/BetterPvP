@@ -148,7 +148,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         Particle.SQUID_INK.builder()
                 .location(player.getLocation())
                 .receivers(30)
-                .extra(0)
+                .speed(0)
                 .count(10)
                 .offset(3, 3, 3)
                 .spawn();
@@ -169,7 +169,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         Particle.GLOW_SQUID_INK.builder()
                 .location(player.getLocation())
                 .receivers(30)
-                .extra(0)
+                .speed(0)
                 .count(10)
                 .offset(3, 3, 3)
                 .spawn();
@@ -301,17 +301,13 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     }
 
     private void displayPassiveEffects(Player player) {
-        final double random = Math.random();
-        if (random < 0.1) {
-            player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.STEP_SOUND, 0, 60);
-        }
-        if (random < 0.3) {
+        if (Math.random() < 0.3) {
             Particle.SMOKE.builder()
                     .location(player.getLocation())
                     .receivers(30)
                     .offset(0, 0.2, 0)
                     .count(5)
-                    .extra(0)
+                    .speed(0)
                     .spawn();
         }
     }

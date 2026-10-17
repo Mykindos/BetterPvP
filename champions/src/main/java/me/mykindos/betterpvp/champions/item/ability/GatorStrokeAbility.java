@@ -78,7 +78,7 @@ public class GatorStrokeAbility extends TemperInteraction implements DisplayedIn
 
         VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0.11, 1.0, true);
         UtilVelocity.velocity(player, null, velocityData);
-        player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK);
+        player.getWorld().playEffect(player.getLocation(), Effect.DESTROY_BLOCK, Material.LAPIS_BLOCK.createBlockData());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FISH_SWIM, 0.8F, 1.5F);
         return InteractionResult.Success.ADVANCE;
     }

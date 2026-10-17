@@ -6,10 +6,9 @@ import dev.brauw.mapper.region.Region;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.lingala.zip4j.ZipFile;
-import org.apache.commons.io.FileUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameRules;
 import org.bukkit.Location;
@@ -61,11 +60,9 @@ public class MappedWorld extends BPvPWorld {
     @SneakyThrows
     @Override
     public void createWorld() {
-        // Extract the world to the destination
-        final File destination = new File(Bukkit.getWorldContainer(), getName());
-        if (destination.exists()) {
-            FileUtils.deleteDirectory(destination);
-        }
+        // Extract the world to its import folder, clearing any copy a previous game left in either place
+        UtilWorld.deleteWorldFolders(getName());
+        final File destination = UtilWorld.getImportFolder(getName());
 
         // Unzip the map
         try (ZipFile zip = new ZipFile(zipFileTemplate)) {
@@ -115,7 +112,7 @@ public class MappedWorld extends BPvPWorld {
         super.unloadWorld();
 
         // Delete the world
-        FileUtils.deleteDirectory(getWorldFolder());
+        UtilWorld.deleteWorldFolders(getName());
     }
 
     @Override

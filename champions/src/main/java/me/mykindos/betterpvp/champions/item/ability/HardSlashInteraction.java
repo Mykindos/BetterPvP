@@ -93,7 +93,7 @@ public class HardSlashInteraction extends CooldownInteraction implements Display
             Vector flameDirection = location.clone().subtract(center).toVector();
             final ParticleBuilder particles = Particle.FLAME.builder()
                     .count(0)
-                    .extra(1.2)
+                    .speed(1.2)
                     .offset(flameDirection.getX(), 0, flameDirection.getZ())
                     .location(center)
                     .receivers(60);

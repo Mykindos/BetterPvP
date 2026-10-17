@@ -94,7 +94,7 @@ public class BoneSpike {
                 .data(Material.BONE_BLOCK.createBlockData())
                 .offset(0.2, 0.1, 0.2)
                 .count(8)
-                .extra(0)
+                .speed(0)
                 .allPlayers()
                 .spawn();
     }

@@ -97,7 +97,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                     .location(lineStart.clone().add(player.getLocation().getDirection()))
                     .count(1)
                     .receivers(30)
-                    .extra(0)
+                    .speed(0)
                     .spawn();
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.6F);
 
@@ -114,7 +114,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                         .location(point)
                         .count(2)
                         .receivers(receivers)
-                        .extra(0)
+                        .speed(0)
                         .spawn();
             }
 

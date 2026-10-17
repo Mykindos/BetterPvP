@@ -119,7 +119,7 @@ public class DashInteraction extends CooldownInteraction implements DisplayedInt
                 }
                 Particle.FLAME.builder()
                         .count(3)
-                        .extra(0)
+                        .speed(0)
                         .offset(0.2, 0.01, 0.2)
                         .location(entity.getLocation())
                         .receivers(60)

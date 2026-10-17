@@ -56,7 +56,7 @@ public class ClusterShell implements CannonAmmo {
     public void tick(@NotNull CannonProjectile projectile) {
         Particle.WHITE_SMOKE.builder()
                 .location(projectile.getEntity().getLocation())
-                .extra(0)
+                .speed(0)
                 .count(2)
                 .offset(0.1, 0.1, 0.1)
                 .receivers(60)

@@ -153,7 +153,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
                     "Glacial Blade");
             cde.setDamageDelay(0);
             UtilDamage.doDamage(cde);
-            hit.getWorld().playEffect(hit.getLocation(), Effect.STEP_SOUND, Material.GLASS);
+            hit.getWorld().playEffect(hit.getLocation(), Effect.DESTROY_BLOCK, Material.GLASS.createBlockData());
             damager.playSound(damager.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
         }

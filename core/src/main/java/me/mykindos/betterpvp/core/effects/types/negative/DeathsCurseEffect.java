@@ -40,7 +40,7 @@ public class DeathsCurseEffect extends VanillaEffectType {
         Particle.SOUL.builder()
                 .location(livingEntity.getLocation().add(0, livingEntity.getHeight() / 2, 0))
                 .count(1)
-                .extra(0.01)
+                .speed(0.01)
                 .offset(0.5, 0.5, 0.5)
                 .allPlayers()
                 .spawn();

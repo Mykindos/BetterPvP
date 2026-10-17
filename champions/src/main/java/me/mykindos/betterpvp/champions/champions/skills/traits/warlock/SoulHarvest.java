@@ -96,7 +96,7 @@ public class SoulHarvest extends Trait implements PassiveSkill, BuffSkill, Healt
         souls.forEach(soul -> {
             List<Player> newActives = new ArrayList<>(active);
             newActives.removeIf(p -> p.getUniqueId().equals(soul.getUuid()));
-            Particle.HEART.builder().location(soul.getLocation().clone().add(0, 1, 0)).receivers(newActives).extra(0).spawn();
+            Particle.HEART.builder().location(soul.getLocation().clone().add(0, 1, 0)).receivers(newActives).speed(0).spawn();
         });
     }
 

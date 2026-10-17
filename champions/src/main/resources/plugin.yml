@@ -4,6 +4,6 @@ name: Champions
 load: STARTUP
 version: '1.0'
 depend: [Core]
-api-version: '1.21'
+api-version: '26.3'
 softdepend:
   - Shops

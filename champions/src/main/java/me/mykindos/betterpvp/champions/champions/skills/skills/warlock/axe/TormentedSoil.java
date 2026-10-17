@@ -164,10 +164,10 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
                 if (i % teamColor == 0) {
                     //show allie based particles for better identification
-                    Particle.DUST.builder().color(Color.RED).location(loc).receivers(enemies).extra(0).spawn();
-                    Particle.DUST.builder().color(Color.GREEN).location(loc).receivers(allies).extra(0).spawn();
+                    Particle.DUST.builder().color(Color.RED).location(loc).receivers(enemies).speed(0).spawn();
+                    Particle.DUST.builder().color(Color.GREEN).location(loc).receivers(allies).speed(0).spawn();
                 } else {
-                    Particle.END_ROD.builder().location(loc).receivers(particleRadius).extra(0).spawn();
+                    Particle.END_ROD.builder().location(loc).receivers(particleRadius).speed(0).spawn();
                 }
                 loc.subtract(x, 0, z);
 

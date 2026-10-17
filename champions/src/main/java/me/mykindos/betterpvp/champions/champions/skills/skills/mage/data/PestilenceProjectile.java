@@ -57,7 +57,7 @@ public class PestilenceProjectile extends Projectile {
             Particle.TRIAL_OMEN.builder()
                     .location(point)
                     .count(1)
-                    .extra(0.5)
+                    .speed(0.5)
                     .offset(0.1, 0.1, 0.1)
                     .receivers(receivers)
                     .spawn();
@@ -84,7 +84,7 @@ public class PestilenceProjectile extends Projectile {
                 .location(location)
                 .count(50)
                 .offset(0.5, 0.5, 0.5)
-                .extra(0.5)
+                .speed(0.5)
                 .receivers(location.getNearbyPlayers(60))
                 .spawn();
         new SoundEffect(Sound.BLOCK_GRASS_PLACE, 0.5f, 1f).play(location);
@@ -122,7 +122,7 @@ public class PestilenceProjectile extends Projectile {
                 .location(livingEntity.getLocation().add(0, livingEntity.getHeight() / 2, 0))
                 .count(10)
                 .offset(0.5, 0.5, 0.5)
-                .extra(0.5)
+                .speed(0.5)
                 .receivers(location.getNearbyPlayers(60))
                 .spawn();
 

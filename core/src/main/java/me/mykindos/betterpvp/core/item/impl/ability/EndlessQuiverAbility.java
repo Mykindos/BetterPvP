@@ -49,6 +49,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.component.ChargedProjectiles;
@@ -475,7 +476,7 @@ public class EndlessQuiverAbility extends AbstractInteraction implements Listene
         final float powerForTime = BowItem.getPowerForTime(usedTime);
 
         try {
-            final Method method = ProjectileWeaponItem.class.getDeclaredMethod("shoot", // shoot
+            final Method method = ProjectileWeaponItem.class.getDeclaredMethod("shoot",
                     ServerLevel.class,
                     net.minecraft.world.entity.LivingEntity.class,
                     InteractionHand.class,
@@ -518,7 +519,7 @@ public class EndlessQuiverAbility extends AbstractInteraction implements Listene
         final float powerForTime = BowItem.getPowerForTime(player.getActiveItemUsedTime());
         if (powerForTime >= 1f) {
             UtilServer.runTask(core, () -> {
-                nmsStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new net.minecraft.world.item.ItemStack(Items.ARROW)));
+                nmsStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new ItemStackTemplate(Items.ARROW)));
             });
             return true;
         }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRules;
@@ -17,8 +18,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -95,14 +98,13 @@ public class SiteWorlds {
             return CompletableFuture.completedFuture(loaded);
         }
 
-        final File folder = new File(Bukkit.getWorldContainer(), worldName);
-        if (folder.isDirectory()) {
-            if (source.getKind() != WorldSource.Kind.OWN || template == null || template.equals(builtFrom(folder))) {
-                return load(worldName, folder, false);
+        if (isOnDisk(worldName)) {
+            if (source.getKind() != WorldSource.Kind.OWN || template == null || template.equals(builtFrom(worldName))) {
+                return load(worldName, false);
             }
 
-            log.info("World '{}' was built from '{}' and is now '{}' - rebuilding", worldName, builtFrom(folder), template).submit();
-            return destroy(worldName).thenCompose(unused -> rebuild(template, worldName, folder));
+            log.info("World '{}' was built from '{}' and is now '{}' - rebuilding", worldName, builtFrom(worldName), template).submit();
+            return destroy(worldName).thenCompose(unused -> rebuild(template, worldName));
         }
 
         if (source.getKind() == WorldSource.Kind.ADOPT) {
@@ -116,21 +118,38 @@ public class SiteWorlds {
 
         // An owned site with nothing to build from generates a world instead, since nothing says an owner's world
         // has to start from anything in particular.
-        return seed == null ? load(worldName, folder, true) : rebuild(seed, worldName, folder);
+        return seed == null ? load(worldName, true) : rebuild(seed, worldName);
     }
 
-    private @NotNull CompletableFuture<World> rebuild(@NotNull String template, @NotNull String worldName,
-                                                      @NotNull File folder) {
-        return copyTemplate(template, worldName, folder)
-                .thenCompose(unused -> load(worldName, folder, true))
+    /** The template is copied to the world's import folder, and Paper moves it into storage as the world loads. */
+    private @NotNull CompletableFuture<World> rebuild(@NotNull String template, @NotNull String worldName) {
+        return copyTemplate(template, worldName, importFolder(worldName))
+                .thenCompose(unused -> load(worldName, true))
                 .thenApply(world -> {
-                    markBuiltFrom(folder, template);
+                    markBuiltFrom(world, template);
                     return world;
                 });
     }
 
-    /** The template a folder on disk was built from, or null for one made before it was worth recording. */
-    private @Nullable String builtFrom(@NotNull File folder) {
+    private static @NotNull File storageFolder(@NotNull String worldName) {
+        return UtilWorld.getStorageFolder(worldName).toFile();
+    }
+
+    private static @NotNull File importFolder(@NotNull String worldName) {
+        return UtilWorld.getImportFolder(worldName);
+    }
+
+    private static boolean isOnDisk(@NotNull String worldName) {
+        return storageFolder(worldName).isDirectory() || new File(importFolder(worldName), "level.dat").isFile();
+    }
+
+    /** The template a world on disk was built from, or null for one made before it was worth recording. */
+    private @Nullable String builtFrom(@NotNull String worldName) {
+        final String stored = readMarker(storageFolder(worldName));
+        return stored != null ? stored : readMarker(importFolder(worldName));
+    }
+
+    private @Nullable String readMarker(@NotNull File folder) {
         final File marker = new File(folder, TEMPLATE_MARKER);
         if (!marker.isFile()) {
             return null;
@@ -144,11 +163,11 @@ public class SiteWorlds {
         }
     }
 
-    private void markBuiltFrom(@NotNull File folder, @NotNull String template) {
+    private void markBuiltFrom(@NotNull World world, @NotNull String template) {
         try {
-            Files.writeString(new File(folder, TEMPLATE_MARKER).toPath(), template);
+            Files.writeString(world.getWorldPath().resolve(TEMPLATE_MARKER), template);
         } catch (IOException unwritable) {
-            log.warn("Could not record the template for {}", folder, unwritable).submit();
+            log.warn("Could not record the template for {}", world.getName(), unwritable).submit();
         }
     }
 
@@ -184,8 +203,6 @@ public class SiteWorlds {
 
         UtilServer.runTask(core, () -> {
             final World world = Bukkit.getWorld(worldName);
-            final File folder = world != null ? world.getWorldFolder() : new File(Bukkit.getWorldContainer(), worldName);
-
             if (world != null) {
                 evacuate(world);
                 if (!Bukkit.unloadWorld(world, false)) {
@@ -197,7 +214,7 @@ public class SiteWorlds {
 
             // Only once the world is definitely going. A failed unload above leaves it alive, and it must keep its
             // harvest state rather than being silently reset.
-            release(worldName, folder, future);
+            release(worldName, future);
         });
 
         return future;
@@ -209,14 +226,14 @@ public class SiteWorlds {
      */
     public @NotNull CompletableFuture<Void> discard(@NotNull String worldName) {
         final CompletableFuture<Void> future = new CompletableFuture<>();
-        UtilServer.runTask(core, () -> release(worldName, new File(Bukkit.getWorldContainer(), worldName), future));
+        UtilServer.runTask(core, () -> release(worldName, future));
         return future;
     }
 
-    /** Announces the world as gone, then deletes its folder off-thread. Must be called on the main thread. */
-    private void release(@NotNull String worldName, @NotNull File folder, @NotNull CompletableFuture<Void> future) {
+    /** Announces the world as gone, then deletes its folders off-thread. Must be called on the main thread. */
+    private void release(@NotNull String worldName, @NotNull CompletableFuture<Void> future) {
         UtilServer.callEvent(new SiteWorldReleasedEvent(worldName));
-        deleteFolder(folder).whenComplete((unused, ex) -> {
+        deleteFolders(worldName).whenComplete((unused, ex) -> {
             if (ex != null) {
                 future.completeExceptionally(ex);
             } else {
@@ -228,13 +245,15 @@ public class SiteWorlds {
     /** Every cloned instance world currently on disk, whether or not anything is tracking it. */
     public @NotNull CompletableFuture<List<String>> clonedWorldsOnDisk() {
         final CompletableFuture<List<String>> future = new CompletableFuture<>();
-        final File root = new File(Bukkit.getWorldContainer(), WORLD_ROOT);
+        final List<File> roots = List.of(storageFolder(WORLD_ROOT), importFolder(WORLD_ROOT));
 
         UtilServer.runTaskAsync(core, () -> {
-            final List<String> worlds = new ArrayList<>();
-            final File[] siteDirs = root.listFiles(File::isDirectory);
-
-            if (siteDirs != null) {
+            final Set<String> worlds = new LinkedHashSet<>();
+            for (File root : roots) {
+                final File[] siteDirs = root.listFiles(File::isDirectory);
+                if (siteDirs == null) {
+                    continue;
+                }
                 for (File siteDir : siteDirs) {
                     final File[] instanceDirs = siteDir.listFiles(File::isDirectory);
                     if (instanceDirs == null) {
@@ -246,7 +265,7 @@ public class SiteWorlds {
                 }
             }
 
-            future.complete(worlds);
+            future.complete(new ArrayList<>(worlds));
         });
 
         return future;
@@ -282,25 +301,30 @@ public class SiteWorlds {
      * Creates the Bukkit world for a folder. {@code discardOnFailure} is set only when this call is what put the
      * folder there, so a hand-built world that fails to load is never deleted out from under us.
      */
-    private @NotNull CompletableFuture<World> load(@NotNull String worldName, @NotNull File folder, boolean discardOnFailure) {
+    private @NotNull CompletableFuture<World> load(@NotNull String worldName, boolean discardOnFailure) {
         final CompletableFuture<World> future = new CompletableFuture<>();
 
         UtilServer.runTask(core, () -> {
             try {
+                // Paper's import keeps only the world's own data, so the marker is carried over by hand.
+                final String importedTemplate = readMarker(importFolder(worldName));
                 final World world = Bukkit.createWorld(WorldCreator.name(worldName));
                 if (world == null) {
                     if (discardOnFailure) {
-                        discardQuietly(folder);
+                        discardQuietly(worldName);
                     }
                     future.completeExceptionally(new IllegalStateException("Failed to create world: " + worldName));
                     return;
                 }
 
+                if (importedTemplate != null && readMarker(world.getWorldPath().toFile()) == null) {
+                    markBuiltFrom(world, importedTemplate);
+                }
                 world.setGameRule(GameRules.PVP, true);
                 future.complete(world);
             } catch (Exception ex) {
                 if (discardOnFailure) {
-                    discardQuietly(folder);
+                    discardQuietly(worldName);
                 }
                 future.completeExceptionally(ex);
             }
@@ -315,12 +339,15 @@ public class SiteWorlds {
         world.getPlayers().forEach(player -> player.teleport(fallback.getSpawnLocation()));
     }
 
-    private @NotNull CompletableFuture<Void> deleteFolder(@NotNull File folder) {
+    private @NotNull CompletableFuture<Void> deleteFolders(@NotNull String worldName) {
         final CompletableFuture<Void> future = new CompletableFuture<>();
+        final File storage = storageFolder(worldName);
+        final File imported = importFolder(worldName);
 
         UtilServer.runTaskAsync(core, () -> {
             try {
-                forceDelete(folder);
+                forceDelete(storage);
+                forceDelete(imported);
                 future.complete(null);
             } catch (Exception ex) {
                 future.completeExceptionally(ex);
@@ -330,13 +357,16 @@ public class SiteWorlds {
         return future;
     }
 
-    /** Removes a folder left behind by a clone whose world could not be created. */
-    private void discardQuietly(@NotNull File folder) {
+    /** Removes the folders left behind by a clone whose world could not be created. */
+    private void discardQuietly(@NotNull String worldName) {
+        final File storage = storageFolder(worldName);
+        final File imported = importFolder(worldName);
         UtilServer.runTaskAsync(core, () -> {
             try {
-                forceDelete(folder);
+                forceDelete(storage);
+                forceDelete(imported);
             } catch (Exception ex) {
-                log.warn("Could not discard orphaned site folder {}", folder, ex).submit();
+                log.warn("Could not discard orphaned site folders for {}", worldName, ex).submit();
             }
         });
     }

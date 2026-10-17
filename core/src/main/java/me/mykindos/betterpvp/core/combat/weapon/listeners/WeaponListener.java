@@ -71,7 +71,7 @@ public class WeaponListener implements Listener {
                 .color(Color.fromRGB(color.red(), color.green(), color.blue()))
                 .allPlayers()
                 .count(1)
-                .extra(0)
+                .speed(0)
                 .spawn();
     }
 

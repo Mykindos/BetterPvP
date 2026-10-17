@@ -138,7 +138,7 @@ public class BuriedCache extends ProfessionSkill {
                 .location(center)
                 .count(20)
                 .offset(0.4, 0.4, 0.4)
-                .extra(0.05)
+                .speed(0.05)
                 .receivers(48, true)
                 .spawn();
     }

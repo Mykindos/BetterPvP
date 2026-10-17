@@ -1,26 +1,31 @@
 package me.mykindos.betterpvp.core.combat.nms;
 
+import io.papermc.paper.event.entity.EntityKnockbackEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public class CombatSheep extends net.minecraft.world.entity.animal.sheep.Sheep {
 
     private final Location location;
 
     public CombatSheep(Location location) {
-        super(EntityType.SHEEP, ((CraftWorld) location.getWorld()).getHandle());
+        super(EntityTypes.SHEEP, ((CraftWorld) location.getWorld()).getHandle());
         this.location = location;
 
         this.goalSelector.removeAllGoals(Objects::nonNull);
@@ -39,7 +44,8 @@ public class CombatSheep extends net.minecraft.world.entity.animal.sheep.Sheep {
 
     // Prevent knockback
     @Override
-    public void knockback(double d0, double d1, double d2) {
+    public void knockback(double power, double xd, double zd, @NotNull DamageSource source, float damage, boolean comesFromEffect,
+                          Entity attacker, @NotNull EntityKnockbackEvent.Cause eventCause) {
     }
 
     // Prevent damage
@@ -61,8 +67,10 @@ public class CombatSheep extends net.minecraft.world.entity.animal.sheep.Sheep {
 
     // Prevent teleport
     @Override
-    public boolean randomTeleport(double d0, double d1, double d2, boolean flag) {
-        return false;
+    public @NotNull RandomTeleportResult randomTeleport(double xx, double yy, double zz, boolean showParticles,
+                                                         @NotNull Predicate<BlockState> isInvalidPosition,
+                                                         @NotNull PlayerTeleportEvent.TeleportCause cause) {
+        return RandomTeleportResult.FAILURE;
     }
 
     // Remove ambient sound

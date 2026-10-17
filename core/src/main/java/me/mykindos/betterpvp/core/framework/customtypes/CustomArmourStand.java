@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.framework.customtypes;
 
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
@@ -16,7 +16,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
  */
 public class CustomArmourStand extends ArmorStand {
     public CustomArmourStand(Level world) {
-        super(EntityType.ARMOR_STAND, world);
+        super(EntityTypes.ARMOR_STAND, world);
         setInvisible(true);
 
     }

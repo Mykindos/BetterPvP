@@ -139,8 +139,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             for (FissureBlock fissureBlock : fissurePath.getFissureBlocks()) {
                 Block block = fissureBlock.getBlock();
 
-                player.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
-                player.getWorld().playEffect(block.getLocation().add(0, 1, 0), Effect.STEP_SOUND, block.getType());
+                player.getWorld().playEffect(block.getLocation(), Effect.DESTROY_BLOCK, block.getBlockData());
+                player.getWorld().playEffect(block.getLocation().add(0, 1, 0), Effect.DESTROY_BLOCK, block.getBlockData());
 
                 for (LivingEntity entity : fissureBlock.getNearbyEntities()) {
                     if (entity.getLocation().getBlockY() == block.getY() + 1 || entity.getLocation().getBlock().equals(block)) {
@@ -173,7 +173,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             Material materialToSet = fissureBlock.getMaterialToSet();
 
             blockHandler.addRestoreBlock(fissureCast.getPlayer(), targetBlock, fissureBlock.getBlockData(), materialToSet, (long) (fissureExpireDuration * 1000), true, "Fissure");
-            targetBlock.getWorld().playEffect(targetBlock.getLocation(), Effect.STEP_SOUND, materialToSet);
+            targetBlock.getWorld().playEffect(targetBlock.getLocation(), Effect.DESTROY_BLOCK, materialToSet.createBlockData());
 
             Location startLocation = fissureCast.getFissurePath().getStartLocation();
             Location blockLocation = fissureBlock.getBlock().getLocation();

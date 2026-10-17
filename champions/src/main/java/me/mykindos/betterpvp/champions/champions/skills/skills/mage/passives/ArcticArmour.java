@@ -169,7 +169,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
         final Optional<Location> closestSurface = UtilLocation.getClosestSurfaceBlock(relative, 3, true);
         closestSurface.ifPresent(loc -> loc.add(0, 2.2, 0));
         final Location result = closestSurface.orElse(relative.add(0, 1.2, 0));
-        Particle.CLOUD.builder().extra(0).location(result).receivers(60).spawn();
+        Particle.CLOUD.builder().speed(0).location(result).receivers(60).spawn();
     }
 
     private void convertWaterToIce(Player player, double duration, int radius) {
@@ -210,7 +210,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
             final double chance = Math.random();
             if (chance < 0.025) {
-                Particle.SNOWFLAKE.builder().extra(0).location(block.getLocation()).receivers(60).spawn();
+                Particle.SNOWFLAKE.builder().speed(0).location(block.getLocation()).receivers(60).spawn();
             }
         }
     }

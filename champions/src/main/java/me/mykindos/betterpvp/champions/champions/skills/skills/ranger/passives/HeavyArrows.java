@@ -96,7 +96,7 @@ public class HeavyArrows extends BowChargeSkill implements DamageSkill, PassiveS
                 it.remove();
             } else {
                 Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.ENCHANTED_HIT.builder().location(location).receivers(60).extra(0).spawn();
+                Particle.ENCHANTED_HIT.builder().location(location).receivers(60).speed(0).spawn();
             }
         }
     }

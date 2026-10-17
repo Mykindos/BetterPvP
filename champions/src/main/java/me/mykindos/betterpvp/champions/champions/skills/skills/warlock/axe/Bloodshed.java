@@ -136,7 +136,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
                     Particle.SNOWFLAKE.builder()
                             .location(l)
                             .receivers(receivers)
-                            .extra(0.0f)
+                            .speed(0.0f)
                             .spawn();
                 }
                 t++;

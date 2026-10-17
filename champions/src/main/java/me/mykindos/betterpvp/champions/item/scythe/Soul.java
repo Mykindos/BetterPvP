@@ -53,7 +53,7 @@ public class Soul {
     public void play(ScytheOfTheFallenLord scythe) {
         // Play lingering effect on the floor
         new ParticleBuilder(Particle.DUST)
-                .extra(0)
+                .speed(0)
                 .offset(1, 1, 1)
                 .count(5)
                 .color(203 + ((int) (Math.random() * 25) - 25), 92, 255)

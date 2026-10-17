@@ -242,7 +242,7 @@ public class CannonRideService {
         ride.getMannequin().reveal();
 
         play(ride, player, new SoundEffect("betterpvp", "prop.cannon.fire", 1f, 2f), from);
-        spawn(ride, player, Particle.EXPLOSION_EMITTER.builder().location(from).extra(0));
+        spawn(ride, player, Particle.EXPLOSION_EMITTER.builder().location(from).speed(0));
     }
 
     /** Plays {@code effect} at {@code where} - across the area, or to the rider alone on a private ride. */
@@ -352,7 +352,7 @@ public class CannonRideService {
         if (toBody.lengthSquared() > 1.0E-4) {
             lookAt(player, toBody);
         }
-        spawn(ride, player, Particle.CLOUD.builder().location(origin).extra(0).count(2).offset(0.1, 0.1, 0.1));
+        spawn(ride, player, Particle.CLOUD.builder().location(origin).speed(0).count(2).offset(0.1, 0.1, 0.1));
 
         final boolean grounded = !next.getBlock().isPassable()
                 || !next.clone().subtract(0, 0.2, 0).getBlock().isPassable();
@@ -372,7 +372,7 @@ public class CannonRideService {
         player.setGameMode(ride.getOrigin().toGameMode());
 
         new SoundEffect(Sound.ENTITY_PLAYER_BIG_FALL, 1f, 1f).play(safe);
-        Particle.EXPLOSION.builder().location(safe).extra(0).count(1).receivers(60).spawn();
+        Particle.EXPLOSION.builder().location(safe).speed(0).count(1).receivers(60).spawn();
         new CannonLandEvent(ride.getCannon(), player, safe).callEvent();
     }
 

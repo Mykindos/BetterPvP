@@ -115,7 +115,7 @@ public class Gravebind extends Skill implements CooldownToggleSkill, Listener, C
                     .data(Material.BONE_BLOCK.createBlockData())
                     .offset(0.25, 0, 0.25)
                     .count(4)
-                    .extra(0)
+                    .speed(0)
                     .allPlayers()
                     .spawn());
         }

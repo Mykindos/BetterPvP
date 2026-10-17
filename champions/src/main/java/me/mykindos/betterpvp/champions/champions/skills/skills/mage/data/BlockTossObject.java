@@ -271,7 +271,7 @@ public final class BlockTossObject {
         final Location location = getCenterLocation();
         final BlockData randomBlock = getRandomBlock();
         Particle.FALLING_DUST.builder().data(randomBlock).location(location).receivers(60, true).spawn();
-        Particle.CLOUD.builder().extra(0).location(location).receivers(60, true).spawn();
+        Particle.CLOUD.builder().speed(0).location(location).receivers(60, true).spawn();
     }
 
     // can be run out of main thread

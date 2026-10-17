@@ -150,7 +150,7 @@ public class BattlebindChains {
                 .data(Material.IRON_CHAIN.createBlockData())
                 .offset(target.getWidth() / 2, target.getHeight() / 2, target.getWidth() / 2)
                 .count(30)
-                .extra(0)
+                .speed(0)
                 .allPlayers()
                 .spawn();
 

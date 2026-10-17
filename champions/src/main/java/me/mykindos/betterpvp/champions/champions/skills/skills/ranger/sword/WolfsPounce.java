@@ -204,7 +204,7 @@ public class WolfsPounce extends ChargeSkill implements InteractSkill, CooldownS
             final Location playerLoc = player.getLocation();
             Particle.CRIT.builder()
                     .count(3)
-                    .extra(0)
+                    .speed(0)
                     .offset(0.6, 0.6, 0.6)
                     .location(playerLoc)
                     .receivers(60)

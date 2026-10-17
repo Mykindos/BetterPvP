@@ -104,14 +104,14 @@ public class RiftPickaxeProjectile extends Projectile {
         for (Location point : interpolateLine()) {
             Particle.NAUTILUS.builder()
                     .count(1)
-                    .extra(0.1)
+                    .speed(0.1)
                     .offset(0.05, 0.05, 0.05)
                     .location(point)
                     .receivers(receivers)
                     .spawn();
             Particle.ENCHANTED_HIT.builder()
                     .count(2)
-                    .extra(0.1)
+                    .speed(0.1)
                     .offset(0.1, 0.1, 0.1)
                     .location(point)
                     .receivers(receivers)
@@ -177,7 +177,7 @@ public class RiftPickaxeProjectile extends Projectile {
         itemDisplay.remove();
         Particle.ELECTRIC_SPARK.builder()
                 .count(10)
-                .extra(0.3)
+                .speed(0.3)
                 .offset(1.5, 1.5, 1.5)
                 .location(location)
                 .receivers(60)
@@ -185,7 +185,7 @@ public class RiftPickaxeProjectile extends Projectile {
         Particle.FLASH.builder()
                 .count(1)
                 .color(Color.AQUA)
-                .extra(0.1)
+                .speed(0.1)
                 .location(location)
                 .receivers(60)
                 .spawn();

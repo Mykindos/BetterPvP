@@ -4,7 +4,7 @@ loader: me.mykindos.betterpvp.core.CoreLoader
 name: Core
 load: STARTUP
 version: '1.0'
-api-version: '1.21'
+api-version: '26.3'
 dependencies:
   server:
     packetevents:

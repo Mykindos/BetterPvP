@@ -153,7 +153,7 @@ public class CapturePointBlocks implements Lifecycled {
             Material wool = Material.valueOf(color.name() + "_WOOL");
             block.setType(wool);
             Particle.BLOCK.builder()
-                    .extra(0)
+                    .speed(0)
                     .data(wool.createBlockData())
                     .count(20)
                     .offset(0.5, 0.1, 0.5)

@@ -46,7 +46,7 @@ public class BattlebindProjectile extends LinkProjectile {
         for (Location point : interpolateLine()) {
             Particle.BLOCK.builder()
                     .count(3)
-                    .extra(0)
+                    .speed(0)
                     .data(data)
                     .offset(0.5, 0.5, 0.5)
                     .location(point)
@@ -116,7 +116,7 @@ public class BattlebindProjectile extends LinkProjectile {
 
         Particle.BLOCK.builder()
                 .count(20)
-                .extra(0)
+                .speed(0)
                 .data(Material.IRON_CHAIN.createBlockData())
                 .offset(0.3, 0.3, 0.3)
                 .location(location)

@@ -47,11 +47,11 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            version("paper", "1.21.11-R0.1-SNAPSHOT")
-            version("paperweight", "2.0.0-beta.19")
+            version("paper", "26.3.build.+")
+            version("paperweight", "2.0.0-beta.24")
             version("jackson", "2.17.2")
-            version("sidebar", "2.4.1")
-            version("mockbukkit", "4.72.8")
+            version("sidebar", "2.8.3")
+            version("mockbukkit", "4.117.0")
             version("junit", "5.13.0-M2")
             version("jooq", "3.19.3")
             version("postgres", "42.7.4")
@@ -69,16 +69,15 @@ dependencyResolutionManagement {
             library("jooq-meta", "org.jooq", "jooq-meta").versionRef("jooq")
             library("jooq-meta-extensions", "org.jooq", "jooq-meta-extensions").versionRef("jooq")
 
-            // Library - reflection mapper
-            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.3")
-
             // Library - lombok
-            library("lombok", "org.projectlombok", "lombok").version("1.18.34")
+            library("lombok", "org.projectlombok", "lombok").version("1.18.48")
 
             // Library - Tests
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("reflections", "org.reflections:reflections:0.10.2")
-            library("mockbukkit", "org.mockbukkit.mockbukkit", "mockbukkit-v1.21").versionRef("mockbukkit")
+            library("mockbukkit", "org.mockbukkit.mockbukkit", "mockbukkit-v26.2").versionRef("mockbukkit")
+            // MockBukkit carries 26.2 registry data, so tests run on the matching API.
+            library("paper-api-test", "io.papermc.paper", "paper-api").version("26.2.build.+")
 
             // Library - Paper
             library("paper-api", "io.papermc.paper", "paper-api").versionRef("paper")
@@ -100,7 +99,7 @@ dependencyResolutionManagement {
 
             // Libraries - Utilities
             library("persistent-data-types", "com.jeff-media", "MorePersistentDataTypes").version("2.4.0")
-            library("glowapi", "fr.skytasul", "glowingentities").version("1.4.8")
+            library("glowapi", "fr.skytasul", "glowingentities").version("2.0.2")
             library("commons-text", "org.apache.commons", "commons-text").version("1.10.0")
             library("commons-lang3", "org.apache.commons", "commons-lang3").version("3.12.0")
             library("commons-math3", "org.apache.commons", "commons-math3").version("3.6.1")
@@ -114,31 +113,27 @@ dependencyResolutionManagement {
             library("jexl3", "org.apache.commons", "commons-jexl3").version("3.4.0")
 
             // Library - Mapper
-            library("mapper", "com.github.BetterPvP", "Mapper").version("1.1.0")
+            library("mapper", "com.github.BetterPvP", "Mapper").version("2.0.1")
 
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
             library("sidebar-impl", "net.megavex", "scoreboard-library-implementation").versionRef("sidebar")
-            library("sidebar-packetevents", "net.megavex", "scoreboard-library-packetevents").versionRef("sidebar")
 
             // Library - WorldEdit
-            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.14.2")
-            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.14.2")
+            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.16.1")
+            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.16.1")
 
             // Library - Mythic
-            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.5")
+            library("mythic", "io.lumine", "Mythic-Dist").version("5.14.0-SNAPSHOT")
 
-            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.9")
+            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.2.0")
 
             // Library - McPets
             library("mcpets", "fr.nocsy", "mcpets").version("4.1.10")
 
             // Library - Protocol
-            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.13")
-            library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.11.0")
-
-            // Library - Mixins
-            library("mixin", "org.spongepowered", "mixin").version("0.8.7")
+            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("26.9.26")
+            library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.14.0")
 
             // Library - Guice
             library("guice", "com.google.inject", "guice").version("7.0.0")
@@ -147,7 +142,7 @@ dependencyResolutionManagement {
             library("jedis", "redis.clients", "jedis").version("5.2.0")
 
             // Bundled Libraries
-            bundle("test", listOf("junit-jupiter", "mockbukkit"))
+            bundle("test", listOf("junit-jupiter", "mockbukkit", "paper-api-test"))
             bundle("paper", listOf("paper-api"))
             bundle(
                 "utils",
@@ -169,7 +164,6 @@ dependencyResolutionManagement {
                     "json",
                     "jexl3"))
             bundle("data", listOf("flyway-core", "flyway-mysql", "flyway-postgres"))
-            bundle("mixins", listOf("mixin"))
         }
     }
 }

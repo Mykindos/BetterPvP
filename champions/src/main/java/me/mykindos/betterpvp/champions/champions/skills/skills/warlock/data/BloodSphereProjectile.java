@@ -165,7 +165,7 @@ public final class BloodSphereProjectile extends Projectile {
             Particle.SCULK_SOUL.builder()
                     .location(location)
                     .count(10)
-                    .extra(0)
+                    .speed(0)
                     .offset(1, 1, 1)
                     .receivers(location.getNearbyPlayers(60))
                     .spawn();
@@ -235,7 +235,7 @@ public final class BloodSphereProjectile extends Projectile {
                     .data(new Particle.DustOptions(Color.MAROON, 0.7f))
                     .location(point.add(direction))
                     .count(1)
-                    .extra(0)
+                    .speed(0)
                     .receivers(nearby)
                     .spawn();
 
@@ -262,7 +262,7 @@ public final class BloodSphereProjectile extends Projectile {
         Particle.LARGE_SMOKE.builder()
                 .location(location)
                 .count(20)
-                .extra(0)
+                .speed(0)
                 .offset(1, 1, 1)
                 .receivers(location.getNearbyPlayers(60))
                 .spawn();

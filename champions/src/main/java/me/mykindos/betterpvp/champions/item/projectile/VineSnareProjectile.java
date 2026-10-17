@@ -103,7 +103,7 @@ public class VineSnareProjectile extends Projectile {
                 .location(location)
                 .count(4)
                 .offset(hitboxSize / 2, hitboxSize / 2, hitboxSize /2)
-                .extra(0)
+                .speed(0)
                 .allPlayers()
                 .spawn();
     }
@@ -117,7 +117,7 @@ public class VineSnareProjectile extends Projectile {
                 .location(location)
                 .count(5)
                 .offset(hitboxSize / 2, hitboxSize / 2, hitboxSize /2)
-                .extra(0)
+                .speed(0)
                 .allPlayers()
                 .spawn();
 
@@ -125,7 +125,7 @@ public class VineSnareProjectile extends Projectile {
                 .location(location)
                 .count(300)
                 .offset(hitboxSize, hitboxSize, hitboxSize)
-                .extra(0)
+                .speed(0)
                 .allPlayers()
                 .spawn();
 

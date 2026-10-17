@@ -163,7 +163,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
                         .offset(0, 0.3, 0)
                         .location(location)
                         .receivers(60, true)
-                        .extra(0)
+                        .speed(0)
                         .count(3)
                         .spawn();
             }

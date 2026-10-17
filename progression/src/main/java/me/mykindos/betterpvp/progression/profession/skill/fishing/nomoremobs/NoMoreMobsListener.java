@@ -49,7 +49,7 @@ public class NoMoreMobsListener implements Listener {
                     .location(at)
                     .count(15)
                     .offset(0.3, 0.3, 0.3)
-                    .extra(0.02)
+                    .speed(0.02)
                     .receivers(48)
                     .spawn();
         }, 1L);

@@ -192,7 +192,7 @@ public class VolticBashAbility extends TemperInteraction implements DisplayedInt
                 .location(player.getLocation())
                 .offset(0.7, 0.7, 0.7)
                 .count(5)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
     }

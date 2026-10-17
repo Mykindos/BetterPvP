@@ -161,7 +161,7 @@ public class GatewayParticleBehavior implements SceneBehavior {
                 Particle.SCULK_CHARGE_POP.builder()
                         .location(impact)
                         .count(50)
-                        .extra(0.1)
+                        .speed(0.1)
                         .receivers(VIEW_RANGE)
                         .spawn();
                 new SoundEffect(Sound.BLOCK_DRIED_GHAST_PLACE_IN_WATER, (float) (0.3F + Math.random() * 0.5f), 2.4f).play(impact);
@@ -179,7 +179,7 @@ public class GatewayParticleBehavior implements SceneBehavior {
                     .location(loc)
                     .count(1)
                     .offset(0.1, 0.1, 0.1)
-                    .extra(0)
+                    .speed(0)
 //                    .data(new Particle.DustTransition(Color.fromRGB(0x404040), Color.BLACK, 2f))
                     .receivers(VIEW_RANGE)
                     .spawn();

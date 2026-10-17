@@ -246,7 +246,7 @@ public class EntangledEffect extends EffectType {
                         .offset(0.5, 0.5, 0.5)
                         .count(40)
                         .allPlayers()
-                        .extra(0)
+                        .speed(0)
                         .spawn();
 
                 Particle.HAPPY_VILLAGER.builder()
@@ -254,7 +254,7 @@ public class EntangledEffect extends EffectType {
                         .offset(1, 1, 1)
                         .count(1)
                         .allPlayers()
-                        .extra(0)
+                        .speed(0)
                         .spawn();
             }
 

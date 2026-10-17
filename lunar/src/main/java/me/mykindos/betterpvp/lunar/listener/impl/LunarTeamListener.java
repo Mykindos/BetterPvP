@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.lunar.listener.impl;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.lunarclient.apollo.Apollo;
-import com.lunarclient.apollo.BukkitApollo;
+import com.lunarclient.apollo.common.location.ApolloLocation;
 import com.lunarclient.apollo.module.team.TeamMember;
 import com.lunarclient.apollo.module.team.TeamModule;
 import com.lunarclient.apollo.player.ApolloPlayer;
@@ -73,7 +73,12 @@ public class LunarTeamListener implements Listener {
                         .playerUuid(player.getUniqueId())
                         .displayName(player.displayName())
                         .markerColor(new Color(ClanRelation.SELF.getPrimary().value()))
-                        .location(BukkitApollo.toApolloLocation(player.getLocation()))
+                        .location(ApolloLocation.builder()
+                                .world(player.getWorld().getName())
+                                .x(player.getX())
+                                .y(player.getY())
+                                .z(player.getZ())
+                                .build())
                         .build())
                 .toList());
     }

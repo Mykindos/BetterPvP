@@ -99,7 +99,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
                         activeIterator.remove();
                     } else {
 
-                        player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.DIAMOND_BLOCK);
+                        player.getWorld().playEffect(player.getLocation(), Effect.DESTROY_BLOCK, Material.DIAMOND_BLOCK.createBlockData());
 
                         for (int i = 0; i <= getRadius(level); i++) {
                             pull(player, player.getEyeLocation().add(player.getLocation().getDirection().multiply(i)));

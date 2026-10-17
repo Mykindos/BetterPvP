@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.map.ClanMapService;
 import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.MapZoneStyleRegistry;
+import me.mykindos.betterpvp.clans.clans.map.VanillaMapPalette;
 import me.mykindos.betterpvp.clans.clans.map.claim.ClaimEntry;
 import me.mykindos.betterpvp.clans.clans.map.claim.ClanClaimIndex;
 import me.mykindos.betterpvp.clans.clans.map.data.MapBackground;
@@ -29,7 +30,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.map.MapPalette;
 
 import java.awt.Color;
 import java.time.Duration;
@@ -290,7 +290,7 @@ public class MapFrameService {
             } catch (NumberFormatException exception) {
                 color = new Color(58, 106, 154);
             }
-            unknownColorId = MapPalette.matchColor(color);
+            unknownColorId = VanillaMapPalette.matchColor(color);
         }
         return unknownColorId;
     }

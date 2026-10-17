@@ -3,7 +3,7 @@ main: me.mykindos.betterpvp.shops.Shops
 name: Shops
 load: POSTWORLD
 version: '1.0'
-api-version: '1.21'
+api-version: '26.3'
 dependencies:
   server:
     Core:

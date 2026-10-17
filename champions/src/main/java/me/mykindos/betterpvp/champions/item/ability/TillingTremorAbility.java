@@ -129,7 +129,7 @@ public class TillingTremorAbility extends CooldownInteraction implements Display
                     continue;
                 }
 
-                world.playEffect(blockLocation, Effect.STEP_SOUND, block.getType());
+                world.playEffect(blockLocation, Effect.DESTROY_BLOCK, block.getBlockData());
 
                 Block cropBlock = world.getBlockAt(blockLocation.clone().add(0, 1, 0));
                 Material cropType = cropBlock.getType();

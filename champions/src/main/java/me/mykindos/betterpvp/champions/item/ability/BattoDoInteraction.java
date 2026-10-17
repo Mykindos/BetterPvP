@@ -158,7 +158,7 @@ public class BattoDoInteraction extends AbstractInteraction implements Displayed
                         .spawn();
                 Particle.FLAME.builder()
                         .count(10)
-                        .extra(0.2)
+                        .speed(0.2)
                         .offset(radius / 2, 0.5, radius / 2)
                         .location(center)
                         .receivers(60)
@@ -247,14 +247,14 @@ public class BattoDoInteraction extends AbstractInteraction implements Displayed
                 for (Location location : UtilLocation.getCircumference(actor.getLocation(), 0.8, 15)) {
                     particles.add(Particle.FLAME.builder()
                             .count(1)
-                            .extra(0)
+                            .speed(0)
                             .location(location)
                             .receivers(60));
                 }
                 for (Location location : UtilLocation.getCircumference(actor.getLocation(), 0.7, 15)) {
                     particles.add(Particle.TRIAL_SPAWNER_DETECTION.builder()
                             .count(1)
-                            .extra(0.01)
+                            .speed(0.01)
                             .location(location)
                             .receivers(60));
                 }

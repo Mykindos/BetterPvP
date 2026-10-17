@@ -25,11 +25,13 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.util.Prediction;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -222,7 +224,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
             for (AxeProjectile axeProjectile : axeList) {
                 ItemStack originalAxe = axeProjectile.getItemStack();
                 CraftPlayer craftPlayer = (CraftPlayer) player;
-                craftPlayer.getHandle().drop(net.minecraft.world.item.ItemStack.fromBukkitCopy(originalAxe), true, true, true, item -> {
+                craftPlayer.getHandle().drop(CraftItemStack.asNMSCopy(originalAxe), true, Prediction.SERVER_ONLY, true, true, item -> {
                             item.setVelocity(new Vector(0,0,0));
                             item.teleport(deathLocation);
                         });

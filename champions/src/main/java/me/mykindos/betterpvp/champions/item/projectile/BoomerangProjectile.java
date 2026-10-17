@@ -89,7 +89,7 @@ public class BoomerangProjectile extends Projectile {
         for (Location point : interpolateLine()) {
             Particle.END_ROD.builder()
                     .count(1)
-                    .extra(0.2)
+                    .speed(0.2)
                     .offset(0.1, 0.1, 0.1)
                     .location(point)
                     .receivers(receivers)
@@ -137,13 +137,13 @@ public class BoomerangProjectile extends Projectile {
                 Particle.FLASH.builder()
                         .color(Color.WHITE)
                         .count(1)
-                        .extra(0.1)
+                        .speed(0.1)
                         .location(location)
                         .receivers(60)
                         .spawn();
                 Particle.GUST.builder()
                         .count(1)
-                        .extra(0.3)
+                        .speed(0.3)
                         .offset(0.3, 0.3, 0.3)
                         .location(location)
                         .receivers(60)
@@ -195,7 +195,7 @@ public class BoomerangProjectile extends Projectile {
         itemDisplay.remove();
         Particle.GUST.builder()
                 .count(1)
-                .extra(0.3)
+                .speed(0.3)
                 .offset(0.3, 0.3, 0.3)
                 .location(location)
                 .receivers(60)
@@ -203,7 +203,7 @@ public class BoomerangProjectile extends Projectile {
         Particle.FLASH.builder()
                 .count(1)
                 .color(Color.WHITE)
-                .extra(0.1)
+                .speed(0.1)
                 .location(location)
                 .receivers(60)
                 .spawn();

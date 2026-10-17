@@ -149,7 +149,7 @@ public class BladeSmashInteraction extends SelectorInteraction {
                     .spawn();
             Particle.FLAME.builder()
                     .count(10)
-                    .extra(0.2)
+                    .speed(0.2)
                     .offset(radius / 2, 0.5, radius / 2)
                     .location(center)
                     .receivers(60)

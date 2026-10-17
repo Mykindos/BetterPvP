@@ -62,7 +62,7 @@ public class BlueprintHolder extends AbstractItem {
         if (!virtualInventory.isEmpty()) {
             // Refund them if they have an empty cursor
             if (cursorItem.isEmpty()) {
-                event.setCursor(virtualInventory.getItem(0));
+                event.getView().setCursor(virtualInventory.getItem(0));
                 virtualInventory.setItem(new PlayerUpdateReason(player, event), 0, null);
                 notifyWindows();
             }
@@ -91,9 +91,9 @@ public class BlueprintHolder extends AbstractItem {
         // Reduce cursor item by 1
         if (cursorItem.getAmount() > 1) {
             cursorItem.setAmount(cursorItem.getAmount() - 1);
-            event.setCursor(cursorItem);
+            event.getView().setCursor(cursorItem);
         } else {
-            event.setCursor(null);
+            event.getView().setCursor(null);
         }
 
         // Update all GUI sections to reflect the addition
