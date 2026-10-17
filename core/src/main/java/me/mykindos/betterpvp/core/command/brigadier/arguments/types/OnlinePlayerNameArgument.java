@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
@@ -75,7 +74,7 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
 
         if (!(source instanceof CommandSourceStack sourceStack)) return player;
 
-        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
+        final @Nullable Player executor = executingPlayer(sourceStack);
 
         if (executor != null &&
                 !clientManager.search().online(executor).hasRank(Rank.HELPER)
@@ -93,7 +92,7 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
         if (!(context.getSource() instanceof final CommandSourceStack sourceStack))
             return super.listSuggestions(context, builder);
 
-        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
+        final @Nullable Player executor = executingPlayer(sourceStack);
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(target -> executor == null ||

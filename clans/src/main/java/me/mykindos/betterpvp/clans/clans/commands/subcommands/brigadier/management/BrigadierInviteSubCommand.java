@@ -68,7 +68,7 @@ public class BrigadierInviteSubCommand extends BrigadierClanSubCommand {
                         .executes(context -> {
                             final Player target = context.getArgument("Invitable Player", Player.class);
 
-                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                            final Player player = getPlayerFromExecutor(context);
 
                             final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 

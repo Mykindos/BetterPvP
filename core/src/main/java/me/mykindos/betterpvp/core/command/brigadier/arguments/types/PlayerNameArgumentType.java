@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.command.brigadier.arguments.types;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -15,6 +14,7 @@ import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.CommandMessages;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -23,14 +23,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 @Singleton
 public class PlayerNameArgumentType extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<String, String> {
-    public static final DynamicCommandExceptionType UNKNOWN_PLAYER_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Player " + name));
-    public static final DynamicCommandExceptionType INVALID_PLAYER_NAME_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Invalid Playername " + name));
+    public static final DynamicCommandExceptionType UNKNOWN_PLAYER_EXCEPTION = new DynamicCommandExceptionType(name -> CommandMessages.translatable("core.command.error.unknown_offline_player", name));
+    public static final DynamicCommandExceptionType INVALID_PLAYER_NAME_EXCEPTION = new DynamicCommandExceptionType(name -> CommandMessages.translatable("core.command.error.invalid_player_name", name));
 
     private final  EffectManager effectManager;
     private final ClientManager clientManager;
@@ -83,7 +82,7 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
         if (!(context.getSource() instanceof final CommandSourceStack sourceStack))
             return Suggestions.empty();
 
-        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
+        final @Nullable Player executor = executingPlayer(sourceStack);
         Bukkit.getOnlinePlayers().stream()
                 .filter(target -> executor == null ||
                         clientManager.search().online(executor).hasRank(Rank.HELPER) ||

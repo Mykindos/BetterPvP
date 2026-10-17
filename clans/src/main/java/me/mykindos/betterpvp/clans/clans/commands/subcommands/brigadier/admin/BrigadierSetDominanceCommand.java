@@ -65,7 +65,7 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
                                 .executes(context -> {
                                     Clan targetClan = context.getArgument("Target Clan", Clan.class);
                                     double newDominance = context.getArgument("Dominance", double.class);
-                                    if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                                    final Player player = getPlayerFromExecutor(context);
 
                                     Clan originClan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
                                     applyNewDominance(targetClan, originClan, newDominance);

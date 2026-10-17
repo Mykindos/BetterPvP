@@ -1,45 +1,49 @@
 package me.mykindos.betterpvp.core.command.brigadier.arguments;
 
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import static me.mykindos.betterpvp.core.command.brigadier.arguments.CommandMessages.translatable;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ArgumentException {
     public static final SimpleCommandExceptionType INSUFFICIENT_PERMISSION = new SimpleCommandExceptionType(
-            new LiteralMessage("Insufficient permissions to use this command")
+            translatable("core.command.error.insufficient_permission")
     );
     public static final Dynamic3CommandExceptionType TARGET_ALREADY_INVITED_BY_ORIGIN_TYPE = new Dynamic3CommandExceptionType(
-            (originName, targetName, type) -> new LiteralMessage(targetName + " already has a " + type + " invite with " + originName)
+            (originName, targetName, type) -> translatable("core.command.error.already_invited", originName, targetName, type)
     );
     public static final Dynamic3CommandExceptionType TARGET_NOT_INVITED_BY_ORIGIN_TYPE = new Dynamic3CommandExceptionType(
-            (originName, targetName, type) -> new LiteralMessage(targetName + " does not have a " + type + " invite with " + originName)
+            (originName, targetName, type) -> translatable("core.command.error.not_invited", originName, targetName, type)
     );
 
-    public static final DynamicCommandExceptionType TARGET_MUST_BE_PLAYER = new DynamicCommandExceptionType(
-            (targetName) -> new LiteralMessage(targetName + " is not a player")
+    public static final SimpleCommandExceptionType PLAYER_ONLY = new SimpleCommandExceptionType(
+            translatable("core.command.error.player_only")
     );
 
     public static final DynamicCommandExceptionType COMMAND_ON_COOLDOWN = new DynamicCommandExceptionType(
             //time is in seconds
-            (time) -> new LiteralMessage("You may use this command in " + time + " seconds")
+            time -> translatable("core.command.error.on_cooldown", time)
     );
     public static final DynamicCommandExceptionType UNKNOWN_PLAYER = new DynamicCommandExceptionType(
-            (playerName) -> new LiteralMessage(playerName + " does not match an online player")
+            playerName -> translatable("core.command.error.unknown_player", playerName)
     );
     public static final DynamicCommandExceptionType UNKNOWN_EFFECT = new DynamicCommandExceptionType(
-            (name) -> new LiteralMessage("Unknown Effect " + name)
+            name -> translatable("core.command.error.unknown_effect", name)
     );
     public static final DynamicCommandExceptionType UNKNOWN_UUIDITEM = new DynamicCommandExceptionType(
-            (uuid) -> new LiteralMessage("Unknown UUIDItem with UUID: " + uuid)
+            uuid -> translatable("core.command.error.unknown_uuid_item", uuid)
     );
     public static final DynamicCommandExceptionType UNKNOWN_BPVPITEM = new DynamicCommandExceptionType(
-            (name) -> new LiteralMessage("Unknown BPvPItem with name: " + name)
+            name -> translatable("core.command.error.unknown_item", name)
     );
     public static final DynamicCommandExceptionType INVALID_BOOLEAN = new DynamicCommandExceptionType(
-            (input) -> new LiteralMessage("Invalid boolean value: " + input + ", Expected true or false")
+            input -> translatable("core.command.error.invalid_boolean", input)
+    );
+    public static final DynamicCommandExceptionType INVALID_DURATION = new DynamicCommandExceptionType(
+            input -> translatable("core.command.error.invalid_duration", input)
     );
 }

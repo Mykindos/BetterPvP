@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -96,7 +97,7 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
     }
 
     @Override
-    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) {
+    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         Component component = super.getRequirementComponent(context);
         boolean inClan = executorHasAClan(context.getSource());
         component = component.appendNewline();

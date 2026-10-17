@@ -12,16 +12,15 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,7 +40,8 @@ public class ClanMemberArgument extends BPvPArgumentType<ClanMember, String> imp
         final String name = nativeType;
 
         if (!(source instanceof final CommandSourceStack sourceStack)) throw new ClassCastException("source type of invalid type");
-        final @NotNull Entity executor = Objects.requireNonNull(sourceStack.getExecutor());
+        final Player executor = executingPlayer(sourceStack);
+        if (executor == null) throw ArgumentException.PLAYER_ONLY.create();
 
         final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(executor.getUniqueId());
         if (executorClanOptional.isEmpty()) throw ClanArgumentException.MUST_BE_IN_A_CLAN_EXCEPTION.create();
@@ -68,7 +68,8 @@ public class ClanMemberArgument extends BPvPArgumentType<ClanMember, String> imp
     @Override
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
         if (!(context.getSource() instanceof final CommandSourceStack sourceStack)) return super.listSuggestions(context, builder);
-        final @NotNull Entity executor = Objects.requireNonNull(sourceStack.getExecutor());
+        final Player executor = executingPlayer(sourceStack);
+        if (executor == null) return builder.buildFuture();
         final Clan executorClan = clanManager.getClanByPlayer(executor.getUniqueId()).orElse(null);
         if (executorClan == null) {
             Bukkit.getOnlinePlayers().stream()

@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.command.brigadier.arguments;
 
-import com.google.inject.Singleton;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -9,6 +8,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.BooleanArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.CustomEffectArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.CustomItemArgumentType;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.DurationArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.UUIDItemArgumentType;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -24,7 +24,6 @@ import java.util.UUID;
 
 
 @CustomLog
-@Singleton
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BPvPArgumentTypes {
     @Getter
@@ -35,6 +34,15 @@ public class BPvPArgumentTypes {
     private static final CustomEffectArgumentType CUSTOM_EFFECT_ARGUMENT = (CustomEffectArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), CustomEffectArgumentType.class);
     private static final BooleanArgumentType BOOLEAN_ARGUMENT = (BooleanArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), BooleanArgumentType.class);
     private static final CustomItemArgumentType CUSTOM_ITEM_ARGUMENT = (CustomItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), CustomItemArgumentType.class);
+    private static final DurationArgumentType DURATION_ARGUMENT = (DurationArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), DurationArgumentType.class);
+
+    /**
+     * Loads this class, so every argument type registers while Core enables
+     */
+    public static void load() {
+        log.info("Loaded {} brigadier argument types", argumentTypes.size()).submit();
+    }
+
     public static BPvPArgumentType<?, ?> createArgumentType(BPvPPlugin plugin, Class<? extends BPvPArgumentType<?, ?>> clazz) {
 
         BPvPArgumentType<?, ?> argumentType = plugin.getInjector().getInstance(clazz);
@@ -88,5 +96,15 @@ public class BPvPArgumentTypes {
      */
     public static CustomItemArgumentType customItemType() {
         return CUSTOM_ITEM_ARGUMENT;
+    }
+
+    /**
+     * A length of time such as {@code 30m}, {@code 2d} or {@code perm}. Offers no suggestions, so the client shows the
+     * argument name as a hint.
+     * <p>Casting class {@link Long}, in milliseconds, with {@code perm} as -1</p>
+     * @return the {@link DurationArgumentType}
+     */
+    public static DurationArgumentType duration() {
+        return DURATION_ARGUMENT;
     }
 }

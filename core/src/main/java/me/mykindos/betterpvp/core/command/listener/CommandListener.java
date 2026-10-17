@@ -91,6 +91,7 @@ public class CommandListener implements Listener {
         String finalCommandName = commandName;
         Optional<ICommand> commandOptional = commandManager.getCommand(finalCommandName, finalArgs);
         if (commandOptional.isEmpty() &&
+                brigadierCommandManager.getObject(finalCommandName).isEmpty() &&
                 !client.hasRank(Rank.ADMIN) &&
                 !event.getPlayer().isOp()) {
             event.setCancelled(true);

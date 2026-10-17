@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -93,6 +94,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
             clans.getReloadables().forEach(Reloadable::reload);
 
             brigadierClansCommandLoader.reload();
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             commandLoader.reload(clans.getClass().getPackageName());
             tipManager.reloadTips(clans);
 

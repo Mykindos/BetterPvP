@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -99,6 +100,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
             core.getReloadables().forEach(Reloadable::reload);
 
             brigadierCoreCommandLoader.reload();
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             commandLoader.reload(core.getClass().getPackageName());
             tipManager.reloadTips(core);
             resourcePackHandler.reload();

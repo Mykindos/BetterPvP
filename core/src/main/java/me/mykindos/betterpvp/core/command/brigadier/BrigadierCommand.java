@@ -1,20 +1,20 @@
 package me.mykindos.betterpvp.core.command.brigadier;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.PaperBrigadier;
-import io.papermc.paper.command.brigadier.PaperCommands;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -85,7 +86,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
 
     /**
      * Builds the LiteralCommandNode<CommandSourceStack> from define()
-     * Requires sender to have required rank and executor to be a player
+     * Requires the command to be enabled and the sender to have the required rank
      * @return the build
      */
     @Override
@@ -107,34 +108,33 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
 
     /**
      * Defines the requirements the root command needs to be runnable
-     * Default: Command is Enabled, Executor is a player, Sender has correct rank
+     * Default: Command is Enabled, Sender has correct rank. Console may run it.
+     * A command that needs a player executor adds {@link #executorIsPlayer(CommandSourceStack)} by overriding this.
      * <p>Used in {@link #build()}</p>
      * @param source the CommandSourceStack
      * @return whether the runner can use the command
      */
     @Override
     public boolean requirement(CommandSourceStack source) {
-            return commandIsEnabled() && executorIsPlayer(source) && senderHasCorrectRank(source);
+        return commandIsEnabled() && senderHasCorrectRank(source);
     }
 
     @Override
-    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) {
-        Client client = getClientFromExecutor(context);
-        Component component = Component.empty();
-        if (requirement(context.getSource())) {
-            component = component.append(UtilMessage.deserialize("<white>You <green>can</green> run this command"));
-        } else {
-            component = component.append(UtilMessage.deserialize("<white>You <red>cannot</red> run this command"));
-        }
-        component = component.appendNewline();
-        component = component.append(Component.text("Enabled: ", NamedTextColor.WHITE))
-                .append(Component.text(this.enabled, this.enabled ? NamedTextColor.GREEN : NamedTextColor.RED));
-        component = component.appendNewline();
-        component = component.append(Component.text("Rank: ", NamedTextColor.WHITE))
-                .append(Component.text(this.requiredRank.name(), this.requiredRank.getColor())).append(Component.text(" | ", NamedTextColor.GRAY))
-                .append((Component.text("You Qualify: ", NamedTextColor.WHITE))
-                        .append(Component.text(client.hasRank(this.requiredRank), client.hasRank(this.requiredRank) ? NamedTextColor.GREEN : NamedTextColor.RED)));
-        return component;
+    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final boolean canRun = requirement(context.getSource());
+        final boolean qualifies = senderHasCorrectRank(context.getSource());
+        return Component.empty()
+                .append(Translations.component(canRun ? "core.command.requirement.can_run" : "core.command.requirement.cannot_run")
+                        .color(canRun ? NamedTextColor.GREEN : NamedTextColor.RED))
+                .appendNewline()
+                .append(Translations.component("core.command.requirement.enabled",
+                        Component.text(this.enabled, this.enabled ? NamedTextColor.GREEN : NamedTextColor.RED)).color(NamedTextColor.WHITE))
+                .appendNewline()
+                .append(Translations.component("core.command.requirement.rank",
+                        Component.text(this.requiredRank.name(), this.requiredRank.getColor())).color(NamedTextColor.WHITE))
+                .append(Component.text(" | ", NamedTextColor.GRAY))
+                .append(Translations.component("core.command.requirement.qualifies",
+                        Component.text(qualifies, qualifies ? NamedTextColor.GREEN : NamedTextColor.RED)).color(NamedTextColor.WHITE));
     }
 
     //Helper Methods
@@ -164,12 +164,12 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @param source the {@link CommandSourceStack}
      * @param rank the {@link Rank} to check against
      * @return {@code false} if {@link CommandSourceStack#getSender()} is a {@link Player}
-     * but does not have the required {@link Rank},
+     * who is not op and does not have the required {@link Rank},
      * {@code true} otherwise (i.e. console)
      */
     protected boolean senderHasRank(CommandSourceStack source, Rank rank) {
         if (source.getSender() instanceof final Player sender) {
-            return clientManager.search().online(sender).hasRank(rank);
+            return sender.isOp() || clientManager.search().online(sender).hasRank(rank);
         }
         //CommandSender is not a player, always allow
         return true;
@@ -209,7 +209,8 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      */
     @NotNull
     protected Player getPlayerFromExecutor(@NotNull CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (!(context.getSource().getExecutor() instanceof final Player player)) throw ArgumentException.TARGET_MUST_BE_PLAYER.create(context.getSource().getExecutor() == null ? null : (context.getSource().getExecutor().getName()));
+        final CommandSourceStack source = context.getSource();
+        if (!(source.getExecutor() instanceof final Player player)) throw ArgumentException.PLAYER_ONLY.create();
         return player;
     }
 
@@ -221,7 +222,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      */
     @NotNull
     protected Player getPlayerFromSender(@NotNull CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (!(context.getSource().getSender() instanceof final Player player)) throw ArgumentException.TARGET_MUST_BE_PLAYER.create(context.getSource().getExecutor() == null ? null : (context.getSource().getSender().getName()));
+        if (!(context.getSource().getSender() instanceof final Player player)) throw ArgumentException.PLAYER_ONLY.create();
         return player;
     }
 
@@ -229,14 +230,11 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * Gets the {@link Client} of the {@link CommandSourceStack#getExecutor()}
      * @param context the {@link CommandContext<CommandSourceStack>}
      * @return the {@link Client}
-     * @throws ClassCastException if {@link CommandSourceStack#getExecutor()} is not instance of {@link Player}
+     * @throws CommandSyntaxException if {@link CommandSourceStack#getExecutor()} is not instance of {@link Player}
      */
     @NotNull
-    protected Client getClientFromExecutor(@NotNull CommandContext<CommandSourceStack> context) throws ClassCastException {
-        if (!(context.getSource().getExecutor() instanceof Player player)) {
-            throw new ClassCastException("Cannot get a client of a non-player");
-        }
-        return clientManager.search().online(player);
+    protected Client getClientFromExecutor(@NotNull CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        return clientManager.search().online(getPlayerFromExecutor(context));
     }
 
     //Since we cannot throw a CommandSyntaxException in async contexts, this will pseudo throw on an empty optional.
@@ -250,9 +248,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     protected CompletableFuture<Optional<Client>> getOfflineClientByName(String name, CommandSender commandSender) {
         return clientManager.search().offline(name).thenApply(clientOptional -> {
                     if (clientOptional.isEmpty()) {
-                        commandSender
-                                .sendMessage(UtilMessage.deserialize("<red>" + PlayerNameArgumentType.UNKNOWN_PLAYER_EXCEPTION
-                                        .create(name).getMessage()));
+                        UtilMessage.sendCommandSyntaxException(commandSender, PlayerNameArgumentType.UNKNOWN_PLAYER_EXCEPTION.create(name));
                     }
                     return clientOptional;
                 }).exceptionally(throwable -> {
@@ -265,20 +261,17 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * Get all the usages of this command
      * @param source the {@link CommandSourceStack}
      * @param parentUsage the usage of the parent to this command
-     * @return the formatted string of all usages
-     * @see PaperBrigadier#wrapNode(CommandNode)
+     * @return one line per usable path of this command, each prefixed with {@code parentUsage} when given
      */
     public String getUsages(CommandSourceStack source, @Nullable String parentUsage) {
-        //get the internal dispatcher, we do not care if it is valid, we are using a helper method
-        //copied from PaperBrigadier#wrapNode(CommandNode)
         LiteralCommandNode<CommandSourceStack> node = build();
-        Map<CommandNode<CommandSourceStack>, String> map = PaperCommands.INSTANCE.getDispatcherInternal()
-                .getSmartUsage(node, source);
-        map.replaceAll((key, value) -> node.getUsageText() + " " + value);
-        if (parentUsage == null) {
-            return map.isEmpty() ? node.getUsageText() :  String.join("\n" + node.getUsageText() + " ", map.values());
+        String prefix = parentUsage == null ? node.getUsageText() : parentUsage + " " + node.getUsageText();
+        final String[] usages = new CommandDispatcher<CommandSourceStack>().getAllUsage(node, source, true);
+        if (usages.length == 0) {
+            return prefix;
         }
-        return map.isEmpty() ? parentUsage + " " + node.getUsageText() : parentUsage + " " + String.join("\n" + parentUsage + " ", map.values());
-
+        return Arrays.stream(usages)
+                .map(usage -> usage.isEmpty() ? prefix : prefix + " " + usage)
+                .collect(Collectors.joining("\n"));
     }
 }

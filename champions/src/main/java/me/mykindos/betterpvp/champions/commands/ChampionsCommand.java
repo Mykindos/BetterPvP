@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -96,6 +97,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             champions.getReloadables().forEach(Reloadable::reload);
 
             brigadierChampionsCommandLoader.reload();
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             commandLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
             buildManager.reloadBuilds();

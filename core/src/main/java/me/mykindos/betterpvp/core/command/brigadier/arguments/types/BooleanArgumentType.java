@@ -11,7 +11,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -47,7 +46,7 @@ public class BooleanArgumentType extends BPvPArgumentType<Boolean, String> imple
         } else if (booleanFalse(nativeType)) {
             return false;
         }
-         throw ArgumentException.INVALID_BOOLEAN.create(Component.text(nativeType));
+        throw ArgumentException.INVALID_BOOLEAN.create(nativeType);
     }
 
     /**

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -67,7 +68,7 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
                 .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
                                 .executes(context -> {
                                     final Clan target = context.getArgument("Clan", Clan.class);
-                                    if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+                                    final Player player = getPlayerFromExecutor(context);
                                     if (clanManager.getClanByPlayer(player).isPresent()) throw ClanArgumentException.MUST_NOT_BE_IN_A_CLAN_EXCEPTION.create(player.getName());
 
                                     final Component notification = UtilMessage.deserialize("<yellow>%s</yellow> had <yellow>%s</yellow> force join <aqua>%s</aqua>",
@@ -83,7 +84,7 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
                                 .executes(context -> {
                                     final Clan target = context.getArgument("Joinable Clan", Clan.class);
 
-                                    if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+                                    final Player player = getPlayerFromExecutor(context);
 
                                     final Client client = getClientFromExecutor(context);
 
@@ -101,7 +102,7 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
     }
 
     @Override
-    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) {
+    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         Component component = super.getRequirementComponent(context);
         boolean inClan = executorHasAClan(context.getSource());
         component = component.appendNewline();

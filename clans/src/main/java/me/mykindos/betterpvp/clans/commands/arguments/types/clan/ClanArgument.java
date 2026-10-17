@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -61,7 +60,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
         final Clan target = clanManager.getClanByName(nativeType).orElseThrow(() -> ClanArgumentException.UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
         if (!(source instanceof final CommandSourceStack sourceStack)) return target;
 
-        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
+        final @Nullable Player executor = executingPlayer(sourceStack);
         if (executor == null) return target;
 
         executorClanChecker(executor, target);
@@ -91,7 +90,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
         if (!(context.getSource() instanceof final CommandSourceStack sourceStack)) return super.listSuggestions(context, builder);
 
-        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
+        final @Nullable Player executor = executingPlayer(sourceStack);
         clanManager.getObjects().values().stream()
                 .filter(clan -> {
                     if (executor == null) return true;

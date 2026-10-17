@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.CommandMessages;
 import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
@@ -332,7 +333,7 @@ public class UtilMessage {
     }
 
     public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
-        sender.sendMessage(Component.text(exception.getMessage(), NamedTextColor.RED));
+        sender.sendMessage(CommandMessages.component(exception.getRawMessage()).color(NamedTextColor.RED));
     }
 
     /**

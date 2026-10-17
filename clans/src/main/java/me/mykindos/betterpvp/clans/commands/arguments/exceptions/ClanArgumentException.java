@@ -18,7 +18,7 @@ public class ClanArgumentException {
         new LiteralMessage(name + " is not a valid Clan name. Clan names must be between " + min + " and " + max + " characters long and only include alphanumeric characters and '_'")
     );
     public static final DynamicCommandExceptionType NAME_ALREADY_EXISTS = new DynamicCommandExceptionType((name) ->
-            new LiteralMessage(name + "is already in use by another Clan")
+            new LiteralMessage(name + " is already in use by another Clan")
     );
     public static final DynamicCommandExceptionType NAME_IS_FILTERED = new DynamicCommandExceptionType((name) ->
             new LiteralMessage(name + " contains a filtered word")

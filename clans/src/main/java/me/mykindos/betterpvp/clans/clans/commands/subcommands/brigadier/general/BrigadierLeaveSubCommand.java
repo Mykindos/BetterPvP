@@ -2,11 +2,11 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import java.util.Objects;
 import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -118,14 +118,15 @@ public class BrigadierLeaveSubCommand extends BrigadierClanSubCommand {
     }
 
     @Override
-    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) {
+    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final Player executor = getPlayerFromExecutor(context);
         Component component = super.getRequirementComponent(context);
-        final Optional<Clan> clanOptional = clanManager.getClanByPlayer(Objects.requireNonNull(context.getSource().getExecutor()).getUniqueId());
+        final Optional<Clan> clanOptional = clanManager.getClanByPlayer(executor.getUniqueId());
         final boolean inClan = clanOptional.isPresent();
         boolean hasClanRank = false;
         if (clanOptional.isPresent()) {
             final Clan clan = clanOptional.get();
-            final ClanMember.MemberRank rank = clan.getMember(Objects.requireNonNull(context.getSource().getExecutor()).getUniqueId()).getRank();
+            final ClanMember.MemberRank rank = clan.getMember(executor.getUniqueId()).getRank();
             if (!rank.hasRank(ClanMember.MemberRank.LEADER)) {
                 hasClanRank = rank.hasRank(this.requiredMemberRank());
             }

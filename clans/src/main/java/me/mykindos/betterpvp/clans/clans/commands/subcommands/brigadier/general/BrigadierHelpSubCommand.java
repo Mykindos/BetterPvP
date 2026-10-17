@@ -15,7 +15,6 @@ import java.util.Objects;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
@@ -97,13 +96,12 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
 
     private void doHelp(CommandContext<CommandSourceStack> context, String filter, int page) throws CommandSyntaxException {
         final Player player = getPlayerFromExecutor(context);
-        final Client client = getClientFromExecutor(context);
 
 
         final IBrigadierCommand parent = getParent();
         List<IBrigadierCommand> childCommands = Objects.requireNonNull(parent).getChildren().stream()
                 .filter(child -> child.getName().toLowerCase().contains(filter.toLowerCase()))
-                .filter(child -> client.hasRank(child.getRequiredRank()))
+                .filter(child -> senderHasRank(context.getSource(), child.getRequiredRank()))
                 .sorted(Comparator.comparing(IBrigadierCommand::getName))
                 .toList();
 
@@ -131,7 +129,7 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
 
     }
 
-    private Component addHelpCommandComponent(CommandContext<CommandSourceStack> context, IBrigadierCommand command) {
+    private Component addHelpCommandComponent(CommandContext<CommandSourceStack> context, IBrigadierCommand command) throws CommandSyntaxException {
         NamedTextColor color = command.requirement(context.getSource()) ? NamedTextColor.GREEN : NamedTextColor.RED;
         Component commandComponent = Component.empty();
         commandComponent = commandComponent.appendNewline()
@@ -139,7 +137,7 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
                         .hoverEvent(HoverEvent.showText(command.getRequirementComponent(context)))
                         .clickEvent(ClickEvent.suggestCommand("/" + command.getName()))
                 ).appendSpace()
-                .append(Component.text(command.getDescription(), NamedTextColor.WHITE)).appendNewline()
+                .append(command.getDescriptionComponent().color(NamedTextColor.WHITE)).appendNewline()
                 .append(Component.text("Usage", NamedTextColor.GOLD)).appendSpace();
 
                 if (command.requirement(context.getSource())) {

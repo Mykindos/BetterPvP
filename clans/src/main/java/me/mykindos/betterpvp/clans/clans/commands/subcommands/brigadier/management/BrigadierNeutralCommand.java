@@ -66,7 +66,7 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
                                 BPvPClansArgumentTypes.neutralableClan())
                         .executes(context -> {
                             Clan target = context.getArgument("Neutralable Clan", Clan.class);
-                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                            final Player player = getPlayerFromExecutor(context);
 
                             Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 

@@ -7,16 +7,16 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executor;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
-import net.minecraft.commands.Commands;
-import net.minecraft.core.LayeredRegistryAccess;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.flag.FeatureFlagSet;
+import me.mykindos.betterpvp.core.locale.Translations;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 @Singleton
 @CustomLog
@@ -24,6 +24,8 @@ public class BrigadierCommandLoader extends Loader {
 
     @Inject
     private BrigadierCommandManager brigadierCommandManager;
+
+    private final Map<Class<?>, BrigadierCommand> loadedCommands = new HashMap<>();
 
     public BrigadierCommandLoader(BPvPPlugin plugin) {
         super(plugin);
@@ -39,10 +41,14 @@ public class BrigadierCommandLoader extends Loader {
 
                 brigadierCommand.setConfig(plugin.getConfig("permissions/commands"));
                 LiteralCommandNode<CommandSourceStack> built = brigadierCommand.build();
-                commands.registrar().register(built, brigadierCommand.getDescription(), brigadierCommand.getAliases());
+                // Paper registers the description as plain text for every viewer, so it is resolved to English here.
+                final String description = PlainTextComponentSerializer.plainText()
+                        .serialize(Translations.render(brigadierCommand.getDescriptionComponent(), (Locale) null));
+                commands.registrar().register(built, description, brigadierCommand.getAliases());
                 log.info("Loaded brigadier command {}", brigadierCommand.getName()).submit();
                 plugin.saveConfig();
 
+                loadedCommands.put(clazz, brigadierCommand);
                 brigadierCommandManager.addObject(built.getName(), brigadierCommand);
                 //because paper registers new commands for each alias, we need to add the alias too
                 brigadierCommand.getAliases().forEach(alias -> {
@@ -84,23 +90,12 @@ public class BrigadierCommandLoader extends Loader {
     }
 
     /**
-     * @see net.minecraft.server.ReloadableServerResources#loadResources(ResourceManager, LayeredRegistryAccess, List, FeatureFlagSet, Commands.CommandSelection, int, Executor, Executor)
+     * Re-reads {@code permissions/commands} for every command this loader loaded, so a changed rank or enabled flag
+     * applies without a restart. Players see the change once their command tree is resent.
      */
     public void reload() {
-        //Does not affect configs
-
-        /*brigadierCommandManager.getObjects().values().forEach(command -> {
-            if (!command.getClass().getPackageName().contains(plugin.getClass().getPackageName())) return;
-            command.setConfig(plugin.getConfig("permissions/commands"));
-            plugin.saveConfig();
-        });
-        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid();
-        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callReloadableRegistrarEvent(
-                io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS,
-                io.papermc.paper.command.brigadier.PaperCommands.INSTANCE,
-                plugin.getClass(),
-                io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.RELOAD);
-        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.invalidate();*/
-
+        ExtendedYamlConfiguration config = plugin.getConfig("permissions/commands");
+        loadedCommands.values().forEach(command -> command.setConfig(config));
+        plugin.saveConfig();
     }
 }

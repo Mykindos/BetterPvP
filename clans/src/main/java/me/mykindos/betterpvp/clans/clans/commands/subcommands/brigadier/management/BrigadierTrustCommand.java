@@ -66,7 +66,7 @@ public class BrigadierTrustCommand extends BrigadierClanSubCommand {
                 .then(Commands.argument("Trustable Clan", BPvPClansArgumentTypes.trustableClan())
                         .executes(context -> {
                             final Clan target = context.getArgument("Trustable Clan", Clan.class);
-                            if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+                            final Player player = getPlayerFromExecutor(context);
 
                             final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
