@@ -4,6 +4,9 @@
     "url": "https://github.com/BetterPvP/Paper/releases/download/26.3-bpvp.1/paper-26.3-bpvp.1.jar",
     "sha256": "3c2b7271b9f513b83e976a67124ba0917f4229a8db428038d20fa408c815a875"
   },
+  "remove": [
+    "MetaBrushes*.jar"
+  ],
   "plugins": [
     {
       "name": "Apollo",
