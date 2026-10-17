@@ -4,4 +4,4 @@ name: Game
 load: POSTWORLD
 version: '1.0'
 depend: [Core, Champions, Mapper]
-api-version: '1.21'
+api-version: '26.3'

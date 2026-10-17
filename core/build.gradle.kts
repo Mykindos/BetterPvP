@@ -31,7 +31,6 @@ dependencies {
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
     implementation(libs.jedis)
-    implementation(libs.reflection.remapper)
     api(libs.sidebar.api)
     runtimeOnly(libs.sidebar.impl)
     runtimeOnly(libs.sidebar.packetevents)
@@ -126,7 +125,6 @@ sourceSets.main {
 }
 
 paperweight {
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
     addServerDependencyTo = configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).map { setOf(it) }
 }
 

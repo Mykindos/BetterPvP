@@ -36,10 +36,6 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-paperweight {
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
-}
-
 // jooqdynamic excludes org.jooq from this module's runtimeOnly/runtimeClasspath (it ships only via :core's shaded
 // jar at real server runtime), and that exclusion also taints testRuntimeClasspath since it extends testRuntimeOnly
 // -> runtimeOnly. Tests that touch classes referencing jOOQ types (e.g. IslandInstanceRepository) still need those

@@ -47,8 +47,8 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            version("paper", "1.21.11-R0.1-SNAPSHOT")
-            version("paperweight", "2.0.0-beta.19")
+            version("paper", "26.3.build.+")
+            version("paperweight", "2.0.0-beta.24")
             version("jackson", "2.17.2")
             version("sidebar", "2.4.1")
             version("mockbukkit", "4.72.8")
@@ -69,11 +69,8 @@ dependencyResolutionManagement {
             library("jooq-meta", "org.jooq", "jooq-meta").versionRef("jooq")
             library("jooq-meta-extensions", "org.jooq", "jooq-meta-extensions").versionRef("jooq")
 
-            // Library - reflection mapper
-            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.3")
-
             // Library - lombok
-            library("lombok", "org.projectlombok", "lombok").version("1.18.34")
+            library("lombok", "org.projectlombok", "lombok").version("1.18.48")
 
             // Library - Tests
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
@@ -137,9 +134,6 @@ dependencyResolutionManagement {
             library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.13")
             library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.11.0")
 
-            // Library - Mixins
-            library("mixin", "org.spongepowered", "mixin").version("0.8.7")
-
             // Library - Guice
             library("guice", "com.google.inject", "guice").version("7.0.0")
 
@@ -169,7 +163,6 @@ dependencyResolutionManagement {
                     "json",
                     "jexl3"))
             bundle("data", listOf("flyway-core", "flyway-mysql", "flyway-postgres"))
-            bundle("mixins", listOf("mixin"))
         }
     }
 }
