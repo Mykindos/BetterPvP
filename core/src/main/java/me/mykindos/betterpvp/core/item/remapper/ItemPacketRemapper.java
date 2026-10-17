@@ -33,6 +33,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -327,7 +328,7 @@ public class ItemPacketRemapper implements PacketListener, Listener {
                 ? window.getCarried()
                 : window.getSlot(slot).getItem();
         try {
-            return SpigotConversionUtil.fromBukkitItemStack(netStack.asBukkitCopy());
+            return SpigotConversionUtil.fromBukkitItemStack(CraftItemStack.asBukkitCopy(netStack));
         } catch (Exception e) {
             return ItemStack.EMPTY;
         }

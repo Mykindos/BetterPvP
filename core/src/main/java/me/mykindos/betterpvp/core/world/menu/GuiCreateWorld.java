@@ -53,11 +53,13 @@ public class GuiCreateWorld extends AbstractGui implements Windowed {
             case NORMAL -> Material.MEDIUM_AMETHYST_BUD;
             case LARGE_BIOMES -> Material.LARGE_AMETHYST_BUD;
             case AMPLIFIED -> Material.AMETHYST_CLUSTER;
+            default -> throw new IllegalArgumentException("World type not offered: " + type);
         }, type -> Translations.component("core.menu.world.create.button.world-type.name").color(NamedTextColor.GRAY).append(switch (type) {
             case FLAT -> Component.text("Flat", TextColor.color(147, 252, 129));
             case NORMAL -> Component.text("Normal", TextColor.color(240, 252, 131));
             case LARGE_BIOMES -> Component.text("Large Biomes", TextColor.color(245, 174, 113));
             case AMPLIFIED -> Component.text("Amplified", TextColor.color(247, 101, 82));
+            default -> throw new IllegalArgumentException("World type not offered: " + type);
         }), creator::type));
         setItem(29, new StructuresButton());
         setItem(31, new HardcoreButton());

@@ -810,7 +810,7 @@ public class UtilBlock {
     public static void playBlockEffect(@NotNull Block block, @NotNull BlockData data) {
         // Capture NMS state BEFORE the block is broken — it becomes air after Player#breakBlock.
         final BlockState capturedState = ((CraftBlockData) data).getState();
-        final LevelAccessor nmsWorld = ((CraftBlock) block).getHandle();
+        final LevelAccessor nmsWorld = ((CraftBlock) block).getLevel();
         final BlockPos position = ((CraftBlock) block).getPosition();
         if (capturedState.getBlock() instanceof BaseFireBlock) {
             nmsWorld.levelEvent(1009, position, 0);

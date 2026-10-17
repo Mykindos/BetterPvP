@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -167,6 +168,6 @@ public class QuickMenuPacketListener implements PacketListener {
         net.minecraft.world.item.ItemStack netStack = slot == -100
                 ? window.getCarried()
                 : window.getSlot(slot).getItem();
-        return SpigotConversionUtil.fromBukkitItemStack(netStack.asBukkitCopy());
+        return SpigotConversionUtil.fromBukkitItemStack(CraftItemStack.asBukkitCopy(netStack));
     }
 }
