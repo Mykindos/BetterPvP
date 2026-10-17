@@ -31,12 +31,14 @@ class CampStructuresTest {
     private final CampUpgrades upgrades = new CampUpgrades(mock(CampStore.class));
 
     @Test
-    void everyTierOneStructureIsRegistered() {
+    void everyStructureIsRegisteredWithItsTier() {
         when(config.structure(anyString())).thenReturn(Optional.empty());
         new CampStructures(config, catalogue, upgrades);
 
-        assertEquals(5, catalogue.all().size());
-        catalogue.all().forEach(type -> assertEquals(1, type.getTier()));
+        assertEquals(6, catalogue.all().size());
+        catalogue.all().stream().filter(type -> !type.getId().equals(CampStructures.CARPENTER))
+                .forEach(type -> assertEquals(1, type.getTier()));
+        assertEquals(2, find(CampStructures.CARPENTER).getTier());
     }
 
     @Test
