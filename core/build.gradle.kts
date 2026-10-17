@@ -33,7 +33,6 @@ dependencies {
     implementation(libs.jedis)
     api(libs.sidebar.api)
     runtimeOnly(libs.sidebar.impl)
-    runtimeOnly(libs.sidebar.packetevents)
 
     api(libs.prettytime)
     api(libs.bundles.data)

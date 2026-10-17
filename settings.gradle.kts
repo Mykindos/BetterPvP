@@ -116,7 +116,6 @@ dependencyResolutionManagement {
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
             library("sidebar-impl", "net.megavex", "scoreboard-library-implementation").versionRef("sidebar")
-            library("sidebar-packetevents", "net.megavex", "scoreboard-library-packetevents").versionRef("sidebar")
 
             // Library - WorldEdit
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.16.1")
