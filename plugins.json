@@ -1,6 +1,13 @@
 {
   "plugins": [
     {
+      "name": "Apollo",
+      "file": "apollo-bukkit-1.3.0.jar",
+      "url": "https://github.com/LunarClient/Apollo/releases/download/v1.3.0/apollo-bukkit-1.3.0.jar",
+      "sha256": "861de06c9d43f89427294ca8b9adf2cb23eaae855141b1559ebbb17d5648850e",
+      "replaces": "apollo*.jar"
+    },
+    {
       "name": "FastAsyncVoxelSniper",
       "file": "fastasyncvoxelsniper-3.2.4-SNAPSHOT.jar",
       "sha256": "4721d466e43e1aafb9fa43fd7e77d6a7f1cb0371db5b37c85295b5dcff764329",
@@ -60,6 +67,19 @@
       "file": "ProtocolLib.jar",
       "sha256": "ee2e7ab9b5386f2d103081c4d108e61b1035df2ca692b53d6e2409fb1f5caccf",
       "replaces": "ProtocolLib*.jar"
+    },
+    {
+      "name": "SimpleVoiceChat",
+      "file": "voicechat-bukkit-2.6.24.jar",
+      "url": "https://cdn.modrinth.com/data/9eGKb6K1/versions/EJth3OAr/voicechat-bukkit-2.6.24.jar",
+      "sha256": "af3d4e2ad318d3065959248c1370ae32a619752cb4d2a4fec2f7a79b10067769",
+      "replaces": "voicechat*.jar"
+    },
+    {
+      "name": "ViaVersion",
+      "file": "ViaVersion-5.12.1.jar",
+      "sha256": "551265afd892e78bb869162e08b4fdd151c518e245fce60af36b0603ad695d76",
+      "replaces": "ViaVersion*.jar"
     }
   ]
 }
