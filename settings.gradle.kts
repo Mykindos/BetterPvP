@@ -50,7 +50,7 @@ dependencyResolutionManagement {
             version("paper", "26.3.build.+")
             version("paperweight", "2.0.0-beta.24")
             version("jackson", "2.17.2")
-            version("sidebar", "2.4.1")
+            version("sidebar", "2.8.3")
             version("mockbukkit", "4.72.8")
             version("junit", "5.13.0-M2")
             version("jooq", "3.19.3")
@@ -97,7 +97,7 @@ dependencyResolutionManagement {
 
             // Libraries - Utilities
             library("persistent-data-types", "com.jeff-media", "MorePersistentDataTypes").version("2.4.0")
-            library("glowapi", "fr.skytasul", "glowingentities").version("1.4.8")
+            library("glowapi", "fr.skytasul", "glowingentities").version("2.0.2")
             library("commons-text", "org.apache.commons", "commons-text").version("1.10.0")
             library("commons-lang3", "org.apache.commons", "commons-lang3").version("3.12.0")
             library("commons-math3", "org.apache.commons", "commons-math3").version("3.6.1")
@@ -111,7 +111,7 @@ dependencyResolutionManagement {
             library("jexl3", "org.apache.commons", "commons-jexl3").version("3.4.0")
 
             // Library - Mapper
-            library("mapper", "com.github.BetterPvP", "Mapper").version("1.1.0")
+            library("mapper", "com.github.BetterPvP", "Mapper").version("2.0.1")
 
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
@@ -119,20 +119,20 @@ dependencyResolutionManagement {
             library("sidebar-packetevents", "net.megavex", "scoreboard-library-packetevents").versionRef("sidebar")
 
             // Library - WorldEdit
-            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.14.2")
-            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.14.2")
+            library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.16.1")
+            library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.16.1")
 
             // Library - Mythic
-            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.5")
+            library("mythic", "io.lumine", "Mythic-Dist").version("5.14.0-SNAPSHOT")
 
-            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.9")
+            library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.2.0")
 
             // Library - McPets
             library("mcpets", "fr.nocsy", "mcpets").version("4.1.10")
 
             // Library - Protocol
-            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("11.0.13")
-            library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.11.0")
+            library("libsdisguises", "me.libraryaddict.disguises", "libsdisguises").version("26.9.26")
+            library("packetevents", "com.github.retrooper", "packetevents-spigot").version("2.14.0")
 
             // Library - Guice
             library("guice", "com.google.inject", "guice").version("7.0.0")
