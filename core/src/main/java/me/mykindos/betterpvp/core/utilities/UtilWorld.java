@@ -12,10 +12,13 @@ import org.bukkit.WorldCreator;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -84,6 +87,70 @@ public class UtilWorld {
         final File source = storage.isDirectory() ? storage : getImportFolder(sourceName);
         final File target = storage.isDirectory() ? getStorageFolder(targetName).toFile() : getImportFolder(targetName);
         FileUtils.copyDirectory(source, target, file -> !file.getName().equals("session.lock") && !file.getName().equals("uid.dat"));
+    }
+
+    /**
+     * Creates or loads a world, keeping the files a world in the older layout carries besides Minecraft's own, such as
+     * Mapper's data points or a terrain mask. They are moved into the world's storage folder before Paper imports it,
+     * so they are there when the world loads, and saved data Paper does not bring across is restored after.
+     */
+    public static @Nullable World createWorld(@NotNull WorldCreator creator) {
+        final File imported = getImportFolder(creator.name());
+        if (!new File(imported, "level.dat").isFile()) {
+            return creator.createWorld();
+        }
+
+        // What Paper's import brings across itself. Everything else in the import folder is deleted with it.
+        final Set<String> importedByPaper = Set.of("region", "entities", "poi", "data", "DIM-1", "DIM1", "level.dat",
+                "level.dat_old", "session.lock", "uid.dat", "paper-world.yml", "playerdata", "stats", "advancements",
+                "datapacks");
+        final File storage = getStorageFolder(creator.name()).toFile();
+        File savedData = null;
+        try {
+            final File[] extras = imported.listFiles(file -> !importedByPaper.contains(file.getName()));
+            if (extras != null) {
+                for (File extra : extras) {
+                    final File target = new File(storage, extra.getName());
+                    if (target.exists()) {
+                        continue;
+                    }
+                    if (extra.isDirectory()) {
+                        FileUtils.copyDirectory(extra, target);
+                    } else {
+                        FileUtils.copyFile(extra, target);
+                    }
+                }
+            }
+
+            final File data = new File(imported, "data");
+            if (data.isDirectory()) {
+                savedData = Files.createTempDirectory("world-data").toFile();
+                FileUtils.copyDirectory(data, savedData);
+            }
+        } catch (IOException e) {
+            log.error("Could not keep the extra files of world {}", creator.name(), e).submit();
+        }
+
+        final World world = creator.createWorld();
+        if (savedData != null) {
+            try {
+                if (world != null) {
+                    final File[] files = savedData.listFiles();
+                    final File target = world.getWorldPath().resolve("data").toFile();
+                    if (files != null) {
+                        for (File file : files) {
+                            if (!new File(target, file.getName()).exists()) {
+                                FileUtils.copyToDirectory(file, target);
+                            }
+                        }
+                    }
+                }
+                FileUtils.deleteDirectory(savedData);
+            } catch (IOException e) {
+                log.error("Could not restore the saved data of world {}", creator.name(), e).submit();
+            }
+        }
+        return world;
     }
 
     private static @NotNull Path getDimensionsFolder() {

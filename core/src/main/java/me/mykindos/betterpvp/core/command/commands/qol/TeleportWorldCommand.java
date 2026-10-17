@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.generator.VoidWorldGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -49,7 +50,7 @@ public class TeleportWorldCommand extends Command {
                     }
                 }
 
-                world = worldCreator.createWorld();
+                world = UtilWorld.createWorld(worldCreator);
             }
 
             if (world != null) {

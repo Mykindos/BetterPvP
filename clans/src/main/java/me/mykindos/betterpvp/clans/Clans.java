@@ -40,6 +40,7 @@ import me.mykindos.betterpvp.core.item.ItemLoader;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDManager;
 import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.loot.serialization.LootEntryRegistry;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.WorldHandler;
 import me.mykindos.betterpvp.core.world.content.WorldContentService;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -158,7 +159,7 @@ public class Clans extends BPvPPlugin {
     }
 
     private static void setupVoidWorld() {
-        World voidWorld = new WorldCreator(BPvPWorld.VOID_WORLD_NAME).createWorld();
+        World voidWorld = UtilWorld.createWorld(new WorldCreator(BPvPWorld.VOID_WORLD_NAME));
         if (voidWorld != null) {
             voidWorld.setViewDistance(3);
             voidWorld.setSimulationDistance(3);

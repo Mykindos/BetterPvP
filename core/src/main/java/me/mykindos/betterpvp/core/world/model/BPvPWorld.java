@@ -93,7 +93,7 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
         if (isLoaded()) {
             return;
         }
-        World loaded = Bukkit.createWorld(WorldCreator.name(name));
+        World loaded = UtilWorld.createWorld(WorldCreator.name(name));
         if (loaded == null) {
             log.error("Failed to load world: {}", name).submit();
         }
@@ -107,7 +107,7 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
         if (isLoaded()) {
             return;
         }
-        this.world = new WeakReference<>(creator.createWorld());
+        this.world = new WeakReference<>(UtilWorld.createWorld(creator));
     }
 
     /**
