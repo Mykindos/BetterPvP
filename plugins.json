@@ -1,11 +1,65 @@
 {
   "plugins": [
     {
+      "name": "FastAsyncVoxelSniper",
+      "file": "fastasyncvoxelsniper-3.2.4-SNAPSHOT.jar",
+      "sha256": "4721d466e43e1aafb9fa43fd7e77d6a7f1cb0371db5b37c85295b5dcff764329",
+      "replaces": "fastasyncvoxelsniper*.jar"
+    },
+    {
+      "name": "FastAsyncWorldEdit",
+      "file": "FastAsyncWorldEdit-Paper-2.13.3-SNAPSHOT-1174.jar",
+      "sha256": "a6e2b8c3f841d47cc339ff4afea7f9a4cb4fa75eb1d3426f4df5619b5ace66c8",
+      "replaces": "FastAsyncWorldEdit*.jar"
+    },
+    {
+      "name": "LibsDisguises",
+      "file": "LibsDisguises-11.0.9-Free.jar",
+      "sha256": "d1597f6924e86ef75a2a3cbf8e23e8dddbdfa905cf416fa78da5438a354b7e3c",
+      "replaces": "LibsDisguises*.jar"
+    },
+    {
       "name": "Mapper",
       "file": "Mapper-1.1.0.jar",
       "url": "https://github.com/BetterPvP/Mapper/releases/download/1.1.0/Mapper-1.1.0.jar",
       "sha256": "fb757993f8c9c45a63cb8020a76dd4e8c80bceb6557924a0eddfb1bb53607123",
       "replaces": "Mapper*.jar"
+    },
+    {
+      "name": "MCPets",
+      "file": "MCPets-4.1.8.jar",
+      "sha256": "d551dfe5343d20f8fb5425494660c02358acd36a776f46613ef09b586dd4bf21",
+      "replaces": "MCPets*.jar"
+    },
+    {
+      "name": "MetaBrushes",
+      "file": "MetaBrushes-4.0-SNAPSHOT.jar",
+      "sha256": "94124a1e776a9a1cbabf14dbd1b19d99032f77733e917161910ed80afcbdf97f",
+      "replaces": "MetaBrushes*.jar"
+    },
+    {
+      "name": "ModelEngine",
+      "file": "ModelEngine-R4.1.0.jar",
+      "sha256": "5d7fd6e2d6b100eb41600d4489cbbfd079933bea2eb0607c5d871e579ae0793c",
+      "replaces": "ModelEngine*.jar"
+    },
+    {
+      "name": "MythicMobs",
+      "file": "MythicMobsPremium-5.10.1-SNAPSHOT.jar",
+      "sha256": "c15e1ffe7af6a19887c94e44945cb2cec59bda1955980c516644fbd91f01e45b",
+      "replaces": "MythicMobs*.jar"
+    },
+    {
+      "name": "PacketEvents",
+      "file": "packetevents-spigot-2.12.2-SNAPSHOT.jar",
+      "sha256": "5d4414f5cb3a6acbcef82985b91adf337836f67d93a518237171f90d8a811e5a",
+      "replaces": "packetevents*.jar"
+    },
+    {
+      "name": "ProtocolLib",
+      "file": "ProtocolLib.jar",
+      "sha256": "ee2e7ab9b5386f2d103081c4d108e61b1035df2ca692b53d6e2409fb1f5caccf",
+      "replaces": "ProtocolLib*.jar"
     }
   ]
 }
