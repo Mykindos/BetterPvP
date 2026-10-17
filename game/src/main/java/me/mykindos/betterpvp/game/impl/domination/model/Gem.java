@@ -134,7 +134,7 @@ public class Gem implements Powerup {
                     .location(location.clone().add(0, translation.y, 0))
                     .receivers(60)
                     .offset(0.7, 0.7, 0.7)
-                    .extra(0.05)
+                    .speed(0.05)
                     .spawn();
         }
     }

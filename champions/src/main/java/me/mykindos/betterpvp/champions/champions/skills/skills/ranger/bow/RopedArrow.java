@@ -115,7 +115,7 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .data(dustOptions)
                 .spawn();

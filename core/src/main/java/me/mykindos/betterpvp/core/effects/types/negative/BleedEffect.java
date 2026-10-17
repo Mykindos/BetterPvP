@@ -60,7 +60,7 @@ public class BleedEffect extends VanillaEffectType {
             UtilDamage.doDamage(cde);
 
             livingEntity.getWorld().playSound(livingEntity.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT_FREEZE, 1f, 2f);
-            livingEntity.getWorld().playEffect(livingEntity.getLocation().add(0, 1, 0), org.bukkit.Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
+            livingEntity.getWorld().playEffect(livingEntity.getLocation().add(0, 1, 0), org.bukkit.Effect.DESTROY_BLOCK, Material.REDSTONE_BLOCK.createBlockData());
 
             lastBleedTimes.put(livingEntity.getUniqueId(), currentTime);
         }

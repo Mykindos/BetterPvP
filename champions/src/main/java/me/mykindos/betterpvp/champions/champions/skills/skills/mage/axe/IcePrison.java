@@ -117,7 +117,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
             final Location loc = block.getBlock().getLocation();
             loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 0.4f, 1.8f);
             loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 1.9f);
-            Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
+            Particle.CLOUD.builder().location(loc).receivers(receivers).speed(0).spawn();
             block.restore();
         }
         UtilMessage.message(player, getClassType().getDisplayName(), "champions.skill.mage.ice-prison.destroyed", getDisplayName().color(NamedTextColor.GREEN));
@@ -204,7 +204,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
                 final Location loc = block.getBlock().getLocation();
 
                 loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.6f, 0.8f);
-                Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
+                Particle.CLOUD.builder().location(loc).receivers(receivers).speed(0).spawn();
 
                 block.restore();
             }

@@ -226,7 +226,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
                     return;
                 }
 
-                Particle.END_ROD.builder().location(position).receivers(30).extra(0).spawn();
+                Particle.END_ROD.builder().location(position).receivers(30).speed(0).spawn();
                 v.multiply(0.9);
                 position.add(v);
             }

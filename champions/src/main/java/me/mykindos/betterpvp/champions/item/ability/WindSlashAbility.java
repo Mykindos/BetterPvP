@@ -152,7 +152,7 @@ public class WindSlashAbility extends CooldownInteraction implements DisplayedIn
                         .offset(0, 0, 0)
                         .count(1)
                         .receivers(receivers)
-                        .extra(0)
+                        .speed(0)
                         .spawn();
             }
         }

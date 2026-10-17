@@ -191,7 +191,7 @@ public class ImbuementPedestalDisplayManager {
             Particle.DUST.builder()
                     .location(newLocation)
                     .count(1)
-                    .extra(0.5)
+                    .speed(0.5)
                     .data(new Particle.DustOptions(Color.fromRGB(128, 0, 128), 0.6f))
                     .receivers(60)
                     .spawn();
@@ -226,7 +226,7 @@ public class ImbuementPedestalDisplayManager {
                 Particle.DUST.builder()
                         .location(groupCenter)
                         .count(1)
-                        .extra(0.5)
+                        .speed(0.5)
                         .data(new Particle.DustOptions(Color.fromRGB(128, 0, 128), 0.6f))
                         .receivers(60)
                         .spawn();
@@ -246,7 +246,7 @@ public class ImbuementPedestalDisplayManager {
             Particle.DUST.builder()
                     .location(newPos)
                     .count(1)
-                    .extra(0.5)
+                    .speed(0.5)
                     .data(new Particle.DustOptions(Color.fromRGB(128, 0, 128), 0.6f))
                     .receivers(60)
                     .spawn();
@@ -256,7 +256,7 @@ public class ImbuementPedestalDisplayManager {
             Particle.OMINOUS_SPAWNING.builder()
                     .location(pedestalLocation.clone().add(0, GROUPING_HEIGHT, 0))
                     .count(7)
-                    .extra(1)
+                    .speed(1)
                     .receivers(60)
                     .spawn();
         }
@@ -291,7 +291,7 @@ public class ImbuementPedestalDisplayManager {
                 Particle.END_ROD.builder()
                         .location(flyingData.getItemDisplay().getLocation())
                         .count(1)
-                        .extra(0.05)
+                        .speed(0.05)
                         .receivers(60)
                         .spawn();
             }

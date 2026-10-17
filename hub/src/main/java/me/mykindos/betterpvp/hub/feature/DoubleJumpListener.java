@@ -87,7 +87,7 @@ public class DoubleJumpListener implements Listener {
         Particle.CLOUD.builder()
                 .location(player.getLocation())
                 .count(10)
-                .extra(0.2)
+                .speed(0.2)
                 .receivers(player)
                 .offset(0.5, 0.5, 0.5)
                 .spawn();

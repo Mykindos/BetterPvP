@@ -111,7 +111,7 @@ public class MagnetismAbility extends TemperInteraction implements DisplayedInte
             spiralPoint.rotateAroundY(yaw);
             spiralPoint.add(point.toVector());
             final Location spiralLoc = spiralPoint.toLocation(world);
-            new ParticleBuilder(Particle.ENCHANTED_HIT).location(spiralLoc).extra(0).receivers(60).spawn();
+            new ParticleBuilder(Particle.ENCHANTED_HIT).location(spiralLoc).speed(0).receivers(60).spawn();
 
             // Second spiral
             Vector spiralPoint2 = new Vector(-x1, 0, -z1);
@@ -119,7 +119,7 @@ public class MagnetismAbility extends TemperInteraction implements DisplayedInte
             spiralPoint2.rotateAroundY(yaw);
             spiralPoint2.add(point.toVector());
             final Location spiralLoc2 = spiralPoint2.toLocation(world);
-            new ParticleBuilder(Particle.ENCHANTED_HIT).location(spiralLoc2).extra(0).receivers(60).spawn();
+            new ParticleBuilder(Particle.ENCHANTED_HIT).location(spiralLoc2).speed(0).receivers(60).spawn();
 
             origin.add(direction); // Move origin forward
         }
@@ -130,7 +130,7 @@ public class MagnetismAbility extends TemperInteraction implements DisplayedInte
         final Location target = entity.getLocation().add(0, entity.getHeight() / 2, 0);
         final VectorLine line = VectorLine.withStepSize(origin, target, 0.5);
         for (Location location : line.toLocations()) {
-            new ParticleBuilder(Particle.ASH).location(location).extra(0).receivers(60).spawn();
+            new ParticleBuilder(Particle.ASH).location(location).speed(0).receivers(60).spawn();
         }
     }
 

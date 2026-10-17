@@ -197,7 +197,7 @@ public class Vipersprint extends AbstractInteraction implements Listener, Displa
             Particle.DUST_PILLAR.builder()
                     .data(Material.VINE.createBlockData())
                     .count(10)
-                    .extra(0.01)
+                    .speed(0.01)
                     .location(point)
                     .receivers(60)
                     .spawn();

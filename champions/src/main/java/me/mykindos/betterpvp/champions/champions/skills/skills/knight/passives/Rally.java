@@ -181,7 +181,7 @@ public class Rally extends Skill implements CooldownToggleSkill, Listener, BuffS
                 .location(player.getLocation().add(0, 1, 0))
                 .offset(0.4, 0.6, 0.4)
                 .count(2)
-                .extra(0)
+                .speed(0)
                 .receivers(48)
                 .spawn();
     }
@@ -198,7 +198,7 @@ public class Rally extends Skill implements CooldownToggleSkill, Listener, BuffS
                 .data(Material.BLACK_CONCRETE.createBlockData())
                 .offset(0.5, 0.4, 0.5)
                 .count(100)
-                .extra(0.02)
+                .speed(0.02)
                 .receivers(receivers)
                 .spawn();
 
@@ -227,7 +227,7 @@ public class Rally extends Skill implements CooldownToggleSkill, Listener, BuffS
             particle.builder()
                     .location(point)
                     .count(1)
-                    .extra(0)
+                    .speed(0)
                     .receivers(receivers)
                     .spawn();
         }
@@ -249,7 +249,7 @@ public class Rally extends Skill implements CooldownToggleSkill, Listener, BuffS
                 .location(location)
                 .offset(0.4, 0.4, 0.4)
                 .count(12)
-                .extra(0)
+                .speed(0)
                 .receivers(48)
                 .spawn();
     }

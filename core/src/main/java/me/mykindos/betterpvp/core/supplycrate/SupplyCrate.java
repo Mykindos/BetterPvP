@@ -114,7 +114,7 @@ public class SupplyCrate extends Projectile {
                     .count(2)
                     .location(lastLocation.clone().add(0, hitboxSize * 2, 0))
                     .offset(hitboxSize / 3, hitboxSize, hitboxSize / 3)
-                    .extra(0.01)
+                    .speed(0.01)
                     .receivers(128)
                     .spawn();
 
@@ -160,7 +160,7 @@ public class SupplyCrate extends Projectile {
                         Particle.BLOCK_CRUMBLE.builder()
                                 .count(1)
                                 .data(Material.OAK_PLANKS.createBlockData())
-                                .extra(0)
+                                .speed(0)
                                 .location(point.toLocation(location.getWorld()))
                                 .receivers(128)
                                 .spawn();
@@ -177,7 +177,7 @@ public class SupplyCrate extends Projectile {
                 .count(20)
                 .location(location.add(0, this.hitboxSize, 0))
                 .offset(hitboxSize, hitboxSize, hitboxSize)
-                .extra(0.1)
+                .speed(0.1)
                 .receivers(60)
                 .spawn();
     }

@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.clans.map;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.map.data.MapZoneStyle;
-import org.bukkit.map.MapPalette;
 
 import java.awt.Color;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +13,6 @@ import java.util.concurrent.ConcurrentMap;
  * hot render path never recomputes a blend it has seen, which is what keeps an always-on tint affordable.
  */
 @Singleton
-@SuppressWarnings("deprecation") // MapPalette colour<->byte is the simplest correct quantiser and is stable
 public class MapColorBlender {
 
     private final ConcurrentMap<Long, Byte> cache = new ConcurrentHashMap<>();
@@ -30,14 +28,14 @@ public class MapColorBlender {
     }
 
     private byte compute(byte terrainPacked, MapZoneStyle style) {
-        final Color terrain = MapPalette.getColor(terrainPacked);
+        final Color terrain = VanillaMapPalette.getColor(terrainPacked);
         final Color tint = style.getColor();
         final double alpha = style.getAlpha();
 
         final int red = clamp(tint.getRed() * alpha + terrain.getRed() * (1 - alpha));
         final int green = clamp(tint.getGreen() * alpha + terrain.getGreen() * (1 - alpha));
         final int blue = clamp(tint.getBlue() * alpha + terrain.getBlue() * (1 - alpha));
-        return MapPalette.matchColor(new Color(red, green, blue));
+        return VanillaMapPalette.matchColor(new Color(red, green, blue));
     }
 
     private static int clamp(double value) {

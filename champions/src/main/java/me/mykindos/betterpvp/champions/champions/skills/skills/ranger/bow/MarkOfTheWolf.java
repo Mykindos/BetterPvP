@@ -260,7 +260,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                         .location(loc)
                         .count(3)
                         .offset(0.3, 0.6, 0.3)
-                        .extra(0)
+                        .speed(0)
                         .receivers(30)
                         .spawn();
             }
@@ -298,7 +298,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
     }

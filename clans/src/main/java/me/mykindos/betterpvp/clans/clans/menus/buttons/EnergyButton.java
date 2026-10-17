@@ -100,7 +100,7 @@ public class EnergyButton extends AbstractItem {
         }
 
         //noinspection deprecation
-        event.setCursor(null);
+        event.getView().setCursor(null);
         final int energy = energyAmount;
         clan.grantEnergy(player, energy, "Deposit");
 

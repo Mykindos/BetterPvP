@@ -180,14 +180,14 @@ public class Illusion extends ChannelSkill implements InteractSkill, CrowdContro
                 .receivers(60)
                 .count(40)
                 .offset(0.4, 0.7, 0.4)
-                .extra(0.02)
+                .speed(0.02)
                 .spawn();
         Particle.CAMPFIRE_COSY_SMOKE.builder()
                 .location(location.clone().add(0, 1, 0))
                 .receivers(60)
                 .count(12)
                 .offset(0.5, 0.5, 0.5)
-                .extra(0.01)
+                .speed(0.01)
                 .spawn();
         new SoundEffect(Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.2f, 1.0f).play(location);
         new SoundEffect(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.6f, 1.0f).play(player.getLocation());

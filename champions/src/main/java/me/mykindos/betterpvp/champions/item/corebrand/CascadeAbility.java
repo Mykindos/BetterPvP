@@ -230,7 +230,7 @@ public class CascadeAbility extends AbstractInteraction implements Listener, Dis
                 .data(new Particle.DustOptions(Color.fromRGB(0x4F, 0xC3, 0xFF), 1.4F))
                 .count(30)
                 .offset(0.5, 0.7, 0.5)
-                .extra(0.05)
+                .speed(0.05)
                 .receivers(60)
                 .spawn();
         Particle.DUST.builder()
@@ -305,7 +305,7 @@ public class CascadeAbility extends AbstractInteraction implements Listener, Dis
                 .location(UtilPlayer.getMidpoint(player))
                 .count(0)
                 .offset(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
-                .extra(0.2)
+                .speed(0.2)
                 .receivers(60)
                 .spawn();
     }

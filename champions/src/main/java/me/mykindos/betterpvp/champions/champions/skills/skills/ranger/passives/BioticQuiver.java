@@ -253,7 +253,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
     // follow harrows logic
     public void displayTrail(Location location) {
-        Particle.GLOW.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
+        Particle.GLOW.builder().location(location).count(3).speed(0).receivers(60, true).spawn();
     }
 
     @Override

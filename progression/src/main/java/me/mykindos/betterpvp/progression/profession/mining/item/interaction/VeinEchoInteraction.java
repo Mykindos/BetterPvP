@@ -115,7 +115,7 @@ public class VeinEchoInteraction extends AbstractInteraction implements Displaye
             Particle.END_ROD.builder()
                     .count(10)
                     .offset(0.6, 0.6, 0.6)
-                    .extra(0.02)
+                    .speed(0.02)
                     .location(broken.getLocation().toCenterLocation())
                     .receivers(40)
                     .spawn();

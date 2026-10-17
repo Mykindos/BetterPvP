@@ -35,7 +35,7 @@ public class AttunementListener implements Listener {
                 .location(player.getLocation())
                 .offset(0.5, 0.5, 0.5)
                 .count(50)
-                .extra(0.1)
+                .speed(0.1)
                 .receivers(60)
                 .spawn();
 

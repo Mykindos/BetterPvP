@@ -125,7 +125,7 @@ public class ScytheData {
         final Player player = getPlayer();
         new ParticleBuilder(Particle.SOUL_FIRE_FLAME)
                 .count(2)
-                .extra(0)
+                .speed(0)
                 .offset(0.4, 0, 0.4)
                 .location(player.getLocation().add(0, 0.1, 0))
                 .receivers(60)

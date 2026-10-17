@@ -215,7 +215,7 @@ public final class ClanCore {
         Particle.LARGE_SMOKE.builder()
                 .location(this.crystal.getLocation().add(0.0, this.crystal.getHeight() / 2f, 0.0))
                 .count(20)
-                .extra(0.2)
+                .speed(0.2)
                 .receivers(60)
                 .spawn();
     }
@@ -243,7 +243,7 @@ public final class ClanCore {
                 Particle.CLOUD.builder()
                         .location(this.crystal.getLocation().add(0.0, this.crystal.getHeight() / 2f, 0.0))
                         .count(20)
-                        .extra(0.2)
+                        .speed(0.2)
                         .receivers(60)
                         .spawn();
 

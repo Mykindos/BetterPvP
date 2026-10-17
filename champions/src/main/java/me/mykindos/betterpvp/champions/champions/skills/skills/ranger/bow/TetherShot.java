@@ -245,7 +245,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                         .location(bat.getLocation().clone().add(0, 0.4, 0))
                         .count(1)
                         .offset(0.0, 0.0, 0.0)
-                        .extra(0)
+                        .speed(0)
                         .data(redDust)
                         .receivers(60)
                         .spawn();
@@ -454,7 +454,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
     }

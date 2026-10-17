@@ -340,9 +340,9 @@ public class GuiCastingMoldPicker extends AbstractGui implements Windowed {
             // Reduce cursor item by 1
             if (cursorItem.getAmount() > 1) {
                 cursorItem.setAmount(cursorItem.getAmount() - 1);
-                event.setCursor(cursorItem);
+                event.getView().setCursor(cursorItem);
             } else {
-                event.setCursor(null);
+                event.getView().setCursor(null);
             }
 
             // Update all GUI sections to reflect the addition

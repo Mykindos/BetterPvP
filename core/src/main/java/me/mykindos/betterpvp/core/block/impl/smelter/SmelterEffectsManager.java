@@ -66,7 +66,7 @@ public class SmelterEffectsManager {
                 .count(SMOKE_PARTICLE_COUNT)
                 .receivers(PARTICLE_RECEIVER_DISTANCE)
                 .offset(0, SMOKE_Y_OFFSET, 0)
-                .extra(0)
+                .speed(0)
                 .spawn();
     }
 

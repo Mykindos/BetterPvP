@@ -140,8 +140,8 @@ public class CannonListener implements Listener {
                 new SoundEffect("betterpvp", "prop.cannon.openhatch").play(location), 2L);
 
         final Location muzzle = cannon.getMuzzle().add(cannon.getLocation().getDirection().multiply(2));
-        Particle.EXPLOSION_EMITTER.builder().location(muzzle).extra(0).receivers(60).spawn();
-        Particle.LARGE_SMOKE.builder().location(muzzle).extra(0).count(10).offset(1, 1, 1).receivers(60).spawn();
+        Particle.EXPLOSION_EMITTER.builder().location(muzzle).speed(0).receivers(60).spawn();
+        Particle.LARGE_SMOKE.builder().location(muzzle).speed(0).count(10).offset(1, 1, 1).receivers(60).spawn();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -368,7 +368,7 @@ public class CannonListener implements Listener {
         rideService.evictFrom(cannon);
         final Location location = cannon.getLocation();
         cannonService.remove(cannon);
-        Particle.LARGE_SMOKE.builder().location(location).extra(0).count(10).offset(1, 1, 1).receivers(60).spawn();
+        Particle.LARGE_SMOKE.builder().location(location).speed(0).count(10).offset(1, 1, 1).receivers(60).spawn();
     }
 
     @EventHandler

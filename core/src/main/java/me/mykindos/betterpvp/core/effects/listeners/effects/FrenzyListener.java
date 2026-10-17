@@ -169,7 +169,7 @@ public class FrenzyListener implements Listener {
         Particle.CLOUD.builder()
                 .location(damager.getLocation())
                 .offset(0.5, 0.5, 0.5)
-                .extra(0)
+                .speed(0)
                 .count(10)
                 .receivers(60)
                 .spawn();

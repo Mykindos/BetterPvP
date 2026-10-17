@@ -95,7 +95,7 @@ public class SkullsplitterProjectile extends Projectile {
             location.getWorld().playSound(location, Sound.ENTITY_WIND_CHARGE_WIND_BURST, 0.4F, 0.3F);
             Particle.CRIT.builder()
                     .count(3)
-                    .extra(0)
+                    .speed(0)
                     .offset(0.1, 0.1, 0.1)
                     .location(location)
                     .receivers(60)
@@ -116,7 +116,7 @@ public class SkullsplitterProjectile extends Projectile {
                 Particle.SMOKE.builder()
                         .count(40)
                         .offset(0.5, 0.5, 0.5)
-                        .extra(0)
+                        .speed(0)
                         .location(location)
                         .receivers(60)
                         .spawn();
@@ -124,7 +124,7 @@ public class SkullsplitterProjectile extends Projectile {
                 // cues
                 Particle.CLOUD.builder()
                         .count(20)
-                        .extra(0.1)
+                        .speed(0.1)
                         .offset(0.4, 0.4, 0.4)
                         .location(caster.getLocation())
                         .receivers(60)
@@ -132,7 +132,7 @@ public class SkullsplitterProjectile extends Projectile {
                 location.getWorld().playSound(caster.getLocation(), Sound.ENTITY_WIND_CHARGE_WIND_BURST, 1F, 0.3F);
                 location.getWorld().playSound(location, Sound.BLOCK_LAVA_POP, 1.2F, 0.3F);
                 final Block block = caster.getLocation().getBlock().getRelative(0, -1, 0);
-                location.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
+                location.getWorld().playEffect(block.getLocation(), Effect.DESTROY_BLOCK, block.getBlockData());
             }
         }
     }
@@ -168,7 +168,7 @@ public class SkullsplitterProjectile extends Projectile {
                 location.getWorld().playSound(location, block.getBlockSoundGroup().getBreakSound(), 1.4F, 2.0F);
                 Particle.BLOCK.builder()
                         .count(120)
-                        .extra(1)
+                        .speed(1)
                         .offset(0.8, 0.8, 0.8)
                         .data(block.getBlockData())
                         .location(location)

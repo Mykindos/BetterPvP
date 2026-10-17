@@ -136,7 +136,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 .count(3)
                 .location(player.getLocation().add(0, player.getHeight() / 2, 0))
                 .receivers(60)
-                .extra(0)
+                .speed(0)
                 .spawn();
 
         final Vector direction = ent.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();

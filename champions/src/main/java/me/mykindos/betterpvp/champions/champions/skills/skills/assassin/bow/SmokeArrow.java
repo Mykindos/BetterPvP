@@ -138,7 +138,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .location(particleLocation)
                 .count(0)
                 .offset(red, green, blue)
-                .extra(1.0)
+                .speed(1.0)
                 .receivers(60)
                 .data(Color.GRAY)
                 .spawn();

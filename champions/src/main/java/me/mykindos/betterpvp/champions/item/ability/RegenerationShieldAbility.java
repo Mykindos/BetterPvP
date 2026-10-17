@@ -74,7 +74,7 @@ public class RegenerationShieldAbility extends TemperInteraction implements Disp
         new ParticleBuilder(Particle.HEART)
                 .location(player.getEyeLocation().add(0, 0.25, 0))
                 .offset(0.5, 0.5, 0.5)
-                .extra(0.2f)
+                .speed(0.2f)
                 .receivers(60)
                 .spawn();
         return InteractionResult.Success.ADVANCE;

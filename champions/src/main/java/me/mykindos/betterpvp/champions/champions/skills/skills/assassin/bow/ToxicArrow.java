@@ -139,7 +139,7 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
                 .count(0)
                 .data(Color.GREEN)
                 .offset(red, green, blue)
-                .extra(1.0)
+                .speed(1.0)
                 .receivers(60)
                 .spawn();
     }

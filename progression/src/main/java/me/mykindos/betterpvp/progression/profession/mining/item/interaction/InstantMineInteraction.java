@@ -195,13 +195,13 @@ public class InstantMineInteraction extends CooldownInteraction implements Displ
             Block block = event.getBlock();
             Particle.REVERSE_PORTAL.builder()
                     .count(10)
-                    .extra(0.2)
+                    .speed(0.2)
                     .location(block.getLocation().toCenterLocation())
                     .receivers(60)
                     .spawn();
             Particle.ENCHANT.builder()
                     .count(5)
-                    .extra(0.1)
+                    .speed(0.1)
                     .location(block.getLocation().toCenterLocation())
                     .offset(0.5, 0.5, 0.5)
                     .receivers(60)

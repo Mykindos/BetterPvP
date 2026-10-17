@@ -56,7 +56,7 @@ public class DaggerProjectile extends Projectile {
         for (Location point : interpolateLine()) {
             Particle.SMALL_GUST.builder()
                     .count(1)
-                    .extra(0)
+                    .speed(0)
                     .offset(0.1, 0.1, 0.1)
                     .location(point)
                     .receivers(receivers)
@@ -92,7 +92,7 @@ public class DaggerProjectile extends Projectile {
         display.remove();
         Particle.GUST.builder()
                 .count(0)
-                .extra(0)
+                .speed(0)
                 .offset(0.0, 0.0, 0.0)
                 .location(location)
                 .receivers(30)

@@ -150,7 +150,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, Reloadable
                     .location(player.getLocation().add(0, 1, 0))
                     .offset(0.3f, 0.3f, 0.3f)
                     .count(3)
-                    .extra(0)
+                    .speed(0)
                     .receivers(60)
                     .spawn();
         }

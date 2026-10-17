@@ -109,7 +109,7 @@ public class GatewayTeleportBehavior implements SceneBehavior {
         Particle.CLOUD.builder()
                 .count(20)
                 .offset(1, 1, 1)
-                .extra(0.3)
+                .speed(0.3)
                 .location(UtilPlayer.getMidpoint(player))
                 .receivers(60)
                 .spawn();

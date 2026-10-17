@@ -139,7 +139,7 @@ public class NectarOfDecay extends CooldownInteraction implements Listener, Disp
                 .location(event.getLivingDamagee().getEyeLocation().add(0, 0.25, 0))
                 .count(3)
                 .offset(0.2f, 0.22f, 0.2f)
-                .extra(0.1)
+                .speed(0.1)
                 .receivers(60)
                 .spawn();
     }

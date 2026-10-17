@@ -167,7 +167,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
                 it.remove();
             } else {
                 Location location = next.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.WAX_ON.builder().location(location).receivers(60).extra(0).spawn();
+                Particle.WAX_ON.builder().location(location).receivers(60).speed(0).spawn();
             }
         }
     }

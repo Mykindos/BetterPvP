@@ -1,15 +1,14 @@
 package me.mykindos.betterpvp.core.item.model;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Equippable;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Objects;
 
 /**
  * Represents a {@link BaseItem} with a custom name and rarity.
@@ -25,13 +24,7 @@ public class VanillaItem extends BaseItem {
     }
 
     public VanillaItem(Component component, Material type, ItemRarity rarity) {
-        super(component, ItemStack.of(type), switch (Objects.requireNonNullElse(type.getCreativeCategory(), CreativeCategory.MISC)) {
-            case BUILDING_BLOCKS, DECORATIONS -> ItemGroup.BLOCK;
-            case REDSTONE, TRANSPORTATION, MISC, BREWING -> ItemGroup.MATERIAL;
-            case FOOD -> ItemGroup.CONSUMABLE;
-            case TOOLS -> ItemGroup.TOOL;
-            case COMBAT -> UtilItem.isWeapon(ItemStack.of(type)) ? ItemGroup.WEAPON : ItemGroup.ARMOR;
-        }, rarity);
+        super(component, ItemStack.of(type), groupOf(ItemStack.of(type)), rarity);
     }
 
     public VanillaItem(String name, ItemStack proxy, ItemRarity rarity) {
@@ -39,13 +32,28 @@ public class VanillaItem extends BaseItem {
     }
 
     public VanillaItem(Component name, ItemStack proxy, ItemRarity rarity) {
-        super(name, proxy, switch (Objects.requireNonNullElse(proxy.getType().getCreativeCategory(), CreativeCategory.MISC)) {
-            case BUILDING_BLOCKS, DECORATIONS -> ItemGroup.BLOCK;
-            case REDSTONE, TRANSPORTATION, MISC, BREWING -> ItemGroup.MATERIAL;
-            case FOOD -> ItemGroup.CONSUMABLE;
-            case TOOLS -> ItemGroup.TOOL;
-            case COMBAT -> UtilItem.isWeapon(proxy) ? ItemGroup.WEAPON : ItemGroup.ARMOR;
-        }, rarity);
+        super(name, proxy, groupOf(proxy), rarity);
+    }
+
+    /** Weapons come before tools, since swords also carry the tool component. */
+    private static ItemGroup groupOf(ItemStack item) {
+        if (item.getType().isBlock()) {
+            return ItemGroup.BLOCK;
+        }
+        if (UtilItem.isWeapon(item)) {
+            return ItemGroup.WEAPON;
+        }
+        final Equippable equippable = item.getData(DataComponentTypes.EQUIPPABLE);
+        if (equippable != null && equippable.slot().isArmor()) {
+            return ItemGroup.ARMOR;
+        }
+        if (item.hasData(DataComponentTypes.TOOL)) {
+            return ItemGroup.TOOL;
+        }
+        if (item.hasData(DataComponentTypes.FOOD) || item.hasData(DataComponentTypes.CONSUMABLE)) {
+            return ItemGroup.CONSUMABLE;
+        }
+        return ItemGroup.MATERIAL;
     }
 
     @Override

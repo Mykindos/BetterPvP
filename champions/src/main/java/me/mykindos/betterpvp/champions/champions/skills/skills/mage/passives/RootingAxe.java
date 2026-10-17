@@ -107,7 +107,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
 
                     if (championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false)) {
                         damagee.teleport(damagee.getLocation().add(0, -1, 0));
-                        damagee.getWorld().playEffect(damagee.getLocation(), Effect.STEP_SOUND, damagee.getLocation().getBlock().getType());
+                        damagee.getWorld().playEffect(damagee.getLocation(), Effect.DESTROY_BLOCK, damagee.getLocation().getBlock().getBlockData());
                         championsManager.getEffects().addEffect(damagee, damager, EffectTypes.NO_JUMP, (long) (getDuration(level) * 1000));
                     }
                 }

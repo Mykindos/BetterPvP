@@ -109,7 +109,7 @@ public class ParticipantRespawnHandler implements Listener {
                                 .location(player.getLocation())
                                 .count(20)
                                 .offset(0.4, 1, 0.4)
-                                .extra(0)
+                                .speed(0)
                                 .receivers(60)
                                 .spawn();
 

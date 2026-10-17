@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.stats.menu.CycleButton;
 import me.mykindos.betterpvp.core.world.WorldHandler;
 import me.mykindos.betterpvp.core.world.menu.button.CreateButton;
 import me.mykindos.betterpvp.core.world.menu.button.HardcoreButton;
-import me.mykindos.betterpvp.core.world.menu.button.KeepSpawnLoadedButton;
 import me.mykindos.betterpvp.core.world.menu.button.SetSeedButton;
 import me.mykindos.betterpvp.core.world.menu.button.StructuresButton;
 import me.mykindos.betterpvp.core.world.menu.button.VoidButton;
@@ -63,7 +62,6 @@ public class GuiCreateWorld extends AbstractGui implements Windowed {
         }), creator::type));
         setItem(29, new StructuresButton());
         setItem(31, new HardcoreButton());
-        setItem(33, new KeepSpawnLoadedButton());
         setItem(36, new BackButton(previous));
         setItem(44, new CreateButton(worldHandler, creator));
         setBackground(Menu.BACKGROUND_ITEM);

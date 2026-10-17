@@ -127,14 +127,14 @@ public class WindDashAbility extends CooldownInteraction implements DisplayedInt
                         .count(10)
                         .receivers(receivers)
                         .offset(0.5, 0.5, 0.5)
-                        .extra(0.1)
+                        .speed(0.1)
                         .spawn();
                 Particle.GUST.builder()
                         .location(player.getLocation())
                         .count(1)
                         .receivers(receivers)
                         .offset(0.5, 0.5, 0.5)
-                        .extra(0.1)
+                        .speed(0.1)
                         .spawn();
             }
         }.runTaskTimer(champions, 0L, 1L);

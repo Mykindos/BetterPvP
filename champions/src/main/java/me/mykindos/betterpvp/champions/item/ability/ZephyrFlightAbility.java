@@ -95,7 +95,7 @@ public class ZephyrFlightAbility extends TemperInteraction implements DisplayedI
                 .location(player.getLocation())
                 .offset(0.2, 0.1, 0.2)
                 .count(2)
-                .extra(0)
+                .speed(0)
                 .receivers(60)
                 .spawn();
 

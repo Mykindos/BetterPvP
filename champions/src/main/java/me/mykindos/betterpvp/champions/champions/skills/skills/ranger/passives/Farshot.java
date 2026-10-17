@@ -104,7 +104,7 @@ public class Farshot extends Skill implements PassiveSkill, DamageSkill, Offensi
                 it.remove();
             } else {
                 Location location = next.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.FIREWORK.builder().location(location).receivers(60).extra(0).spawn();
+                Particle.FIREWORK.builder().location(location).receivers(60).speed(0).spawn();
             }
         }
     }

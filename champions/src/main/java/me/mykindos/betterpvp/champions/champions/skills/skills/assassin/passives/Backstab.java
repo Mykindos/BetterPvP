@@ -68,7 +68,7 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
         if (UtilMath.getAngle(damager.getLocation().getDirection(), event.getDamagee().getLocation().getDirection()) < 60) {
             event.addModifier(new SkillDamageModifier.Flat(this, getDamageModifier(level)));
             damager.getWorld().playSound(event.getDamagee().getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 1f, 2f);
-            damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
+            damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.DESTROY_BLOCK, Material.REDSTONE_BLOCK.createBlockData());
         }
     }
 

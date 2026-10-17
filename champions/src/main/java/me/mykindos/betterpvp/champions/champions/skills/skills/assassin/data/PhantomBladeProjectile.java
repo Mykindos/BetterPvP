@@ -138,7 +138,7 @@ public class PhantomBladeProjectile extends Projectile {
         Particle.DUST.builder()
                 .location(point)
                 .count(1)
-                .extra(0.5)
+                .speed(0.5)
                 .data(new Particle.DustOptions(color, size))
                 .receivers(60)
                 .spawn();
@@ -157,7 +157,7 @@ public class PhantomBladeProjectile extends Projectile {
                 .location(location)
                 .count(15)
                 .offset(0.2, 0.2, 0.2)
-                .extra(0.5)
+                .speed(0.5)
                 .data(new Particle.DustOptions(Color.fromRGB(184, 56, 207), 1.3f))
                 .receivers(60)
                 .spawn();

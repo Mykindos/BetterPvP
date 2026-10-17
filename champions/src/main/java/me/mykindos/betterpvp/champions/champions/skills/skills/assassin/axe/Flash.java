@@ -188,7 +188,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
             final Location lineEnd = player.getLocation().clone().add(0.0, player.getHeight() / 2, 0.0);
             final VectorLine line = VectorLine.withStepSize(lineStart, lineEnd, 0.25f);
             for (Location point : line.toLocations()) {
-                Particle.FIREWORK.builder().location(point).count(2).receivers(100).extra(0).spawn();
+                Particle.FIREWORK.builder().location(point).count(2).receivers(100).speed(0).spawn();
             }
 
             player.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.4F, 1.2F);

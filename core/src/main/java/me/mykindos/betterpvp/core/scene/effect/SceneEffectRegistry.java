@@ -118,7 +118,7 @@ public class SceneEffectRegistry {
                 .receivers(radius)
                 .count(count)
                 .offset(spread.getX(), spread.getY(), spread.getZ())
-                .extra(speed)
+                .speed(speed)
                 .force(force)
                 .data(data)
                 .spawn();

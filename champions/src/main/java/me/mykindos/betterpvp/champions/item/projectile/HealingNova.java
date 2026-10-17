@@ -54,7 +54,7 @@ public class HealingNova extends Projectile {
                 Particle.DUST.builder()
                         .location(point)
                         .count(1)
-                        .extra(0.5)
+                        .speed(0.5)
                         .offset(0.1, 0.1, 0.1)
                         .data(new Particle.DustOptions(Color.fromRGB(80, 200, 80), 2))
                         .receivers(60)
@@ -82,7 +82,7 @@ public class HealingNova extends Projectile {
                         .data(new Particle.DustOptions(color, 2))
                         .location(point.clone().add(direction))
                         .count(1)
-                        .extra(0)
+                        .speed(0)
                         .receivers(particleReceivers)
                         .spawn();
             }
@@ -90,7 +90,7 @@ public class HealingNova extends Projectile {
             Particle.HEART.builder()
                     .location(location)
                     .count(2)
-                    .extra(0)
+                    .speed(0)
                     .offset(0.5, 0.5, 0.5)
                     .receivers(particleReceivers)
                     .spawn();

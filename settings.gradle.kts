@@ -51,7 +51,7 @@ dependencyResolutionManagement {
             version("paperweight", "2.0.0-beta.24")
             version("jackson", "2.17.2")
             version("sidebar", "2.8.3")
-            version("mockbukkit", "4.72.8")
+            version("mockbukkit", "4.117.0")
             version("junit", "5.13.0-M2")
             version("jooq", "3.19.3")
             version("postgres", "42.7.4")
@@ -75,7 +75,9 @@ dependencyResolutionManagement {
             // Library - Tests
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef("junit")
             library("reflections", "org.reflections:reflections:0.10.2")
-            library("mockbukkit", "org.mockbukkit.mockbukkit", "mockbukkit-v1.21").versionRef("mockbukkit")
+            library("mockbukkit", "org.mockbukkit.mockbukkit", "mockbukkit-v26.2").versionRef("mockbukkit")
+            // MockBukkit carries 26.2 registry data, so tests run on the matching API.
+            library("paper-api-test", "io.papermc.paper", "paper-api").version("26.2.build.+")
 
             // Library - Paper
             library("paper-api", "io.papermc.paper", "paper-api").versionRef("paper")
@@ -140,7 +142,7 @@ dependencyResolutionManagement {
             library("jedis", "redis.clients", "jedis").version("5.2.0")
 
             // Bundled Libraries
-            bundle("test", listOf("junit-jupiter", "mockbukkit"))
+            bundle("test", listOf("junit-jupiter", "mockbukkit", "paper-api-test"))
             bundle("paper", listOf("paper-api"))
             bundle(
                 "utils",

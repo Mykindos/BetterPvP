@@ -62,9 +62,9 @@ public class SpongeListener implements Listener {
 
             player.setVelocity(new Vector(0.0D, 1.8D, 0.0D));
             player.getWorld().playSound(event.getClickedBlock().getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2f, 1.7f);
-            player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
-            player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
-            player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
+            player.getWorld().playEffect(player.getLocation(), Effect.DESTROY_BLOCK, Material.SPONGE.createBlockData(), 15);
+            player.getWorld().playEffect(player.getLocation(), Effect.DESTROY_BLOCK, Material.SPONGE.createBlockData(), 15);
+            player.getWorld().playEffect(player.getLocation(), Effect.DESTROY_BLOCK, Material.SPONGE.createBlockData(), 15);
             event.setCancelled(true);
 
             effectManager.addEffect(player, player, EffectTypes.NO_FALL, "Sponge", 14,

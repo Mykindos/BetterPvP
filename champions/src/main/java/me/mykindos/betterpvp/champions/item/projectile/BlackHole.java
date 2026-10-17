@@ -50,7 +50,7 @@ public class BlackHole extends Projectile {
                 Particle.DUST.builder()
                         .location(point)
                         .count(1)
-                        .extra(0.5)
+                        .speed(0.5)
                         .offset(0.1, 0.1, 0.1)
                         .data(new Particle.DustOptions(Color.fromRGB(64, 138, 199), 2))
                         .receivers(60)
@@ -79,7 +79,7 @@ public class BlackHole extends Projectile {
                         .data(new Particle.DustOptions(color, 2))
                         .location(point.clone().add(direction))
                         .count(1)
-                        .extra(0)
+                        .speed(0)
                         .receivers(particleReceivers)
                         .spawn();
             }
@@ -87,7 +87,7 @@ public class BlackHole extends Projectile {
             Particle.GLOW.builder()
                     .location(location)
                     .count(1)
-                    .extra(0.5)
+                    .speed(0.5)
                     .offset(0.5, 0.5, 0.5)
                     .receivers(particleReceivers)
                     .spawn();
@@ -105,7 +105,7 @@ public class BlackHole extends Projectile {
                     Particle.ASH.builder()
                             .location(loc)
                             .count(1)
-                            .extra(0)
+                            .speed(0)
                             .receivers(60)
                             .spawn();
                 }

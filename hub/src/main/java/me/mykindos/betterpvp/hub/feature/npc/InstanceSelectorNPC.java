@@ -157,7 +157,7 @@ public class InstanceSelectorNPC extends ModeledNPC implements HubNPC {
                 Particle.END_ROD.builder()
                         .count(1)
                         .location(location.clone().add(0, 1.5, 0))
-                        .extra(0.1)
+                        .speed(0.1)
                         .receivers(viewers)
                         .spawn();
             }

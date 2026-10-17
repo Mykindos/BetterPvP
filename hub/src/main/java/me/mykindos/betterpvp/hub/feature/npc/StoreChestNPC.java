@@ -84,7 +84,7 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
                     .count(30)
                     .location(entity.getLocation().add(0, 1.5, 0))
                     .offset(0.5, 0.5, 0.5)
-                    .extra(0)
+                    .speed(0)
                     .receivers(runner)
                     .spawn();
         }, 25L);
@@ -114,13 +114,13 @@ public class StoreChestNPC extends ModeledNPC implements HubNPC, Ticked {
         Particle.WITCH.builder()
                 .count(1)
                 .location(location.clone().add(x, y, z))
-                .extra(0)
+                .speed(0)
                 .receivers(viewers)
                 .spawn();
         Particle.WITCH.builder()
                 .count(1)
                 .location(location.clone().add(-x, y, -z))
-                .extra(0)
+                .speed(0)
                 .receivers(viewers)
                 .spawn();
     }

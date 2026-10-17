@@ -182,7 +182,7 @@ public class ClansExplosionListener extends ClanListener {
             }
 
             block.setType(Material.AIR);
-            block.getWorld().playEffect(block.getLocation().toCenterLocation(), Effect.STEP_SOUND, block.getType());
+            block.getWorld().playEffect(block.getLocation().toCenterLocation(), Effect.DESTROY_BLOCK, block.getBlockData());
 
         }
 
@@ -222,7 +222,7 @@ public class ClansExplosionListener extends ClanListener {
 
             final int index = tiers.indexOf(block.getType());
             if (index == tiers.size() - 1) {
-                block.getWorld().playEffect(block.getLocation().toCenterLocation(), Effect.STEP_SOUND, block.getType());
+                block.getWorld().playEffect(block.getLocation().toCenterLocation(), Effect.DESTROY_BLOCK, block.getBlockData());
                 if (block.getState() instanceof Container) {
                     block.breakNaturally(true);
                 }

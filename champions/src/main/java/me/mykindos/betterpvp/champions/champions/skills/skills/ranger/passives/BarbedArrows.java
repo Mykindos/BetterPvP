@@ -231,7 +231,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 Location location = next.getLocation();
                 Particle.ENCHANTED_HIT.builder()
                         .count(1)
-                        .extra(0)
+                        .speed(0)
                         .offset(0.0, 0.0, 0.0)
                         .location(location)
                         .receivers(30)

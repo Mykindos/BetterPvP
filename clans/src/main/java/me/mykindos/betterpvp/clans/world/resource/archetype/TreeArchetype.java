@@ -234,7 +234,7 @@ public class TreeArchetype implements ResourceArchetype {
                 .location(center)
                 .offset(width / 2, height / 2, width / 2)
                 .count(200)
-                .extra(0.1)
+                .speed(0.1)
                 .receivers(60)
                 .spawn();
     }

@@ -76,7 +76,7 @@ public class AxeProjectile extends Projectile {
             location.getWorld().playSound(location, Sound.ENTITY_BREEZE_INHALE, 0.2F, 2.0F);
             Particle.ENCHANTED_HIT.builder()
                     .count(3)
-                    .extra(0)
+                    .speed(0)
                     .offset(0.1, 0.1, 0.1)
                     .location(location)
                     .receivers(60)
@@ -87,7 +87,7 @@ public class AxeProjectile extends Projectile {
             location.getWorld().playSound(location, Sound.ITEM_BUNDLE_INSERT, 0.5F, 1.0F);
             Particle.CRIT.builder()
                     .count(3)
-                    .extra(0)
+                    .speed(0)
                     .offset(0.1, 0.1, 0.1)
                     .location(location)
                     .receivers(60)
@@ -116,7 +116,7 @@ public class AxeProjectile extends Projectile {
                 location.getWorld().playSound(location, block.getBlockSoundGroup().getBreakSound(), 1.0F, 0.0F);
                 Particle.BLOCK.builder()
                         .count(30)
-                        .extra(1)
+                        .speed(1)
                         .offset(0.2, 0.2, 0.2)
                         .data(block.getBlockData())
                         .location(location)

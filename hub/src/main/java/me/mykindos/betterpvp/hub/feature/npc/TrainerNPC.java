@@ -70,7 +70,7 @@ public class TrainerNPC extends ModeledNPC implements HubNPC {
                 .count(5)
                 .location(getEntity().getLocation().add(0, 2, 0))
                 .offset(0.7, 0.7, 0.7)
-                .extra(0)
+                .speed(0)
                 .receivers(runner)
                 .spawn();
     }

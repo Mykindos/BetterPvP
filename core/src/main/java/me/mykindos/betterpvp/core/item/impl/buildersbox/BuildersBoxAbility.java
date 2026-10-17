@@ -140,7 +140,7 @@ public class BuildersBoxAbility extends AbstractInteraction implements Displayed
                             Particle.POOF.builder()
                                     .count(25)
                                     .offset(0.2, 0.2, 0.2)
-                                    .extra(0.1)
+                                    .speed(0.1)
                                     .location(location)
                                     .receivers(60)
                                     .spawn();
@@ -180,7 +180,7 @@ public class BuildersBoxAbility extends AbstractInteraction implements Displayed
         Particle.POOF.builder()
                 .count(25)
                 .offset(0.2, 0.2, 0.2)
-                .extra(0.1)
+                .speed(0.1)
                 .location(location.clone().add(0, 3, 0))
                 .receivers(60)
                 .spawn();
@@ -192,7 +192,7 @@ public class BuildersBoxAbility extends AbstractInteraction implements Displayed
                 .location(location)
                 .offset(0.3, 0.3, 0.3)
                 .receivers(60)
-                .extra(0.2)
+                .speed(0.2)
                 .count(50)
                 .data(Material.OAK_PLANKS.createBlockData())
                 .spawn();
@@ -227,7 +227,7 @@ public class BuildersBoxAbility extends AbstractInteraction implements Displayed
         final ParticleBuilder openVFX = Particle.POOF.builder()
                 .count(25)
                 .offset(0.2, 0.2, 0.2)
-                .extra(0.1)
+                .speed(0.1)
                 .location(location)
                 .receivers(60);
         UtilServer.runTaskLater(plugin, () -> {

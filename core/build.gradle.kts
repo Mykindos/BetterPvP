@@ -60,8 +60,6 @@ dependencies {
     // Mob and structure view tests mock ModelEngine models, the scene registry and PacketEvents packets.
     testImplementation(libs.modelengine)
     testImplementation(libs.packetevents)
-    // MockBukkit brings an older Paper API. Align Adventure with the server so tests can build sprite objects.
-    testImplementation(platform("net.kyori:adventure-bom:4.26.1"))
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

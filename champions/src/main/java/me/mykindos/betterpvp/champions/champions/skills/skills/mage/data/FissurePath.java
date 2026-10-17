@@ -76,7 +76,7 @@ public class FissurePath {
                 if (fissureBlocks.contains(fissureBlock)) continue;
 
                 if(i == 0) {
-                    targetBlock.getWorld().playEffect(targetBlock.getLocation(), org.bukkit.Effect.STEP_SOUND, block.getType());
+                    targetBlock.getWorld().playEffect(targetBlock.getLocation(), org.bukkit.Effect.DESTROY_BLOCK, block.getBlockData());
                 }
 
                 fissureBlocks.add(fissureBlock);

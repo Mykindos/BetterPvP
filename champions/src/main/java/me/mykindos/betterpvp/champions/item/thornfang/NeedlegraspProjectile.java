@@ -78,7 +78,7 @@ public class NeedlegraspProjectile extends ReturningLinkProjectile {
         // Spawn collision particles
         Particle.BLOCK.builder()
                 .count(30)
-                .extra(0.1)
+                .speed(0.1)
                 .data(Material.MOSS_BLOCK.createBlockData())
                 .offset(0.3, 0.3, 0.3)
                 .location(midpoint)
@@ -87,7 +87,7 @@ public class NeedlegraspProjectile extends ReturningLinkProjectile {
 
         Particle.ELECTRIC_SPARK.builder()
                 .count(10)
-                .extra(0.1)
+                .speed(0.1)
                 .offset(0.3, 0.3, 0.3)
                 .location(midpoint)
                 .receivers(30)
@@ -108,7 +108,7 @@ public class NeedlegraspProjectile extends ReturningLinkProjectile {
 
         Particle.BLOCK.builder()
                 .count(100)
-                .extra(0)
+                .speed(0)
                 .data(Material.EMERALD_BLOCK.createBlockData())
                 .offset(0.5, 0.5, 0.5)
                 .location(location)

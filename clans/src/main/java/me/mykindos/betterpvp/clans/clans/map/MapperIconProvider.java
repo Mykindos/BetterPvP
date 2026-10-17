@@ -13,6 +13,8 @@ import me.mykindos.betterpvp.core.map.events.MapPointOfInterestEvent;
 import me.mykindos.betterpvp.core.utilities.MapperHelper;
 import me.mykindos.betterpvp.core.world.mapper.RegionTags;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -83,7 +85,8 @@ public class MapperIconProvider implements Listener {
 
     private MapCursor.Type parseType(String raw) {
         try {
-            return MapCursor.Type.valueOf(raw.trim().toUpperCase(Locale.ROOT));
+            final MapCursor.Type type = Registry.MAP_DECORATION_TYPE.get(NamespacedKey.minecraft(raw.trim().toLowerCase(Locale.ROOT)));
+            return type != null ? type : DEFAULT_TYPE;
         } catch (IllegalArgumentException exception) {
             return DEFAULT_TYPE;
         }

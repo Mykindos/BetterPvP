@@ -162,7 +162,7 @@ public class ImbuementPedestalRecipeExecutor {
         Location explosionCenter = pedestalLocation.clone().add(0, GROUPING_HEIGHT, 0);
         Particle.END_ROD.builder()
                 .location(explosionCenter)
-                .extra(0.2)
+                .speed(0.2)
                 .count(50)
                 .receivers(60)
                 .spawn();
