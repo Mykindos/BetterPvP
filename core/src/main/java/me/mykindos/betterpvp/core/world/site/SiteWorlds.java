@@ -131,17 +131,12 @@ public class SiteWorlds {
                 });
     }
 
-    /** Where a world is stored once Paper has loaded it. */
     private static @NotNull File storageFolder(@NotNull String worldName) {
         return UtilWorld.getStorageFolder(worldName).toFile();
     }
 
-    /**
-     * Where a world sits before Paper imports it on its first load: a template just copied, or a world saved before
-     * the storage layout changed.
-     */
     private static @NotNull File importFolder(@NotNull String worldName) {
-        return new File(Bukkit.getWorldContainer(), worldName);
+        return UtilWorld.getImportFolder(worldName);
     }
 
     private static boolean isOnDisk(@NotNull String worldName) {

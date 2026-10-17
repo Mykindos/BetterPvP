@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -73,8 +72,6 @@ public class WorldHandler {
     @SneakyThrows
     public void deleteWorld(BPvPWorld world) {
         world.unloadWorld();
-        if (world.getWorldFolder().exists()) {
-            FileUtils.forceDelete(world.getWorldFolder());
-        }
+        UtilWorld.deleteWorldFolders(world.getName());
     }
 }

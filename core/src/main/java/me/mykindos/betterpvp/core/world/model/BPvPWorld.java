@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.description.Describable;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -47,22 +48,11 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
 
     public BPvPWorld(@NotNull File worldFolder) {
         Preconditions.checkArgument(worldFolder.isDirectory(), "The file must be a directory.");
-        Preconditions.checkArgument(new File(worldFolder, "level.dat").exists(), "Directory is not a world folder.");
+        Preconditions.checkArgument(new File(worldFolder, "level.dat").exists() || new File(worldFolder, "region").isDirectory(),
+                "Directory is not a world folder.");
         String name = worldFolder.getName();
         try {
-            File container = Bukkit.getWorldContainer().getCanonicalFile();
-            File current = worldFolder.getParentFile();
-            if (current != null) {
-                current = current.getCanonicalFile();
-            }
-
-            while (current != null && !current.equals(container)) {
-                name = current.getName() + "/" + name;
-                current = current.getParentFile();
-                if (current != null) {
-                    current = current.getCanonicalFile();
-                }
-            }
+            name = UtilWorld.getWorldName(worldFolder);
         } catch (IOException e) {
             log.error("Failed to get canonical path for world folder: {}", worldFolder.getAbsolutePath(), e).submit();
         }
@@ -80,7 +70,7 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
      * @return The world's folder.
      */
     public @NotNull File getWorldFolder() {
-        return getWorld() == null ? new File(Bukkit.getWorldContainer(), name) : getWorld().getWorldFolder();
+        return getWorld() == null ? UtilWorld.getWorldFolder(name) : getWorld().getWorldPath().toFile();
     }
 
     public void checkLoaded() {
@@ -210,19 +200,7 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
 
     @SneakyThrows
     public BPvPWorld duplicate(String name) {
-        final File worldFolder = getWorldFolder();
-        final File newFolder = new File(Bukkit.getWorldContainer(), name);
-        final File sessionLock = new File(worldFolder, "session.lock");
-        if (sessionLock.exists()) {
-            FileUtils.forceDelete(sessionLock);
-        }
-
-        FileUtils.copyDirectory(worldFolder, newFolder);
-        final File uidFile = new File(newFolder, "uid.dat");
-        if (uidFile.exists()) {
-            FileUtils.forceDelete(uidFile);
-        }
-
-        return new BPvPWorld(newFolder);
+        UtilWorld.copyWorld(this.name, name);
+        return new BPvPWorld(name);
     }
 }
