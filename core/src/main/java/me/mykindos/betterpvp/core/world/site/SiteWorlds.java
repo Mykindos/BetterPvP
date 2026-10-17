@@ -306,9 +306,7 @@ public class SiteWorlds {
 
         UtilServer.runTask(core, () -> {
             try {
-                // Paper's import keeps only the world's own data, so the marker is carried over by hand.
-                final String importedTemplate = readMarker(importFolder(worldName));
-                final World world = Bukkit.createWorld(WorldCreator.name(worldName));
+                final World world = UtilWorld.createWorld(WorldCreator.name(worldName));
                 if (world == null) {
                     if (discardOnFailure) {
                         discardQuietly(worldName);
@@ -317,9 +315,6 @@ public class SiteWorlds {
                     return;
                 }
 
-                if (importedTemplate != null && readMarker(world.getWorldPath().toFile()) == null) {
-                    markBuiltFrom(world, importedTemplate);
-                }
                 world.setGameRule(GameRules.PVP, true);
                 future.complete(world);
             } catch (Exception ex) {
