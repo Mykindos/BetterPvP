@@ -6,12 +6,15 @@ import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +31,21 @@ public class UtilWorld {
         } catch (NumberFormatException ex) {
             return s.hashCode();
         }
+    }
+
+    /**
+     * The folder a world is stored in, whether or not it is loaded: {@code dimensions/<namespace>/<key>} under the
+     * main level. A world folder from before 26.x sits at {@code <world container>/<name>} until its first load, when
+     * Paper imports it here and deletes the old folder.
+     */
+    public static @NotNull Path getStorageFolder(@NotNull String worldName) {
+        final World loaded = Bukkit.getWorld(worldName);
+        if (loaded != null) {
+            return loaded.getWorldPath();
+        }
+
+        final NamespacedKey key = WorldCreator.name(worldName).key();
+        return Bukkit.getServer().getLevelDirectory().resolve("dimensions").resolve(key.namespace()).resolve(key.value());
     }
 
     public static Collection<File> getUnloadedWorlds() {
