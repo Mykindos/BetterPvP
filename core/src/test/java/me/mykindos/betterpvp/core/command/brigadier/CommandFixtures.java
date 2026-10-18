@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.command.brigadier;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -76,6 +77,10 @@ final class CommandFixtures {
 
     void noOfflineClient(String name) {
         when(search.offline(name)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
+    }
+
+    void offlineLookupFails(String name) {
+        when(search.offline(name)).thenReturn(CompletableFuture.failedFuture(new IllegalStateException("database down")));
     }
 
     /**
@@ -160,6 +165,61 @@ final class CommandFixtures {
         public LiteralArgumentBuilder<CommandSourceStack> define() {
             return IBrigadierCommand.literal(getName())
                     .then(IBrigadierCommand.argument("target", StringArgumentType.word())
+                            .executes(context -> runs.incrementAndGet()));
+        }
+    }
+
+    /**
+     * {@code /root bank}, alias {@code /root b}, which only holds {@link DepositCommand}.
+     */
+    static class BankCommand extends BrigadierCommand {
+
+        BankCommand(ClientManager clientManager) {
+            super(clientManager);
+            getAliases().add("b");
+        }
+
+        @Override
+        public String getName() {
+            return "bank";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Bank";
+        }
+
+        @Override
+        public LiteralArgumentBuilder<CommandSourceStack> define() {
+            return IBrigadierCommand.literal(getName());
+        }
+    }
+
+    /**
+     * {@code /root bank deposit <amount>}, alias {@code /root bank d}. Counts its runs.
+     */
+    static class DepositCommand extends BrigadierCommand {
+        final AtomicInteger runs = new AtomicInteger();
+
+        DepositCommand(ClientManager clientManager) {
+            super(clientManager);
+            getAliases().add("d");
+        }
+
+        @Override
+        public String getName() {
+            return "deposit";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Deposit";
+        }
+
+        @Override
+        public LiteralArgumentBuilder<CommandSourceStack> define() {
+            return IBrigadierCommand.literal(getName())
+                    .then(IBrigadierCommand.argument("amount", IntegerArgumentType.integer(1))
                             .executes(context -> runs.incrementAndGet()));
         }
     }

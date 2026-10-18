@@ -12,7 +12,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.BankCommand;
 import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.ConditionalCommand;
+import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.DepositCommand;
 import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.InfoCommand;
 import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.PlayerOnlyCommand;
 import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.RootCommand;
@@ -84,6 +86,26 @@ class BrigadierCommandTest {
         dispatcher.execute("root i Bob", source);
 
         assertEquals(2, info.runs.get());
+    }
+
+    @Test
+    @DisplayName("#2401 AC1 a subcommand of a subcommand is reachable through every alias")
+    void ac1_nestedSubcommandReachableThroughAliases() throws CommandSyntaxException {
+        final DepositCommand deposit = new DepositCommand(fixtures.clientManager);
+        final BankCommand bank = new BankCommand(fixtures.clientManager);
+        deposit.setParent(bank);
+        bank.getChildren().add(deposit);
+        final RootCommand root = rootWith(fixtures.clientManager, config("root.requiredRank=PLAYER",
+                "root.bank.requiredRank=PLAYER", "root.bank.deposit.requiredRank=PLAYER"), bank);
+        final CommandDispatcher<CommandSourceStack> dispatcher = dispatcher(root);
+        final CommandSourceStack source = fixtures.source(fixtures.player("Alice", Rank.PLAYER, false));
+
+        dispatcher.execute("root bank deposit 5", source);
+        dispatcher.execute("root bank d 5", source);
+        dispatcher.execute("root b deposit 5", source);
+        dispatcher.execute("root b d 5", source);
+
+        assertEquals(4, deposit.runs.get());
     }
 
     @Test
@@ -265,6 +287,22 @@ class BrigadierCommandTest {
         final ArgumentCaptor<Component> sent = ArgumentCaptor.forClass(Component.class);
         verify(sender).sendMessage(sent.capture());
         assertEquals("Unknown Player Bob", plain(sent.getValue()));
+    }
+
+    @Test
+    @DisplayName("#2401 AC3 a failed offline lookup tells the sender with a translated error")
+    void ac3_failedOfflineLookupReported() {
+        final RootCommand root = rootWith(fixtures.clientManager, config("root.requiredRank=PLAYER"));
+        final CommandSender sender = mock(CommandSender.class);
+        fixtures.offlineLookupFails("Bob");
+
+        assertEquals(Optional.empty(), root.offlineClient("Bob", sender).join());
+
+        final ArgumentCaptor<Component> sent = ArgumentCaptor.forClass(Component.class);
+        verify(sender).sendMessage(sent.capture());
+        assertTrue(containsKey(sent.getValue(), "core.command.error.offline_lookup_failed"), sent.getValue().toString());
+        assertEquals("Could not look up Bob, try again", plain(sent.getValue()));
+        assertEquals(NamedTextColor.RED, sent.getValue().color());
     }
 
     @Test

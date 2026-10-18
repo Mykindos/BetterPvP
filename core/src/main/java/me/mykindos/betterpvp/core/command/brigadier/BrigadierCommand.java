@@ -93,13 +93,12 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     public LiteralCommandNode<CommandSourceStack> build() {
         LiteralArgumentBuilder<CommandSourceStack> root = define();
         this.children.forEach(child -> {
-            LiteralArgumentBuilder<CommandSourceStack> childArgument = child.define().requires(child::requirement);
-            //define the child
-            root.then(child.define().requires(child::requirement));
+            LiteralCommandNode<CommandSourceStack> childNode = child.build();
+            root.then(childNode);
 
             //add all aliases like Paper does for the root
             for (String alias : child.getAliases()) {
-                root.then(IBrigadierCommand.copyLiteral(alias, childArgument));
+                root.then(IBrigadierCommand.copyLiteral(alias, childNode));
             }
         });
         return root.requires(this::requirement).build();
@@ -246,14 +245,16 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @param commandSender the player sending the command
      */
     protected CompletableFuture<Optional<Client>> getOfflineClientByName(String name, CommandSender commandSender) {
-        return clientManager.search().offline(name).thenApply(clientOptional -> {
-                    if (clientOptional.isEmpty()) {
-                        UtilMessage.sendCommandSyntaxException(commandSender, PlayerNameArgumentType.UNKNOWN_PLAYER_EXCEPTION.create(name));
-                    }
-                    return clientOptional;
-                }).exceptionally(throwable -> {
-                    log.error("Error retrieving offline player for command {}", getName(), throwable).submit();
-                    return Optional.empty();
+        return clientManager.search().offline(name).handle((clientOptional, throwable) -> {
+            if (throwable != null) {
+                log.error("Error retrieving offline player for command {}", getName(), throwable).submit();
+                UtilMessage.sendCommandSyntaxException(commandSender, ArgumentException.OFFLINE_LOOKUP_FAILED.create(name));
+                return Optional.empty();
+            }
+            if (clientOptional.isEmpty()) {
+                UtilMessage.sendCommandSyntaxException(commandSender, PlayerNameArgumentType.UNKNOWN_PLAYER_EXCEPTION.create(name));
+            }
+            return clientOptional;
         });
     }
 
