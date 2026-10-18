@@ -92,8 +92,8 @@ class InvseeItemLoggerTest {
     }
 
     @Test
-    @DisplayName("#2401 AC2 putting a UUID item in an offline player's inventory logs ITEM_INVSEE_PUT")
-    void ac2_offlinePutLogged() throws InterruptedException {
+    @DisplayName("#2401 AC2 putting a UUID item in logs ITEM_INVSEE_PUT naming the target by id and name, without a Player")
+    void ac2_putLoggedByTargetIdAndName() throws InterruptedException {
         LoggerFactory.getInstance().addAppender(appender);
         final InvseeItemLogger logger = new InvseeItemLogger(registry, lookupService);
         final ItemPostUpdateEvent event = new ItemPostUpdateEvent(mock(Inventory.class), 0, null, null, uuidItem());
@@ -104,8 +104,8 @@ class InvseeItemLoggerTest {
     }
 
     @Test
-    @DisplayName("#2401 AC2 taking a UUID item from an offline player's inventory logs ITEM_INVSEE_RETRIEVE")
-    void ac2_offlineRetrieveLogged() throws InterruptedException {
+    @DisplayName("#2401 AC2 taking a UUID item out logs ITEM_INVSEE_RETRIEVE naming the target by id and name, without a Player")
+    void ac2_retrieveLoggedByTargetIdAndName() throws InterruptedException {
         LoggerFactory.getInstance().addAppender(appender);
         final InvseeItemLogger logger = new InvseeItemLogger(registry, lookupService);
         final ItemPostUpdateEvent event = new ItemPostUpdateEvent(mock(Inventory.class), 0, null, uuidItem(), null);
