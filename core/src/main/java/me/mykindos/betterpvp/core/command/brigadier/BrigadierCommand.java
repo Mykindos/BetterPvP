@@ -245,15 +245,16 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @param commandSender the player sending the command
      */
     protected CompletableFuture<Optional<Client>> getOfflineClientByName(String name, CommandSender commandSender) {
-        return clientManager.search().offline(name).thenApply(clientOptional -> {
-                    if (clientOptional.isEmpty()) {
-                        UtilMessage.sendCommandSyntaxException(commandSender, PlayerNameArgumentType.UNKNOWN_PLAYER_EXCEPTION.create(name));
-                    }
-                    return clientOptional;
-                }).exceptionally(throwable -> {
-                    log.error("Error retrieving offline player for command {}", getName(), throwable).submit();
-                    UtilMessage.sendCommandSyntaxException(commandSender, ArgumentException.OFFLINE_LOOKUP_FAILED.create(name));
-                    return Optional.empty();
+        return clientManager.search().offline(name).handle((clientOptional, throwable) -> {
+            if (throwable != null) {
+                log.error("Error retrieving offline player for command {}", getName(), throwable).submit();
+                UtilMessage.sendCommandSyntaxException(commandSender, ArgumentException.OFFLINE_LOOKUP_FAILED.create(name));
+                return Optional.empty();
+            }
+            if (clientOptional.isEmpty()) {
+                UtilMessage.sendCommandSyntaxException(commandSender, PlayerNameArgumentType.UNKNOWN_PLAYER_EXCEPTION.create(name));
+            }
+            return clientOptional;
         });
     }
 
