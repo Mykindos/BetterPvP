@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -178,6 +180,9 @@ class BrigadierCommandLoaderTest {
     void ac2_configSavedOnceWithDefaults() {
         final ExtendedYamlConfiguration config = loadScannedPackage();
 
+        final InOrder order = inOrder(registrar, plugin);
+        order.verify(registrar, times(2)).register(any(LiteralCommandNode.class), any(String.class), anyCollection());
+        order.verify(plugin, times(1)).saveConfig();
         verify(plugin, times(1)).saveConfig();
         assertEquals("ADMIN", config.getString("scanned.requiredRank"));
         assertTrue(config.getBoolean("other.enabled"));
