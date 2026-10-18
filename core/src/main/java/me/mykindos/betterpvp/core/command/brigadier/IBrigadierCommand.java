@@ -82,15 +82,15 @@ public interface IBrigadierCommand {
     }
 
     /**
-     * Copies the literal, for command aliasing. Uses the same code as Paper's aliasing, but returning a
-     * {@link LiteralArgumentBuilder} of {@link CommandSourceStack}
+     * Copies the literal, for command aliasing. Uses the same code as Paper's aliasing.
+     * The copy shares the children of {@code source}, so every nested subcommand is reachable through the alias.
      * @param alias the alias name for the command
-     * @param source the argument builder source
+     * @param source the built command node
      * @return the copied Literal at {@code alias} of {@code source}
      * @see PaperBrigadier#copyLiteral(String, LiteralCommandNode)
      */
     @NotNull
-    static LiteralArgumentBuilder<CommandSourceStack> copyLiteral(@NotNull String alias, @NotNull LiteralArgumentBuilder<CommandSourceStack> source) {
+    static LiteralCommandNode<CommandSourceStack> copyLiteral(@NotNull String alias, @NotNull LiteralCommandNode<CommandSourceStack> source) {
         LiteralArgumentBuilder<CommandSourceStack> copyBuilder = IBrigadierCommand.literal(alias)
                 .requires(source.getRequirement())
                 .forward(source.getRedirect(), source.getRedirectModifier(), source.isFork());
@@ -98,11 +98,11 @@ public interface IBrigadierCommand {
             copyBuilder.executes(source.getCommand());
         }
 
-        for(CommandNode<CommandSourceStack> child : source.build().getChildren()) {
+        for (CommandNode<CommandSourceStack> child : source.getChildren()) {
             copyBuilder.then(child);
         }
 
-        return copyBuilder;
+        return copyBuilder.build();
     }
 
     /**

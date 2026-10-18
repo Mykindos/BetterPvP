@@ -93,13 +93,12 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     public LiteralCommandNode<CommandSourceStack> build() {
         LiteralArgumentBuilder<CommandSourceStack> root = define();
         this.children.forEach(child -> {
-            LiteralArgumentBuilder<CommandSourceStack> childArgument = child.define().requires(child::requirement);
-            //define the child
-            root.then(child.define().requires(child::requirement));
+            LiteralCommandNode<CommandSourceStack> childNode = child.build();
+            root.then(childNode);
 
             //add all aliases like Paper does for the root
             for (String alias : child.getAliases()) {
-                root.then(IBrigadierCommand.copyLiteral(alias, childArgument));
+                root.then(IBrigadierCommand.copyLiteral(alias, childNode));
             }
         });
         return root.requires(this::requirement).build();
@@ -253,6 +252,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
                     return clientOptional;
                 }).exceptionally(throwable -> {
                     log.error("Error retrieving offline player for command {}", getName(), throwable).submit();
+                    UtilMessage.sendCommandSyntaxException(commandSender, ArgumentException.OFFLINE_LOOKUP_FAILED.create(name));
                     return Optional.empty();
         });
     }

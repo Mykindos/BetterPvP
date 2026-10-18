@@ -8,9 +8,7 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.ReferencingInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.window.Window;
-import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
-import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -28,8 +26,7 @@ import java.util.UUID;
 @CustomLog
 public class PlayerInventoryMenu extends AbstractGui implements Windowed {
 
-    private final ItemRegistry registry;
-    private final ComponentLookupService lookupService;
+    private final InvseeItemLogger itemLogger;
 
     @Getter
     private @Nullable Player player;
@@ -59,8 +56,7 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
      */
     public PlayerInventoryMenu(ItemRegistry registry, ComponentLookupService lookupService, @Nullable Player player, String name, UUID id, CraftInventoryPlayer inventoryPlayer, boolean offline) {
         super(9, 6);
-        this.registry = registry;
-        this.lookupService = lookupService;
+        this.itemLogger = new InvseeItemLogger(registry, lookupService);
         this.player = player;
         this.name = name;
         this.id = id;
@@ -156,30 +152,7 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
             return;
         }
         Player viewer = this.findAllCurrentViewers().stream().findFirst().orElseThrow();
-
-        // Player is getting the new UUIDItem
-        lookupService.getItemComponentPair(event.getNewItem(), UUIDProperty.class).ifPresent(result -> {
-            final UUIDProperty component = result.getComponent();
-            final ItemInstance item = result.getItem();
-            log.info("{} put ({}) in {}'s inventory", viewer.getName(), component.getUniqueId().toString(), player.getName())
-                    .setAction("ITEM_INVSEE_PUT").addClientContext(player)
-                    .addItemContext(registry, item)
-                    .addClientContext(viewer)
-                    .addClientContext(player, true)
-                    .submit();
-        });
-
-        // Viewer is getting the new UUIDItem
-        lookupService.getItemComponentPair(event.getPreviousItem(), UUIDProperty.class).ifPresent(result -> {
-            final UUIDProperty component = result.getComponent();
-            final ItemInstance item = result.getItem();
-            log.info("{} retrieved ({}) from {}'s inventory", viewer.getName(), component.getUniqueId().toString(), player.getName())
-                    .setAction("ITEM_INVSEE_RETRIEVE").addClientContext(player)
-                    .addItemContext(registry, item)
-                    .addClientContext(viewer)
-                    .addClientContext(player, true)
-                    .submit();
-        });
+        itemLogger.log(viewer, id, name, event);
     }
 
     @Override
