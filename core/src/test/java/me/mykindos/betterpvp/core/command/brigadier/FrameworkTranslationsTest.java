@@ -52,6 +52,7 @@ class FrameworkTranslationsTest {
                 "core.command.error.on_cooldown",
                 "core.command.error.unknown_player",
                 "core.command.error.unknown_offline_player",
+                "core.command.error.offline_lookup_failed",
                 "core.command.error.invalid_player_name",
                 "core.command.error.unknown_effect",
                 "core.command.error.unknown_item",
