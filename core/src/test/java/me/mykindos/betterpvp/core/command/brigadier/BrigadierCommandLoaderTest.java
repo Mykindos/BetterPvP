@@ -11,6 +11,9 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.InfoCommand;
 import me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.RootCommand;
+import me.mykindos.betterpvp.core.command.brigadier.scanned.ScannedChildCommand;
+import me.mykindos.betterpvp.core.command.brigadier.scanned.ScannedOtherCommand;
+import me.mykindos.betterpvp.core.command.brigadier.scanned.ScannedRootCommand;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.locale.Translations;
@@ -20,21 +23,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static me.mykindos.betterpvp.core.command.brigadier.CommandFixtures.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -137,6 +145,48 @@ class BrigadierCommandLoaderTest {
 
         assertTrue(root.getChildren().contains(info));
         assertSame(root, info.getParent());
+    }
+
+    private ExtendedYamlConfiguration loadScannedPackage() {
+        final ScannedRootCommand root = new ScannedRootCommand(fixtures.clientManager);
+        when(injector.getInstance(ScannedRootCommand.class)).thenReturn(root);
+        when(injector.getInstance(ScannedOtherCommand.class)).thenReturn(new ScannedOtherCommand(fixtures.clientManager));
+        when(injector.getInstance(ScannedChildCommand.class)).thenReturn(new ScannedChildCommand(fixtures.clientManager));
+        final ExtendedYamlConfiguration config = config();
+        when(plugin.getConfig("permissions/commands")).thenReturn(config);
+
+        loader.loadCommands(ScannedRootCommand.class.getPackageName());
+        runCommandsLifecycleEvent();
+        return config;
+    }
+
+    @Test
+    @DisplayName("#2402 AC1 loadCommands registers every top-level command in a package and attaches its subcommands")
+    @SuppressWarnings("unchecked")
+    void ac1_loadCommandsRegistersPackage() {
+        loadScannedPackage();
+
+        final ArgumentCaptor<LiteralCommandNode<CommandSourceStack>> nodes = ArgumentCaptor.forClass(LiteralCommandNode.class);
+        verify(registrar, times(2)).register(nodes.capture(), any(String.class), anyCollection());
+        final Set<String> names = nodes.getAllValues().stream().map(LiteralCommandNode::getName).collect(Collectors.toSet());
+        assertEquals(Set.of("scanned", "other"), names);
+        final LiteralCommandNode<CommandSourceStack> scanned = nodes.getAllValues().stream()
+                .filter(node -> node.getName().equals("scanned")).findFirst().orElseThrow();
+        assertNotNull(scanned.getChild("child"));
+    }
+
+    @Test
+    @DisplayName("#2402 AC2 loading several commands saves the config once, with the missing defaults written")
+    void ac2_configSavedOnceWithDefaults() {
+        final ExtendedYamlConfiguration config = loadScannedPackage();
+
+        final InOrder order = inOrder(registrar, plugin);
+        order.verify(registrar, times(2)).register(any(LiteralCommandNode.class), any(String.class), anyCollection());
+        order.verify(plugin, times(1)).saveConfig();
+        verify(plugin, times(1)).saveConfig();
+        assertEquals("ADMIN", config.getString("scanned.requiredRank"));
+        assertTrue(config.getBoolean("other.enabled"));
+        assertEquals("ADMIN", config.getString("scanned.child.requiredRank"));
     }
 
     @Test
