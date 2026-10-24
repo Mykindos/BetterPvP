@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
@@ -59,7 +59,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .executes(context -> {
                     final Player executor = getPlayerFromExecutor(context);
                     final Clan executorClan = getClanByExecutor(context);
@@ -76,7 +76,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
 
                     return Command.SINGLE_SUCCESS;
                 })
-                .then(IBrigadierCommand.argument("Clan",
+                .then(BrigadierNodes.argument("Clan",
                         BPvPClansArgumentTypes.clan(),
                         this::senderIsAdministrating)
                         .executes(context -> {

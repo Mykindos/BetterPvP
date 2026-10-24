@@ -19,7 +19,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -64,8 +64,8 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
                                 .executes(context -> {
                                     final Clan target = context.getArgument("Clan", Clan.class);
                                     final Player player = getPlayerFromExecutor(context);
@@ -79,7 +79,7 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
                                     return Command.SINGLE_SUCCESS;
                                 })
                 )
-                .then(IBrigadierCommand.argument("Joinable Clan", BPvPClansArgumentTypes.joinableClan(),
+                .then(BrigadierNodes.argument("Joinable Clan", BPvPClansArgumentTypes.joinableClan(),
                                         (source) -> !this.executorHasAClan(source) && !this.senderIsAdministrating(source))
                                 .executes(context -> {
                                     final Clan target = context.getArgument("Joinable Clan", Clan.class);

@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDItem;
 import me.mykindos.betterpvp.core.logging.LogContext;
@@ -48,8 +48,8 @@ public class BrigadierSearchCommand extends BrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal("search")
-                    .then(IBrigadierCommand.argument("Item Id", BPvPArgumentTypes.uuidItem())
+        return BrigadierNodes.literal("search")
+                    .then(BrigadierNodes.argument("Item Id", BPvPArgumentTypes.uuidItem())
                             .executes(context -> {
                                 final UUIDItem item = context.getArgument("Item Id", UUIDItem.class);
                                 final Player executor = getPlayerFromExecutor(context);
@@ -66,7 +66,7 @@ public class BrigadierSearchCommand extends BrigadierCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
                         )
-                    ).then(IBrigadierCommand.argument("Player Name", BPvPArgumentTypes.playerName())
+                    ).then(BrigadierNodes.argument("Player Name", BPvPArgumentTypes.playerName())
                         .suggests(BPvPArgumentTypes.playerName()::suggestions)
                         .executes(context -> {
                             final String targetName = context.getArgument("Player Name", String.class);

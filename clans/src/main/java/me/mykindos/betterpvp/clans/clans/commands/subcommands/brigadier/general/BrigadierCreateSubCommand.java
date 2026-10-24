@@ -21,7 +21,7 @@ import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.chat.filter.IFilterService;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.utilities.SnowflakeIdGenerator;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -55,7 +55,7 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clanName())
                         .executes(context -> {
                             final String name = context.getArgument("Clan Name", String.class);

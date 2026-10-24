@@ -5,7 +5,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 
 /**
  * {@code /scanned child}, found by scanning this package.
@@ -29,6 +29,6 @@ public class ScannedChildCommand extends BrigadierCommand {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName());
+        return BrigadierNodes.literal(getName());
     }
 }

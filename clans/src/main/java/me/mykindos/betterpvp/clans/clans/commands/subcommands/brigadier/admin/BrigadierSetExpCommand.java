@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -57,9 +57,9 @@ public class BrigadierSetExpCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan())
-                        .then(IBrigadierCommand.argument("experience", DoubleArgumentType.doubleArg(0))
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Clan", BPvPClansArgumentTypes.clan())
+                        .then(BrigadierNodes.argument("experience", DoubleArgumentType.doubleArg(0))
                                 .executes(context -> {
                                     final CommandSender sender = context.getSource().getSender();
                                     final Clan target = context.getArgument("Clan", Clan.class);

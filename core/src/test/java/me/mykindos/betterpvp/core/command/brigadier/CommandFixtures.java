@@ -95,7 +95,7 @@ final class CommandFixtures {
         return config;
     }
 
-    static CommandDispatcher<CommandSourceStack> dispatcher(IBrigadierCommand command) {
+    static CommandDispatcher<CommandSourceStack> dispatcher(BrigadierCommand command) {
         final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
         dispatcher.getRoot().addChild(command.build());
         return dispatcher;
@@ -128,7 +128,7 @@ final class CommandFixtures {
 
         @Override
         public LiteralArgumentBuilder<CommandSourceStack> define() {
-            return IBrigadierCommand.literal(getName()).executes(context -> runs.incrementAndGet());
+            return BrigadierNodes.literal(getName()).executes(context -> runs.incrementAndGet());
         }
 
         CompletableFuture<Optional<Client>> offlineClient(String name, CommandSender sender) {
@@ -163,8 +163,8 @@ final class CommandFixtures {
 
         @Override
         public LiteralArgumentBuilder<CommandSourceStack> define() {
-            return IBrigadierCommand.literal(getName())
-                    .then(IBrigadierCommand.argument("target", StringArgumentType.word())
+            return BrigadierNodes.literal(getName())
+                    .then(BrigadierNodes.argument("target", StringArgumentType.word())
                             .executes(context -> runs.incrementAndGet()));
         }
     }
@@ -191,7 +191,7 @@ final class CommandFixtures {
 
         @Override
         public LiteralArgumentBuilder<CommandSourceStack> define() {
-            return IBrigadierCommand.literal(getName());
+            return BrigadierNodes.literal(getName());
         }
     }
 
@@ -218,8 +218,8 @@ final class CommandFixtures {
 
         @Override
         public LiteralArgumentBuilder<CommandSourceStack> define() {
-            return IBrigadierCommand.literal(getName())
-                    .then(IBrigadierCommand.argument("amount", IntegerArgumentType.integer(1))
+            return BrigadierNodes.literal(getName())
+                    .then(BrigadierNodes.argument("amount", IntegerArgumentType.integer(1))
                             .executes(context -> runs.incrementAndGet()));
         }
     }
@@ -245,7 +245,7 @@ final class CommandFixtures {
 
         @Override
         public LiteralArgumentBuilder<CommandSourceStack> define() {
-            return IBrigadierCommand.literal(getName()).executes(context -> {
+            return BrigadierNodes.literal(getName()).executes(context -> {
                 getClientFromExecutor(context);
                 return 1;
             });
@@ -274,7 +274,7 @@ final class CommandFixtures {
 
         @Override
         public LiteralArgumentBuilder<CommandSourceStack> define() {
-            return IBrigadierCommand.literal(getName()).executes(context -> 1);
+            return BrigadierNodes.literal(getName()).executes(context -> 1);
         }
 
         @Override

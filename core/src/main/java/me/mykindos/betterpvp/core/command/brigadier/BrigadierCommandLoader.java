@@ -41,7 +41,7 @@ public class BrigadierCommandLoader extends Loader {
      */
     public void loadCommands(String packageName) {
         final Reflections reflections = new Reflections(packageName);
-        loadAll(reflections.getSubTypesOf(IBrigadierCommand.class));
+        loadAll(reflections.getSubTypesOf(BrigadierCommand.class));
         loadSubCommands(reflections.getTypesAnnotatedWith(BrigadierSubCommand.class));
     }
 
@@ -89,8 +89,8 @@ public class BrigadierCommandLoader extends Loader {
         log.info(Arrays.toString(classes.toArray())).submit();
         classes.forEach(clazz -> {
                     BrigadierSubCommand subCommandAnnotation = clazz.getAnnotation(BrigadierSubCommand.class);
-                    IBrigadierCommand parent = plugin.getInjector().getInstance(subCommandAnnotation.value());
-                    IBrigadierCommand subCommand = (IBrigadierCommand) plugin.getInjector().getInstance(clazz);
+                    BrigadierCommand parent = plugin.getInjector().getInstance(subCommandAnnotation.value());
+                    BrigadierCommand subCommand = (BrigadierCommand) plugin.getInjector().getInstance(clazz);
                     plugin.getInjector().injectMembers(subCommand);
                     log.info("Adding Brigadier Sub Command {} to {}", subCommand.getName(), parent.getName()).submit();
                     subCommand.setParent(parent);
@@ -98,9 +98,8 @@ public class BrigadierCommandLoader extends Loader {
                 });
     }
 
-    private void loadAll(Set<Class<? extends IBrigadierCommand>> classes) {
+    private void loadAll(Set<Class<? extends BrigadierCommand>> classes) {
         register(classes.stream()
-                .filter(BrigadierCommand.class::isAssignableFrom)
                 .filter(clazz -> !clazz.isAnnotationPresent(BrigadierSubCommand.class))
                 .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
                 .toList());

@@ -17,7 +17,7 @@ import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -48,9 +48,9 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 //by clan name
-                .then(IBrigadierCommand.argument("Clan Name", BPvPClansArgumentTypes.clan())
+                .then(BrigadierNodes.argument("Clan Name", BPvPClansArgumentTypes.clan())
                         .suggests((context, builder) -> {
                             /*
                             we need to do it this way for reasons. I have no idea why. If BPvPArgumentTypes.playerName()
@@ -72,7 +72,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                         })
                 )
                 //must be before selector, selector fails without falling
-                .then(IBrigadierCommand.argument("Clan Member", BPvPArgumentTypes.playerName())
+                .then(BrigadierNodes.argument("Clan Member", BPvPArgumentTypes.playerName())
                         .executes(context -> {
                             final String targetName = context.getArgument("Clan Member", String.class);
                             final CommandSender sender = context.getSource().getSender();

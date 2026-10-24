@@ -42,7 +42,7 @@ import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommandManager;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.command.CommandManager;
@@ -266,9 +266,9 @@ public class ClanEventListener extends ClanListener {
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();
 
-        final IBrigadierCommand clanCommand = this.commandManager.getObject("clan").orElseThrow();
+        final BrigadierCommand clanCommand = this.commandManager.getObject("clan").orElseThrow();
 
-        for (final IBrigadierCommand subCommand : clanCommand.getChildren()) {
+        for (final BrigadierCommand subCommand : clanCommand.getChildren()) {
 
             if (subCommand.getName().equalsIgnoreCase(clan.getName()) || subCommand.getAliases().stream().anyMatch(o -> o.equalsIgnoreCase(clan.getName()))) {
                 UtilMessage.message(player, "clans.prefix", "clans.command.clan.create.invalid-name");

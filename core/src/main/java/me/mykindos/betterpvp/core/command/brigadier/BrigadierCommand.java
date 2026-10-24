@@ -34,14 +34,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @CustomLog
-public abstract class BrigadierCommand implements IBrigadierCommand {
+public abstract class BrigadierCommand {
     protected final ClientManager clientManager;
 
+    /**
+     * The command this is a subcommand of, used in finding the config path. {@code null} for a top-level command.
+     */
     @Getter
     @Setter
-    private IBrigadierCommand parent;
+    @Nullable
+    private BrigadierCommand parent;
     @Getter
-    private final Collection<IBrigadierCommand> children = new ArrayList<>();
+    private final Collection<BrigadierCommand> children = new ArrayList<>();
 
     protected ExtendedYamlConfiguration config;
     @Getter
@@ -55,6 +59,37 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
         this.clientManager = clientManager;
     }
 
+    /**
+     * Used in retrieving path for config options
+     * @return the name of this command
+     */
+    public abstract String getName();
+
+    /**
+     * Gets the description of this command, used in registration
+     * @return the description
+     */
+    public abstract String getDescription();
+
+    /**
+     * Gets the description as a component, which may be translatable
+     * @return the description
+     */
+    public Component getDescriptionComponent() {
+        return Component.text(getDescription());
+    }
+
+    /**
+     * Define the command, using normal rank based permissions
+     * Requires sender to have required rank and executor to be a player
+     * @return the builder to be used in Build
+     */
+    public abstract LiteralArgumentBuilder<CommandSourceStack> define();
+
+    /**
+     * Sets the config for this command and its children. Must be done before calling {@link #build()}
+     * @param config the config
+     */
     public void setConfig(ExtendedYamlConfiguration config) {
         this.config = config;
         String rankPath = getPath() + ".requiredRank";
@@ -75,7 +110,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     public String getPath() {
 
         StringBuilder path = new StringBuilder(getName());
-        IBrigadierCommand currentParent = getParent();
+        BrigadierCommand currentParent = getParent();
         while (currentParent != null) {
             path.insert(0, currentParent.getName() + ".");
             currentParent = currentParent.getParent();
@@ -89,7 +124,6 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * Requires the command to be enabled and the sender to have the required rank
      * @return the build
      */
-    @Override
     public LiteralCommandNode<CommandSourceStack> build() {
         LiteralArgumentBuilder<CommandSourceStack> root = define();
         this.children.forEach(child -> {
@@ -98,7 +132,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
 
             //add all aliases like Paper does for the root
             for (String alias : child.getAliases()) {
-                root.then(IBrigadierCommand.copyLiteral(alias, childNode));
+                root.then(BrigadierNodes.copyLiteral(alias, childNode));
             }
         });
         return root.requires(this::requirement).build();
@@ -113,12 +147,15 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @param source the CommandSourceStack
      * @return whether the runner can use the command
      */
-    @Override
     public boolean requirement(CommandSourceStack source) {
         return commandIsEnabled() && senderHasCorrectRank(source);
     }
 
-    @Override
+    /**
+     * Outline the requirements to run this command and compare it to the current context
+     * @param context the {@link CommandContext} to compare
+     * @return the {@link Component} describing this command's requirements
+     */
     public Component getRequirementComponent(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         final boolean canRun = requirement(context.getSource());
         final boolean qualifies = senderHasCorrectRank(context.getSource());

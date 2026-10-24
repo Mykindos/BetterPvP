@@ -18,7 +18,7 @@ import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -62,14 +62,14 @@ public class BrigadierListCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .executes(context -> {
                     Player executor = getPlayerFromExecutor(context);
                     Clan executorClan = getClanByExecutor(context);
                     doList(executor, executorClan, 1);
                     return Command.SINGLE_SUCCESS;
                 })
-                .then(IBrigadierCommand.argument("Page Number", IntegerArgumentType.integer(1))
+                .then(BrigadierNodes.argument("Page Number", IntegerArgumentType.integer(1))
                         .executes(context -> {
                             Player executor = getPlayerFromExecutor(context);
                             Clan executorClan = getClanByExecutor(context);

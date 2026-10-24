@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BrigadierSubCommand {
 
-    Class<? extends IBrigadierCommand> value();
+    Class<? extends BrigadierCommand> value();
 }

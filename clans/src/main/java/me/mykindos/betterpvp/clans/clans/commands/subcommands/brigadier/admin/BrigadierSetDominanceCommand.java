@@ -16,7 +16,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentExc
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import org.bukkit.entity.Player;
 
@@ -58,7 +58,7 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .then(Commands.argument("Target Clan", BPvPClansArgumentTypes.enemyClan())
                         //do it by clan you are in
                         .then(Commands.argument("Dominance", DoubleArgumentType.doubleArg(-100.0, 100.0))

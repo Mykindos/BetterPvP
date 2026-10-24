@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -13,19 +12,20 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.PaperBrigadier;
-import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface IBrigadierCommand {
-    //That this isn't default behavior does not make sense
+/**
+ * Builders for the nodes of a Brigadier command tree, typed to {@link CommandSourceStack}.
+ */
+public final class BrigadierNodes {
+
+    private BrigadierNodes() {
+    }
+
     /**
      * <P>Utility to create a required argument builder with the correct generic.</P>
      * Sets the {@link RequiredArgumentBuilder#requires(Predicate) requirement}
@@ -39,7 +39,7 @@ public interface IBrigadierCommand {
      * @see Commands#argument(String, ArgumentType)
      */
     @NotNull
-    static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType, Predicate<CommandSourceStack> requirement) {
+    public static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType, Predicate<CommandSourceStack> requirement) {
         RequiredArgumentBuilder<CommandSourceStack, T> builder = Commands.argument(name, argumentType);
         builder.requires(requirement);
         builder.suggests((context, suggestionsBuilder) -> {
@@ -63,7 +63,7 @@ public interface IBrigadierCommand {
      * @see Commands#literal(String)
      */
     @NotNull
-    static LiteralArgumentBuilder<CommandSourceStack> literal(final String literal) {
+    public static LiteralArgumentBuilder<CommandSourceStack> literal(final String literal) {
         return Commands.literal(literal);
     }
 
@@ -77,7 +77,7 @@ public interface IBrigadierCommand {
      * @see Commands#argument(String, ArgumentType)
      */
     @NotNull
-    static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType) {
+    public static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType) {
         return Commands.argument(name, argumentType);
     }
 
@@ -90,8 +90,8 @@ public interface IBrigadierCommand {
      * @see PaperBrigadier#copyLiteral(String, LiteralCommandNode)
      */
     @NotNull
-    static LiteralCommandNode<CommandSourceStack> copyLiteral(@NotNull String alias, @NotNull LiteralCommandNode<CommandSourceStack> source) {
-        LiteralArgumentBuilder<CommandSourceStack> copyBuilder = IBrigadierCommand.literal(alias)
+    public static LiteralCommandNode<CommandSourceStack> copyLiteral(@NotNull String alias, @NotNull LiteralCommandNode<CommandSourceStack> source) {
+        LiteralArgumentBuilder<CommandSourceStack> copyBuilder = literal(alias)
                 .requires(source.getRequirement())
                 .forward(source.getRedirect(), source.getRedirectModifier(), source.isFork());
         if (source.getCommand() != null) {
@@ -104,87 +104,4 @@ public interface IBrigadierCommand {
 
         return copyBuilder.build();
     }
-
-    /**
-     * Used in retrieving path for config options
-     * @return the name of this command
-     */
-    String getName();
-
-    /**\
-     * Builds the command to be registered
-     * @return The command
-     */
-    LiteralCommandNode<CommandSourceStack> build();
-
-    /**
-     * Gets the description of this command, used in registration
-     * @return the description
-     */
-    String getDescription();
-
-    /**
-     * Gets the description as a component, which may be translatable
-     * @return the description
-     */
-    default Component getDescriptionComponent() {
-        return Component.text(getDescription());
-    }
-
-    /**
-     * Gets the aliases for this command, used in registration
-     * @return the description
-     */
-    Collection<String> getAliases();
-
-    /**
-     * Sets the config for this command. Must be done before calling Build
-     * @param config the config
-     */
-    void setConfig(ExtendedYamlConfiguration config);
-
-    public Rank getRequiredRank();
-
-    /**
-     * Sets the parent of this command, used in finding the path
-     * @param parent the parent command
-     */
-    void setParent(IBrigadierCommand parent);
-    @Nullable IBrigadierCommand getParent();
-
-    /**
-     * Gets the Collection of children
-     * @return the collection of children
-     */
-    Collection<IBrigadierCommand> getChildren();
-    /**
-     * Define the command, using normal rank based permissions
-     * Requires sender to have required rank and executor to be a player
-     * @return the builder to be used in Build
-     */
-    LiteralArgumentBuilder<CommandSourceStack> define();
-
-    /**
-     * Get the requirement for running the command. Applied on build, even if this is a sub command
-     * @param source the source
-     * @return true if able to run, false otherwise
-     */
-    boolean requirement(CommandSourceStack source);
-
-
-    /**
-     * Outline the requirements to run this command and compare it to the current context
-     * @param context the {@link CommandContext} to compare
-     * @return the {@link Component} describing this command's requirements
-     */
-    Component getRequirementComponent(CommandContext<CommandSourceStack> context) throws CommandSyntaxException;
-
-    /**
-     * Get all the usages of this command
-     * @param source the {@link CommandSourceStack}
-     * @param parentUsage the usage of the parent to this command
-     * @return the formatted string of all usages
-     */
-    String getUsages(CommandSourceStack source, @Nullable String parentUsage);
-
 }
