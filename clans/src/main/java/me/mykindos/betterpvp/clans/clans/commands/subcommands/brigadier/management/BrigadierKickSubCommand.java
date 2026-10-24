@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -63,8 +63,8 @@ public class BrigadierKickSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Kickable Clan Member",
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Kickable Clan Member",
                                 BPvPClansArgumentTypes.lowerRankClanMember(),
                                 sourceStack -> this.executorHasAClan(sourceStack) && !this.senderIsAdministrating(sourceStack))
                         .executes(context -> {
@@ -88,7 +88,7 @@ public class BrigadierKickSubCommand extends BrigadierClanSubCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                 //allow administrating clients to kick any member
-                ).then(IBrigadierCommand.argument("Admin Kickable Clan Member",
+                ).then(BrigadierNodes.argument("Admin Kickable Clan Member",
                                 BPvPClansArgumentTypes.clanMember(),
                                 sourceStack -> this.executorHasAClan(sourceStack) && senderIsAdministrating(sourceStack))
                         .executes(context -> {

@@ -219,8 +219,8 @@ class BrigadierCommandTest {
             }
         };
         final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
-        dispatcher.register(IBrigadierCommand.literal("x")
-                .then(IBrigadierCommand.argument("value", suggesting, source -> allowed.get()).executes(context -> 1)));
+        dispatcher.register(BrigadierNodes.literal("x")
+                .then(BrigadierNodes.argument("value", suggesting, source -> allowed.get()).executes(context -> 1)));
         final CommandSourceStack source = fixtures.source(fixtures.player("Alice", Rank.PLAYER, false));
 
         assertTrue(dispatcher.getCompletionSuggestions(dispatcher.parse("x ", source)).join().isEmpty());
@@ -333,5 +333,12 @@ class BrigadierCommandTest {
         assertTrue(admin.contains("You Qualify: true"), admin);
         assertTrue(player.contains("You cannot run this command"), player);
         assertTrue(player.contains("You Qualify: false"), player);
+    }
+
+    @Test
+    @DisplayName("CLANS-53 AC1 BrigadierCommand is the only command type, with no IBrigadierCommand interface")
+    void ac1_interfaceFolded() {
+        assertThrows(ClassNotFoundException.class,
+                () -> Class.forName(BrigadierCommand.class.getPackageName() + ".IBrigadierCommand"));
     }
 }

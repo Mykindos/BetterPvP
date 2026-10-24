@@ -12,7 +12,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -61,9 +61,9 @@ public class BrigadierCustomGiveCommand extends BrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("players", ArgumentTypes.players())
-                        .then(IBrigadierCommand.argument("item", BPvPArgumentTypes.customItemType())
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("players", ArgumentTypes.players())
+                        .then(BrigadierNodes.argument("item", BPvPArgumentTypes.customItemType())
                                 .executes(context -> {
                                     final Player player = getPlayerFromSender(context);
                                     final List<Player> targets = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());
@@ -71,7 +71,7 @@ public class BrigadierCustomGiveCommand extends BrigadierCommand {
                                     doGive(player, targets, item, 1);
                                     return Command.SINGLE_SUCCESS;
                                 })
-                                .then(IBrigadierCommand.argument("amount", IntegerArgumentType.integer(1, 64))
+                                .then(BrigadierNodes.argument("amount", IntegerArgumentType.integer(1, 64))
                                         .executes(context -> {
                                             final Player player = getPlayerFromSender(context);
                                             final List<Player> targets = context.getArgument("players", PlayerSelectorArgumentResolver.class).resolve(context.getSource());

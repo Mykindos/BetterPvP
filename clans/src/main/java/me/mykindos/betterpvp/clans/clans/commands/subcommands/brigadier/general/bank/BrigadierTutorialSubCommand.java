@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.clans.clans.commands.subcommands.TutorialSubCommand
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -51,7 +51,7 @@ public class BrigadierTutorialSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .executes(context -> {
                     final Player executor = getPlayerFromExecutor(context);
                     executor.openBook(TutorialSubCommand.localizedBook(executor));

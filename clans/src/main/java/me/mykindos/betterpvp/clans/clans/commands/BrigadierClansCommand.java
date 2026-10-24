@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -43,7 +43,7 @@ public class BrigadierClansCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        final LiteralArgumentBuilder<CommandSourceStack> argumentBuilder =  IBrigadierCommand.literal(getName())
+        final LiteralArgumentBuilder<CommandSourceStack> argumentBuilder =  BrigadierNodes.literal(getName())
                 .executes(context -> {
                     final Player executor = getPlayerFromExecutor(context);
                     final Clan executorClan = getClanByExecutor(context);
@@ -51,7 +51,7 @@ public class BrigadierClansCommand extends ClanBrigadierCommand {
                     return Command.SINGLE_SUCCESS;
                 })
                 //adding suggestions here will also show all other literal commands regardless of ability to run them
-                .then(IBrigadierCommand.argument("Clan Name | Clan Member", StringArgumentType.string())
+                .then(BrigadierNodes.argument("Clan Name | Clan Member", StringArgumentType.string())
                     .executes(context -> {
                         final String targetName = context.getArgument("Clan Name | Clan Member", String.class);
                         final Player executor = getPlayerFromExecutor(context);
@@ -86,9 +86,9 @@ public class BrigadierClansCommand extends ClanBrigadierCommand {
         //doing this will also show all other literal commands regardless of ability to run them
         /*
         //add info pseudo indirect if exists
-        final Optional<IBrigadierCommand> infoOptional = getChildren().stream().filter(command -> command.getName().equalsIgnoreCase("info")).findFirst();
+        final Optional<BrigadierCommand> infoOptional = getChildren().stream().filter(command -> command.getName().equalsIgnoreCase("info")).findFirst();
         if (infoOptional.isEmpty()) return builder;
-        final IBrigadierCommand info = infoOptional.get();
+        final BrigadierCommand info = infoOptional.get();
         info.build().getChildren().forEach(child -> {
             builder.then(child.createBuilder());
         });

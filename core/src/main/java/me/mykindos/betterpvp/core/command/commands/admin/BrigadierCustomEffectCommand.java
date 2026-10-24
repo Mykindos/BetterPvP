@@ -13,7 +13,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectType;
@@ -55,10 +55,10 @@ public class BrigadierCustomEffectCommand extends BrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                    .then(IBrigadierCommand.literal("give")
-                            .then(IBrigadierCommand.argument("living entities", ArgumentTypes.entities())
-                                    .then(IBrigadierCommand.argument("effect", BPvPArgumentTypes.customEffect())
+        return BrigadierNodes.literal(getName())
+                    .then(BrigadierNodes.literal("give")
+                            .then(BrigadierNodes.argument("living entities", ArgumentTypes.entities())
+                                    .then(BrigadierNodes.argument("effect", BPvPArgumentTypes.customEffect())
                                             .executes(context -> {
                                                 final CommandSender sender = context.getSource().getSender();
                                                 final List<Entity> targets = context.getArgument("living entities", EntitySelectorArgumentResolver.class).resolve(context.getSource());
@@ -66,7 +66,7 @@ public class BrigadierCustomEffectCommand extends BrigadierCommand {
                                                 doGive(sender, targets, effectType, 30, 1);
                                                 return Command.SINGLE_SUCCESS;
                                             })
-                                            .then(IBrigadierCommand.argument("duration  (seconds)", DoubleArgumentType.doubleArg(0.05))
+                                            .then(BrigadierNodes.argument("duration  (seconds)", DoubleArgumentType.doubleArg(0.05))
                                                     .executes(context -> {
                                                         final CommandSender sender = context.getSource().getSender();
                                                         final List<Entity> targets = context.getArgument("living entities", EntitySelectorArgumentResolver.class).resolve(context.getSource());
@@ -75,7 +75,7 @@ public class BrigadierCustomEffectCommand extends BrigadierCommand {
                                                         doGive(sender, targets, effectType, duration, 1);
                                                         return Command.SINGLE_SUCCESS;
                                                     })
-                                                    .then(IBrigadierCommand.argument("strength", IntegerArgumentType.integer(1))
+                                                    .then(BrigadierNodes.argument("strength", IntegerArgumentType.integer(1))
                                                             .executes(context -> {
                                                                 final CommandSender sender = context.getSource().getSender();
                                                                 final List<Entity> targets = context.getArgument("living entities", EntitySelectorArgumentResolver.class).resolve(context.getSource());
@@ -89,15 +89,15 @@ public class BrigadierCustomEffectCommand extends BrigadierCommand {
                                             )
                                     )
                             )
-                    ).then(IBrigadierCommand.literal("clear")
-                            .then(IBrigadierCommand.argument("living entities", ArgumentTypes.entities())
+                    ).then(BrigadierNodes.literal("clear")
+                            .then(BrigadierNodes.argument("living entities", ArgumentTypes.entities())
                                     .executes(context -> {
                                         final CommandSender sender = context.getSource().getSender();
                                         final List<Entity> targets = context.getArgument("living entities", EntitySelectorArgumentResolver.class).resolve(context.getSource());
                                         doClear(sender, targets, null);
                                         return Command.SINGLE_SUCCESS;
                                     })
-                                    .then(IBrigadierCommand.argument("effect", BPvPArgumentTypes.customEffect())
+                                    .then(BrigadierNodes.argument("effect", BPvPArgumentTypes.customEffect())
                                             .executes(context -> {
                                                 final CommandSender sender = context.getSource().getSender();
                                                 final List<Entity> targets = context.getArgument("living entities", EntitySelectorArgumentResolver.class).resolve(context.getSource());

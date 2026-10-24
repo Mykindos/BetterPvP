@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 
 
@@ -54,8 +54,8 @@ public class BrigadierRecoveryCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan())
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Clan", BPvPClansArgumentTypes.clan())
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan", Clan.class);
                             clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> triggered clan recovery for <yellow>%s", context.getSource().getSender().getName(), target.getName()), Rank.HELPER);

@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentExc
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -64,7 +64,7 @@ public class BrigadierCoreSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .executes(context -> {
 
                     final Player executor = getPlayerFromExecutor(context);
@@ -79,7 +79,7 @@ public class BrigadierCoreSubCommand extends BrigadierClanSubCommand {
                     UtilServer.callEvent(new ClanCoreTeleportEvent(executor, () -> core.teleport(executor, client, true)));
                     return Command.SINGLE_SUCCESS;
                 })
-                .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
+                .then(BrigadierNodes.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
                         .executes(context -> {
                             final Player executor = getPlayerFromExecutor(context);
                             final Client client = getClientFromExecutor(context);

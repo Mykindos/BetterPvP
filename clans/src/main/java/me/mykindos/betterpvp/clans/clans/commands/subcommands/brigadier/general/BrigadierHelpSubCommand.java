@@ -16,8 +16,9 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -65,25 +66,25 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .executes(context -> {
                     doHelp(context, "", 1);
                     return Command.SINGLE_SUCCESS;
                 })
-                .then(IBrigadierCommand.argument("page", IntegerArgumentType.integer(0))
+                .then(BrigadierNodes.argument("page", IntegerArgumentType.integer(0))
                         .executes(context -> {
                             int page = context.getArgument("page", Integer.class);
                             doHelp(context, "", page);
                             return Command.SINGLE_SUCCESS;
                         })
                 )
-                .then(IBrigadierCommand.argument("filter", StringArgumentType.word())
+                .then(BrigadierNodes.argument("filter", StringArgumentType.word())
                         .executes(context -> {
                             String filter = context.getArgument("filter", String.class);
                             doHelp(context, filter, 1);
                             return Command.SINGLE_SUCCESS;
                         })
-                        .then(IBrigadierCommand.argument("page", IntegerArgumentType.integer(0))
+                        .then(BrigadierNodes.argument("page", IntegerArgumentType.integer(0))
                                 .executes(context -> {
                                     String filter = context.getArgument("filter", String.class);
                                     int page = context.getArgument("page", Integer.class);
@@ -98,11 +99,11 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
         final Player player = getPlayerFromExecutor(context);
 
 
-        final IBrigadierCommand parent = getParent();
-        List<IBrigadierCommand> childCommands = Objects.requireNonNull(parent).getChildren().stream()
+        final BrigadierCommand parent = getParent();
+        List<BrigadierCommand> childCommands = Objects.requireNonNull(parent).getChildren().stream()
                 .filter(child -> child.getName().toLowerCase().contains(filter.toLowerCase()))
                 .filter(child -> senderHasRank(context.getSource(), child.getRequiredRank()))
-                .sorted(Comparator.comparing(IBrigadierCommand::getName))
+                .sorted(Comparator.comparing(BrigadierCommand::getName))
                 .toList();
 
 
@@ -118,7 +119,7 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
 
         if (start <= size) {
             if (end > size) end = size;
-            for (IBrigadierCommand subCommand : childCommands.subList(start, end)) {
+            for (BrigadierCommand subCommand : childCommands.subList(start, end)) {
                 if (count == NUMPERPAGE) break;
                 component = component.append(addHelpCommandComponent(context, subCommand));
 
@@ -129,7 +130,7 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
 
     }
 
-    private Component addHelpCommandComponent(CommandContext<CommandSourceStack> context, IBrigadierCommand command) throws CommandSyntaxException {
+    private Component addHelpCommandComponent(CommandContext<CommandSourceStack> context, BrigadierCommand command) throws CommandSyntaxException {
         NamedTextColor color = command.requirement(context.getSource()) ? NamedTextColor.GREEN : NamedTextColor.RED;
         Component commandComponent = Component.empty();
         commandComponent = commandComponent.appendNewline()

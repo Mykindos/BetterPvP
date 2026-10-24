@@ -16,7 +16,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import org.bukkit.entity.Player;
 
@@ -63,8 +63,8 @@ public class BrigadierBankWithdrawSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("amount", IntegerArgumentType.integer(1))
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("amount", IntegerArgumentType.integer(1))
                         .executes(context -> {
                             final Player executor = getPlayerFromExecutor(context);
                             final Client executorClient = getClientFromExecutor(context);

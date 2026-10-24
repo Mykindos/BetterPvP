@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -63,8 +63,8 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Promotable Clan Member",
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Promotable Clan Member",
                                         BPvPClansArgumentTypes.lowerRankClanMember(),
                                     sourceStack -> this.executorHasAClan(sourceStack) && !senderIsAdministrating(sourceStack))
                         .executes(context -> {
@@ -89,7 +89,7 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                 //allow administrating clients to promote anyone
-                ).then(IBrigadierCommand.argument("Admin Promotable Clan Member",
+                ).then(BrigadierNodes.argument("Admin Promotable Clan Member",
                                 BPvPClansArgumentTypes.clanMember(),
                                 sourceStack -> this.executorHasAClan(sourceStack) && senderIsAdministrating(sourceStack))
                         .executes(context -> {

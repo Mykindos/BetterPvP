@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.Brigadie
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -106,7 +106,7 @@ class ConsoleClanCommandsTest {
 
             @Override
             public LiteralArgumentBuilder<CommandSourceStack> define() {
-                return IBrigadierCommand.literal(getName());
+                return BrigadierNodes.literal(getName());
             }
 
             @Override

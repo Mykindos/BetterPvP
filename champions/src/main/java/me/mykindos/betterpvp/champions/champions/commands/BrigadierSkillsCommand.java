@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -70,7 +70,7 @@ public class BrigadierSkillsCommand extends BrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
+        return BrigadierNodes.literal(getName())
                 .executes(context -> {
                     final Player player = getPlayerFromExecutor(context);
                     final Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
@@ -85,7 +85,7 @@ public class BrigadierSkillsCommand extends BrigadierCommand {
                     }
                     return Command.SINGLE_SUCCESS;
                 })
-                .then(IBrigadierCommand.argument("player", ArgumentTypes.player(), source -> this.senderHasRank(source, this.seeOtherPlayerSkillsRank))
+                .then(BrigadierNodes.argument("player", ArgumentTypes.player(), source -> this.senderHasRank(source, this.seeOtherPlayerSkillsRank))
                         .executes(context -> {
                             final Player target = context.getArgument("player", PlayerSelectorArgumentResolver.class).resolve(context.getSource()).getFirst();
                             final CommandSender sender = context.getSource().getSender();

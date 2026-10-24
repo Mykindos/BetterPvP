@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.clans.logging.menu.PlayersOfClanMenu;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -39,8 +39,8 @@ public class BrigadierGetPlayersOfClanSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan())
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Clan", BPvPClansArgumentTypes.clan())
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan", Clan.class);
                             final Player player = getPlayerFromExecutor(context);

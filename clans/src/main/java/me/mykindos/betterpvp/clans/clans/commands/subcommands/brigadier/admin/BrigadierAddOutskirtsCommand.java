@@ -18,7 +18,7 @@ import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -64,9 +64,9 @@ public class BrigadierAddOutskirtsCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan())
-                        .then(IBrigadierCommand.argument("radius", IntegerArgumentType.integer(1))
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Clan", BPvPClansArgumentTypes.clan())
+                        .then(BrigadierNodes.argument("radius", IntegerArgumentType.integer(1))
                             .executes(context -> {
                                 final Clan target = context.getArgument("Clan", Clan.class);
                                 final int radius = context.getArgument("radius", Integer.class);

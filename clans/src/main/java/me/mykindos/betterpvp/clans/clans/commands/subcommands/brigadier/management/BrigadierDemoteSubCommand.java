@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierNodes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -64,8 +64,8 @@ public class BrigadierDemoteSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return IBrigadierCommand.literal(getName())
-                .then(IBrigadierCommand.argument("Demotable Clan Member",
+        return BrigadierNodes.literal(getName())
+                .then(BrigadierNodes.argument("Demotable Clan Member",
                                 BPvPClansArgumentTypes.demotableClanMember(),
                                 sourceStack -> this.executorHasAClan(sourceStack) && !senderIsAdministrating(sourceStack))
                         .executes(context -> {
@@ -78,7 +78,7 @@ public class BrigadierDemoteSubCommand extends BrigadierClanSubCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                         //allow administrating clients to demote anyone
-                ).then(IBrigadierCommand.argument("Admin Demotable Clan Member",
+                ).then(BrigadierNodes.argument("Admin Demotable Clan Member",
                         BPvPClansArgumentTypes.clanMember(),
                         sourceStack -> this.executorHasAClan(sourceStack) && senderIsAdministrating(sourceStack))
                         .executes(context -> {
