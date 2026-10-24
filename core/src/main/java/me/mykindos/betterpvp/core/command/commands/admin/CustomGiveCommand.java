@@ -49,7 +49,7 @@ public class CustomGiveCommand extends Command {
     @Singleton
     @Override
     public String getName() {
-        return "give";
+        return "legacygive";
     }
 
     @Override
@@ -70,7 +70,7 @@ public class CustomGiveCommand extends Command {
             UtilMessage.message(player, "core.prefix.command", "core.command.give.invalid_player", Component.text(args[0], NamedTextColor.RED));
             return;
         }
-;
+
         BaseItem baseItem = itemRegistry.getItem(args[1]);
         if (baseItem == null) {
             final @NotNull Map<NamespacedKey, BaseItem> options = itemRegistry.getItemsByKey(args[1]);

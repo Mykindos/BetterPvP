@@ -19,7 +19,7 @@ public class CustomEffectCommand extends Command {
     @Singleton
     @Override
     public String getName() {
-        return "customeffect";
+        return "legacycustomeffect";
     }
 
     @Override

@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.CommandMessages;
 import me.mykindos.betterpvp.core.locale.TranslationService;
 import me.mykindos.betterpvp.core.locale.Translations;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
@@ -27,6 +29,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -327,6 +330,10 @@ public class UtilMessage {
      */
     public static void broadcast(Component message) {
         Bukkit.getServer().broadcast(message);
+    }
+
+    public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
+        sender.sendMessage(CommandMessages.component(exception.getRawMessage()).color(NamedTextColor.RED));
     }
 
     /**

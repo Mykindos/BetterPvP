@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCoreCommandLoader;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.content.manifest.ManifestPublisher;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.model.Reloadable;
 import me.mykindos.betterpvp.core.world.schematic.SchematicService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -55,6 +57,9 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
         @Inject
         private Core core;
+
+        @Inject
+        private BrigadierCoreCommandLoader brigadierCoreCommandLoader;
 
         @Inject
         private CoreCommandLoader commandLoader;
@@ -94,6 +99,8 @@ public class CoreCommand extends Command implements IConsoleCommand {
             core.reload();
             core.getReloadables().forEach(Reloadable::reload);
 
+            brigadierCoreCommandLoader.reload();
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             commandLoader.reload(core.getClass().getPackageName());
             tipManager.reloadTips(core);
             resourcePackHandler.reload();

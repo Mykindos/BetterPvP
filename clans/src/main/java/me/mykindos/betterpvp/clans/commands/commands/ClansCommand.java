@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.core.vault.restriction.ClanVaultRestrictions;
+import me.mykindos.betterpvp.clans.commands.BrigadierClansCommandLoader;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Reloadable;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -68,6 +70,9 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Inject
         private ClansSidebarListener sidebar;
 
+        @Inject
+        private BrigadierClansCommandLoader brigadierClansCommandLoader;
+
         @Override
         public String getName() {
             return "reload";
@@ -88,6 +93,8 @@ public class ClansCommand extends Command implements IConsoleCommand {
             clans.reload();
             clans.getReloadables().forEach(Reloadable::reload);
 
+            brigadierClansCommandLoader.reload();
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             commandLoader.reload(clans.getClass().getPackageName());
             tipManager.reloadTips(clans);
 
